@@ -2,6 +2,8 @@
 
 > AI agents that autonomously buy/sell data using blockchain-based gasless micropayments
 
+**[🇪🇸 Versión en Español](./README.es.md)** | **🇺🇸 English Version**
+
 > **⚡ Important:** This implements an **ERC-8004 EXTENDED version** with bidirectional reputation (NOT the base spec!) deployed on **Avalanche** - the home of **Ultravioleta DAO**. Both buyers and sellers rate each other after transactions.
 
 [![Avalanche](https://img.shields.io/badge/Avalanche-Fuji-E84142?logo=avalanche)](https://testnet.snowtrace.io/)
