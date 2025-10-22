@@ -116,11 +116,20 @@ function permit(
 
 **Uso**: Approvals sin gas (útil para DEXs, contratos)
 
-### Features Adicionales
-- ✅ **Mintable**: Para testing en Fuji (solo owner)
-- ✅ **Burnable**: Los usuarios pueden quemar sus tokens
-- ✅ **Pausable**: Owner puede pausar en emergencias
-- ✅ **Ownable**: Control administrativo
+### Token Parameters (Matching UVT V1)
+- **Name**: Ultravioleta DAO Token
+- **Symbol**: UVD
+- **Decimals**: 6 (matching USDC for lower gas costs)
+- **Initial Supply**: 24,157,817 UVD
+- **Owner Wallet**: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+- **Total Supply**: 24,157,817,000,000 (with decimals)
+
+### Security Features
+- ✅ **Nonce-based Replay Protection**: Each authorization can only be used once
+- ✅ **Time-window Validation**: validAfter/validBefore timestamps
+- ✅ **EIP-712 Signature Verification**: Type-safe signed messages
+- ✅ **Cancel Authorization**: Users can revoke unused authorizations
+- ✅ **Ownable**: Admin control for owner wallet
 
 ---
 
@@ -164,89 +173,149 @@ forge install OpenZeppelin/openzeppelin-contracts
 
 ## 📦 Despliegue
 
+### Prerequisites
+
+```bash
+# 1. Install Foundry
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+
+# 2. Get testnet AVAX (~0.5 AVAX for deployment gas)
+# https://faucet.avax.network/
+
+# 3. Have deployer wallet private key ready
+```
+
 ### Configuración
 
 ```bash
-# 1. Copiar archivo de ejemplo
+# 1. Copy environment template
 cp .env.example .env
 
-# 2. Editar .env con tu private key
-# PRIVATE_KEY=0xTU_PRIVATE_KEY_AQUI
+# 2. Edit .env with your values
+nano .env
 
-# 3. Verificar configuración
-cat .env
+# Required:
+# - PRIVATE_KEY: Your deployer wallet private key
+# - RPC_URL_AVALANCHE_FUJI: Your custom RPC (or use public fallback)
+
+# Optional:
+# - SNOWTRACE_API_KEY: For contract verification
 ```
 
-### Deploy a Fuji Testnet
-
-**Opción A: Script Automático**
+### Install Dependencies
 
 ```bash
-# Linux/Mac
+# Install OpenZeppelin contracts
+forge install OpenZeppelin/openzeppelin-contracts --no-commit
+
+# Install Forge Standard Library
+forge install foundry-rs/forge-std --no-commit
+```
+
+### Deploy to Fuji Testnet
+
+**Automated Deployment (Recommended):**
+
+```bash
+# Make script executable
 chmod +x deploy-fuji.sh
+
+# Run deployment
 ./deploy-fuji.sh
-
-# Windows (PowerShell)
-.\deploy-fuji.ps1
-
-# Windows (CMD)
-deploy-fuji.bat
 ```
 
-**Opción B: Manual con Forge**
+**The script will:**
+1. ✅ Build contracts with `forge build`
+2. ✅ Deploy UVD_V2 contract to Avalanche Fuji
+3. ✅ Mint 24,157,817 UVD to owner wallet (0x5211...3389)
+4. ✅ Verify contract on Snowtrace (if API key provided)
+5. ✅ Save deployment info to `deployment.json`
+6. ✅ Display next steps for x402 configuration
+
+**Expected Output:**
+
+```
+========================================
+UVD V2 Token Deployment
+========================================
+Network: Avalanche Fuji Testnet
+Chain ID: 43113
+
+Contract Address: 0xABC...DEF
+Token Name: Ultravioleta DAO Token
+Token Symbol: UVD
+Decimals: 6
+Initial Supply: 24,157,817 UVD
+Total Supply (with decimals): 24,157,817,000,000
+Owner: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+Owner Balance: 24,157,817 UVD
+========================================
+
+Deployment info saved to: deployment.json
+```
+
+### Manual Deployment (Advanced)
 
 ```bash
-# 1. Compilar
+# 1. Build contracts
 forge build
 
-# 2. Deploy
-forge create src/UVDToken.sol:UVDToken \
-  --rpc-url https://avalanche-fuji-c-chain-rpc.publicnode.com \
-  --private-key $PRIVATE_KEY \
-  --constructor-args "Ultravioleta DAO" "UVD" 1000000000000000000000000 \
-  --legacy
-
-# 3. Guardar address del contrato
-# Token deployed at: 0x...
+# 2. Deploy using forge script
+forge script script/Deploy.s.sol:DeployUVD_V2 \
+  --rpc-url $RPC_URL_AVALANCHE_FUJI \
+  --broadcast \
+  --verify \
+  -vvvv
 ```
 
-### Verificar en Snowtrace
+### Verify on Snowtrace
+
+If auto-verification failed:
 
 ```bash
+# Get deployed address from deployment.json
+TOKEN_ADDRESS=$(cat deployment.json | jq -r '.tokenAddress')
+
+# Verify manually
 forge verify-contract \
-  0xTU_CONTRACT_ADDRESS \
-  src/UVDToken.sol:UVDToken \
+  $TOKEN_ADDRESS \
+  src/UVD_V2.sol:UVD_V2 \
   --chain-id 43113 \
-  --constructor-args $(cast abi-encode "constructor(string,string,uint256)" "Ultravioleta DAO" "UVD" "1000000000000000000000000")
+  --etherscan-api-key $SNOWTRACE_API_KEY
 ```
 
 ### Post-Deployment
 
 ```bash
-# 1. Guardar address en deployment.json
-echo '{
-  "network": "fuji",
-  "chainId": 43113,
-  "contracts": {
-    "UVDToken": "0xTU_CONTRACT_ADDRESS"
-  },
-  "deployer": "0xTU_WALLET_ADDRESS",
-  "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"
-}' > deployment.json
+# 1. Verify deployment.json was created
+cat deployment.json
 
-# 2. Mintear tokens de testing
-cast send 0xTU_CONTRACT_ADDRESS \
-  "mint(address,uint256)" \
-  0xTU_WALLET_ADDRESS \
-  100000000000000000000000 \
-  --rpc-url https://avalanche-fuji-c-chain-rpc.publicnode.com \
-  --private-key $PRIVATE_KEY
+# Expected output:
+# {
+#   "network": "avalanche-fuji",
+#   "chainId": 43113,
+#   "tokenAddress": "0x...",
+#   "tokenName": "Ultravioleta DAO Token",
+#   "tokenSymbol": "UVD",
+#   "decimals": 6,
+#   "initialSupply": 24157817,
+#   "owner": "0x52110a2Cc8B6bBf846101265edAAe34E753f3389",
+#   "deployedAt": 1234567890
+# }
 
-# 3. Verificar balance
-cast call 0xTU_CONTRACT_ADDRESS \
-  "balanceOf(address)(uint256)" \
-  0xTU_WALLET_ADDRESS \
-  --rpc-url https://avalanche-fuji-c-chain-rpc.publicnode.com
+# 2. Update x402 facilitator configuration
+TOKEN_ADDRESS=$(cat deployment.json | jq -r '.tokenAddress')
+echo "UVD_TOKEN_ADDRESS=$TOKEN_ADDRESS" >> ../x402-rs/.env
+
+# 3. Verify on Snowtrace
+echo "https://testnet.snowtrace.io/address/$TOKEN_ADDRESS"
+
+# 4. Check owner balance
+cast call $TOKEN_ADDRESS "balanceOf(address)(uint256)" 0x52110a2Cc8B6bBf846101265edAAe34E753f3389 \
+  --rpc-url $RPC_URL_AVALANCHE_FUJI
+
+# Expected: 24157817000000 (24,157,817 UVD with 6 decimals)
 ```
 
 ---
