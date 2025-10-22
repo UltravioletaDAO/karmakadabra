@@ -9,7 +9,7 @@ import "../src/UVD_V2.sol";
  * @notice Deploys UVD V2 token to Avalanche Fuji Testnet
  * @dev Uses same deployment parameters as UVT V1:
  *      - Initial Supply: 24,157,817 UVD
- *      - Owner: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+ *      - Owner: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
  *      - Decimals: 6
  *
  * Usage:
@@ -21,7 +21,7 @@ import "../src/UVD_V2.sol";
  */
 contract DeployUVD_V2 is Script {
     /// @notice Owner wallet (same as UVT V1)
-    address constant OWNER_WALLET = 0x52110a2Cc8B6bBf846101265edAAe34E753f3389;
+    address constant OWNER_WALLET = 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8;
 
     /// @notice Initial supply: 24,157,817 UVD
     uint256 constant INITIAL_SUPPLY = 24_157_817;

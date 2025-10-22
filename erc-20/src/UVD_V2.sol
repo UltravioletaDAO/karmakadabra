@@ -14,7 +14,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * Network: Avalanche Fuji Testnet (Chain ID: 43113)
  * Decimals: 6 (to match USDC and reduce gas costs)
  * Initial Supply: 24,157,817 UVD (same as UVT V1)
- * Owner: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389 (same as UVT V1)
+ * Owner: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8 (same as UVT V1)
  *
  * Features:
  * - EIP-2612 Permit (gasless approvals)
@@ -22,11 +22,15 @@ import "@openzeppelin/contracts/access/Ownable.sol";
  * - EIP-712 typed structured data hashing
  *
  * ASCII Art:
- *     _   ___   ______    _   ______
- *    | | | \ \ / /  _ \  | | / /___ \
- *    | | | |\ V /| | | | | |/ /  __) |
- *    | |_| | | | | |_| | |   \  / __/
- *     \___/  |_| |____/  |_|\_\|_____|
+ *  /$$   /$$ /$$    /$$ /$$$$$$$                    /$$$$$$ 
+ * | $$  | $$| $$   | $$| $$__  $$                  /$$__  $$
+ * | $$  | $$| $$   | $$| $$  \ $$       /$$    /$$|__/  \ $$
+ * | $$  | $$|  $$ / $$/| $$  | $$      |  $$  /$$/  /$$$$$$/
+ * | $$  | $$ \  $$ $$/ | $$  | $$       \  $$/$$/  /$$____/ 
+ * | $$  | $$  \  $$$/  | $$  | $$        \  $$$/  | $$      
+ * |  $$$$$$/   \  $/   | $$$$$$$/         \  $/   | $$$$$$$$
+ * \______/     \_/    |_______/           \_/    |________/
+ *                                                                                                         
  *
  * Part of Karmacadabra - Trustless Agent Economy
  */
@@ -42,7 +46,7 @@ contract UVD_V2 is ERC20, ERC20Permit, Ownable {
     uint256 private constant INITIAL_SUPPLY = 24_157_817 * 10**DECIMALS;
 
     /// @notice Owner wallet address (matching UVT V1)
-    address private constant OWNER_WALLET = 0x52110a2Cc8B6bBf846101265edAAe34E753f3389;
+    address private constant OWNER_WALLET = 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8;
 
     // =============================================================================
     // EIP-3009: transferWithAuthorization

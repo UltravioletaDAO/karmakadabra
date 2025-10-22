@@ -8,7 +8,7 @@
 #
 # Deployment Parameters (matching UVT V1):
 # - Initial Supply: 24,157,817 UVD
-# - Owner: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+# - Owner: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
 # - Decimals: 6
 # - Network: Avalanche Fuji (Chain ID: 43113)
 #
@@ -29,7 +29,7 @@ NC='\033[0m' # No Color
 # Configuration
 NETWORK="fuji"
 CHAIN_ID=43113
-OWNER_WALLET="0x52110a2Cc8B6bBf846101265edAAe34E753f3389"
+OWNER_WALLET="0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
 INITIAL_SUPPLY=24157817
 
 echo -e "${BLUE}========================================${NC}"

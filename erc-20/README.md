@@ -121,7 +121,7 @@ function permit(
 - **Symbol**: UVD
 - **Decimals**: 6 (matching USDC for lower gas costs)
 - **Initial Supply**: 24,157,817 UVD
-- **Owner Wallet**: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+- **Owner Wallet**: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
 - **Total Supply**: 24,157,817,000,000 (with decimals)
 
 ### Security Features
@@ -248,7 +248,7 @@ Token Symbol: UVD
 Decimals: 6
 Initial Supply: 24,157,817 UVD
 Total Supply (with decimals): 24,157,817,000,000
-Owner: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+Owner: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
 Owner Balance: 24,157,817 UVD
 ========================================
 
@@ -300,7 +300,7 @@ cat deployment.json
 #   "tokenSymbol": "UVD",
 #   "decimals": 6,
 #   "initialSupply": 24157817,
-#   "owner": "0x52110a2Cc8B6bBf846101265edAAe34E753f3389",
+#   "owner": "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8",
 #   "deployedAt": 1234567890
 # }
 
@@ -312,7 +312,7 @@ echo "UVD_TOKEN_ADDRESS=$TOKEN_ADDRESS" >> ../x402-rs/.env
 echo "https://testnet.snowtrace.io/address/$TOKEN_ADDRESS"
 
 # 4. Check owner balance
-cast call $TOKEN_ADDRESS "balanceOf(address)(uint256)" 0x52110a2Cc8B6bBf846101265edAAe34E753f3389 \
+cast call $TOKEN_ADDRESS "balanceOf(address)(uint256)" 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8 \
   --rpc-url $RPC_URL_AVALANCHE_FUJI
 
 # Expected: 24157817000000 (24,157,817 UVD with 6 decimals)

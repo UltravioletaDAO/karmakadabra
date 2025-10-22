@@ -58,15 +58,62 @@ El **Validator Agent** es un agente neutral que valida la calidad de datos en tr
 - Si ofrece Fraud Detection premium (0.20 UVD): +revenue adicional
 - Ver `MONETIZATION_OPPORTUNITIES.md` § Tier 3 "Fraud Detection Service"
 
-### Fees
+### Fees y Costos
 
-- **0.001 UVD** por validación básica (pagado por el comprador o seller)
+**Ingresos (UVD recibido)**:
+- **0.001 UVD** por validación básica (pagado por el buyer)
 - **0.20 UVD** por Fraud Detection Service (servicio premium)
-- **Reputación on-chain** basada en accuracy
+
+**Gastos (AVAX pagado)**:
+- **~0.01 AVAX** por cada transacción `validationResponse()` on-chain
+- ⚠️ **IMPORTANTE**: Validator es el ÚNICO agente que paga gas (los demás usan EIP-3009 gasless)
+
+**Economía del Validator**:
+```
+Fee actual:     0.001 UVD por validación
+Gas cost:       ~0.01 AVAX por validación
+Rentabilidad:   ❌ NO rentable en testnet (gas > fee)
+
+Soluciones:
+1. Aumentar VALIDATION_FEE_UVD a 0.01+ UVD
+2. Usar Layer 2 para reducir gas
+3. Batch validations (validar múltiples en una tx)
+```
+
+**Reputación on-chain** basada en accuracy (cuántas validaciones fueron correctas)
 
 ---
 
 ## 🏗️ Arquitectura
+
+### Interacción con Blockchain
+
+```
+┌────────────────────────────────────────────────────┐
+│         AVALANCHE FUJI TESTNET                     │
+│                                                    │
+│  ┌──────────────────────────────────────────┐     │
+│  │   ValidationRegistry (Smart Contract)    │     │
+│  │                                          │     │
+│  │   validationRequest(validator, seller,   │     │
+│  │                     dataHash)            │ ◄── Buyer llama
+│  │   ✓ Registra request on-chain           │     │
+│  │                                          │     │
+│  │   validationResponse(dataHash, score)    │ ◄── ❗VALIDATOR ESCRIBE❗
+│  │   ✓ Requiere AVAX para gas (~0.01)       │     │
+│  │   ✓ Guarda score 0-100 on-chain          │     │
+│  │   ✓ Emite event ValidationResponseEvent  │     │
+│  │                                          │     │
+│  │   getValidationResponse(dataHash)        │     │
+│  │   ✓ Lectura gratis (no gas)              │     │
+│  └──────────────────────────────────────────┘     │
+└────────────────────────────────────────────────────┘
+                      ▲
+                      │ web3.py
+                      │ Validator.send_transaction()
+                      │ PAGA GAS AQUÍ
+                      │
+┌─────────────────────┴──────────────────────────────┐
 
 ```
 ┌─────────────────────────────────────────────┐

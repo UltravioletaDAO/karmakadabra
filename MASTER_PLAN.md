@@ -51,22 +51,37 @@ Crear un **ecosistema completamente autónomo** donde agentes AI pueden:
 ### Diagrama de Alto Nivel
 
 ```
-┌─────────────────────────────────────────────────────────────────────┐
-│                        FUJI TESTNET (AVALANCHE)                     │
-│                                                                     │
-│  ┌─────────────────┐  ┌─────────────────┐  ┌──────────────────┐  │
-│  │   UVD V2 Token  │  │  ERC-8004       │  │   Validator      │  │
-│  │   (EIP-3009)    │  │  Registries     │  │   Smart Agent    │  │
-│  │                 │  │  - Identity     │  │   (On-chain)     │  │
-│  │  • transferWith │  │  - Reputation   │  │                  │  │
-│  │    Authorization│  │  - Validation   │  │  Agent ID: 3     │  │
-│  │  • Gasless txs  │  │                 │  │                  │  │
-│  └─────────────────┘  └─────────────────┘  └──────────────────┘  │
-│         ▲                      ▲                       ▲           │
-└─────────┼──────────────────────┼───────────────────────┼───────────┘
-          │                      │                       │
-          │ EIP-3009 Settlement  │ ERC-8004 Registration │
-          │                      │                       │
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                        FUJI TESTNET (AVALANCHE)                             │
+│                                                                             │
+│  ┌─────────────────┐  ┌──────────────────────────────────────────────┐    │
+│  │   UVD V2 Token  │  │         ERC-8004 Registries                  │    │
+│  │   (EIP-3009)    │  │                                              │    │
+│  │                 │  │  ┌────────────┐ ┌────────────┐ ┌──────────┐ │    │
+│  │  • transferWith │  │  │ Identity   │ │ Reputation │ │Validation│ │    │
+│  │    Authorization│  │  │ Registry   │ │ Registry   │ │ Registry │ │    │
+│  │  • Gasless txs  │  │  └────────────┘ └────────────┘ └─────┬────┘ │    │
+│  └────────┬────────┘  └──────────┬─────────────────────────────┼──────┘    │
+│           │                      │                             │           │
+│           │                      │                  ❗VALIDATOR ESCRIBE❗  │
+│           │                      │              validationResponse(...)    │
+│           ▲                      ▲                             ▲           │
+└───────────┼──────────────────────┼─────────────────────────────┼───────────┘
+            │                      │                             │
+            │ EIP-3009 Settlement  │ ERC-8004 Registration       │ Gas required!
+            │                      │                             │
+            │                      │                  ┌──────────┴──────────┐
+            │                      │                  │ Validator Agent     │
+            │                      │                  │ (Python + Web3)     │
+            │                      │                  │                     │
+            │                      │                  │ • Recibe requests   │
+            │                      │                  │ • CrewAI analiza    │
+            │                      │                  │ • PAGA GAS (~0.01   │
+            │                      │                  │   AVAX) para tx     │
+            │                      │                  │ • Cobra 0.001 UVD   │
+            │                      │                  └──────────┬──────────┘
+            │                      │                             │
+
 ┌─────────┴──────────────────────┴───────────────────────┴───────────┐
 │          facilitator.ultravioletadao.xyz (x402-rs)                 │
 │                                                                     │
@@ -153,7 +168,7 @@ Crear un **ecosistema completamente autónomo** donde agentes AI pueden:
 
 **Deployment Parameters (Matching UVT V1):**
 - Initial Supply: 24,157,817 UVD
-- Owner: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+- Owner: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
 - Decimals: 6 (matching USDC)
 - Network: Avalanche Fuji (Chain ID: 43113)
 
@@ -669,7 +684,7 @@ validator/
 
 **Deployment Parameters (Matching UVT V1):**
 - **Initial Supply**: 24,157,817 UVD
-- **Owner Wallet**: 0x52110a2Cc8B6bBf846101265edAAe34E753f3389
+- **Owner Wallet**: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
 - **Decimals**: 6 (matching USDC for lower gas)
 - **Total Supply**: 24,157,817,000,000 (with decimals)
 - **Network**: Avalanche Fuji (Chain ID: 43113)
@@ -967,19 +982,27 @@ forge install                      # Install dependencies
 │ Request Validation (Optional)        │
 │ ERC-8004 ValidationRegistry          │
 └──────┬───────────────────────────────┘
-       │ 7. Abracadabra solicita validación
+       │ 7. Abracadabra solicita validación (ON-CHAIN)
        │    validationRequest(validator_id,
        │                       abracadabra_id,
        │                       data_hash)
+       │    📝 Escribe en blockchain
        │
        ▼
 ┌──────────────────────────────────────┐
-│ Validator Agent (Bob)                │
-│ - Carga transcripción                │
-│ - CrewAI valida calidad              │
-│ - Submite score on-chain             │
+│ Validator Agent (Python + Web3.py)  │
+│ - Escucha events ValidationRequest  │
+│ - Paga 0.001 UVD al validator        │
+│ - Descarga transcripción             │
+│ - CrewAI valida calidad (GPT-4o)     │
+│ - 🔴 PAGA GAS (~0.01 AVAX) 🔴        │
+│ - Submite score ON-CHAIN             │
 └──────┬───────────────────────────────┘
-       │ 8. ValidationResponse(score=95)
+       │ 8. ValidationResponse(score=95) - ON-CHAIN TX
+       │    validationResponse(dataHash, 95)
+       │    ⛽ Gas pagado por VALIDATOR_WALLET
+       │    📝 Score guardado en blockchain
+       │    📡 Event emitido: ValidationResponseEvent
        │
        ▼
 ┌──────────────────────────────────────┐
@@ -1013,14 +1036,24 @@ forge install                      # Install dependencies
 └──────────────────────────────────────┘
 ```
 
-**Duración total**: ~2-3 segundos
+**Duración total**: ~2-3 segundos (sin validación) / ~5-7 segundos (con validación)
 
-**Costo de gas**: 0 (gasless gracias a EIP-3009)
+**Costos de Gas (AVAX)**:
+- ✅ Buyer: 0 (gasless gracias a EIP-3009)
+- ✅ Seller: 0 (gasless gracias a EIP-3009)
+- ✅ Facilitator: 0 (stateless, solo verifica firmas off-chain)
+- 🔴 **Validator: ~0.01 AVAX** (paga gas por tx `validationResponse()` on-chain)
 
-**Fees**:
-- Abracadabra: +0.02 UVD
-- Facilitator: 0 (stateless, no fee por ahora)
-- Validator: +0.001 UVD (si se solicitó validación)
+**Fees en UVD**:
+- Abracadabra Seller: +0.02 UVD (recibe pago)
+- Facilitator: 0 UVD (no cobra fee actualmente)
+- Validator: +0.001 UVD (recibe fee, pero paga 0.01 AVAX gas - no rentable en testnet)
+- Karma-Hello Buyer: -0.021 UVD total (-0.02 seller, -0.001 validator)
+
+**⚠️ Nota Importante**: La economía del Validator no es sostenible con fee de 0.001 UVD ya que paga ~0.01 AVAX por transacción. En producción considerar:
+- Aumentar `VALIDATION_FEE_UVD` a 0.01+ UVD
+- Usar Layer 2 / Optimistic Rollup para reducir gas
+- Batch validations (validar múltiples items en una tx)
 
 ---
 
@@ -1060,16 +1093,18 @@ forge install                      # Install dependencies
    - `rateClient(clientAgent, rating)`
    - `getReputation(agentId)` → score
 
-3. **ValidationRegistry**
-   - `validationRequest(validator, requester, dataHash)`
-   - `validationResponse(dataHash, score)`
-   - `rateValidator(validatorId, rating)`
+3. **ValidationRegistry** 🔴 **REQUIERE GAS** 🔴
+   - `validationRequest(validator, requester, dataHash)` - Buyer llama (puede ser gasless via relayer)
+   - `validationResponse(dataHash, score)` - **❗Validator PAGA GAS❗** (~0.01 AVAX)
+   - `rateValidator(validatorId, rating)` - Feedback del seller
+   - `getValidationResponse(dataHash)` - Leer score (gratis)
 
 **Uso en nuestro sistema**:
-- Cada agente (seller, buyer, validator) se registra con ID único
-- Reputación se construye en cada transacción
-- Validaciones quedan registradas on-chain
-- Ratings bidireccionales (seller ← → buyer)
+- Cada agente (seller, buyer, validator) se registra con ID único en `IdentityRegistry`
+- Reputación se construye en cada transacción en `ReputationRegistry`
+- **Validaciones quedan registradas on-chain en `ValidationRegistry`**
+- Validator es el **ÚNICO agente que paga gas** (los demás usan EIP-3009 gasless)
+- Ratings bidireccionales: seller ← → buyer, buyer → validator
 
 ---
 

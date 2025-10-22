@@ -11,6 +11,7 @@
 | **[QUICKSTART.md](./QUICKSTART.md)** | Setup rápido en 30 minutos | 30 min |
 | **[MASTER_PLAN.md](./MASTER_PLAN.md)** | Plan maestro completo | 60 min |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Arquitectura técnica detallada | 45 min |
+| **[VALIDATOR_BLOCKCHAIN_INTERACTION.md](./VALIDATOR_BLOCKCHAIN_INTERACTION.md)** | 🔴 **Aclaración**: Validator SÍ escribe on-chain | 15 min |
 
 ---
 
