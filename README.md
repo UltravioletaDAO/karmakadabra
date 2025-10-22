@@ -2,8 +2,10 @@
 
 > AI agents that autonomously buy/sell data using blockchain-based gasless micropayments
 
+> **⚡ Important:** This implements an **ERC-8004 EXTENDED version** with bidirectional reputation (NOT the base spec!) deployed on **Avalanche** - the home of **Ultravioleta DAO**. Both buyers and sellers rate each other after transactions.
+
 [![Avalanche](https://img.shields.io/badge/Avalanche-Fuji-E84142?logo=avalanche)](https://testnet.snowtrace.io/)
-[![ERC-8004](https://img.shields.io/badge/ERC--8004-Trust%20Framework-blue)](https://eips.ethereum.org/EIPS/eip-8004)
+[![ERC-8004](https://img.shields.io/badge/ERC--8004%20Extended-Bidirectional%20Rating-blue)](https://eips.ethereum.org/EIPS/eip-8004)
 [![x402](https://img.shields.io/badge/x402-Payment%20Protocol-green)](https://www.x402.org)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)](https://www.python.org/)
 [![Rust](https://img.shields.io/badge/Rust-Latest-orange?logo=rust)](https://www.rust-lang.org/)
@@ -14,10 +16,21 @@
 
 **Karmacadabra** is an ecosystem of autonomous AI agents that **buy and sell data** without human intervention using:
 
-- **ERC-8004** for on-chain identity & reputation
+- **ERC-8004 Extended** - **NOT the base implementation!** This is a custom extension enabling **bidirectional reputation** (both buyers and sellers rate each other)
 - **A2A protocol** (Pydantic AI) for agent-to-agent communication
 - **x402 + EIP-3009** for HTTP micropayments (gasless!)
 - **CrewAI** for multi-agent orchestration
+
+### 🏔️ Deployed on Avalanche - Our Home
+
+**Karmacadabra lives on Avalanche**, the native blockchain home of **Ultravioleta DAO**. We chose Avalanche for:
+
+- **Fast finality**: 2-second block times for instant agent transactions
+- **Low costs**: Minimal gas fees make micropayments economically viable
+- **EVM compatibility**: Full Solidity support with Ethereum tooling
+- **DAO alignment**: Avalanche is where Ultravioleta DAO was born and thrives
+
+Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 
 ### The Problem We Solve
 
@@ -57,12 +70,13 @@ python demo.py
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│          AVALANCHE FUJI TESTNET (Layer 1)               │
+│   AVALANCHE FUJI TESTNET (Our Home - Layer 1)          │
 │  ┌──────────────────┐    ┌──────────────────────┐      │
-│  │  UVD V2 Token    │    │  ERC-8004 Registries │      │
-│  │  (EIP-3009)      │    │  • Identity          │      │
-│  │  Gasless txs ✓   │    │  • Reputation        │      │
-│  └──────────────────┘    │  • Validation        │      │
+│  │  UVD V2 Token    │    │ ERC-8004 EXTENDED    │      │
+│  │  (EIP-3009)      │    │  (Bidirectional!)    │      │
+│  │  Gasless txs ✓   │    │  • Identity          │      │
+│  └──────────────────┘    │  • Reputation        │      │
+│                          │  • Validation        │      │
 │                          └──────────────────────┘      │
 └─────────────────────────────────────────────────────────┘
                           ▲
@@ -119,7 +133,7 @@ python demo.py
 ```
 karmacadabra/
 ├── erc-20/                    # UVD V2 Token (EIP-3009)
-├── erc-8004/                  # Identity/Reputation/Validation registries
+├── erc-8004/                  # ERC-8004 Extended - Bidirectional reputation registries
 ├── x402-rs/                   # Payment facilitator (Rust)
 ├── validator/                 # Validator agent (Python + CrewAI)
 ├── karma-hello-agent/         # Chat log seller/buyer agents
@@ -152,7 +166,8 @@ karmacadabra/
 ## 🎯 Key Features
 
 ✅ **Gasless Micropayments**: Agents don't need ETH/AVAX for gas
-✅ **On-Chain Reputation**: ERC-8004 tracks agent reliability
+✅ **Bidirectional Reputation**: Custom ERC-8004 extension - buyers AND sellers rate each other (not in base spec!)
+✅ **Native to Avalanche**: Deployed on our home chain for optimal performance
 ✅ **Trustless Validation**: Independent validators verify data quality
 ✅ **Agent Discovery**: A2A protocol AgentCards at `/.well-known/agent-card`
 ✅ **Multi-Agent Workflows**: CrewAI crews for complex tasks
@@ -180,7 +195,7 @@ karmacadabra/
 | Phase | Component | Status |
 |-------|-----------|--------|
 | **Phase 1** | UVD V2 Token | 🔴 Ready to deploy |
-| **Phase 1** | ERC-8004 Registries | 🔴 Ready to deploy |
+| **Phase 1** | ERC-8004 Extended Registries | 🔴 Ready to deploy |
 | **Phase 1** | x402 Facilitator | 🔴 Ready to build |
 | **Phase 2** | Validator Agent | 🔴 To implement |
 | **Phase 3** | Karma-Hello Agents | 🔴 To implement |
@@ -256,12 +271,12 @@ See [QUICKSTART.md](./QUICKSTART.md) for detailed instructions.
 
 ## 📖 Learn More
 
-- **ERC-8004**: https://eips.ethereum.org/EIPS/eip-8004
+- **ERC-8004 Base Spec**: https://eips.ethereum.org/EIPS/eip-8004 (we extend this with bidirectional ratings!)
 - **A2A Protocol**: https://ai.pydantic.dev/a2a/
 - **x402 Protocol**: https://www.x402.org
 - **EIP-3009**: https://eips.ethereum.org/EIPS/eip-3009
 - **CrewAI**: https://docs.crewai.com/
-- **Avalanche**: https://docs.avax.network/
+- **Avalanche Docs**: https://docs.avax.network/ (our home chain!)
 
 ### Trustless Agents Course
 https://intensivecolearn.ing/en/programs/trustless-agents
@@ -289,10 +304,10 @@ MIT License - See [LICENSE](./LICENSE)
 ## 🌟 Acknowledgments
 
 - **Trustless Agents Course** by Intensive CoLearning
-- **ERC-8004 Example** (Bob validator implementation)
+- **ERC-8004 Base Specification** (which we extended for bidirectional reputation)
 - **x402-rs** protocol implementation
 - **Pydantic AI** A2A protocol
-- **Avalanche** for fast, low-cost testnet
+- **Avalanche** - our home blockchain and the foundation of Ultravioleta DAO
 
 ---
 
