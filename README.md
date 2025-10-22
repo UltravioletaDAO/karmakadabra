@@ -93,6 +93,16 @@ python demo.py
          └────────────────────┘
 ```
 
+### 🔗 About Our ERC-8004 Implementation
+
+> **Modified Bi-Directional ERC-8004**: This project uses a custom implementation of ERC-8004 that extends the original specification with bi-directional reputation and validation capabilities. This enhanced version will be deployed on **Avalanche**, home of Ultravioleta DAO, enabling symmetric trust relationships between agents (buyers can validate sellers AND sellers can validate buyers).
+
+**Key Differences from Original ERC-8004:**
+- ✅ Bi-directional validation support
+- ✅ Optimized for Avalanche's fast finality (2s blocks)
+- ✅ Integrated with EIP-3009 for gasless operations
+- ✅ Extended reputation metrics for autonomous agents
+
 ---
 
 ## 💰 What Can Be Monetized?
