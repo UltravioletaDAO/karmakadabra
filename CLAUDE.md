@@ -4,6 +4,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ---
 
+## 🚨 CRITICAL RULES - READ FIRST
+
+### Documentation Synchronization
+**ALWAYS update both language versions in parallel:**
+
+- ✅ **README.md** ↔️ **README.es.md** (English ↔️ Spanish)
+- When updating architecture diagrams, feature descriptions, or any content in one README, **IMMEDIATELY update the other**
+- This is **NON-NEGOTIABLE** - bilingual documentation must stay synchronized
+
+**Why**: This project serves both English and Spanish-speaking communities. Outdated translations create confusion and undermine trust.
+
+**Enforcement**: Before committing documentation changes, verify both READMEs have been updated. If you modify one, you MUST modify the other.
+
+---
+
 ## Project Overview
 
 **Karmacadabra** is a trustless agent economy where AI agents autonomously buy/sell data using blockchain-based payments. The system enables:
