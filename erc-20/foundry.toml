@@ -1,0 +1,141 @@
+# =============================================================================
+# Foundry Configuration for UVD V2 Token
+# Karmacadabra - Ultravioleta DAO
+# =============================================================================
+
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.20"
+
+# Optimizer settings
+optimizer = true
+optimizer_runs = 200
+
+# EVM version
+evm_version = "shanghai"
+
+# Remappings for OpenZeppelin
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/",
+    "forge-std/=lib/forge-std/src/"
+]
+
+# Gas reporting
+gas_reports = ["*"]
+
+# =============================================================================
+# Network Configuration
+# =============================================================================
+
+[rpc_endpoints]
+# Avalanche Fuji Testnet (primary deployment target)
+fuji = "${RPC_URL_AVALANCHE_FUJI}"
+fuji_fallback = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
+
+# Local development (Anvil)
+localhost = "http://localhost:8545"
+
+[etherscan]
+# Snowtrace (Avalanche block explorer)
+fuji = { key = "${SNOWTRACE_API_KEY}", url = "https://api-testnet.snowtrace.io/api" }
+
+# =============================================================================
+# Test Configuration
+# =============================================================================
+
+[fuzz]
+runs = 256
+max_test_rejects = 65536
+
+[invariant]
+runs = 256
+depth = 15
+fail_on_revert = true
+
+# =============================================================================
+# Formatter Configuration
+# =============================================================================
+
+[fmt]
+line_length = 100
+tab_width = 4
+bracket_spacing = true
+int_types = "long"
+quote_style = "double"
+number_underscore = "thousands"
+
+# =============================================================================
+# Documentation Configuration
+# =============================================================================
+
+[doc]
+out = "docs"
+title = "UVD V2 Token Documentation"
+ignore = ["test/**"]
+
+# =============================================================================
+# Build Configuration
+# =============================================================================
+
+# Don't include metadata hash in bytecode
+bytecode_hash = "none"
+
+# AST output for analysis
+ast = true
+
+# Build info for verification
+build_info = true
+extra_output = ["abi", "evm.bytecode", "evm.deployedBytecode", "metadata"]
+
+# =============================================================================
+# Deployment Verification
+# =============================================================================
+
+# Verify contracts on Snowtrace after deployment
+verify = true
+
+# =============================================================================
+# Cache Configuration
+# =============================================================================
+
+# Cache compilation artifacts
+cache = true
+cache_path = "cache"
+force = false
+
+# =============================================================================
+# Dependencies
+# =============================================================================
+
+# Auto-detect and install dependencies
+auto_detect_remappings = true
+auto_detect_solc = false
+
+# =============================================================================
+# Notes:
+#
+# Environment variables required:
+# - PRIVATE_KEY: Deployer wallet private key
+# - RPC_URL_AVALANCHE_FUJI: Custom Avalanche Fuji RPC endpoint
+# - SNOWTRACE_API_KEY: Snowtrace API key for verification (optional)
+#
+# Install dependencies:
+#   forge install OpenZeppelin/openzeppelin-contracts
+#   forge install foundry-rs/forge-std
+#
+# Build:
+#   forge build
+#
+# Test:
+#   forge test
+#
+# Deploy to Fuji:
+#   forge script script/Deploy.s.sol:DeployUVD_V2 \
+#     --rpc-url fuji \
+#     --broadcast \
+#     --verify \
+#     -vvvv
+#
+# =============================================================================
