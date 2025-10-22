@@ -11,11 +11,10 @@
 
 | Contract | Address | Status |
 |----------|---------|--------|
+| **UVD V2 Token (EIP-3009)** | `0xfEe5CC33479E748f40F5F299Ff6494b23F88C425` | ✅ [Verified](https://testnet.snowtrace.io/address/0xfEe5CC33479E748f40F5F299Ff6494b23F88C425) |
 | **Identity Registry (ERC-8004)** | `0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618` | ✅ [Verified](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) |
 | **Reputation Registry (ERC-8004)** | `0x932d32194C7A47c0fe246C1d61caF244A4804C6a` | ✅ [Verified](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) |
 | **Validation Registry (ERC-8004)** | `0x9aF4590035C109859B4163fd8f2224b820d11bc2` | ✅ [Verified](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) |
-
-**Note**: UVD V2 Token shares the same address as Identity Registry due to deterministic deployment.
 
 **Deployment Date**: October 22, 2025
 **Chain ID**: 43113 (Avalanche Fuji Testnet)
