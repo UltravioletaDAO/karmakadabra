@@ -215,8 +215,11 @@ erc-8004/
 - ✅ Verifica firmas EIP-712
 - ✅ Ejecuta `transferWithAuthorization` on-chain
 - ✅ Stateless (no DB, todo on-chain)
-- ✅ Multi-token support
-- ✅ OpenTelemetry tracing
+- ✅ Multi-token support (UVD, USDC, WAVAX)
+- ✅ OpenTelemetry tracing (Prometheus + Grafana + Loki)
+- ✅ HTTPS con Caddy reverse proxy
+- ✅ Rate limiting (60 req/min)
+- ✅ Hot wallet rotation strategy
 
 **Endpoints**:
 ```
@@ -224,19 +227,87 @@ POST /verify   - Verifica payload de pago
 POST /settle   - Ejecuta transferencia on-chain
 GET /supported - Lista métodos de pago soportados
 GET /health    - Health check
+GET /metrics   - Prometheus metrics
 ```
 
-**Estado**: ✅ Ya implementado en Rust, por configurar para Fuji
+**Estado**: ✅ Configurado y listo para deployment
 
-**Configuración**:
+**Estructura de Archivos**:
+```
+x402-rs/
+├── src/
+│   └── network.rs           ← UVD + WAVAX tokens agregados
+├── .env.example             ← Configuración completa para Fuji
+├── Caddyfile                ← HTTPS reverse proxy
+├── docker-compose.yml       ← Multi-service deployment
+├── prometheus.yml           ← Metrics collection
+├── deploy-facilitator.sh    ← Automated deployment script
+├── DEPLOYMENT.md            ← Step-by-step deployment guide
+└── README.md                ← Karmacadabra-specific docs
+```
+
+**Configuración Completa** (ver `.env.example`):
 ```bash
-# .env para facilitator
+# Network
 SIGNER_TYPE=private-key
-EVM_PRIVATE_KEY=0x...
-RPC_URL_FUJI=https://avalanche-fuji-c-chain-rpc.publicnode.com
+EVM_PRIVATE_KEY=0x...                        # Hot wallet (2-5 AVAX for gas)
+RPC_URL_AVALANCHE_FUJI=https://your-rpc.xyz  # Custom RPC
+RPC_URL_AVALANCHE_FUJI_FALLBACK=https://avalanche-fuji-c-chain-rpc.publicnode.com
+CHAIN_ID=43113
+
+# Server
 HOST=0.0.0.0
 PORT=8080
+RUST_LOG=info
+
+# Tokens (Avalanche Fuji)
+UVD_TOKEN_ADDRESS=0x...     # After deploying erc-20/UVD_V2.sol
+USDC_FUJI_ADDRESS=0x5425890298aed601595a70AB815c96711a31Bc65
+WAVAX_FUJI_ADDRESS=0xd00ae08403B9bbb9124bB305C09058E32C39A48c
+
+# Observability
+OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana.ultravioletadao.xyz:4317
+OTEL_EXPORTER_OTLP_PROTOCOL=grpc
+OTEL_SERVICE_NAME=x402-facilitator-karmacadabra
+
+# Rate Limiting
+RATE_LIMIT_ENABLED=false  # Enable in production
+RATE_LIMIT_PER_MINUTE=60
+RATE_LIMIT_PER_HOUR=1000
+
+# Hot Wallet Management
+BALANCE_ALERT_THRESHOLD=1.0
+STANDBY_WALLET_ADDRESS=0x...  # For monthly rotation
 ```
+
+**Deployment Rápido**:
+```bash
+# 1. Initialize
+cd x402-rs
+./deploy-facilitator.sh init
+
+# 2. Configure .env (update UVD_TOKEN_ADDRESS after erc-20 deployment)
+cp .env.example .env
+nano .env
+
+# 3. Build & Deploy
+./deploy-facilitator.sh build
+./deploy-facilitator.sh deploy
+
+# 4. Verify
+./deploy-facilitator.sh status
+curl https://facilitator.ultravioletadao.xyz/health
+curl https://facilitator.ultravioletadao.xyz/supported
+```
+
+**Infraestructura**:
+- **Deployment**: Docker on Cherry Servers
+- **HTTPS**: Caddy with auto SSL (Let's Encrypt)
+- **Monitoring**: Prometheus + Grafana dashboards
+- **Logs**: JSON format, rotated daily
+- **Backup**: Automated daily backups
+
+**Guía Completa**: Ver `x402-rs/DEPLOYMENT.md` para deployment paso a paso
 
 ---
 
@@ -587,17 +658,47 @@ validator/
 - ✅ Guía de uso
 
 #### Milestone 1.3: x402 Facilitator
-- [ ] Configurar x402-rs para Fuji
-- [ ] Agregar UVD V2 token a network.rs
-- [ ] Deploy a facilitator.ultravioletadao.xyz
+- [x] Configurar x402-rs para Fuji
+- [x] Agregar UVD V2 token a network.rs
+- [x] Agregar WAVAX token a network.rs
+- [x] Crear .env.example con configuración completa
+- [x] Crear Caddyfile para HTTPS reverse proxy
+- [x] Crear docker-compose.yml para deployment
+- [x] Crear prometheus.yml para metrics
+- [x] Crear deploy-facilitator.sh script
+- [x] Crear DEPLOYMENT.md guía completa
+- [ ] Deploy UVD V2 token (prerequisito)
+- [ ] Actualizar UVD_TOKEN_ADDRESS en .env
+- [ ] Generar hot wallet y fundar con AVAX
+- [ ] Deploy a facilitator.ultravioletadao.xyz con Docker
+- [ ] Configurar Caddy HTTPS
+- [ ] Testing de /health endpoint
+- [ ] Testing de /supported endpoint
 - [ ] Testing de /verify endpoint
 - [ ] Testing de /settle endpoint
-- [ ] Monitoring con OpenTelemetry
+- [ ] Configurar Prometheus + Grafana dashboards
+- [ ] Setup alertas (balance < 1 AVAX, high error rate)
+
+**Herramientas de Deployment**:
+```bash
+./deploy-facilitator.sh init     # Initialize deployment
+./deploy-facilitator.sh build    # Build Docker image
+./deploy-facilitator.sh deploy   # Deploy with Docker Compose
+./deploy-facilitator.sh status   # Check health
+./deploy-facilitator.sh logs     # View logs
+```
 
 **Entregables**:
-- ✅ Facilitator corriendo en producción
-- ✅ HTTPS configurado
-- ✅ Documentación de API
+- ✅ Configuración completa en x402-rs/
+- ✅ .env.example con todas las variables
+- ✅ Caddyfile para HTTPS
+- ✅ docker-compose.yml multi-service
+- ✅ prometheus.yml para metrics
+- ✅ deploy-facilitator.sh automation
+- ✅ DEPLOYMENT.md paso a paso
+- ⏳ Facilitator corriendo en producción (pending UVD deployment)
+- ⏳ HTTPS configurado (pending DNS + deployment)
+- ✅ Documentación de API (en README.md)
 
 ---
 
