@@ -73,8 +73,9 @@ contract DeployUVD_V2 is Script {
             )
         );
 
-        vm.writeFile("deployment.json", deploymentJson);
+        // vm.writeFile("deployment.json", deploymentJson);
         console.log("");
-        console.log("Deployment info saved to: deployment.json");
+        console.log("Deployment info (manual save required):");
+        console.log(deploymentJson);
     }
 }
