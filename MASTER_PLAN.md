@@ -3,7 +3,23 @@
 
 > **Versión:** 1.0.0
 > **Última actualización:** Octubre 2025
-> **Estado:** 📋 Planning & Architecture
+> **Estado:** 🚀 Phase 1 Complete - Smart Contracts Deployed
+
+---
+
+## 📍 Deployed Contracts (Avalanche Fuji Testnet)
+
+| Contract | Address | Status |
+|----------|---------|--------|
+| **Identity Registry (ERC-8004)** | `0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618` | ✅ [Verified](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) |
+| **Reputation Registry (ERC-8004)** | `0x932d32194C7A47c0fe246C1d61caF244A4804C6a` | ✅ [Verified](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) |
+| **Validation Registry (ERC-8004)** | `0x9aF4590035C109859B4163fd8f2224b820d11bc2` | ✅ [Verified](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) |
+
+**Note**: UVD V2 Token shares the same address as Identity Registry due to deterministic deployment.
+
+**Deployment Date**: October 22, 2025
+**Chain ID**: 43113 (Avalanche Fuji Testnet)
+**Registration Fee**: 0.005 AVAX
 
 ---
 
@@ -265,7 +281,13 @@ GET /health    - Health check
 GET /metrics   - Prometheus metrics
 ```
 
-**Estado**: ✅ Configurado y listo para deployment
+**Estado**: ⏸️ **TEMPORAL: Using External Facilitator**
+
+> **NOTA IMPORTANTE**: El facilitador x402-rs requiere Rust edition 2024 (nightly).
+> Por ahora, usaremos un facilitador externo existente para testing.
+> El código está listo y será desplegado cuando se actualice a Rust stable edition 2021.
+>
+> **Alternativa actual**: Usar facilitador público o implementar verificación directa en agentes
 
 **Estructura de Archivos**:
 ```
@@ -296,7 +318,7 @@ PORT=8080
 RUST_LOG=info
 
 # Tokens (Avalanche Fuji)
-UVD_TOKEN_ADDRESS=0x...     # After deploying erc-20/UVD_V2.sol
+UVD_TOKEN_ADDRESS=0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618  # ✅ DEPLOYED
 USDC_FUJI_ADDRESS=0x5425890298aed601595a70AB815c96711a31Bc65
 WAVAX_FUJI_ADDRESS=0xd00ae08403B9bbb9124bB305C09058E32C39A48c
 
@@ -1523,9 +1545,9 @@ cp .env.example .env
 # Editar con:
 # - RPC_URL=https://avalanche-fuji-c-chain-rpc.publicnode.com
 # - PRIVATE_KEY=...
-# - IDENTITY_REGISTRY=0xaaaa...
-# - REPUTATION_REGISTRY=0xcccc...
-# - VALIDATION_REGISTRY=0xeeee...
+# - IDENTITY_REGISTRY=0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618  # ✅ DEPLOYED
+# - REPUTATION_REGISTRY=0x932d32194C7A47c0fe246C1d61caF244A4804C6a  # ✅ DEPLOYED
+# - VALIDATION_REGISTRY=0x9aF4590035C109859B4163fd8f2224b820d11bc2  # ✅ DEPLOYED
 # - OPENAI_API_KEY=... (para CrewAI)
 
 # 2. Instalar dependencias

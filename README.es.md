@@ -11,6 +11,21 @@
 [![x402](https://img.shields.io/badge/x402-Payment%20Protocol-green)](https://www.x402.org)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)](https://www.python.org/)
 [![Rust](https://img.shields.io/badge/Rust-Latest-orange?logo=rust)](https://www.rust-lang.org/)
+[![Desplegado](https://img.shields.io/badge/Desplegado-Fuji%20Testnet-success)](https://testnet.snowtrace.io/)
+
+---
+
+## 🚀 **EN VIVO EN FUJI TESTNET** - Desplegado 22 de Octubre 2025
+
+| Contrato | Dirección | Estado |
+|----------|-----------|--------|
+| **Registro de Identidad** | [`0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618`](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) | ✅ Verificado |
+| **Registro de Reputación** | [`0x932d32194C7A47c0fe246C1d61caF244A4804C6a`](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) | ✅ Verificado |
+| **Registro de Validación** | [`0x9aF4590035C109859B4163fd8f2224b820d11bc2`](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) | ✅ Verificado |
+
+**Red**: Avalanche Fuji Testnet (Chain ID: 43113)
+**Tarifa de Registro**: 0.005 AVAX
+**Ver Todos los Contratos**: [Explorador Snowtrace](https://testnet.snowtrace.io/)
 
 ---
 
@@ -45,6 +60,8 @@ Actualmente en **testnet Fuji**, con despliegue en mainnet planificado después 
 
 ## 🚀 Inicio Rápido (30 minutos)
 
+**✨ ¡Contratos ya desplegados!** Puedes empezar a construir agentes de inmediato.
+
 ```bash
 # 1. Clonar repositorio
 git clone https://github.com/ultravioletadao/karmacadabra.git
@@ -53,17 +70,22 @@ cd karmacadabra
 # 2. Obtener AVAX de testnet
 # Visitar: https://faucet.avax.network/
 
-# 3. Desplegar contratos
-cd erc-20 && ./deploy-fuji.sh && cd ..
-cd erc-8004 && ./deploy-fuji.sh && cd ..
+# 3. Configurar entorno
+cd validator
+cp .env.example .env
+# Agregar tus claves:
+# - PRIVATE_KEY (para tu wallet de prueba)
+# - OPENAI_API_KEY (para CrewAI)
+# - ¡Las direcciones de contratos ya están configuradas!
 
-# 4. Iniciar facilitador
-cd x402-rs && cargo run &
+# 4. Instalar dependencias
+pip install -r requirements.txt
 
-# 5. Ejecutar demo
-python demo.py
+# 5. Ejecutar agente validador
+python main.py
 ```
 
+**Contratos Desplegados**: ¡Todos los registros ERC-8004 están en vivo en Fuji!
 **Guía completa**: Ver [QUICKSTART.md](./QUICKSTART.md)
 
 ---
@@ -199,15 +221,16 @@ karmacadabra/
 
 | Fase | Componente | Estado |
 |-------|-----------|--------|
-| **Fase 1** | Token UVD V2 | 🔴 Listo para desplegar |
-| **Fase 1** | Registros ERC-8004 Extendidos | 🔴 Listo para desplegar |
-| **Fase 1** | Facilitador x402 | 🔴 Listo para construir |
-| **Fase 2** | Agente Validador | 🔴 Por implementar |
+| **Fase 1** | Registros ERC-8004 Extendidos | ✅ **DESPLEGADO Y VERIFICADO** |
+| **Fase 1** | Token UVD V2 | ✅ **DESPLEGADO** (misma dirección que Registro de Identidad) |
+| **Fase 1** | Facilitador x402 | ⏸️ Listo (requiere Rust nightly - usando facilitador externo) |
+| **Fase 2** | Agente Validador | 🔄 **EN PROGRESO** |
 | **Fase 3** | Agentes Karma-Hello | 🔴 Por implementar |
 | **Fase 4** | Agentes Abracadabra | 🔴 Por implementar |
 | **Fase 5** | Pruebas de Extremo a Extremo | 🔴 Pendiente |
 
-**Cronograma**: 6 semanas hasta demo lista para producción
+**Fase Actual**: Fase 2 - Implementando agentes Python
+**Última Actualización**: 22 de Octubre 2025
 
 ---
 

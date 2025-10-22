@@ -6,6 +6,20 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 🚨 CRITICAL RULES - READ FIRST
 
+### SECURITY: NEVER Show Private Keys in Output
+**⚠️ THIS REPOSITORY IS SHARED ON LIVE STREAMS**
+
+**ABSOLUTE RULES:**
+- ❌ NEVER display contents of .env files
+- ❌ NEVER echo PRIVATE_KEY values in commands
+- ❌ NEVER show wallet private keys in ANY output
+- ❌ NEVER include sensitive data in code examples
+- ✅ Use placeholders like `0x...` or `$PRIVATE_KEY` in examples
+- ✅ Use environment variable references instead of values
+- ✅ Assume all terminal output is publicly visible
+
+**Why**: This codebase is demonstrated in public streams. Exposing private keys would compromise wallets.
+
 ### Documentation Synchronization
 **ALWAYS update both language versions in parallel:**
 
