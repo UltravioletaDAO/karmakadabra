@@ -264,6 +264,55 @@ Full catalog in `MONETIZATION_OPPORTUNITIES.md`. Quick reference:
 
 ## Development Workflow
 
+### Git Workflow - GRANULAR COMMITS REQUIRED
+
+**🚨 CRITICAL: Commit after EVERY completed task in MASTER_PLAN.md**
+
+**Rules:**
+1. **ONE task = ONE commit** - Do NOT accumulate changes
+2. When you mark a checklist item as `[x]` in MASTER_PLAN.md → commit immediately
+3. Commit message must reference the specific task completed
+4. Use descriptive commit messages with context
+
+**Example workflow:**
+```bash
+# Complete a task (e.g., "Create base_agent.py")
+# Mark [x] in MASTER_PLAN.md
+
+# Immediately commit:
+git add shared/base_agent.py MASTER_PLAN.md
+git commit -m "Implement ERC8004BaseAgent base class
+
+- Created shared/base_agent.py with core agent functionality
+- Web3.py integration for Fuji contracts
+- AWS Secrets Manager integration
+- Identity Registry registration
+- MASTER_PLAN.md: Phase 2 Task 1 complete
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+git push
+```
+
+**Why granular commits:**
+- Easier rollback if something breaks
+- Clear progress tracking
+- Better collaboration (small, focused changes)
+- Matches MASTER_PLAN.md structure exactly
+
+**What gets committed together:**
+- The code/files for that specific task
+- Updated MASTER_PLAN.md with `[x]` marked
+- Related tests (if applicable)
+- Updated README if the task requires it
+
+**Do NOT commit together:**
+- Multiple unrelated MASTER_PLAN tasks
+- "Batch" commits with 5+ tasks
+- Mixing Phase 1 and Phase 2 work
+
 ### Phase 1: Blockchain Infrastructure (Current)
 ```bash
 # 1. Deploy contracts
