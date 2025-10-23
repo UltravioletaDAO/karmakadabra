@@ -278,6 +278,77 @@ async with A2AClient() as client:
 
 ---
 
+### `validation_crew.py` - CrewAI Validation Pattern
+
+Reusable multi-agent validation crew for data quality verification using CrewAI.
+
+**Features:**
+- ✅ Three-agent validation system (Quality, Fraud, Price)
+- ✅ Automated scoring (0-100 scale)
+- ✅ CrewAI tools for schema/timestamp/similarity checks
+- ✅ Detailed validation reports
+- ✅ Pass/fail thresholds
+- ✅ Issue detection and reporting
+
+**Agents:**
+1. **Quality Analyst** - Schema compliance, timestamp validation, required fields
+2. **Fraud Detector** - Duplicate detection, authenticity verification
+3. **Price Reviewer** - Market rate comparison, price fairness
+
+**Usage:**
+```python
+from shared import ValidationCrew
+
+# Initialize crew
+crew = ValidationCrew(openai_api_key="sk-...")
+
+# Validate transaction data
+result = crew.validate(
+    data={
+        "messages": [...],
+        "timestamp": 1698765432
+    },
+    data_type="logs",
+    seller_id=1,
+    buyer_id=2,
+    price="0.01"
+)
+
+# Check result
+if result.passed:
+    print(f"Validation passed! Score: {result.score}/100")
+else:
+    print(f"Validation failed. Issues: {result.issues}")
+
+# Detailed scores
+print(f"Quality: {result.quality_score}/100")
+print(f"Fraud: {result.fraud_score}/100")
+print(f"Price: {result.price_score}/100")
+```
+
+**ValidationResult Schema:**
+```python
+{
+    "score": 85,                    # Overall score (weighted average)
+    "quality_score": 90,            # Quality analyst score
+    "fraud_score": 95,              # Fraud detector score
+    "price_score": 70,              # Price reviewer score
+    "passed": True,                 # Passed threshold (>= 70)
+    "report": "Detailed analysis...",
+    "issues": []                    # List of detected issues
+}
+```
+
+**CrewAI Tools Included:**
+- `CheckSchemaTool` - JSON schema validation
+- `VerifyTimestampsTool` - Timestamp validity checks
+- `SimilarityCheckTool` - Duplicate detection
+- `MarketCheckTool` - Price fairness verification
+
+This pattern is used by the Validator agent and can be adapted for other validation needs.
+
+---
+
 ### `transaction_logger.py` - On-Chain Transaction Logging
 
 Utility for logging transaction metadata on-chain via TransactionLogger contract.

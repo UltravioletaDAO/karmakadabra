@@ -10,6 +10,7 @@ from .a2a_protocol import (
     A2AServer, A2AClient, AgentCard, Skill, Price, Registration,
     discover_agent
 )
+from .validation_crew import ValidationCrew, ValidationResult
 
 __all__ = [
     "get_private_key",
@@ -27,5 +28,7 @@ __all__ = [
     "Skill",
     "Price",
     "Registration",
-    "discover_agent"
+    "discover_agent",
+    "ValidationCrew",
+    "ValidationResult"
 ]
