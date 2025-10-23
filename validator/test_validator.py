@@ -6,8 +6,17 @@ Tests the validator with sample data without needing OpenAI API calls.
 
 import asyncio
 import json
+import sys
 from datetime import datetime
 from typing import Dict, Any
+
+# Fix Windows console encoding
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except:
+        pass
 
 
 # Sample test data
