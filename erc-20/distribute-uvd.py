@@ -29,6 +29,7 @@ AGENT_WALLETS = {
     "validator": None,  # Will be loaded from .env
     "karma-hello-agent": None,
     "abracadabra-agent": None,
+    "client-agent": None,  # NEW: Generic buyer agent
 }
 
 # UVD Token ABI (minimal - only transfer function)
@@ -66,7 +67,8 @@ def load_agent_wallets():
     agent_dirs = {
         "validator": "../validator/.env",
         "karma-hello-agent": "../karma-hello-agent/.env",
-        "abracadabra-agent": "../abracadabra-agent/.env"
+        "abracadabra-agent": "../abracadabra-agent/.env",
+        "client-agent": "../client-agent/.env"
     }
 
     for agent_name, env_path in agent_dirs.items():

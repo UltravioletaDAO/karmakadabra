@@ -20,6 +20,18 @@
 **Chain ID**: 43113 (Avalanche Fuji Testnet)
 **Registration Fee**: 0.005 AVAX
 
+### Agent Wallets (Funded with 10,946 UVD each)
+
+| Agent | Wallet Address | UVD Balance | Status |
+|-------|----------------|-------------|--------|
+| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 10,946 UVD | ✅ Funded |
+| **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 10,946 UVD | ✅ Funded |
+| **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 10,946 UVD | ✅ Funded |
+| **Client Agent** | TBD (to be generated) | 10,946 UVD | ⏳ Pending |
+
+**Total Distributed**: 32,838 UVD (3 agents funded)
+**Pending Distribution**: 10,946 UVD (Client Agent)
+
 ---
 
 ## 📋 Tabla de Contenidos
@@ -155,6 +167,24 @@ Crear un **ecosistema completamente autónomo** donde agentes AI pueden:
 │     cursor\karma-hello  │                 │     cursor\abracadabra │
 │                         │                 │                        │
 └─────────────────────────┘                 └────────────────────────┘
+                ▲                                       ▲
+                │                                       │
+                │         A2A Discovery + x402          │
+                │                                       │
+                └───────────────┬───────────────────────┘
+                                │
+                    ┌───────────┴───────────┐
+                    │  Client Agent (NEW!)  │
+                    │  (Generic Buyer)      │
+                    │                       │
+                    │  • Can buy from ANY   │
+                    │    seller (K-H or A)  │
+                    │  • A2A discovery      │
+                    │  • x402-reqwest       │
+                    │  • No selling         │
+                    │  • 10,946 UVD         │
+                    │  • Wallet: TBD        │
+                    └───────────────────────┘
 ```
 
 ### Stack Tecnológico
@@ -826,6 +856,35 @@ forge install                      # Install dependencies
 - ✅ Validator agent funcional
 - ✅ Validación de logs y transcripts
 - ✅ Reportes de validación
+
+#### Milestone 2.3: Generic Client Agent (NEW - CRITICAL)
+**⚠️ PREREQUISITE FOR PHASE 3-4**: This agent must be implemented before seller/buyer agents.
+
+**Purpose**: Generic buyer agent that can purchase from any seller (Karma-Hello OR Abracadabra).
+
+- [ ] Create `client-agent/` directory with project structure
+- [ ] Setup `.env.example` with required configuration
+- [ ] Generate new wallet for client agent
+- [ ] Fund wallet with 10,946 UVD (using `erc-20/distribute-uvd.py`)
+- [ ] Implement `client_agent.py` with A2A discovery
+- [ ] Implement x402-reqwest integration for payments
+- [ ] Implement multi-seller support (can buy from Karma-Hello OR Abracadabra)
+- [ ] CrewAI crew for data analysis and purchase decisions
+- [ ] Testing with mock sellers
+- [ ] Documentation of client agent API
+
+**Wallet Information**:
+- **Address**: TBD (will be generated)
+- **UVD Balance**: 10,946 UVD
+- **Purpose**: Generic data buyer (no selling capabilities)
+
+**Entregables**:
+- ✅ Client agent wallet created and funded
+- ✅ Client agent can discover sellers via A2A
+- ✅ Client agent can purchase from Karma-Hello
+- ✅ Client agent can purchase from Abracadabra
+- ✅ Payment flow working with x402 protocol
+- ✅ Documentation and examples
 
 ---
 
