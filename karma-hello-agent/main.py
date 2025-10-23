@@ -1,0 +1,404 @@
+"""
+Karma-Hello Seller Agent
+
+Sells Twitch chat logs via x402 protocol with A2A discovery.
+Supports both local file testing and MongoDB production data.
+"""
+
+import asyncio
+import json
+import os
+import sys
+from datetime import datetime
+from pathlib import Path
+from typing import Dict, List, Optional, Any
+from decimal import Decimal
+
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel, Field
+import uvicorn
+from dotenv import load_dotenv
+
+# Add parent directory to path for shared imports
+sys.path.append(str(Path(__file__).parent.parent))
+
+from shared.base_agent import ERC8004BaseAgent
+
+# Fix Windows console encoding
+if sys.platform == 'win32':
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except:
+        pass
+
+# Load environment
+load_dotenv()
+
+
+# ============================================================================
+# Request/Response Models
+# ============================================================================
+
+class ChatLogRequest(BaseModel):
+    """Request for chat logs"""
+    stream_id: Optional[str] = Field(None, description="Specific stream ID")
+    date: Optional[str] = Field(None, description="Date in YYYY-MM-DD format")
+    start_time: Optional[str] = Field(None, description="Start time ISO 8601")
+    end_time: Optional[str] = Field(None, description="End time ISO 8601")
+    users: Optional[List[str]] = Field(None, description="Filter by specific users")
+    limit: int = Field(1000, description="Max messages to return")
+    include_stats: bool = Field(True, description="Include statistics")
+
+
+class ChatLogResponse(BaseModel):
+    """Response with chat logs"""
+    stream_id: str
+    stream_date: str
+    total_messages: int
+    unique_users: int
+    messages: List[Dict[str, Any]]
+    statistics: Optional[Dict[str, Any]] = None
+    metadata: Dict[str, Any]
+
+
+# ============================================================================
+# Karma-Hello Seller Agent
+# ============================================================================
+
+class KarmaHelloSeller(ERC8004BaseAgent):
+    """
+    Karma-Hello seller agent - sells Twitch chat logs
+
+    Features:
+    - Local file fallback for testing (reads from data/karma-hello/)
+    - MongoDB integration for production
+    - x402 payment protocol
+    - A2A protocol discovery
+    - Multiple service tiers
+    """
+
+    def __init__(self, config: Dict[str, Any]):
+        """Initialize Karma-Hello seller agent"""
+
+        # Initialize base agent (registers on-chain)
+        super().__init__(
+            private_key=config.get("private_key"),
+            rpc_url=config["rpc_url_fuji"],
+            chain_id=config["chain_id"],
+            identity_registry=config["identity_registry"],
+            reputation_registry=config["reputation_registry"],
+            validation_registry=config["validation_registry"],
+            glue_token_address=config["glue_token_address"],
+            facilitator_url=config["facilitator_url"]
+        )
+
+        self.config = config
+        self.use_local_files = config.get("use_local_files", True)
+
+        # Setup data source
+        if self.use_local_files:
+            self.local_data_path = Path(config.get("local_data_path", "../data/karma-hello"))
+            print(f"=Á Using local files from: {self.local_data_path}")
+        else:
+            # MongoDB setup for production
+            from pymongo import MongoClient
+            self.mongo_client = MongoClient(config["mongo_uri"])
+            self.db = self.mongo_client[config["mongo_db"]]
+            self.collection = self.db[config["mongo_collection"]]
+            print(f"=Ä  Connected to MongoDB: {config['mongo_db']}")
+
+        # Register agent identity
+        try:
+            self.agent_id = self.register_agent(config["agent_domain"])
+            print(f" Agent registered on-chain: ID {self.agent_id}")
+        except Exception as e:
+            print(f"   Agent registration failed (may already be registered): {e}")
+            self.agent_id = None
+
+        print(f"> Karma-Hello Seller initialized")
+        print(f"   Address: {self.address}")
+        print(f"   Balance: {self.get_glue_balance()} GLUE")
+
+    def get_agent_card(self) -> Dict[str, Any]:
+        """Return A2A AgentCard for discovery"""
+        return {
+            "schema_version": "1.0.0",
+            "agent_id": str(self.agent_id) if self.agent_id else "unregistered",
+            "name": "Karma-Hello Seller",
+            "description": "Twitch chat log seller - provides historical chat data from streams",
+            "domain": self.config["agent_domain"],
+            "wallet_address": self.address,
+            "blockchain": {
+                "network": "avalanche-fuji",
+                "chain_id": self.config["chain_id"],
+                "contracts": {
+                    "identity_registry": self.config["identity_registry"],
+                    "reputation_registry": self.config["reputation_registry"]
+                }
+            },
+            "skills": [
+                {
+                    "name": "get_chat_logs",
+                    "description": "Get Twitch chat logs for a specific stream or date range",
+                    "input_schema": ChatLogRequest.model_json_schema(),
+                    "output_schema": ChatLogResponse.model_json_schema(),
+                    "pricing": {
+                        "currency": "GLUE",
+                        "base_price": str(self.config["base_price"]),
+                        "price_per_message": str(self.config["price_per_message"]),
+                        "max_price": str(self.config["max_price"])
+                    }
+                }
+            ],
+            "payment_methods": [
+                {
+                    "protocol": "x402",
+                    "version": "1.0",
+                    "facilitator_url": self.config["facilitator_url"],
+                    "token": {
+                        "symbol": "GLUE",
+                        "address": self.config["glue_token_address"],
+                        "decimals": 18
+                    }
+                }
+            ],
+            "contact": {
+                "support_url": "https://ultravioletadao.xyz/support",
+                "documentation": "https://github.com/UltravioletaDAO/karmacadabra"
+            }
+        }
+
+    def calculate_price(self, message_count: int) -> Decimal:
+        """Calculate price based on message count"""
+        base = Decimal(str(self.config["base_price"]))
+        per_message = Decimal(str(self.config["price_per_message"]))
+        max_price = Decimal(str(self.config["max_price"]))
+
+        price = base + (per_message * message_count)
+        return min(price, max_price)
+
+    async def get_chat_logs_from_file(self, request: ChatLogRequest) -> ChatLogResponse:
+        """Get chat logs from local JSON files"""
+
+        # Try to find matching file
+        if request.date:
+            # Format: chat_logs_YYYYMMDD.json
+            date_str = request.date.replace("-", "")
+            filename = f"chat_logs_{date_str}.json"
+        else:
+            # Use most recent file
+            files = sorted(self.local_data_path.glob("chat_logs_*.json"))
+            if not files:
+                raise HTTPException(status_code=404, detail="No chat logs found")
+            filename = files[-1].name
+
+        filepath = self.local_data_path / filename
+
+        if not filepath.exists():
+            raise HTTPException(status_code=404, detail=f"File not found: {filename}")
+
+        # Load data
+        with open(filepath, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        # Filter messages if needed
+        messages = data["messages"]
+
+        if request.users:
+            messages = [m for m in messages if m["user"] in request.users]
+
+        if request.start_time:
+            messages = [m for m in messages if m["timestamp"] >= request.start_time]
+
+        if request.end_time:
+            messages = [m for m in messages if m["timestamp"] <= request.end_time]
+
+        # Limit results
+        messages = messages[:request.limit]
+
+        # Build response
+        response_data = {
+            "stream_id": data["stream_id"],
+            "stream_date": data["stream_date"],
+            "total_messages": len(messages),
+            "unique_users": len(set(m["user"] for m in messages)),
+            "messages": messages,
+            "metadata": {
+                "source": "local_file",
+                "filename": filename,
+                "seller": self.address,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        }
+
+        if request.include_stats:
+            response_data["statistics"] = data.get("statistics", {})
+
+        return ChatLogResponse(**response_data)
+
+    async def get_chat_logs_from_mongo(self, request: ChatLogRequest) -> ChatLogResponse:
+        """Get chat logs from MongoDB"""
+
+        # Build query
+        query = {}
+
+        if request.stream_id:
+            query["stream_id"] = request.stream_id
+
+        if request.date:
+            query["stream_date"] = request.date
+
+        if request.users:
+            query["messages.user"] = {"$in": request.users}
+
+        # Find matching stream
+        stream_doc = self.collection.find_one(query)
+
+        if not stream_doc:
+            raise HTTPException(status_code=404, detail="Stream not found")
+
+        messages = stream_doc["messages"]
+
+        # Filter by time range
+        if request.start_time:
+            messages = [m for m in messages if m["timestamp"] >= request.start_time]
+
+        if request.end_time:
+            messages = [m for m in messages if m["timestamp"] <= request.end_time]
+
+        # Limit results
+        messages = messages[:request.limit]
+
+        # Build response
+        response_data = {
+            "stream_id": stream_doc["stream_id"],
+            "stream_date": stream_doc["stream_date"],
+            "total_messages": len(messages),
+            "unique_users": len(set(m["user"] for m in messages)),
+            "messages": messages,
+            "metadata": {
+                "source": "mongodb",
+                "seller": self.address,
+                "timestamp": datetime.utcnow().isoformat()
+            }
+        }
+
+        if request.include_stats:
+            response_data["statistics"] = stream_doc.get("statistics", {})
+
+        return ChatLogResponse(**response_data)
+
+
+# ============================================================================
+# FastAPI Application
+# ============================================================================
+
+# Initialize agent
+config = {
+    "private_key": os.getenv("PRIVATE_KEY"),
+    "rpc_url_fuji": os.getenv("RPC_URL_FUJI"),
+    "chain_id": int(os.getenv("CHAIN_ID", 43113)),
+    "identity_registry": os.getenv("IDENTITY_REGISTRY"),
+    "reputation_registry": os.getenv("REPUTATION_REGISTRY"),
+    "validation_registry": os.getenv("VALIDATION_REGISTRY"),
+    "glue_token_address": os.getenv("GLUE_TOKEN_ADDRESS"),
+    "facilitator_url": os.getenv("FACILITATOR_URL"),
+    "agent_domain": os.getenv("AGENT_DOMAIN"),
+    "mongo_uri": os.getenv("MONGO_URI"),
+    "mongo_db": os.getenv("MONGO_DB", "karma_hello"),
+    "mongo_collection": os.getenv("MONGO_COLLECTION", "chat_logs"),
+    "use_local_files": os.getenv("USE_LOCAL_FILES", "true").lower() == "true",
+    "local_data_path": os.getenv("LOCAL_DATA_PATH", "../data/karma-hello"),
+    "base_price": float(os.getenv("BASE_PRICE", "0.01")),
+    "price_per_message": float(os.getenv("PRICE_PER_MESSAGE", "0.0001")),
+    "max_price": float(os.getenv("MAX_PRICE", "200.0"))
+}
+
+agent = KarmaHelloSeller(config)
+
+# Create FastAPI app
+app = FastAPI(
+    title="Karma-Hello Seller",
+    description="Twitch chat log seller via x402 protocol",
+    version="1.0.0"
+)
+
+
+@app.get("/")
+async def root():
+    """Health check endpoint"""
+    return {
+        "service": "Karma-Hello Seller",
+        "status": "healthy",
+        "agent_id": str(agent.agent_id) if agent.agent_id else "unregistered",
+        "address": agent.address,
+        "balance": f"{agent.get_glue_balance()} GLUE",
+        "data_source": "local_files" if agent.use_local_files else "mongodb"
+    }
+
+
+@app.get("/health")
+async def health():
+    """Detailed health check"""
+    return await root()
+
+
+@app.get("/.well-known/agent-card")
+async def agent_card():
+    """A2A protocol - return agent capabilities"""
+    return agent.get_agent_card()
+
+
+@app.post("/get_chat_logs")
+async def get_chat_logs(request: ChatLogRequest):
+    """
+    Get chat logs endpoint
+
+    Supports x402 payment protocol via X-Payment header.
+    """
+    try:
+        # Get data from appropriate source
+        if agent.use_local_files:
+            response = await agent.get_chat_logs_from_file(request)
+        else:
+            response = await agent.get_chat_logs_from_mongo(request)
+
+        # Calculate price
+        price = agent.calculate_price(response.total_messages)
+
+        return JSONResponse(
+            content=response.model_dump(),
+            headers={
+                "X-Price": str(price),
+                "X-Currency": "GLUE",
+                "X-Message-Count": str(response.total_messages)
+            }
+        )
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving logs: {str(e)}")
+
+
+# ============================================================================
+# Main
+# ============================================================================
+
+if __name__ == "__main__":
+    host = os.getenv("HOST", "0.0.0.0")
+    port = int(os.getenv("PORT", 8002))
+
+    print(f"\n{'='*70}")
+    print(f"  Karma-Hello Seller Agent")
+    print(f"{'='*70}")
+    print(f"  Address: {agent.address}")
+    print(f"  Agent ID: {agent.agent_id}")
+    print(f"  Balance: {agent.get_glue_balance()} GLUE")
+    print(f"  Data Source: {'Local Files' if agent.use_local_files else 'MongoDB'}")
+    print(f"  Server: http://{host}:{port}")
+    print(f"{'='*70}\n")
+
+    uvicorn.run(app, host=host, port=port)
