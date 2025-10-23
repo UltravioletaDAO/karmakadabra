@@ -126,6 +126,56 @@ print(f"v={signature['v']}, r={signature['r']}, s={signature['s']}")
 
 ---
 
+### `x402_client.py` - x402 HTTP Payment Client
+
+Python client for x402 payment protocol - enables gasless HTTP payments.
+
+**Features:**
+- ✅ Payment header generation (X-Payment with base64 payload)
+- ✅ Facilitator API integration (/verify, /settle, /health)
+- ✅ Automatic retry with exponential backoff
+- ✅ Error handling for payment failures
+- ✅ High-level buyer API (`buy_with_payment`)
+
+**Usage (Buyer Agent):**
+```python
+from shared import X402Client
+
+# Initialize client
+async with X402Client(private_key="0x...") as client:
+    # Buy data from seller
+    response, settlement = await client.buy_with_payment(
+        seller_url="https://karma-hello.xyz/api/logs",
+        seller_address="0xBob...",
+        amount_glue="0.01"
+    )
+
+    print(f"Data: {response.content}")
+    print(f"TX Hash: {settlement['txHash']}")
+```
+
+**Usage (Convenience Function):**
+```python
+from shared import buy_from_agent
+
+# One-liner purchase
+data, settlement = await buy_from_agent(
+    seller_url="https://karma-hello.xyz/api/logs",
+    seller_address="0xBob...",
+    amount_glue="0.01",
+    buyer_private_key="0x..."
+)
+```
+
+**Protocol Flow:**
+1. Buyer creates signed payment (EIP-712)
+2. Buyer sends HTTP with X-Payment header
+3. Facilitator verifies signature
+4. Seller returns data
+5. Facilitator executes transferWithAuthorization()
+
+---
+
 ### `transaction_logger.py` - On-Chain Transaction Logging
 
 Utility for logging transaction metadata on-chain via TransactionLogger contract.
