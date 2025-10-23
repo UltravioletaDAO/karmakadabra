@@ -77,13 +77,100 @@ All smart contracts are live and verified on Snowtrace. Agent wallets have been 
 - Testing Guide: [`shared/tests/README.md`](./shared/tests/README.md)
 - Architecture: [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 
-### 🔵 Phase 2: Agent Development (IN PROGRESS)
+### 🔵 Phase 2: Agent Development (IN PROGRESS - October 2025)
 
-Foundation complete, now implementing agents:
-- **Validator** - Data quality verification service
-- **Karma-Hello** - Twitch chat log seller/buyer
-- **Abracadabra** - Stream transcript seller/buyer
-- **Client** - Generic buyer agent
+**Sprint 2: System Agents** - Building the marketplace infrastructure
+
+#### ✅ Sprint 2.1: Validator Agent (COMPLETE)
+**Independent data quality verification service** - `validator/` - **1,545+ lines**
+
+**What it does:**
+- Multi-agent validation using CrewAI (9 AI agents across 3 crews)
+- Quality analysis + fraud detection + price review
+- On-chain validation score submission (validator pays gas)
+- FastAPI server with A2A protocol support
+
+**Key Files:**
+1. `main.py` (470+ lines) - ValidatorAgent class, FastAPI server
+2. `crews/quality_crew.py` (200+ lines) - Quality validation crew
+3. `crews/fraud_crew.py` (200+ lines) - Fraud detection crew
+4. `crews/price_crew.py` (200+ lines) - Price fairness crew
+5. `test_validator.py` (280+ lines) - Testing suite with --quick, --live, --crews modes
+6. `README.md` (330+ lines) - Full documentation
+7. `TESTING.md` (280+ lines) - Testing guide
+
+**Testing:**
+```bash
+cd validator
+python test_validator.py --quick  # Mock test (no dependencies)
+python test_validator.py --live   # Test with running validator
+```
+
+**Deployment:**
+- Wallet: `0x1219eF9484BF7E40E6479141B32634623d37d507`
+- Balance: 55,000 GLUE
+- Validation fee: 0.001 GLUE per validation
+- Port: 8001
+
+#### ✅ Sprint 2.2: Client Agent (COMPLETE)
+**Generic buyer agent for marketplace** - `client-agent/` - **440+ lines**
+
+**What it does:**
+- Discovers sellers via A2A protocol (`/.well-known/agent-card`)
+- Requests validation before purchases
+- Handles x402 payment flow with signed authorizations
+- Saves purchased data to organized directory structure
+
+**Key Files:**
+1. `main.py` (170+ lines) - ClientAgent class with discover/validate/purchase
+2. `.env.example` (40+ lines) - Configuration template
+3. `README.md` (230+ lines) - Usage documentation
+
+**Key Methods:**
+- `discover_seller()` - A2A protocol discovery
+- `request_validation()` - Validator integration
+- `save_data()` - Data storage with metadata
+
+**Deployment:**
+- Wallet: `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`
+- Balance: 55,000 GLUE
+- Max price: 1.0 GLUE (configurable)
+- Min validation score: 0.7 (configurable)
+
+#### ✅ Sprint 2.3: Data Integration (COMPLETE)
+**Sample data files for testing** - `data/` - **495+ lines**
+
+**What it provides:**
+- Realistic chat logs from Karma-Hello seller
+- Realistic transcriptions from Abracadabra seller
+- Both files designed to pass validation (0.8-0.9 scores)
+
+**Key Files:**
+1. `karma-hello/chat_logs_20251023.json` - 156 messages, 23 users, 2-hour stream
+2. `abracadabra/transcription_20251023.json` - 15 segments, 2-hour transcript
+3. `README.md` (300+ lines) - Data format documentation
+
+**Sample Data Stats:**
+- Chat logs: 156 messages from 23 unique users
+- Transcription: 15 segments, 7200 seconds (2 hours)
+- Both share `stream_id: stream_20251023_001` for complementary data testing
+
+#### 📋 Sprint 2.4: Karma-Hello Seller Agent (NEXT)
+**Twitch chat log seller** - Sells logs from MongoDB via x402 protocol
+
+**Planned features:**
+- FastAPI server with x402 middleware
+- MongoDB integration for production logs
+- Local file fallback for testing
+- Multiple service tiers (0.01-200 GLUE)
+
+#### 📋 Sprint 2.5: Abracadabra Seller Agent
+**Stream transcript seller** - Sells transcripts from SQLite+Cognee via x402 protocol
+
+#### 📋 Sprint 2.6: Voice Extractor Agent
+**Audio processing service** - Extracts audio from video for Abracadabra
+
+**Progress:** 3 of 6 milestones complete (50%)
 
 
 ---

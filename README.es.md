@@ -77,13 +77,100 @@ Todos los contratos inteligentes están en vivo y verificados en Snowtrace. Las 
 - Guía de Testing: [`shared/tests/README.md`](./shared/tests/README.md)
 - Arquitectura: [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 
-### 🔵 Fase 2: Desarrollo de Agentes (EN PROGRESO)
+### 🔵 Fase 2: Desarrollo de Agentes (EN PROGRESO - Octubre 2025)
 
-Fundamentos completos, ahora implementando agentes:
-- **Validator** - Servicio de verificación de calidad de datos
-- **Karma-Hello** - Vendedor/comprador de logs de chat de Twitch
-- **Abracadabra** - Vendedor/comprador de transcripciones de streams
-- **Client** - Agente comprador genérico
+**Sprint 2: Agentes del Sistema** - Construyendo la infraestructura del mercado
+
+#### ✅ Sprint 2.1: Agente Validador (COMPLETO)
+**Servicio independiente de verificación de calidad de datos** - `validator/` - **1,545+ líneas**
+
+**Qué hace:**
+- Validación multi-agente usando CrewAI (9 agentes de IA en 3 crews)
+- Análisis de calidad + detección de fraude + revisión de precios
+- Envío on-chain de puntuación de validación (validador paga el gas)
+- Servidor FastAPI con soporte para protocolo A2A
+
+**Archivos clave:**
+1. `main.py` (470+ líneas) - Clase ValidatorAgent, servidor FastAPI
+2. `crews/quality_crew.py` (200+ líneas) - Crew de validación de calidad
+3. `crews/fraud_crew.py` (200+ líneas) - Crew de detección de fraude
+4. `crews/price_crew.py` (200+ líneas) - Crew de equidad de precios
+5. `test_validator.py` (280+ líneas) - Suite de pruebas con modos --quick, --live, --crews
+6. `README.md` (330+ líneas) - Documentación completa
+7. `TESTING.md` (280+ líneas) - Guía de pruebas
+
+**Pruebas:**
+```bash
+cd validator
+python test_validator.py --quick  # Prueba simulada (sin dependencias)
+python test_validator.py --live   # Prueba con validador ejecutándose
+```
+
+**Despliegue:**
+- Wallet: `0x1219eF9484BF7E40E6479141B32634623d37d507`
+- Balance: 55,000 GLUE
+- Tarifa de validación: 0.001 GLUE por validación
+- Puerto: 8001
+
+#### ✅ Sprint 2.2: Agente Cliente (COMPLETO)
+**Agente comprador genérico para el mercado** - `client-agent/` - **440+ líneas**
+
+**Qué hace:**
+- Descubre vendedores vía protocolo A2A (`/.well-known/agent-card`)
+- Solicita validación antes de compras
+- Maneja flujo de pago x402 con autorizaciones firmadas
+- Guarda datos comprados en estructura de directorios organizada
+
+**Archivos clave:**
+1. `main.py` (170+ líneas) - Clase ClientAgent con discover/validate/purchase
+2. `.env.example` (40+ líneas) - Plantilla de configuración
+3. `README.md` (230+ líneas) - Documentación de uso
+
+**Métodos clave:**
+- `discover_seller()` - Descubrimiento por protocolo A2A
+- `request_validation()` - Integración con validador
+- `save_data()` - Almacenamiento de datos con metadatos
+
+**Despliegue:**
+- Wallet: `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`
+- Balance: 55,000 GLUE
+- Precio máximo: 1.0 GLUE (configurable)
+- Puntuación mínima de validación: 0.7 (configurable)
+
+#### ✅ Sprint 2.3: Integración de Datos (COMPLETO)
+**Archivos de datos de muestra para pruebas** - `data/` - **495+ líneas**
+
+**Qué proporciona:**
+- Logs de chat realistas del vendedor Karma-Hello
+- Transcripciones realistas del vendedor Abracadabra
+- Ambos archivos diseñados para pasar validación (puntuaciones 0.8-0.9)
+
+**Archivos clave:**
+1. `karma-hello/chat_logs_20251023.json` - 156 mensajes, 23 usuarios, stream de 2 horas
+2. `abracadabra/transcription_20251023.json` - 15 segmentos, transcripción de 2 horas
+3. `README.md` (300+ líneas) - Documentación de formato de datos
+
+**Estadísticas de datos de muestra:**
+- Logs de chat: 156 mensajes de 23 usuarios únicos
+- Transcripción: 15 segmentos, 7200 segundos (2 horas)
+- Ambos comparten `stream_id: stream_20251023_001` para pruebas de datos complementarios
+
+#### 📋 Sprint 2.4: Agente Vendedor Karma-Hello (PRÓXIMO)
+**Vendedor de logs de chat de Twitch** - Vende logs desde MongoDB vía protocolo x402
+
+**Características planificadas:**
+- Servidor FastAPI con middleware x402
+- Integración con MongoDB para logs de producción
+- Respaldo de archivos locales para pruebas
+- Múltiples niveles de servicio (0.01-200 GLUE)
+
+#### 📋 Sprint 2.5: Agente Vendedor Abracadabra
+**Vendedor de transcripciones de streams** - Vende transcripciones desde SQLite+Cognee vía protocolo x402
+
+#### 📋 Sprint 2.6: Agente Extractor de Voz
+**Servicio de procesamiento de audio** - Extrae audio de video para Abracadabra
+
+**Progreso:** 3 de 6 hitos completados (50%)
 
 
 ---
