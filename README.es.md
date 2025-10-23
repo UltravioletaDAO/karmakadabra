@@ -42,7 +42,11 @@
 5. **\`validation_crew.py\`** (550+ líneas) - Patrón de validación CrewAI
 6. **\`tests/\`** (1,200+ líneas) - 26 tests unitarios pasando + framework de integración
 
-**Documentación API**: [\`shared/README.md\`](./shared/README.md)
+**Estado**: Fundamentos completos, listos para desarrollo de agentes (Sprint 2)
+
+**Documentación API**: [`shared/README.md`](./shared/README.md) | **Guía de Testing**: [`shared/tests/README.md`](./shared/tests/README.md)
+
+---
 
 ### 🔴 Fase 2: Desarrollo de Agentes (SIGUIENTE)
 
