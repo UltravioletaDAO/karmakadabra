@@ -1,8 +1,10 @@
 """
-Karma-Hello Seller Agent
+Karma-Hello Agent (Seller + Buyer)
 
-Sells Twitch chat logs via x402 protocol with A2A discovery.
-Supports both local file testing and MongoDB production data.
+SELLS: Twitch chat logs via x402 protocol
+BUYS: Stream transcriptions from Abracadabra agent
+
+Supports both local file testing and MongoDB/direct purchase for production.
 """
 
 import asyncio
@@ -100,21 +102,21 @@ class KarmaHelloSeller(ERC8004BaseAgent):
         # Setup data source
         if self.use_local_files:
             self.local_data_path = Path(config.get("local_data_path", "../data/karma-hello"))
-            print(f"=� Using local files from: {self.local_data_path}")
+            print(f"=� Using local files from: {self.local_data_path}")
         else:
             # MongoDB setup for production
             from pymongo import MongoClient
             self.mongo_client = MongoClient(config["mongo_uri"])
             self.db = self.mongo_client[config["mongo_db"]]
             self.collection = self.db[config["mongo_collection"]]
-            print(f"=�  Connected to MongoDB: {config['mongo_db']}")
+            print(f"=�  Connected to MongoDB: {config['mongo_db']}")
 
         # Register agent identity
         try:
             self.agent_id = self.register_agent(config["agent_domain"])
             print(f" Agent registered on-chain: ID {self.agent_id}")
         except Exception as e:
-            print(f"�  Agent registration failed (may already be registered): {e}")
+            print(f"�  Agent registration failed (may already be registered): {e}")
             self.agent_id = None
 
         print(f"> Karma-Hello Seller initialized")
@@ -290,6 +292,132 @@ class KarmaHelloSeller(ERC8004BaseAgent):
 
         return ChatLogResponse(**response_data)
 
+    # ========================================================================
+    # Buyer Capabilities - Purchase transcriptions from Abracadabra
+    # ========================================================================
+
+    async def discover_abracadabra(self, abracadabra_url: str) -> Optional[Dict[str, Any]]:
+        """
+        Discover Abracadabra seller via A2A protocol
+
+        Args:
+            abracadabra_url: URL of Abracadabra agent
+
+        Returns:
+            Agent card data or None if not found
+        """
+        import httpx
+
+        agent_card_url = f"{abracadabra_url}/.well-known/agent-card"
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(agent_card_url, timeout=10.0)
+                if response.status_code == 200:
+                    print(f"✅ Discovered Abracadabra seller: {abracadabra_url}")
+                    return response.json()
+                else:
+                    print(f"⚠️  Abracadabra not found at {abracadabra_url}")
+                    return None
+        except Exception as e:
+            print(f"❌ Error discovering Abracadabra: {e}")
+            return None
+
+    async def buy_transcription(
+        self,
+        abracadabra_url: str,
+        stream_id: Optional[str] = None,
+        date: Optional[str] = None,
+        include_summary: bool = False,
+        include_topics: bool = False
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Buy transcription from Abracadabra agent
+
+        Args:
+            abracadabra_url: URL of Abracadabra agent
+            stream_id: Specific stream ID to purchase
+            date: Date in YYYY-MM-DD format
+            include_summary: Include AI summary
+            include_topics: Include extracted topics
+
+        Returns:
+            Transcription data or None if purchase failed
+        """
+        import httpx
+
+        # Discover seller first
+        agent_card = await self.discover_abracadabra(abracadabra_url)
+        if not agent_card:
+            return None
+
+        # Build request
+        request_data = {}
+        if stream_id:
+            request_data["stream_id"] = stream_id
+        if date:
+            request_data["date"] = date
+        if include_summary:
+            request_data["include_summary"] = True
+        if include_topics:
+            request_data["include_topics"] = True
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{abracadabra_url}/get_transcription",
+                    json=request_data,
+                    timeout=30.0
+                )
+
+                if response.status_code == 200:
+                    transcription = response.json()
+                    price = response.headers.get("X-Price", "unknown")
+
+                    print(f"✅ Purchased transcription from Abracadabra")
+                    print(f"   Stream ID: {transcription['stream_id']}")
+                    print(f"   Duration: {transcription['duration_seconds']}s")
+                    print(f"   Price: {price} GLUE")
+
+                    # Store transcription
+                    self.save_purchased_transcription(transcription)
+
+                    return transcription
+                else:
+                    print(f"❌ Purchase failed: {response.status_code}")
+                    print(f"   {response.text}")
+                    return None
+
+        except Exception as e:
+            print(f"❌ Error buying transcription: {e}")
+            return None
+
+    def save_purchased_transcription(self, transcription: Dict[str, Any]):
+        """
+        Save purchased transcription to local storage
+
+        Args:
+            transcription: Transcription data from Abracadabra
+        """
+        # Create storage directory
+        storage_dir = Path("purchased_transcriptions")
+        storage_dir.mkdir(exist_ok=True)
+
+        # Save to file
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        stream_id = transcription.get("stream_id", "unknown")
+        filename = f"{stream_id}_{timestamp}.json"
+        filepath = storage_dir / filename
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump({
+                "purchased_at": datetime.utcnow().isoformat(),
+                "seller": transcription.get("metadata", {}).get("seller"),
+                "transcription": transcription
+            }, f, indent=2)
+
+        print(f"💾 Saved transcription to: {filepath}")
+
 
 # ============================================================================
 # FastAPI Application
@@ -320,8 +448,8 @@ agent = KarmaHelloSeller(config)
 
 # Create FastAPI app
 app = FastAPI(
-    title="Karma-Hello Seller",
-    description="Twitch chat log seller via x402 protocol",
+    title="Karma-Hello Agent",
+    description="Twitch chat log seller + transcription buyer",
     version="1.0.0"
 )
 
@@ -381,6 +509,42 @@ async def get_chat_logs(request: ChatLogRequest):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving logs: {str(e)}")
+
+
+@app.post("/buy_transcription")
+async def buy_transcription_endpoint(
+    abracadabra_url: str,
+    stream_id: Optional[str] = None,
+    date: Optional[str] = None,
+    include_summary: bool = False,
+    include_topics: bool = False
+):
+    """
+    Buy transcription from Abracadabra agent
+
+    This endpoint allows Karma-Hello to purchase transcriptions
+    to enrich its data with audio context.
+    """
+    try:
+        transcription = await agent.buy_transcription(
+            abracadabra_url=abracadabra_url,
+            stream_id=stream_id,
+            date=date,
+            include_summary=include_summary,
+            include_topics=include_topics
+        )
+
+        if transcription:
+            return {
+                "success": True,
+                "message": "Transcription purchased successfully",
+                "transcription": transcription
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to purchase transcription")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error buying transcription: {str(e)}")
 
 
 # ============================================================================

@@ -1,8 +1,10 @@
 """
-Abracadabra Seller Agent
+Abracadabra Agent (Seller + Buyer)
 
-Sells stream transcriptions via x402 protocol with A2A discovery.
-Supports both local file testing and SQLite production data.
+SELLS: Stream transcriptions via x402 protocol
+BUYS: Chat logs from Karma-Hello agent
+
+Supports both local file testing and SQLite/direct purchase for production.
 """
 
 import asyncio
@@ -98,19 +100,19 @@ class AbracadabraSeller(ERC8004BaseAgent):
         # Setup data source
         if self.use_local_files:
             self.local_data_path = Path(config.get("local_data_path", "../data/abracadabra"))
-            print(f"=� Using local files from: {self.local_data_path}")
+            print(f"=� Using local files from: {self.local_data_path}")
         else:
             # SQLite setup for production
             import sqlite3
             self.db_path = config["sqlite_db_path"]
-            print(f"=�  Using SQLite database: {self.db_path}")
+            print(f"=�  Using SQLite database: {self.db_path}")
 
         # Register agent identity
         try:
             self.agent_id = self.register_agent(config["agent_domain"])
             print(f" Agent registered on-chain: ID {self.agent_id}")
         except Exception as e:
-            print(f"�  Agent registration failed (may already be registered): {e}")
+            print(f"�  Agent registration failed (may already be registered): {e}")
             self.agent_id = None
 
         print(f"> Abracadabra Seller initialized")
@@ -282,6 +284,132 @@ class AbracadabraSeller(ERC8004BaseAgent):
 
         return TranscriptionResponse(**response_data)
 
+    # ========================================================================
+    # Buyer Capabilities - Purchase chat logs from Karma-Hello
+    # ========================================================================
+
+    async def discover_karma_hello(self, karma_hello_url: str) -> Optional[Dict[str, Any]]:
+        """
+        Discover Karma-Hello seller via A2A protocol
+
+        Args:
+            karma_hello_url: URL of Karma-Hello agent
+
+        Returns:
+            Agent card data or None if not found
+        """
+        import httpx
+
+        agent_card_url = f"{karma_hello_url}/.well-known/agent-card"
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.get(agent_card_url, timeout=10.0)
+                if response.status_code == 200:
+                    print(f"✅ Discovered Karma-Hello seller: {karma_hello_url}")
+                    return response.json()
+                else:
+                    print(f"⚠️  Karma-Hello not found at {karma_hello_url}")
+                    return None
+        except Exception as e:
+            print(f"❌ Error discovering Karma-Hello: {e}")
+            return None
+
+    async def buy_chat_logs(
+        self,
+        karma_hello_url: str,
+        stream_id: Optional[str] = None,
+        date: Optional[str] = None,
+        users: Optional[List[str]] = None,
+        limit: int = 1000,
+        include_stats: bool = True
+    ) -> Optional[Dict[str, Any]]:
+        """
+        Buy chat logs from Karma-Hello agent
+
+        Args:
+            karma_hello_url: URL of Karma-Hello agent
+            stream_id: Specific stream ID to purchase
+            date: Date in YYYY-MM-DD format
+            users: Filter by specific users
+            limit: Max messages to return
+            include_stats: Include statistics
+
+        Returns:
+            Chat log data or None if purchase failed
+        """
+        import httpx
+
+        # Discover seller first
+        agent_card = await self.discover_karma_hello(karma_hello_url)
+        if not agent_card:
+            return None
+
+        # Build request
+        request_data = {"limit": limit, "include_stats": include_stats}
+        if stream_id:
+            request_data["stream_id"] = stream_id
+        if date:
+            request_data["date"] = date
+        if users:
+            request_data["users"] = users
+
+        try:
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    f"{karma_hello_url}/get_chat_logs",
+                    json=request_data,
+                    timeout=30.0
+                )
+
+                if response.status_code == 200:
+                    chat_logs = response.json()
+                    price = response.headers.get("X-Price", "unknown")
+
+                    print(f"✅ Purchased chat logs from Karma-Hello")
+                    print(f"   Stream ID: {chat_logs['stream_id']}")
+                    print(f"   Messages: {chat_logs['total_messages']}")
+                    print(f"   Price: {price} GLUE")
+
+                    # Store chat logs
+                    self.save_purchased_chat_logs(chat_logs)
+
+                    return chat_logs
+                else:
+                    print(f"❌ Purchase failed: {response.status_code}")
+                    print(f"   {response.text}")
+                    return None
+
+        except Exception as e:
+            print(f"❌ Error buying chat logs: {e}")
+            return None
+
+    def save_purchased_chat_logs(self, chat_logs: Dict[str, Any]):
+        """
+        Save purchased chat logs to local storage
+
+        Args:
+            chat_logs: Chat log data from Karma-Hello
+        """
+        # Create storage directory
+        storage_dir = Path("purchased_chat_logs")
+        storage_dir.mkdir(exist_ok=True)
+
+        # Save to file
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        stream_id = chat_logs.get("stream_id", "unknown")
+        filename = f"{stream_id}_{timestamp}.json"
+        filepath = storage_dir / filename
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump({
+                "purchased_at": datetime.utcnow().isoformat(),
+                "seller": chat_logs.get("metadata", {}).get("seller"),
+                "chat_logs": chat_logs
+            }, f, indent=2)
+
+        print(f"💾 Saved chat logs to: {filepath}")
+
 
 # ============================================================================
 # FastAPI Application
@@ -310,8 +438,8 @@ agent = AbracadabraSeller(config)
 
 # Create FastAPI app
 app = FastAPI(
-    title="Abracadabra Seller",
-    description="Stream transcription seller via x402 protocol",
+    title="Abracadabra Agent",
+    description="Stream transcription seller + chat log buyer",
     version="1.0.0"
 )
 
@@ -373,6 +501,44 @@ async def get_transcription(request: TranscriptionRequest):
         raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving transcription: {str(e)}")
+
+
+@app.post("/buy_chat_logs")
+async def buy_chat_logs_endpoint(
+    karma_hello_url: str,
+    stream_id: Optional[str] = None,
+    date: Optional[str] = None,
+    users: Optional[List[str]] = None,
+    limit: int = 1000,
+    include_stats: bool = True
+):
+    """
+    Buy chat logs from Karma-Hello agent
+
+    This endpoint allows Abracadabra to purchase chat logs
+    to enrich transcriptions with chat context.
+    """
+    try:
+        chat_logs = await agent.buy_chat_logs(
+            karma_hello_url=karma_hello_url,
+            stream_id=stream_id,
+            date=date,
+            users=users,
+            limit=limit,
+            include_stats=include_stats
+        )
+
+        if chat_logs:
+            return {
+                "success": True,
+                "message": "Chat logs purchased successfully",
+                "chat_logs": chat_logs
+            }
+        else:
+            raise HTTPException(status_code=500, detail="Failed to purchase chat logs")
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error buying chat logs: {str(e)}")
 
 
 # ============================================================================
