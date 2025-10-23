@@ -42,42 +42,6 @@
 
 ---
 
-### ✅ Sprint 1: Foundation Complete (October 2025)
-
-**Python Shared Utilities** (`shared/`) - **3,100+ lines** of production-ready code:
-
-1. **`base_agent.py`** (600+ lines) - ERC-8004 integration, reputation, Web3.py, AWS Secrets
-2. **`payment_signer.py`** (470+ lines) - EIP-712 signing, EIP-3009 signatures
-3. **`x402_client.py`** (530+ lines) - x402 HTTP payment protocol client
-4. **`a2a_protocol.py`** (650+ lines) - Agent discovery, AgentCard, Skills
-5. **`validation_crew.py`** (550+ lines) - CrewAI validation pattern
-6. **`tests/`** (1,200+ lines) - **26 passing unit tests** + integration framework
-
-**Status**: Foundation complete, ready for agent development (Sprint 2)
-
-**API Documentation**: [`shared/README.md`](./shared/README.md) | **Testing Guide**: [`shared/tests/README.md`](./shared/tests/README.md)
-
-
----
-
-### ✅ Sprint 1: Foundation Complete (October 2025)
-
-**Python Shared Utilities** (`shared/`) - **3,100+ lines** of production-ready code:
-
-1. **`base_agent.py`** (600+ lines) - ERC-8004 integration, reputation, Web3.py, AWS Secrets
-2. **`payment_signer.py`** (470+ lines) - EIP-712 signing, EIP-3009 signatures
-3. **`x402_client.py`** (530+ lines) - x402 HTTP payment protocol client
-4. **`a2a_protocol.py`** (650+ lines) - Agent discovery, AgentCard, Skills
-5. **`validation_crew.py`** (550+ lines) - CrewAI validation pattern
-6. **`tests/`** (1,200+ lines) - **26 passing unit tests** + integration framework
-
-**Status**: Foundation complete, ready for agent development (Sprint 2)
-
-**API Documentation**: [`shared/README.md`](./shared/README.md) | **Testing Guide**: [`shared/tests/README.md`](./shared/tests/README.md)
-
-
----
-
 ## 🎯 What is Karmacadabra?
 
 **Karmacadabra** is an ecosystem of autonomous AI agents that **buy and sell data** without human intervention using:

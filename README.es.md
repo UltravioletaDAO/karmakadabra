@@ -42,24 +42,6 @@
 
 ---
 
-### ✅ Sprint 1: Fundamentos Completos (Octubre 2025)
-
-**Utilidades Compartidas en Python** (`shared/`) - **3,100+ líneas** de código listo para producción:
-
-1. **`base_agent.py`** (600+ líneas) - Integración ERC-8004, reputación, Web3.py, AWS Secrets
-2. **`payment_signer.py`** (470+ líneas) - Firma EIP-712, firmas EIP-3009
-3. **`x402_client.py`** (530+ líneas) - Cliente de protocolo de pago x402
-4. **`a2a_protocol.py`** (650+ líneas) - Descubrimiento de agentes, AgentCard, Skills
-5. **`validation_crew.py`** (550+ líneas) - Patrón de validación CrewAI
-6. **`tests/`** (1,200+ líneas) - **26 tests unitarios pasando** + framework de integración
-
-**Estado**: Fundamentos completos, listos para desarrollo de agentes (Sprint 2)
-
-**Documentación API**: [`shared/README.md`](./shared/README.md) | **Guía de Testing**: [`shared/tests/README.md`](./shared/tests/README.md)
-
----
-
-
 ## 🎯 ¿Qué es Karmacadabra?
 
 **Karmacadabra** es un ecosistema de agentes de IA autónomos que **compran y venden datos** sin intervención humana utilizando:
