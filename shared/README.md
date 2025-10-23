@@ -176,6 +176,108 @@ data, settlement = await buy_from_agent(
 
 ---
 
+### `a2a_protocol.py` - Agent-to-Agent Communication
+
+A2A (Agent-to-Agent) protocol implementation for agent discovery and skill invocation.
+
+**Features:**
+- ✅ AgentCard publication and discovery
+- ✅ Skill registration with pricing
+- ✅ HTTP discovery endpoint (/.well-known/agent-card)
+- ✅ Async client for skill invocation
+- ✅ Integration with x402 payment protocol
+- ✅ Pydantic data models
+
+**Usage (Seller Agent):**
+```python
+from shared import ERC8004BaseAgent, A2AServer
+
+class MySellerAgent(ERC8004BaseAgent, A2AServer):
+    def __init__(self):
+        super().__init__(
+            agent_name="my-seller",
+            agent_domain="my-seller.ultravioletadao.xyz"
+        )
+
+        # Register on-chain
+        self.agent_id = self.register_agent()
+
+        # Add skills
+        self.add_skill(
+            skill_id="get_data",
+            name="Get Data",
+            description="Retrieve data from database",
+            price_amount="0.01",
+            input_schema={"type": "object"}
+        )
+
+        # Publish AgentCard
+        self.publish_agent_card(
+            name="My Data Seller",
+            description="Sells data services"
+        )
+
+    # Later in FastAPI:
+    @app.get("/.well-known/agent-card")
+    async def agent_card():
+        return self.get_agent_card_json()
+```
+
+**Usage (Buyer Agent):**
+```python
+from shared import A2AClient
+
+async with A2AClient() as client:
+    # Discover agent
+    card = await client.discover("my-seller.ultravioletadao.xyz")
+
+    # Find skill
+    skill = card.find_skill("get_data")
+    print(f"Price: {skill.price.amount} {skill.price.currency}")
+
+    # Invoke skill with payment
+    response = await client.invoke_skill(
+        agent_card=card,
+        skill_id="get_data",
+        params={"query": "stream_12345"},
+        payment_header=x402_payment_header
+    )
+```
+
+**AgentCard Schema:**
+```python
+{
+  "agentId": 1,
+  "name": "My Data Seller",
+  "description": "Sells data services",
+  "version": "1.0.0",
+  "domain": "my-seller.ultravioletadao.xyz",
+  "skills": [
+    {
+      "skillId": "get_data",
+      "name": "Get Data",
+      "description": "Retrieve data from database",
+      "price": {"amount": "0.01", "currency": "GLUE"},
+      "inputSchema": {"type": "object"},
+      "outputSchema": {},
+      "endpoint": "/api/get_data"
+    }
+  ],
+  "trustModels": ["erc-8004"],
+  "paymentMethods": ["x402-eip3009-GLUE"],
+  "registrations": [
+    {
+      "contract": "IdentityRegistry",
+      "address": "0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618",
+      "agentId": 1,
+      "network": "avalanche-fuji:43113"
+    }
+  ]
+}
+```
+
+---
+
 ### `transaction_logger.py` - On-Chain Transaction Logging
 
 Utility for logging transaction metadata on-chain via TransactionLogger contract.

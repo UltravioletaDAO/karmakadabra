@@ -78,7 +78,7 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 | Web3.py contract integration | 1 day | ✅ DONE | Included in base_agent.py |
 | EIP-712 payment signing | 2 days | ✅ DONE | shared/payment_signer.py (470+ lines) |
 | x402 HTTP client (Python) | 1-2 days | ✅ DONE | shared/x402_client.py (530+ lines) |
-| A2A AgentCard implementation | 2 days | 🔴 TODO | Publish/discover agents |
+| A2A AgentCard implementation | 2 days | ✅ DONE | shared/a2a_protocol.py (650+ lines) |
 | First CrewAI crew | 1 day | 🔴 TODO | Pattern for other crews |
 | Integration tests | 1 day | 🔴 TODO | Foundation verified |
 
