@@ -20,17 +20,17 @@
 **Chain ID**: 43113 (Avalanche Fuji Testnet)
 **Registration Fee**: 0.005 AVAX
 
-### Agent Wallets (Funded with 10,946 UVD each)
+### Agent Wallets (All Funded)
 
 | Agent | Wallet Address | UVD Balance | Status |
 |-------|----------------|-------------|--------|
-| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 10,946 UVD | ✅ Funded |
-| **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 10,946 UVD | ✅ Funded |
-| **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 10,946 UVD | ✅ Funded |
-| **Client Agent** | TBD (to be generated) | 10,946 UVD | ⏳ Pending |
+| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 21,892 UVD | ✅ Funded |
+| **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 21,892 UVD | ✅ Funded |
+| **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 21,892 UVD | ✅ Funded |
+| **Client Agent** | `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA` | 10,946 UVD | ✅ Funded |
 
-**Total Distributed**: 32,838 UVD (3 agents funded)
-**Pending Distribution**: 10,946 UVD (Client Agent)
+**Total Distributed**: 76,622 UVD (4 agents funded)
+**Owner Remaining**: 24,081,195 UVD
 
 ---
 
@@ -862,10 +862,10 @@ forge install                      # Install dependencies
 
 **Purpose**: Generic buyer agent that can purchase from any seller (Karma-Hello OR Abracadabra).
 
-- [ ] Create `client-agent/` directory with project structure
-- [ ] Setup `.env.example` with required configuration
-- [ ] Generate new wallet for client agent
-- [ ] Fund wallet with 10,946 UVD (using `erc-20/distribute-uvd.py`)
+- [x] Create `client-agent/` directory with project structure
+- [x] Setup `.env.example` with required configuration
+- [x] Generate new wallet for client agent
+- [x] Fund wallet with 10,946 UVD (using `erc-20/distribute-uvd.py`)
 - [ ] Implement `client_agent.py` with A2A discovery
 - [ ] Implement x402-reqwest integration for payments
 - [ ] Implement multi-seller support (can buy from Karma-Hello OR Abracadabra)
@@ -874,8 +874,8 @@ forge install                      # Install dependencies
 - [ ] Documentation of client agent API
 
 **Wallet Information**:
-- **Address**: TBD (will be generated)
-- **UVD Balance**: 10,946 UVD
+- **Address**: `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA` ✅
+- **UVD Balance**: 10,946 UVD ✅ Funded
 - **Purpose**: Generic data buyer (no selling capabilities)
 
 **Entregables**:

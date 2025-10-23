@@ -26,7 +26,7 @@ AMOUNT_PER_AGENT = 10_946 * 10**6  # 10,946.000000 UVD
 
 # Agent wallet addresses (extracted from .env files)
 AGENT_WALLETS = {
-    "validator": None,  # Will be loaded from .env
+    "validator-agent": None,  # Will be loaded from .env
     "karma-hello-agent": None,
     "abracadabra-agent": None,
     "client-agent": None,  # NEW: Generic buyer agent
@@ -65,7 +65,7 @@ def load_agent_wallets():
     import re
 
     agent_dirs = {
-        "validator": "../validator/.env",
+        "validator-agent": "../validator-agent/.env",
         "karma-hello-agent": "../karma-hello-agent/.env",
         "abracadabra-agent": "../abracadabra-agent/.env",
         "client-agent": "../client-agent/.env"
