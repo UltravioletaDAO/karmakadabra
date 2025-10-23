@@ -1,0 +1,144 @@
+{
+  "stream_id": "stream_20251023_001",
+  "stream_date": "2025-10-23",
+  "stream_title": "Building Trustless AI Agents on Avalanche",
+  "streamer": "ultravioletadao",
+  "duration_seconds": 7200,
+  "language": "en",
+  "transcript": [
+    {
+      "start": 0,
+      "end": 15,
+      "speaker": "host",
+      "text": "Welcome everyone to today's stream! We're going to build trustless AI agents that can buy and sell data autonomously."
+    },
+    {
+      "start": 15,
+      "end": 35,
+      "speaker": "host",
+      "text": "The key innovation here is using Avalanche blockchain for gasless micropayments. Agents don't need ETH or AVAX for gas fees."
+    },
+    {
+      "start": 35,
+      "end": 55,
+      "speaker": "host",
+      "text": "We're implementing ERC-8004 Extended, which is different from the base specification. Our version has bidirectional reputation where both buyers and sellers rate each other."
+    },
+    {
+      "start": 55,
+      "end": 75,
+      "speaker": "host",
+      "text": "Let me show you the architecture. We have three layers: Avalanche blockchain at layer one with GLUE token and ERC-8004 registries."
+    },
+    {
+      "start": 75,
+      "end": 95,
+      "speaker": "host",
+      "text": "Layer two is the x402 facilitator written in Rust. It verifies EIP-712 signatures and executes the on-chain transfers."
+    },
+    {
+      "start": 95,
+      "end": 120,
+      "speaker": "host",
+      "text": "Layer three is where our AI agents live. They're written in Python using CrewAI for multi-agent orchestration. Each agent can discover other agents using the A2A protocol."
+    },
+    {
+      "start": 120,
+      "end": 145,
+      "speaker": "host",
+      "text": "The Validator agent is particularly interesting. It uses three separate CrewAI crews: one for quality analysis, one for fraud detection, and one for price review."
+    },
+    {
+      "start": 145,
+      "end": 165,
+      "speaker": "host",
+      "text": "Each crew has three specialized agents. So we have nine AI agents working together to validate a single data transaction. Pretty cool, right?"
+    },
+    {
+      "start": 165,
+      "end": 185,
+      "speaker": "host",
+      "text": "The validator submits scores on-chain to the ValidationRegistry. This is the only agent that pays gas. Buyers and sellers don't pay any gas thanks to EIP-3009."
+    },
+    {
+      "start": 185,
+      "end": 210,
+      "speaker": "host",
+      "text": "Now let's look at the data flow. When a buyer wants to purchase data, they first discover the seller via the A2A protocol by fetching the agent card."
+    },
+    {
+      "start": 210,
+      "end": 235,
+      "speaker": "host",
+      "text": "The buyer signs an EIP-712 payment authorization off-chain. This is sent to the seller with the HTTP request using an X-Payment header."
+    },
+    {
+      "start": 235,
+      "end": 255,
+      "speaker": "host",
+      "text": "The seller's x402 middleware extracts the payment signature and sends it to the facilitator for verification."
+    },
+    {
+      "start": 255,
+      "end": 280,
+      "speaker": "host",
+      "text": "Optionally, the seller can request validation from a validator agent. The validator analyzes the data and returns quality scores."
+    },
+    {
+      "start": 280,
+      "end": 300,
+      "speaker": "host",
+      "text": "Once everything checks out, the facilitator executes the transferWithAuthorization function on the GLUE token contract."
+    },
+    {
+      "start": 300,
+      "end": 320,
+      "speaker": "host",
+      "text": "The whole process takes about two to three seconds end-to-end. All transactions are recorded on Avalanche Fuji testnet."
+    }
+  ],
+  "summary": "Stream covering the architecture and implementation of Karmacadabra, a trustless agent economy on Avalanche. Topics include ERC-8004 Extended, gasless micropayments via x402 protocol, CrewAI multi-agent validation, and the three-layer system architecture.",
+  "key_topics": [
+    "Avalanche blockchain",
+    "ERC-8004 Extended",
+    "Gasless micropayments",
+    "x402 protocol",
+    "CrewAI multi-agent systems",
+    "Validator architecture",
+    "A2A protocol"
+  ],
+  "entities": [
+    {
+      "entity": "Avalanche",
+      "type": "blockchain",
+      "mentions": 3
+    },
+    {
+      "entity": "GLUE",
+      "type": "token",
+      "mentions": 2
+    },
+    {
+      "entity": "ERC-8004",
+      "type": "standard",
+      "mentions": 2
+    },
+    {
+      "entity": "CrewAI",
+      "type": "framework",
+      "mentions": 2
+    }
+  ],
+  "statistics": {
+    "total_words": 450,
+    "speaking_rate_wpm": 150,
+    "pause_count": 8,
+    "technical_terms": 24
+  },
+  "metadata": {
+    "transcription_method": "whisper_large_v3",
+    "confidence_avg": 0.94,
+    "format_version": "1.0",
+    "data_quality": "high"
+  }
+}
