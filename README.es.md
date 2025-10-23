@@ -437,7 +437,7 @@ Licencia MIT - Ver [LICENSE](./LICENSE)
 
 ## 🌟 Agradecimientos
 
-- **Curso Trustless Agents** por Intensive CoLearning
+- **[Curso Trustless Agents](https://intensivecolearn.ing/en/programs/trustless-agents)** por Intensive CoLearning
 - **Especificación Base ERC-8004** (que extendimos para reputación bidireccional)
 - **x402-rs** implementación del protocolo
 - **Pydantic AI** protocolo A2A
