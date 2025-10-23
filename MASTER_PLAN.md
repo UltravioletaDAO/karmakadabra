@@ -80,7 +80,7 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 | x402 HTTP client (Python) | 1-2 days | ✅ DONE | shared/x402_client.py (530+ lines) |
 | A2A AgentCard implementation | 2 days | ✅ DONE | shared/a2a_protocol.py (650+ lines) |
 | First CrewAI crew | 1 day | ✅ DONE | shared/validation_crew.py (550+ lines) |
-| Integration tests | 1 day | 🔴 TODO | Foundation verified |
+| Integration tests | 1 day | ✅ DONE | shared/tests/ (26 unit + integration tests) |
 
 **Output:** `shared/base_agent.py`, `shared/eip712_signer.py`, `shared/x402_client.py`, `shared/a2a_protocol.py`
 
