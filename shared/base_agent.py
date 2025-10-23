@@ -535,6 +535,59 @@ class ERC8004BaseAgent:
         """
         return self.reputation_registry.functions.getFeedbackAuthId(client_id, server_id).call()
 
+    def submit_validation_response(
+        self,
+        seller_address: str,
+        buyer_address: str,
+        score: int,
+        metadata: str = ""
+    ) -> str:
+        """
+        Submit validation response to ValidationRegistry on-chain
+
+        This method is called by validator agents to submit validation scores.
+        The validator PAYS GAS for this transaction.
+
+        Args:
+            seller_address: Address of the seller being validated
+            buyer_address: Address of the buyer requesting validation
+            score: Validation score (0-100)
+            metadata: Optional metadata (validation ID, notes, etc.)
+
+        Returns:
+            tx_hash: Transaction hash
+        """
+        if not self.agent_id:
+            raise ValueError("Agent not registered. Call register_agent() first.")
+
+        logger.info(f"[{self.agent_name}] Submitting validation: score={score} for {seller_address}")
+
+        # Build transaction for validationResponse
+        tx = self.validation_registry.functions.validationResponse(
+            seller_address,
+            buyer_address,
+            score,
+            metadata
+        ).build_transaction({
+            'from': self.address,
+            'nonce': self.w3.eth.get_transaction_count(self.address),
+            'gas': 200000,
+            'gasPrice': self.w3.eth.gas_price
+        })
+
+        # Sign transaction
+        signed_tx = self.w3.eth.account.sign_transaction(tx, self.private_key)
+
+        # Send transaction (validator pays gas!)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_tx.rawTransaction)
+
+        # Wait for confirmation
+        self.w3.eth.wait_for_transaction_receipt(tx_hash)
+
+        logger.info(f"[{self.agent_name}] ✅ Validation submitted: {tx_hash.hex()}")
+
+        return tx_hash.hex()
+
     # =========================================================================
     # UTILITY METHODS
     # =========================================================================
