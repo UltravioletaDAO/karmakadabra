@@ -37,9 +37,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Karmacadabra** is a trustless agent economy where AI agents autonomously buy/sell data using blockchain-based payments. The system enables:
 
-- **Karma-Hello agents** selling Twitch stream chat logs (0.01-1.00 UVD per service)
-- **Abracadabra agents** selling stream transcriptions + AI analysis (0.02-3.00 UVD per service)
-- **Validator agents** providing quality verification (0.001 UVD per validation)
+- **Karma-Hello agents** selling Twitch stream chat logs (0.01-1.00 GLUE per service)
+- **Abracadabra agents** selling stream transcriptions + AI analysis (0.02-3.00 GLUE per service)
+- **Validator agents** providing quality verification (0.001 GLUE per validation)
 - **Gasless micropayments** using EIP-3009 meta-transactions via x402 protocol
 - **On-chain reputation** using ERC-8004 registries on Avalanche Fuji testnet
 
@@ -50,7 +50,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 ## Architecture: Three-Layer System
 
 ### Layer 1: Blockchain (Avalanche Fuji Testnet)
-- **UVD V2 Token** (`erc-20/`): ERC-20 with EIP-3009 for gasless transfers
+- **GLUE Token** (`erc-20/`): ERC-20 with EIP-3009 for gasless transfers at 0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
 - **ERC-8004 Registries** (`erc-8004/`): Identity, Reputation, Validation contracts
 - All agents register on-chain and build reputation through transactions
 
@@ -89,7 +89,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Smart Contracts (Foundry)
 
-**Deploy UVD Token to Fuji:**
+**Deploy GLUE Token to Fuji:**
 ```bash
 cd erc-20
 forge build
@@ -200,7 +200,7 @@ cp .env.example .env
 - `PRIVATE_KEY`: Wallet private key for signing transactions
 - `RPC_URL_FUJI`: Avalanche Fuji RPC endpoint
 - `IDENTITY_REGISTRY`: Address from ERC-8004 deployment
-- `UVD_TOKEN_ADDRESS`: Address from UVD token deployment
+- `GLUE_TOKEN_ADDRESS`: Address from GLUE token deployment
 - `FACILITATOR_URL`: x402 facilitator endpoint
 - `OPENAI_API_KEY`: For CrewAI agents (GPT-4o)
 
@@ -227,7 +227,7 @@ class KarmaHelloSeller(ERC8004BaseAgent, A2AServer):
         # Publish A2A AgentCard
         self.publish_agent_card()
 
-    @x402_required(price=UVD.amount("0.01"))
+    @x402_required(price=GLUE.amount("0.01"))
     async def get_logs(self, request):
         # CrewAI crew formats/validates data
         crew = Crew(agents=[formatter, validator])
@@ -243,22 +243,22 @@ class KarmaHelloSeller(ERC8004BaseAgent, A2AServer):
 Full catalog in `MONETIZATION_OPPORTUNITIES.md`. Quick reference:
 
 **Karma-Hello (6 tiers):**
-- Tier 1 (0.01-0.05 UVD): Chat logs, user activity, token economics
-- Tier 2 (0.05-0.15 UVD): ML predictions, sentiment analysis
-- Tier 3 (0.15-0.30 UVD): Fraud detection, economic health
-- Tier 4-6: A/B testing, custom models, enterprise (up to 200 UVD)
+- Tier 1 (0.01-0.05 GLUE): Chat logs, user activity, token economics
+- Tier 2 (0.05-0.15 GLUE): ML predictions, sentiment analysis
+- Tier 3 (0.15-0.30 GLUE): Fraud detection, economic health
+- Tier 4-6: A/B testing, custom models, enterprise (up to 200 GLUE)
 
 **Abracadabra (6 tiers):**
-- Tier 1 (0.02-0.08 UVD): Raw/enhanced transcripts, multi-language
-- Tier 2 (0.10-0.25 UVD): Clip generation, blog posts, social media
-- Tier 3 (0.25-0.50 UVD): Predictive engine, recommendations
-- Tier 4-6: Video editing, image generation, enterprise (up to 100 UVD)
+- Tier 1 (0.02-0.08 GLUE): Raw/enhanced transcripts, multi-language
+- Tier 2 (0.10-0.25 GLUE): Clip generation, blog posts, social media
+- Tier 3 (0.25-0.50 GLUE): Predictive engine, recommendations
+- Tier 4-6: Video editing, image generation, enterprise (up to 100 GLUE)
 
 **Mapping files to services:**
-- `logs/YYYYMMDD/full.txt` → Chat Logs service (0.01 UVD)
-- `transcripts/YYYYMMDD/{id}/transcripcion.json` → Raw Transcript (0.02 UVD)
-- `transcripts/YYYYMMDD/{id}/ideas_extraidas.json` → Idea Extraction (1.20 UVD)
-- `transcripts/YYYYMMDD/{id}/imagenes_generadas/` → Image Generation (0.80 UVD)
+- `logs/YYYYMMDD/full.txt` → Chat Logs service (0.01 GLUE)
+- `transcripts/YYYYMMDD/{id}/transcripcion.json` → Raw Transcript (0.02 GLUE)
+- `transcripts/YYYYMMDD/{id}/ideas_extraidas.json` → Idea Extraction (1.20 GLUE)
+- `transcripts/YYYYMMDD/{id}/imagenes_generadas/` → Image Generation (0.80 GLUE)
 
 ---
 
@@ -271,7 +271,7 @@ cd erc-20 && ./deploy-fuji.sh && cd ..
 cd erc-8004 && ./deploy-fuji.sh && cd ..
 
 # 2. Save addresses to all agent .env files
-# Copy IDENTITY_REGISTRY, REPUTATION_REGISTRY, VALIDATION_REGISTRY, UVD_TOKEN
+# Copy IDENTITY_REGISTRY, REPUTATION_REGISTRY, VALIDATION_REGISTRY, GLUE_TOKEN
 
 # 3. Start facilitator
 cd x402-rs && cargo run &

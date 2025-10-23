@@ -17,7 +17,7 @@
 
 ## 📦 Por Componente
 
-### 🪙 UVD V2 Token (ERC-20)
+### 🪙 GLUE Token (ERC-20)
 ```
 erc-20/
 ├── README.md         → Guía completa del token

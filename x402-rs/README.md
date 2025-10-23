@@ -13,7 +13,7 @@
 
 ```
 z:\ultravioleta\dao\karmacadabra\
-├── erc-20/                    (UVD V2 Token - facilitator settles with this)
+├── erc-20/                    (GLUE Token - facilitator settles with this)
 ├── erc-8004/                  (ERC-8004 Registries)
 ├── x402-rs/                   ← YOU ARE HERE
 ├── validator/                 (Uses facilitator for validation fees)
@@ -102,11 +102,11 @@ Based on deployment addresses from `erc-20/deployment.json`:
 
 | Token | Network | Address | Decimals | Use Case |
 |-------|---------|---------|----------|----------|
-| **UVD V2** | Fuji | `0x...` (from deployment) | 6 | Primary payment token |
+| **GLUE** | Fuji | `0x...` (from deployment) | 6 | Primary payment token |
 | **USDC** | Fuji | `0x5425890298aed601595a70AB815c96711a31Bc65` | 6 | Alternative payment |
 | **WAVAX** | Fuji | `0xd00ae08403B9bbb9124bB305C09058E32C39A48c` | 18 | Alternative payment |
 
-**Note**: Token addresses will be configured after deploying UVD V2 token in Phase 1.
+**Note**: Token addresses will be configured after deploying GLUE token in Phase 1.
 
 ### Wallet Configuration
 
@@ -388,7 +388,7 @@ python scripts/test_payment.py --facilitator http://localhost:8080
 
 ### Phase 1: Initial Deployment
 
-- [ ] Deploy UVD V2 token to Fuji
+- [ ] Deploy GLUE token to Fuji
 - [ ] Save UVD address to `erc-20/deployment.json`
 - [ ] Update `.env` with UVD address
 - [ ] Build Docker image
@@ -498,7 +498,7 @@ const MAX_REQUESTS_PER_HOUR: u32 = 1000;
 ### Karmacadabra Docs
 
 - **MASTER_PLAN.md**: Complete system architecture
-- **erc-20/README.md**: UVD V2 Token documentation
+- **erc-20/README.md**: GLUE Token documentation
 - **MONETIZATION_OPPORTUNITIES.md**: All services & pricing
 
 ### x402 Protocol
@@ -539,4 +539,4 @@ const MAX_REQUESTS_PER_HOUR: u32 = 1000;
 
 **Status**: Ready for Phase 1 deployment
 
-**Next Step**: Deploy UVD V2 token, then configure and deploy facilitator
+**Next Step**: Deploy GLUE token, then configure and deploy facilitator

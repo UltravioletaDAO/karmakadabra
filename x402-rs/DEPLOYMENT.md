@@ -5,7 +5,7 @@ Complete step-by-step guide for deploying the x402 payment facilitator to Cherry
 
 ---
 
-## =Ë Table of Contents
+## =ï¿½ Table of Contents
 
 1. [Prerequisites](#prerequisites)
 2. [Phase 1: Initial Setup](#phase-1-initial-setup)
@@ -111,7 +111,7 @@ cast balance 0xYourWalletAddress \
 
 ## Phase 2: Token Deployment
 
-### 2.1 Deploy UVD V2 Token
+### 2.1 Deploy GLUE Token
 
 ```bash
 # Navigate to erc-20 folder
@@ -121,7 +121,7 @@ cd ../erc-20
 ./deploy-fuji.sh
 
 # Output:
-#  UVD V2 deployed to: 0xABC...
+#  GLUE deployed to: 0xABC...
 #  Saved to deployment.json
 ```
 
@@ -234,7 +234,7 @@ curl http://localhost:8080/supported | jq
 Ensure DNS A record points to your server:
 
 ```bash
-facilitator.ultravioletadao.xyz ’ your-server-ip
+facilitator.ultravioletadao.xyz ï¿½ your-server-ip
 ```
 
 Verify:
@@ -441,9 +441,9 @@ WEBHOOK_URL=https://discord.com/api/webhooks/...
 ./deploy-facilitator.sh logs
 
 # Common issues:
-# - Invalid private key ’ Check EVM_PRIVATE_KEY in .env
-# - RPC connection failed ’ Test RPC_URL manually
-# - Port 8080 in use ’ Check with: lsof -i :8080
+# - Invalid private key ï¿½ Check EVM_PRIVATE_KEY in .env
+# - RPC connection failed ï¿½ Test RPC_URL manually
+# - Port 8080 in use ï¿½ Check with: lsof -i :8080
 ```
 
 ### Payment Verification Fails
@@ -587,6 +587,6 @@ nano .env  # Change RPC_URL_AVALANCHE_FUJI
 
 ---
 
-**Deployment Status**: Ready for Phase 1 (after UVD V2 token deployment)
+**Deployment Status**: Ready for Phase 1 (after GLUE token deployment)
 
-**Next Step**: Deploy UVD V2 token, then follow this guide step-by-step
+**Next Step**: Deploy GLUE token, then follow this guide step-by-step

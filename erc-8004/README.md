@@ -13,7 +13,7 @@
 
 ```
 z:\ultravioleta\dao\karmacadabra\
-├── erc-20/                    (UVD V2 Token)
+├── erc-20/                    (GLUE Token)
 ├── erc-8004/                  ← ESTÁS AQUÍ
 ├── x402-rs/                   (x402 Facilitator)
 ├── validator/                 (Validator Agent - USA estos contratos)

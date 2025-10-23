@@ -1,0 +1,98 @@
+# Voice-Extractor Agent Dependencies
+# Python 3.11+
+
+# ============================================================================
+# Core Framework
+# ============================================================================
+crewai>=0.1.0                 # Multi-agent orchestration
+pydantic>=2.0.0               # Data validation
+pydantic-ai>=0.1.0            # A2A protocol support
+
+# ============================================================================
+# Web Framework
+# ============================================================================
+fastapi>=0.104.0              # HTTP server
+uvicorn[standard]>=0.24.0     # ASGI server
+httpx>=0.25.0                 # Async HTTP client
+
+# ============================================================================
+# Blockchain & Web3
+# ============================================================================
+web3>=6.11.0                  # Ethereum/Avalanche interaction
+eth-account>=0.10.0           # Wallet management
+eth-abi>=4.2.0                # ABI encoding/decoding
+
+# ============================================================================
+# NLP & Linguistic Analysis
+# ============================================================================
+spacy>=3.7.0                  # NLP toolkit
+nltk>=3.8.0                   # Natural Language Toolkit
+textstat>=0.7.3               # Text statistics and readability
+langdetect>=1.0.9             # Language detection (for code-switching)
+
+# SpaCy models (install separately)
+# python -m spacy download en_core_web_lg
+# python -m spacy download es_core_news_lg
+
+# ============================================================================
+# LLM Integration
+# ============================================================================
+openai>=1.3.0                 # OpenAI API for GPT-4o
+tiktoken>=0.5.0               # Token counting
+
+# ============================================================================
+# x402 Protocol
+# ============================================================================
+# x402-python (when available)
+# For now, implement via httpx with custom headers
+
+# ============================================================================
+# Data Processing
+# ============================================================================
+pandas>=2.1.0                 # Data analysis
+numpy>=1.26.0                 # Numerical computing
+scikit-learn>=1.3.0           # ML utilities (clustering, classification)
+
+# ============================================================================
+# Caching & Performance
+# ============================================================================
+redis>=5.0.0                  # Caching layer
+aioredis>=2.0.1               # Async Redis client
+
+# ============================================================================
+# Security
+# ============================================================================
+cryptography>=41.0.0          # Encryption for stored profiles
+python-jose[cryptography]>=3.3.0  # JWT handling
+passlib>=1.7.4                # Password hashing utilities
+
+# ============================================================================
+# Utilities
+# ============================================================================
+python-dotenv>=1.0.0          # Environment variable management
+click>=8.1.0                  # CLI interface
+rich>=13.0.0                  # Terminal formatting
+loguru>=0.7.0                 # Enhanced logging
+
+# ============================================================================
+# Testing
+# ============================================================================
+pytest>=7.4.0                 # Testing framework
+pytest-asyncio>=0.21.0        # Async test support
+pytest-cov>=4.1.0             # Code coverage
+httpx-mock>=0.11.0            # HTTP mocking
+
+# ============================================================================
+# Development
+# ============================================================================
+black>=23.0.0                 # Code formatting
+flake8>=6.1.0                 # Linting
+mypy>=1.7.0                   # Type checking
+isort>=5.12.0                 # Import sorting
+
+# ============================================================================
+# Optional: Advanced NLP
+# ============================================================================
+# transformers>=4.35.0        # Hugging Face transformers (for advanced analysis)
+# torch>=2.1.0                # PyTorch (if using transformers)
+# sentencepiece>=0.1.99       # Tokenization (for some models)

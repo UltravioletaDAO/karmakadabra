@@ -126,6 +126,7 @@ desktop.ini
 # Ignore all date folders in karma-hello-agent/logs/ except 20251021
 karma-hello-agent/logs/*/
 !karma-hello-agent/logs/20251021/
+karma-hello-agent/logs/users-historical/
 
 # Ignore all date folders in abracadabra-agent/transcripts/ except 20251021
 abracadabra-agent/transcripts/*/
@@ -133,6 +134,7 @@ abracadabra-agent/transcripts/*/
 
 # But still ignore large media files inside 20251021
 karma-hello-agent/logs/20251021/*.mp3
+
 abracadabra-agent/transcripts/20251021/*/*.mp3
 abracadabra-agent/transcripts/20251021/*/*.mp4
 abracadabra-agent/transcripts/20251021/*/*.wav

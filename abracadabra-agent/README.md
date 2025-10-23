@@ -13,7 +13,7 @@
 
 ```
 z:\ultravioleta\dao\karmacadabra\
-├── erc-20/                    (UVD V2 Token - RECIBE pagos aquí)
+├── erc-20/                    (GLUE Token - RECIBE pagos aquí)
 ├── erc-8004/                  (SE REGISTRA como Agent ID 2 y 5)
 ├── x402-rs/                   (USA facilitator para pagos)
 ├── validator/                 (SOLICITA validaciones antes de venta)

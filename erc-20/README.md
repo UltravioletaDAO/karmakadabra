@@ -1,11 +1,12 @@
-# 🪙 UVD V2 Token - ERC-20 con EIP-3009
+# 🪙 GLUE Token - ERC-20 con EIP-3009
 
 > Token ERC-20 con soporte de meta-transacciones gasless para el ecosistema Ultravioleta DAO
 
-**Versión**: 2.0.0
+**Versión**: 1.0.0
 **Network**: Avalanche Fuji Testnet (Chain ID: 43113)
-**Estado**: 🔴 Por desplegar
-**Última actualización**: Octubre 21, 2025
+**Estado**: ✅ Desplegado y Verificado
+**Dirección**: `0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743`
+**Última actualización**: Octubre 23, 2025
 
 ---
 
@@ -42,23 +43,23 @@ z:\ultravioleta\dao\karmacadabra\
 
 ## 🎯 Descripción
 
-**UVD V2** es el token nativo del ecosistema de agentes autónomos de Ultravioleta DAO. Su característica principal es el soporte de **transferencias gasless** mediante EIP-3009, permitiendo que agentes AI realicen micropagos sin necesitar ETH/AVAX para gas.
+**GLUE Token** (Gasless Lightweight Ultraviolet Economy) es el token nativo del ecosistema de agentes autónomos de Ultravioleta DAO. Su característica principal es el soporte de **transferencias gasless** mediante EIP-3009, permitiendo que agentes AI realicen micropagos sin necesitar ETH/AVAX para gas.
 
 ### Rol en el Ecosistema
 
-UVD V2 es la **moneda de pago** para todos los servicios comercializados entre agentes:
+GLUE es la **moneda de pago** para todos los servicios comercializados entre agentes:
 
-- **Karma-Hello Agent** vende logs de streams: 0.01-1.00 UVD por servicio
-- **Abracadabra Agent** vende transcripciones: 0.02-3.00 UVD por servicio
-- **Validator Agent** cobra fees de validación: 0.001 UVD por validación
-- **Cross-Platform Bundles**: 0.25-1.80 UVD con descuentos
+- **Karma-Hello Agent** vende logs de streams: 0.01-1.00 GLUE por servicio
+- **Abracadabra Agent** vende transcripciones: 0.02-3.00 GLUE por servicio
+- **Validator Agent** cobra fees de validación: 0.001 GLUE por validación
+- **Cross-Platform Bundles**: 0.25-1.80 GLUE con descuentos
 
 **Total de servicios monetizables**: 50+ productos (ver `MONETIZATION_OPPORTUNITIES.md`)
 
 **Revenue proyectado**:
-- Scenario conservador: 1,800 UVD/año (100 agentes)
-- Scenario moderado: 120,000 UVD/año (1,000 agentes)
-- Scenario optimista: 3,000,000 UVD/año (10,000 agentes)
+- Scenario conservador: 1,800 GLUE/año (100 agentes)
+- Scenario moderado: 120,000 GLUE/año (1,000 agentes)
+- Scenario optimista: 3,000,000 GLUE/año (10,000 agentes)
 
 ### ¿Por qué EIP-3009?
 
@@ -116,13 +117,14 @@ function permit(
 
 **Uso**: Approvals sin gas (útil para DEXs, contratos)
 
-### Token Parameters (Matching UVT V1)
-- **Name**: Ultravioleta DAO Token
-- **Symbol**: UVD
+### Token Parameters
+- **Name**: GLUE Token
+- **Symbol**: GLUE
 - **Decimals**: 6 (matching USDC for lower gas costs)
-- **Initial Supply**: 24,157,817 UVD
+- **Initial Supply**: 24,157,817 GLUE
 - **Owner Wallet**: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
 - **Total Supply**: 24,157,817,000,000 (with decimals)
+- **Deployed Address**: 0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
 
 ### Security Features
 - ✅ **Nonce-based Replay Protection**: Each authorization can only be used once
@@ -227,8 +229,8 @@ chmod +x deploy-fuji.sh
 
 **The script will:**
 1. ✅ Build contracts with `forge build`
-2. ✅ Deploy UVD_V2 contract to Avalanche Fuji
-3. ✅ Mint 24,157,817 UVD to owner wallet (0x5211...3389)
+2. ✅ Deploy GLUE contract to Avalanche Fuji
+3. ✅ Mint 24,157,817 GLUE to owner wallet
 4. ✅ Verify contract on Snowtrace (if API key provided)
 5. ✅ Save deployment info to `deployment.json`
 6. ✅ Display next steps for x402 configuration
@@ -237,19 +239,19 @@ chmod +x deploy-fuji.sh
 
 ```
 ========================================
-UVD V2 Token Deployment
+GLUE Token Deployment
 ========================================
 Network: Avalanche Fuji Testnet
 Chain ID: 43113
 
-Contract Address: 0xABC...DEF
-Token Name: Ultravioleta DAO Token
-Token Symbol: UVD
+Contract Address: 0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
+Token Name: GLUE Token
+Token Symbol: GLUE
 Decimals: 6
-Initial Supply: 24,157,817 UVD
+Initial Supply: 24,157,817 GLUE
 Total Supply (with decimals): 24,157,817,000,000
 Owner: 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
-Owner Balance: 24,157,817 UVD
+Owner Balance: 24,157,817 GLUE
 ========================================
 
 Deployment info saved to: deployment.json
@@ -262,7 +264,7 @@ Deployment info saved to: deployment.json
 forge build
 
 # 2. Deploy using forge script
-forge script script/Deploy.s.sol:DeployUVD_V2 \
+forge script script/DeployGLUE.s.sol:DeployGLUE \
   --rpc-url $RPC_URL_AVALANCHE_FUJI \
   --broadcast \
   --verify \
@@ -280,9 +282,10 @@ TOKEN_ADDRESS=$(cat deployment.json | jq -r '.tokenAddress')
 # Verify manually
 forge verify-contract \
   $TOKEN_ADDRESS \
-  src/UVD_V2.sol:UVD_V2 \
+  src/GLUE.sol:GLUE \
   --chain-id 43113 \
-  --etherscan-api-key $SNOWTRACE_API_KEY
+  --verifier blockscout \
+  --verifier-url https://api.routescan.io/v2/network/testnet/evm/43113/etherscan
 ```
 
 ### Post-Deployment
@@ -295,18 +298,18 @@ cat deployment.json
 # {
 #   "network": "avalanche-fuji",
 #   "chainId": 43113,
-#   "tokenAddress": "0x...",
-#   "tokenName": "Ultravioleta DAO Token",
-#   "tokenSymbol": "UVD",
+#   "tokenAddress": "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743",
+#   "tokenName": "GLUE Token",
+#   "tokenSymbol": "GLUE",
 #   "decimals": 6,
 #   "initialSupply": 24157817,
 #   "owner": "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8",
-#   "deployedAt": 1234567890
+#   "deployedAt": 1761242932
 # }
 
 # 2. Update x402 facilitator configuration
 TOKEN_ADDRESS=$(cat deployment.json | jq -r '.tokenAddress')
-echo "UVD_TOKEN_ADDRESS=$TOKEN_ADDRESS" >> ../x402-rs/.env
+echo "GLUE_TOKEN_ADDRESS=$TOKEN_ADDRESS" >> ../x402-rs/.env
 
 # 3. Verify on Snowtrace
 echo "https://testnet.snowtrace.io/address/$TOKEN_ADDRESS"
@@ -315,7 +318,7 @@ echo "https://testnet.snowtrace.io/address/$TOKEN_ADDRESS"
 cast call $TOKEN_ADDRESS "balanceOf(address)(uint256)" 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8 \
   --rpc-url $RPC_URL_AVALANCHE_FUJI
 
-# Expected: 24157817000000 (24,157,817 UVD with 6 decimals)
+# Expected: 24157817000000 (24,157,817 GLUE with 6 decimals)
 ```
 
 ---
@@ -326,7 +329,7 @@ cast call $TOKEN_ADDRESS "balanceOf(address)(uint256)" 0x34033041a5944B8F10f8E4D
 
 ```javascript
 // JavaScript/TypeScript (ethers.js)
-const token = new ethers.Contract(UVD_ADDRESS, UVD_ABI, signer);
+const token = new ethers.Contract(GLUE_ADDRESS, GLUE_ABI, signer);
 
 // Transfer
 await token.transfer(recipientAddress, ethers.parseUnits("10", 6));
@@ -343,17 +346,17 @@ import { ethers } from 'ethers';
 // 1. Preparar autorización
 const from = await signer.getAddress();
 const to = "0x..."; // Recipient
-const value = ethers.parseUnits("0.02", 6); // 0.02 UVD
+const value = ethers.parseUnits("0.02", 6); // 0.02 GLUE
 const validAfter = 0;
 const validBefore = Math.floor(Date.now() / 1000) + 3600; // 1 hora
 const nonce = ethers.hexlify(ethers.randomBytes(32));
 
 // 2. Domain separator (EIP-712)
 const domain = {
-  name: "Ultravioleta DAO",
-  version: "2",
+  name: "GLUE Token",
+  version: "1",
   chainId: 43113,
-  verifyingContract: UVD_ADDRESS
+  verifyingContract: GLUE_ADDRESS
 };
 
 // 3. Types
@@ -401,17 +404,17 @@ w3 = Web3(Web3.HTTPProvider("https://avalanche-fuji-c-chain-rpc.publicnode.com")
 # 1. Preparar datos
 from_address = "0x..."
 to_address = "0x..."
-value = 20000  # 0.02 UVD (6 decimals)
+value = 20000  # 0.02 GLUE (6 decimals)
 valid_after = 0
 valid_before = int(time.time()) + 3600
 nonce = "0x" + secrets.token_hex(32)
 
 # 2. EIP-712 domain
 domain = {
-    "name": "Ultravioleta DAO",
-    "version": "2",
+    "name": "GLUE Token",
+    "version": "1",
     "chainId": 43113,
-    "verifyingContract": UVD_ADDRESS
+    "verifyingContract": GLUE_ADDRESS
 }
 
 # 3. Message
@@ -452,7 +455,7 @@ structured_msg = encode_typed_data(
 signed = w3.eth.account.sign_message(structured_msg, private_key=PRIVATE_KEY)
 
 # 6. Ejecutar
-token = w3.eth.contract(address=UVD_ADDRESS, abi=UVD_ABI)
+token = w3.eth.contract(address=GLUE_ADDRESS, abi=GLUE_ABI)
 tx = token.functions.transferWithAuthorization(
     from_address,
     to_address,
@@ -473,7 +476,7 @@ print(f"Transfer gasless completado: {receipt.transactionHash.hex()}")
 
 ## 🔌 Integración con x402
 
-El token UVD V2 está diseñado para funcionar perfectamente con el protocolo x402 para micropagos HTTP.
+El token GLUE está diseñado para funcionar perfectamente con el protocolo x402 para micropagos HTTP.
 
 ### Configuración en x402-rs
 
@@ -483,23 +486,23 @@ El token UVD V2 está diseñado para funcionar perfectamente con el protocolo x4
 use crate::types::{TokenAsset, TokenDeployment, TokenAssetEip712};
 use crate::network::Network;
 
-pub struct UVDDeployment;
+pub struct GLUEDeployment;
 
-impl UVDDeployment {
+impl GLUEDeployment {
     pub fn by_network(network: Network) -> TokenDeployment {
         match network {
             Network::AvalancheFuji => TokenDeployment {
                 asset: TokenAsset {
-                    address: "0xTU_UVD_ADDRESS".parse().unwrap(),
+                    address: "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743".parse().unwrap(),
                     network: Network::AvalancheFuji,
                 },
                 decimals: 6,
                 eip712: TokenAssetEip712 {
-                    name: "Ultravioleta DAO".into(),
-                    version: "2".into(),
+                    name: "GLUE Token".into(),
+                    version: "1".into(),
                 },
             },
-            _ => panic!("UVD not deployed on {:?}", network)
+            _ => panic!("GLUE not deployed on {:?}", network)
         }
     }
 }
@@ -511,14 +514,14 @@ impl UVDDeployment {
 # karma-hello-agent/agents/karma_hello_seller.py
 
 from x402_axum import X402Middleware, IntoPriceTag
-from network import UVDDeployment, Network
+from network import GLUEDeployment, Network
 
 # Setup x402 middleware
 x402 = X402Middleware(facilitator_url="https://facilitator.ultravioletadao.xyz")
-uvd = UVDDeployment.by_network(Network.AvalancheFuji)
+glue = GLUEDeployment.by_network(Network.AvalancheFuji)
 
 # Define precio
-price_tag = uvd.amount("0.01").pay_to(SELLER_WALLET_ADDRESS)
+price_tag = glue.amount("0.01").pay_to(SELLER_WALLET_ADDRESS)
 
 # Aplicar a endpoint
 @app.post("/api/logs")
@@ -557,13 +560,13 @@ forge test --fork-url https://avalanche-fuji-c-chain-rpc.publicnode.com -vv
 ### Test de EIP-3009 Gasless
 
 ```solidity
-// test/UVDToken.t.sol
+// test/GLUEToken.t.sol
 
 function testTransferWithAuthorizationGasless() public {
     // Setup
     address alice = makeAddr("alice");
     address bob = makeAddr("bob");
-    uint256 amount = 100 * 10**6; // 100 UVD
+    uint256 amount = 100 * 10**6; // 100 GLUE
 
     // Mint to Alice
     token.mint(alice, amount);

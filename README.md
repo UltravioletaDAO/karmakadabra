@@ -19,22 +19,24 @@
 
 | Contract | Address | Status |
 |----------|---------|--------|
-| **UVD V2 Token (EIP-3009)** | [`0xfEe5CC33479E748f40F5F299Ff6494b23F88C425`](https://testnet.snowtrace.io/address/0xfEe5CC33479E748f40F5F299Ff6494b23F88C425) | ✅ Verified |
-| **Identity Registry (ERC-8004)** | [`0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618`](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) | ✅ Verified |
-| **Reputation Registry (ERC-8004)** | [`0x932d32194C7A47c0fe246C1d61caF244A4804C6a`](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) | ✅ Verified |
-| **Validation Registry (ERC-8004)** | [`0x9aF4590035C109859B4163fd8f2224b820d11bc2`](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) | ✅ Verified |
+| **GLUE Token (EIP-3009)** | [`0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743`](https://testnet.snowtrace.io/address/0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743) | ✅ Verified |
+| **Identity Registry** | [`0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618`](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) | ✅ Verified |
+| **Reputation Registry** | [`0x932d32194C7A47c0fe246C1d61caF244A4804C6a`](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) | ✅ Verified |
+| **Validation Registry** | [`0x9aF4590035C109859B4163fd8f2224b820d11bc2`](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) | ✅ Verified |
+| **Transaction Logger** | [`0x85ea82dDc0d3dDC4473AAAcc7E7514f4807fF654`](https://testnet.snowtrace.io/address/0x85ea82dDc0d3dDC4473AAAcc7E7514f4807fF654) | ✅ Verified |
 
 **Network**: Avalanche Fuji Testnet (Chain ID: 43113)
 **Registration Fee**: 0.005 AVAX
-**Token Supply**: 24,157,817 UVD (6 decimals)
+**Token Supply**: 24,157,817 GLUE (6 decimals)
 
-### Agent Wallets (Funded with 10,946 UVD each)
+### Agent Wallets (Funded with 55,000 GLUE each)
 
-| Agent | Wallet Address | UVD Balance |
-|-------|----------------|-------------|
-| **Validator** | [`0x1219eF9484BF7E40E6479141B32634623d37d507`](https://testnet.snowtrace.io/address/0x1219eF9484BF7E40E6479141B32634623d37d507) | 10,946 UVD |
-| **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://testnet.snowtrace.io/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 10,946 UVD |
-| **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://testnet.snowtrace.io/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 10,946 UVD |
+| Agent | Wallet Address | GLUE Balance |
+|-------|----------------|--------------|
+| **Validator** | [`0x1219eF9484BF7E40E6479141B32634623d37d507`](https://testnet.snowtrace.io/address/0x1219eF9484BF7E40E6479141B32634623d37d507) | 55,000 GLUE |
+| **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://testnet.snowtrace.io/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 55,000 GLUE |
+| **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://testnet.snowtrace.io/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 55,000 GLUE |
+| **Client Agent** | [`0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`](https://testnet.snowtrace.io/address/0xCf30021812F27132d36dc791E0eC17f34B4eE8BA) | 55,000 GLUE |
 
 **View All Contracts**: [Snowtrace Explorer](https://testnet.snowtrace.io/)
 
@@ -101,13 +103,45 @@ python main.py
 
 ---
 
+## 🔐 AWS Secrets Manager (Security)
+
+All agent private keys are stored centrally in **AWS Secrets Manager** for security. The agents automatically fetch keys from AWS when `.env` files are empty, or use local keys if filled (for testing).
+
+### Quick Setup
+
+```bash
+# 1. Configure AWS CLI (one-time)
+aws configure
+# Enter your AWS Access Key ID, Secret Access Key, region (us-east-1)
+
+# 2. Store all keys in AWS Secrets Manager
+python scripts/setup-secrets.py
+# Creates secret 'karmacadabra' with all agent private keys
+
+# 3. (Optional) Clear local .env files
+python scripts/clear-env-keys.py
+# Empties PRIVATE_KEY in all .env files
+
+# 4. Test retrieval
+python -m shared.secrets_manager validator-agent
+# [AWS Secrets] Retrieved key for 'validator-agent' from AWS
+```
+
+**How it works:**
+- If `PRIVATE_KEY` in `.env` is **filled** → uses local key (development)
+- If `PRIVATE_KEY` in `.env` is **empty** → fetches from AWS (production)
+
+**Full guide**: See [shared/AWS_SECRETS_SETUP.md](./shared/AWS_SECRETS_SETUP.md)
+
+---
+
 ## 🏗️ Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
 │   AVALANCHE FUJI TESTNET (Our Home - Layer 1)                   │
 │  ┌──────────────────┐    ┌─────────────────────────────────┐    │
-│  │  UVD V2 Token    │    │ ERC-8004 EXTENDED               │    │
+│  │  GLUE Token      │    │ ERC-8004 EXTENDED               │    │
 │  │  (EIP-3009)      │    │  (Bidirectional!)               │    │
 │  │  Gasless txs ✓   │    │  • Identity Registry            │    │
 │  └──────────────────┘    │  • Reputation Registry          │    │
@@ -130,7 +164,7 @@ python main.py
 │ Karma-Hello Agent  │      │ Abracadabra Agent  │
 │ • Sells: Chat logs │◄────►│ • Sells: Transcripts│
 │ • Buys: Transcripts│      │ • Buys: Chat logs   │
-│ • Price: 0.01 UVD  │      │ • Price: 0.02 UVD   │
+│ • Price: 0.01 GLUE │      │ • Price: 0.02 GLUE  │
 │ • Data: MongoDB    │      │ • Data: SQLite      │
 │ • Gas: 0 (gasless!)│      │ • Gas: 0 (gasless!) │
 └────────────────────┘      └─────────────────────┘
@@ -141,7 +175,7 @@ python main.py
          │  Validator Agent   │
          │  • CrewAI crew     │
          │  • Quality score   │
-         │  • Fee: 0.001 UVD  │
+         │  • Fee: 0.001 GLUE │
          └────────────────────┘
 ```
 
@@ -150,17 +184,17 @@ python main.py
 ## 💰 What Can Be Monetized?
 
 ### Karma-Hello Services (20+ products)
-- **Tier 1** (0.01 UVD): Chat logs, user activity
-- **Tier 2** (0.10 UVD): ML predictions, sentiment analysis
-- **Tier 3** (0.20 UVD): Fraud detection, economic health
-- **Enterprise** (up to 200 UVD): White-label, custom models
+- **Tier 1** (0.01 GLUE): Chat logs, user activity
+- **Tier 2** (0.10 GLUE): ML predictions, sentiment analysis
+- **Tier 3** (0.20 GLUE): Fraud detection, economic health
+- **Enterprise** (up to 200 GLUE): White-label, custom models
 
 ### Abracadabra Services (30+ products)
-- **Tier 1** (0.02 UVD): Raw transcripts, enhanced transcripts
-- **Tier 2** (0.15 UVD): Clip generation, blog posts
-- **Tier 3** (0.35 UVD): Predictive engine, recommendations
-- **Tier 4** (1.50 UVD): Auto video editing, image generation
-- **Enterprise** (up to 100 UVD): Custom AI models
+- **Tier 1** (0.02 GLUE): Raw transcripts, enhanced transcripts
+- **Tier 2** (0.15 GLUE): Clip generation, blog posts
+- **Tier 3** (0.35 GLUE): Predictive engine, recommendations
+- **Tier 4** (1.50 GLUE): Auto video editing, image generation
+- **Enterprise** (up to 100 GLUE): Custom AI models
 
 **Full catalog**: [MONETIZATION_OPPORTUNITIES.md](./MONETIZATION_OPPORTUNITIES.md)
 
@@ -170,12 +204,17 @@ python main.py
 
 ```
 karmacadabra/
-├── erc-20/                    # UVD V2 Token (EIP-3009)
+├── erc-20/                    # GLUE Token (EIP-3009)
 ├── erc-8004/                  # ERC-8004 Extended - Bidirectional reputation registries
 ├── x402-rs/                   # Payment facilitator (Rust)
 ├── validator/                 # Validator agent (Python + CrewAI)
 ├── karma-hello-agent/         # Chat log seller/buyer agents
 ├── abracadabra-agent/         # Transcript seller/buyer agents
+├── client-agent/              # Generic buyer agent
+├── voice-extractor-agent/     # Linguistic analysis agent
+├── skill-extractor-agent/     # Skill profiling agent
+├── shared/                    # Shared utilities (AWS Secrets Manager, etc.)
+├── scripts/                   # Setup and deployment scripts
 ├── MASTER_PLAN.md            # Complete vision & roadmap
 ├── ARCHITECTURE.md           # Technical architecture
 ├── MONETIZATION_OPPORTUNITIES.md
@@ -191,7 +230,7 @@ karmacadabra/
 | Layer | Technology | Purpose |
 |-------|-----------|---------|
 | **Blockchain** | Avalanche Fuji | EVM testnet for smart contracts |
-| **Contracts** | Solidity + Foundry | ERC-8004 registries + UVD token |
+| **Contracts** | Solidity + Foundry | ERC-8004 registries + GLUE token |
 | **Facilitator** | Rust (Axum) | x402 payment verification |
 | **Agents** | Python 3.11+ | AI agent runtime |
 | **AI Framework** | CrewAI | Multi-agent orchestration |
@@ -209,7 +248,7 @@ karmacadabra/
 ✅ **Trustless Validation**: Independent validators verify data quality
 ✅ **Agent Discovery**: A2A protocol AgentCards at `/.well-known/agent-card`
 ✅ **Multi-Agent Workflows**: CrewAI crews for complex tasks
-✅ **50+ Monetizable Services**: From $0.01 to $200 UVD per service
+✅ **50+ Monetizable Services**: From $0.01 to $200 GLUE per service
 
 ---
 
@@ -233,8 +272,9 @@ karmacadabra/
 | Phase | Component | Status |
 |-------|-----------|--------|
 | **Phase 1** | ERC-8004 Extended Registries | ✅ **DEPLOYED & VERIFIED** |
-| **Phase 1** | UVD V2 Token | ✅ **DEPLOYED & VERIFIED** |
-| **Phase 1** | Token Distribution | ✅ **COMPLETE** (10,946 UVD to each agent) |
+| **Phase 1** | GLUE Token | ✅ **DEPLOYED & VERIFIED** |
+| **Phase 1** | TransactionLogger | ✅ **DEPLOYED & VERIFIED** |
+| **Phase 1** | Token Distribution | ✅ **COMPLETE** (55,000 GLUE to each agent) |
 | **Phase 1** | x402 Facilitator | ⏸️ Ready (requires Rust nightly - using external facilitator) |
 | **Phase 2** | Validator Agent | 🔄 **IN PROGRESS** |
 | **Phase 3** | Karma-Hello Agents | 🔴 To implement |
@@ -272,17 +312,18 @@ python generate-wallet.py my-agent
 - Displays Fuji testnet info and next steps
 - Reusable for unlimited agents
 
-### UVD Token Distributor
-Distribute UVD tokens to agent wallets:
+### Token Distributor
+Distribute tokens (GLUE/UVD/etc.) to agent wallets:
 
 ```bash
 cd erc-20
-python distribute-uvd.py
+python distribute-token.py
 ```
 
 **Features**:
 - Automatically loads wallet addresses from agent `.env` files
-- Distributes 10,946 UVD to each agent
+- Configurable amounts (currently 55,000 GLUE for all agents)
+- Supports any ERC-20 token (configure via UVD_TOKEN_ADDRESS in .env)
 - Shows before/after balances
 - Transaction links on Snowtrace
 - Supports: validator, karma-hello-agent, abracadabra-agent, client-agent
@@ -290,10 +331,10 @@ python distribute-uvd.py
 **Agents**:
 | Agent | Funded | Balance |
 |-------|--------|---------|
-| Validator | ✅ | 10,946 UVD |
-| Karma-Hello | ✅ | 10,946 UVD |
-| Abracadabra | ✅ | 10,946 UVD |
-| Client-Agent | ⏳ | Pending |
+| Validator | ✅ | 55,000 GLUE |
+| Karma-Hello | ✅ | 55,000 GLUE |
+| Abracadabra | ✅ | 55,000 GLUE |
+| Client-Agent | ✅ | 55,000 GLUE |
 
 ---
 

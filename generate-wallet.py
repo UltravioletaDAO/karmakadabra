@@ -94,9 +94,9 @@ def generate_wallet(agent_name=None, auto_save=False):
         print(f"    Edit: {agent_name}/.env")
     print(f"    PRIVATE_KEY={account.key.hex()}")
     print()
-    print("[3] Fund wallet with UVD tokens:")
+    print("[3] Fund wallet with tokens:")
     print("    cd erc-20")
-    print("    python distribute-uvd.py")
+    print("    python distribute-token.py")
     print()
 
     # Save to file option

@@ -14,7 +14,7 @@
 
 ```
 z:\ultravioleta\dao\karmacadabra\
-├── erc-20/                    (UVD V2 Token - recibe 0.001 UVD por validación)
+├── erc-20/                    (GLUE Token - recibe 0.001 GLUE por validación)
 ├── erc-8004/                  (REGISTRA identidad aquí, SUBE validaciones)
 ├── x402-rs/                   (x402 Facilitator)
 ├── validator/                 ← ESTÁS AQUÍ

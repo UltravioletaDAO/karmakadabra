@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 """
-UVD Token Distribution Script
-Distributes 10,946 UVD to each agent wallet
+Token Distribution Script
+Distributes tokens (GLUE/UVD/etc.) to agent wallets based on role:
+- System agents (validator, karma-hello, abracadabra): 21,892 tokens each
+- Client agents: 10,946 tokens each
+
+Configure token address in .env as UVD_TOKEN_ADDRESS
 
 Usage:
-    python distribute-uvd.py
+    python distribute-token.py
 """
 
 import os
@@ -18,21 +22,30 @@ load_dotenv()
 # Configuration
 RPC_URL = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
 CHAIN_ID = 43113
-UVD_TOKEN_ADDRESS = "0xfEe5CC33479E748f40F5F299Ff6494b23F88C425"
+UVD_TOKEN_ADDRESS = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"  # GLUE Token
 OWNER_PRIVATE_KEY = os.getenv("PRIVATE_KEY")
 
-# Amount to distribute: 10,946 UVD (with 6 decimals)
-AMOUNT_PER_AGENT = 10_946 * 10**6  # 10,946.000000 UVD
+# Amount to distribute per agent (with 6 decimals)
+# All agents get 55,000 GLUE each
+AGENT_AMOUNTS = {
+    "validator-agent": 55_000 * 10**6,      # 55,000.000000 GLUE
+    "karma-hello-agent": 55_000 * 10**6,    # 55,000.000000 GLUE
+    "abracadabra-agent": 55_000 * 10**6,    # 55,000.000000 GLUE
+    "client-agent": 55_000 * 10**6,         # 55,000.000000 GLUE
+    "voice-extractor-agent": 55_000 * 10**6, # 55,000.000000 GLUE
+}
 
 # Agent wallet addresses (extracted from .env files)
 AGENT_WALLETS = {
     "validator-agent": None,  # Will be loaded from .env
     "karma-hello-agent": None,
     "abracadabra-agent": None,
-    "client-agent": None,  # NEW: Generic buyer agent
+    "client-agent": None,  # Generic buyer agent
+    "voice-extractor-agent": None,  # Voice/personality extraction agent
 }
 
-# UVD Token ABI (minimal - only transfer function)
+# GLUE Token ABI (minimal - only transfer function needed)
+# Note: Currently using UVD V2 deployment until GLUE is deployed
 UVD_ABI = [
     {
         "inputs": [
@@ -68,7 +81,8 @@ def load_agent_wallets():
         "validator-agent": "../validator-agent/.env",
         "karma-hello-agent": "../karma-hello-agent/.env",
         "abracadabra-agent": "../abracadabra-agent/.env",
-        "client-agent": "../client-agent/.env"
+        "client-agent": "../client-agent/.env",
+        "voice-extractor-agent": "../voice-extractor-agent/.env"
     }
 
     for agent_name, env_path in agent_dirs.items():
@@ -93,10 +107,10 @@ def load_agent_wallets():
 
     return AGENT_WALLETS
 
-def distribute_uvd():
-    """Main distribution function"""
+def distribute_tokens():
+    """Main token distribution function (supports GLUE, UVD, or other ERC-20 tokens)"""
     print("=" * 60)
-    print("UVD Token Distribution to Agent Wallets")
+    print("Token Distribution to Agent Wallets")
     print("=" * 60)
     print()
 
@@ -126,7 +140,7 @@ def distribute_uvd():
     # Check owner balance
     owner_balance = uvd_contract.functions.balanceOf(owner_account.address).call()
     owner_balance_human = owner_balance / 10**6
-    print(f"[BALANCE] Owner UVD Balance: {owner_balance_human:,.6f} UVD")
+    print(f"[BALANCE] Owner GLUE Balance: {owner_balance_human:,.6f} GLUE")
     print()
 
     # Load agent wallets
@@ -135,18 +149,20 @@ def distribute_uvd():
     print()
 
     # Calculate total needed
-    active_agents = [addr for addr in AGENT_WALLETS.values() if addr]
-    total_needed = len(active_agents) * AMOUNT_PER_AGENT
+    active_agents = [(name, addr) for name, addr in AGENT_WALLETS.items() if addr]
+    total_needed = sum(AGENT_AMOUNTS[name] for name, _ in active_agents)
     total_needed_human = total_needed / 10**6
 
     print(f"[PLAN] Distribution Plan:")
-    print(f"   Amount per agent: {AMOUNT_PER_AGENT / 10**6:,.6f} UVD")
+    for agent_name, _ in active_agents:
+        amount_human = AGENT_AMOUNTS[agent_name] / 10**6
+        print(f"   {agent_name}: {amount_human:,.6f} GLUE")
     print(f"   Number of agents: {len(active_agents)}")
-    print(f"   Total required: {total_needed_human:,.6f} UVD")
+    print(f"   Total required: {total_needed_human:,.6f} GLUE")
     print()
 
     if owner_balance < total_needed:
-        print(f"[X] Insufficient balance! Need {total_needed_human:,.6f} UVD, have {owner_balance_human:,.6f} UVD")
+        print(f"[X] Insufficient balance! Need {total_needed_human:,.6f} GLUE, have {owner_balance_human:,.6f} GLUE")
         return
 
     # Confirm distribution
@@ -156,7 +172,7 @@ def distribute_uvd():
             current_balance = uvd_contract.functions.balanceOf(wallet_address).call()
             current_balance_human = current_balance / 10**6
             print(f"   - {agent_name}: {wallet_address}")
-            print(f"     Current balance: {current_balance_human:,.6f} UVD")
+            print(f"     Current balance: {current_balance_human:,.6f} GLUE")
     print()
 
     # Auto-proceed with distribution
@@ -177,7 +193,8 @@ def distribute_uvd():
             print(f"[SKIP] Skipping {agent_name} (no wallet address)")
             continue
 
-        print(f"\n[SEND] Transferring {AMOUNT_PER_AGENT / 10**6:,.6f} UVD to {agent_name}...")
+        amount_to_send = AGENT_AMOUNTS[agent_name]
+        print(f"\n[SEND] Transferring {amount_to_send / 10**6:,.6f} GLUE to {agent_name}...")
         print(f"   Address: {wallet_address}")
 
         try:
@@ -186,7 +203,7 @@ def distribute_uvd():
 
             tx = uvd_contract.functions.transfer(
                 wallet_address,
-                AMOUNT_PER_AGENT
+                amount_to_send
             ).build_transaction({
                 'from': owner_account.address,
                 'nonce': nonce,
@@ -213,7 +230,7 @@ def distribute_uvd():
                 # Check new balance
                 new_balance = uvd_contract.functions.balanceOf(wallet_address).call()
                 new_balance_human = new_balance / 10**6
-                print(f"   [BALANCE] New balance: {new_balance_human:,.6f} UVD")
+                print(f"   [BALANCE] New balance: {new_balance_human:,.6f} GLUE")
             else:
                 print(f"   [X] Transaction failed!")
 
@@ -231,11 +248,11 @@ def distribute_uvd():
         if wallet_address:
             balance = uvd_contract.functions.balanceOf(wallet_address).call()
             balance_human = balance / 10**6
-            print(f"   {agent_name}: {balance_human:,.6f} UVD")
+            print(f"   {agent_name}: {balance_human:,.6f} GLUE")
 
     owner_final = uvd_contract.functions.balanceOf(owner_account.address).call()
     owner_final_human = owner_final / 10**6
-    print(f"   Owner (remaining): {owner_final_human:,.6f} UVD")
+    print(f"   Owner (remaining): {owner_final_human:,.6f} GLUE")
 
 if __name__ == "__main__":
-    distribute_uvd()
+    distribute_tokens()
