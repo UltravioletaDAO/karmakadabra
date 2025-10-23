@@ -1,499 +1,364 @@
-# 🎬 Abracadabra Agent System
+# Abracadabra Seller Agent
 
-> Agentes AI autónomos que comercializan transcripciones de streams usando ERC-8004 + A2A + x402
+Stream transcription seller via x402 protocol with A2A discovery.
 
-**Versión**: 1.0.0
-**Network**: Avalanche Fuji Testnet
-**Estado**: 🔴 Por implementar
-**Última actualización**: Octubre 21, 2025
+## Overview
 
----
+The **Abracadabra Seller Agent** sells stream transcriptions through the Karmacadabra marketplace. It supports both local file testing and SQLite production data.
 
-## 🗂️ Ubicación en el Proyecto
+**Key Features:**
+- FastAPI server with x402 payment protocol
+- A2A protocol discovery (`.well-known/agent-card`)
+- Local file fallback for testing
+- SQLite integration for production
+- Multi-tier pricing based on transcript length
+- ERC-8004 on-chain registration
 
-```
-z:\ultravioleta\dao\karmacadabra\
-├── erc-20/                    (GLUE Token - RECIBE pagos aquí)
-├── erc-8004/                  (SE REGISTRA como Agent ID 2 y 5)
-├── x402-rs/                   (USA facilitator para pagos)
-├── validator/                 (SOLICITA validaciones antes de venta)
-├── karma-hello-agent/         (COMPRA logs / VENDE transcripts)
-├── abracadabra-agent/         ← ESTÁS AQUÍ
-├── MASTER_PLAN.md
-└── MONETIZATION_OPPORTUNITIES.md (VER productos completos aquí)
-```
+## Quick Start
 
-**Parte del Master Plan**: Phase 4 - Abracadabra Agents (Semana 5)
+### 1. Installation
 
-**Fuente de datos**: `z:\ultravioleta\ai\cursor\abracadabra\analytics.db` (SQLite + Cognee)
-
----
-
-## 🎯 Descripción
-
-El **Abracadabra Agent System** comercializa datos de transcripciones del sistema [abracadabra](z:\ultravioleta\ai\cursor\abracadabra).
-
-### 💰 Productos que Vende (50+ servicios)
-
-**Ver catálogo completo en**: `MONETIZATION_OPPORTUNITIES.md` § Abracadabra Servicios
-
-**Tier 1** (0.02-0.08 UVD) - Datos de Transcripción:
-- ✅ Raw Transcriptions (0.02 UVD)
-- ✅ Enhanced Transcripts con topics (0.05 UVD)
-- ✅ Multi-Language Transcripts (0.08 UVD) - 10 idiomas
-
-**Tier 2** (0.10-0.25 UVD) - Content Intelligence:
-- ✅ Clip Generation Service - 0.15 UVD
-- ✅ Blog Post Generation (4 estilos) - 0.20 UVD
-- ✅ Social Media Package - 0.18 UVD
-- ✅ Insights Engine - 0.22 UVD
-
-**Tier 3** (0.25-0.50 UVD) - Advanced Analytics:
-- ✅ Predictive Engine (LSTM forecasting) - 0.35 UVD
-- ✅ Recommendation System - 0.30 UVD
-- ✅ Knowledge Graph Search (640+ topics) - 0.25 UVD
-
-**Tier 4** (0.50-2.00 UVD) - Production Services:
-- ✅ Automated Video Editing - 1.50 UVD
-- ✅ Image Generation (20 imágenes DALL-E 3) - 0.80 UVD
-- ✅ Auto Publishing System - 0.60 UVD/post
-
-**Tier 5** (0.80-3.00 UVD) - AI-Powered Analysis:
-- ✅ Deep Idea Extraction - 1.20 UVD
-- ✅ Audio Analysis Suite - 0.90 UVD
-- ✅ Advanced A/B Testing (Bayesian) - 2.00 UVD
-
-**Tier 6** (Custom Pricing) - Enterprise:
-- Multi-Stream Aggregation (10-50 UVD)
-- Team Management Suite (25 UVD + 10 UVD/mes)
-- Custom AI Model Training (100 UVD)
-
-**Total**: 30+ servicios comercializables
-
-### Datos Disponibles
-
-Abracadabra procesa streams con (`z:\ultravioleta\ai\cursor\abracadabra`):
-- **Transcripciones completas** (AWS Transcribe + Whisper)
-- **Segmentos con timestamps** precisos por palabra
-- **Topics extraídos** con GPT-4o (640+ topics en Cognee)
-- **Entidades** (personas, lugares, productos, tecnologías)
-- **Sentiment analysis** (7 categorías de emociones)
-- **Knowledge graph** (Cognee con semantic search)
-- **Analytics** (engagement scoring, coherence, quality metrics)
-- **Images** (20 generadas con DALL-E 3 + Computer Vision scoring)
-- **Clips** (auto-detected highlights con timestamps)
-- **Ideas** (5 ideas extraídas con brainstorming completo)
-
-### Problema que Resuelve
-
-Karma-Hello tiene **logs del chat**, pero NO sabe:
-- ¿Qué dijo el streamer en ese momento?
-- ¿De qué estaba hablando?
-- ¿Qué topic estaba cubriendo?
-- ¿Cómo se relaciona con lo que dijo el chat?
-
-**Solución**: Comprar transcripciones de Abracadabra para relacionar logs del chat con contenido de audio.
-
-### 🛒 Productos que Compra
-
-**Abracadabra Buyer** compra de Karma-Hello:
-- ✅ Chat Logs (0.01 UVD)
-- ✅ User Activity (0.02 UVD)
-- ✅ Token Economics Data (0.03 UVD)
-
-**Caso de uso**: Relacionar transcripciones con lo que decía el chat en tiempo real.
-
----
-
-## 📂 Estructura de Datos - PRODUCTOS A VENDER
-
-### Ubicación Local de Productos
-
-```
-z:\ultravioleta\dao\karmacadabra\abracadabra-agent\
-├── transcripts/                       ← PRODUCTOS AQUÍ
-│   ├── 20251013/
-│   ├── 20251014/
-│   ├── 20251015/
-│   ├── 20251016/
-│   ├── 20251017/
-│   ├── 20251020/                     # Ejemplo actual
-│   │   └── 2596913801/               # Stream ID
-│   │       ├── audio_2596913801.mp3  # 127MB - Audio original
-│   │       ├── transcripcion.json    # 3.3MB - ✅ PRODUCTO PRINCIPAL
-│   │       ├── ideas_extraidas.json  # 21KB - ✅ Ideas + brainstorming
-│   │       ├── processing_status.json # 5KB - Metadata
-│   │       ├── titulo_stream.txt     # Título del stream
-│   │       │
-│   │       ├── resumen_completo.txt  # 3.8KB - ✅ Resumen técnico
-│   │       ├── analisis_completo.txt # 6.7KB - ✅ Análisis profundo
-│   │       ├── resumen_telegram.txt  # 2.9KB - ✅ Resumen corto
-│   │       ├── tweet.txt             # 318B - ✅ Tweet generado
-│   │       ├── analisis_critico_marketing.txt # 2.1KB
-│   │       ├── descripcion_seo_twitch.txt     # 463B
-│   │       │
-│   │       ├── segmentos/            # ✅ Clips detectados
-│   │       │   └── [timestamps + metadata]
-│   │       │
-│   │       ├── imagenes_generadas/   # ✅ 20 imágenes DALL-E 3
-│   │       │   ├── imagen_0.png
-│   │       │   ├── imagen_1.png
-│   │       │   └── [18 imágenes más...]
-│   │       │
-│   │       ├── prompts_imagen/       # Prompts para DALL-E
-│   │       ├── prompts_video/        # Prompts para clips
-│   │       ├── resumenes_para_youtube/
-│   │       └── resumenes_web/
-│   └── README.md
-└── .env.example
+```bash
+cd abracadabra-agent
+pip install -r requirements.txt
 ```
 
-### Productos Clave por Archivo
+### 2. Configuration
 
-**1. `transcripcion.json`** (3.3MB) - PRODUCTO PRINCIPAL
+```bash
+cp .env.example .env
+# Edit .env with your configuration
+```
+
+**Required configuration:**
+- `PRIVATE_KEY` - Seller wallet private key (or leave empty for AWS Secrets)
+- `AGENT_DOMAIN` - Your agent's domain name
+- Contract addresses (already configured for Fuji testnet)
+
+**Optional configuration:**
+- `USE_LOCAL_FILES=true` - Use sample data files (default for testing)
+- `USE_LOCAL_FILES=false` - Use SQLite (production)
+
+### 3. Run Server
+
+```bash
+python main.py
+```
+
+The seller will start on `http://0.0.0.0:8003`
+
+## Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│               Abracadabra Seller Agent                      │
+├─────────────────────────────────────────────────────────────┤
+│                                                             │
+│  FastAPI Server                                             │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  Endpoints:                                            │ │
+│  │  • GET  /                    - Health check           │ │
+│  │  • GET  /health              - Detailed health        │ │
+│  │  • GET  /.well-known/agent-card - A2A discovery       │ │
+│  │  • POST /get_transcription   - Get transcript (x402)  │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                             │
+│  Data Sources (configurable):                               │
+│  ┌────────────────────────────────────────────────────────┐ │
+│  │  Testing: ../data/abracadabra/transcription_*.json    │ │
+│  │  Production: SQLite (analytics.db)                    │ │
+│  └────────────────────────────────────────────────────────┘ │
+│                                                             │
+│  Payment: x402 + EIP-3009 (gasless)                         │
+│  Blockchain: Avalanche Fuji (Chain ID: 43113)               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## API Endpoints
+
+### Health Check
+
+```bash
+GET /
+GET /health
+```
+
+**Response:**
 ```json
 {
-  "stream_id": "2596913801",
-  "duration": 10800,  // 3 horas
-  "segments": [
-    {
-      "timestamp": 125.5,
-      "text": "Hoy vamos a programar un smart contract...",
-      "confidence": 0.98,
-      "speaker": "streamer"
-    }
-  ],
-  "topics": [
-    {
-      "tipo": "arquitectura",
-      "idea": "Migración AWS a Cherry Servers",
-      "tecnologias": ["AWS", "Docker", "Kubernetes"],
-      "prioridad": 8
-    },
-    {
-      "tipo": "nuevo_proyecto",
-      "idea": "Convertirse en facilitador X-402",
-      "tecnologias": ["X-402", "FastAPI"],
-      "timeline": "mañana"
-    }
-  ],
-  "entities": {
-    "personas": ["0xultravioleta"],
-    "tecnologias": ["AWS", "Cherry Servers", "X-402", "ERC-8004"],
-    "proyectos": ["UltravioletaDao Facilitator"]
-  }
+  "service": "Abracadabra Seller",
+  "status": "healthy",
+  "agent_id": "2",
+  "address": "0x940DDDf6fB28E611b132FbBedbc4854CC7C22648",
+  "balance": "55000.0 GLUE",
+  "data_source": "local_files"
 }
 ```
 
-**2. `ideas_extraidas.json`** (21KB) - 5 IDEAS CON BRAINSTORMING
+### Agent Card (A2A Discovery)
+
+```bash
+GET /.well-known/agent-card
+```
+
+**Response:**
 ```json
 {
-  "ideas": [
+  "schema_version": "1.0.0",
+  "agent_id": "2",
+  "name": "Abracadabra Seller",
+  "description": "Stream transcription seller - provides AI-transcribed audio from streams",
+  "domain": "abracadabra.ultravioletadao.xyz",
+  "wallet_address": "0x940DDDf6fB28E611b132FbBedbc4854CC7C22648",
+  "skills": [
     {
-      "idea_original": "Convertirse en facilitador X-402",
-      "tecnologias": ["X-402", "FastAPI", "Node.js"],
-      "complejidad": "moderada",
-      "impacto_estimado": "alto",
-      "prioridad_sugerida": 8,
-      "roi_estimado": "Alto, creciente interés en protocolos de verificación",
-      "proximos_pasos": [
-        "Contactar desarrolladores X-402",
-        "Desarrollar prototipo básico"
-      ]
+      "name": "get_transcription",
+      "description": "Get AI transcription for a specific stream or date",
+      "pricing": {
+        "currency": "GLUE",
+        "base_price": "0.02",
+        "price_per_segment": "0.001",
+        "max_price": "300.0"
+      }
+    }
+  ],
+  "payment_methods": [
+    {
+      "protocol": "x402",
+      "token": {
+        "symbol": "GLUE",
+        "address": "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
+      }
     }
   ]
 }
 ```
 
-**3. `imagenes_generadas/`** - 20 IMÁGENES DALL-E 3
-- Computer Vision scoring de calidad
-- Color palette extraction (k-means)
-- Composition scoring
-- Brightness/contrast analysis
+### Get Transcription
 
-**4. Content Generation**:
-- `resumen_completo.txt` - Blog post técnico
-- `tweet.txt` - Tweet optimizado
-- `analisis_critico_marketing.txt` - Análisis de marketing
-- `resumenes_para_youtube/` - Descripciones para YouTube
-
-### Fuente Original (SQLite + Cognee)
-
-**Producción**: `z:\ultravioleta\ai\cursor\abracadabra\analytics.db` (SQLite)
-
-**Tablas**:
-- `transcripts` - Transcripciones completas
-- `segments` - Segmentos con timestamps
-- `topics` - Topics extraídos (640+ topics)
-- `entities` - Entidades mencionadas
-- `analytics` - Métricas de engagement
-
-**Cognee Knowledge Graph**: 640+ topics indexados con embeddings
-
-**Nota**: Los archivos en `abracadabra-agent/transcripts/` son **copias exportadas** para testing. El agente en producción consultará SQLite + Cognee.
-
-### CrewAI Agent: Dónde Buscar Datos
-
-```python
-# En abracadabra_seller.py
-
-class AbracadabraSeller(ERC8004BaseAgent):
-    def __init__(self, config):
-        # OPCIÓN 1: Desarrollo/Testing - Leer archivos locales
-        self.transcripts_path = "z:\\ultravioleta\\dao\\karmacadabra\\abracadabra-agent\\transcripts"
-
-        # OPCIÓN 2: Producción - SQLite + Cognee
-        self.db_path = config.SQLITE_DB_PATH  # z:\ultravioleta\ai\cursor\abracadabra\analytics.db
-        self.db = sqlite3.connect(self.db_path)
-        self.cognee = CogneeClient()
-
-    async def get_transcript(self, stream_id: str, enhanced: bool = False):
-        # TESTING: Leer de archivos locales
-        if config.USE_LOCAL_FILES:
-            # Buscar en transcripts/YYYYMMDD/{stream_id}/
-            transcript_file = self._find_transcript_file(stream_id)
-
-            with open(f"{transcript_file}/transcripcion.json", 'r') as f:
-                transcript = json.load(f)
-
-            if enhanced:
-                # Incluir ideas, resúmenes, imágenes
-                with open(f"{transcript_file}/ideas_extraidas.json", 'r') as f:
-                    transcript["ideas"] = json.load(f)
-
-                # Listar imágenes generadas
-                images_dir = f"{transcript_file}/imagenes_generadas"
-                transcript["images"] = os.listdir(images_dir)
-
-            return transcript
-
-        # PRODUCCIÓN: Query SQLite + Cognee
-        else:
-            transcript = self.db.execute(
-                "SELECT * FROM transcripts WHERE stream_id = ?",
-                (stream_id,)
-            ).fetchone()
-
-            if enhanced:
-                # Buscar topics en Cognee knowledge graph
-                topics = await self.cognee.search(transcript["text"])
-                transcript["topics"] = topics
-
-            return transcript
-
-    def _find_transcript_file(self, stream_id: str):
-        """Busca el stream_id en todas las fechas"""
-        for date_folder in os.listdir(self.transcripts_path):
-            stream_path = f"{self.transcripts_path}/{date_folder}/{stream_id}"
-            if os.path.exists(stream_path):
-                return stream_path
-        raise FileNotFoundError(f"Stream {stream_id} not found")
-```
-
-### Servicios Disponibles por Archivo
-
-| Archivo/Carpeta | Servicio | Tier | Precio |
-|----------------|----------|------|--------|
-| `transcripcion.json` | Raw Transcript | 1 | 0.02 UVD |
-| `transcripcion.json` + topics | Enhanced Transcript | 1 | 0.05 UVD |
-| `ideas_extraidas.json` | Deep Idea Extraction | 5 | 1.20 UVD |
-| `imagenes_generadas/` | Image Generation Service | 4 | 0.80 UVD |
-| `resumen_completo.txt` | Blog Post Generation | 2 | 0.20 UVD |
-| `tweet.txt` | Social Media Package | 2 | 0.18 UVD |
-| `segmentos/` | Clip Generation | 2 | 0.15 UVD |
-| Cognee search | Knowledge Graph Search | 3 | 0.25 UVD |
-
-**Total productos en un stream**: 8+ servicios comercializables
-
----
-
-## 🤖 Agentes
-
-### 1. AbracadabraSeller (Server Agent)
-
-**Endpoint**: `POST /api/transcripts`
-**Precio**: 0.02 UVD por transcripción
-
-**Implementación clave**:
-```python
-from agents.base_agent import ERC8004BaseAgent
-from a2a import A2AServer
-import sqlite3
-from cognee import CogneeClient
-
-class AbracadabraSeller(ERC8004BaseAgent, A2AServer):
-    def __init__(self, config):
-        super().__init__(
-            agent_domain="abracadabra-seller.ultravioletadao.xyz",
-            private_key=config.SELLER_PRIVATE_KEY
-        )
-
-        # SQLite analytics DB
-        self.db = sqlite3.connect(config.SQLITE_DB_PATH)
-
-        # Cognee knowledge graph
-        self.cognee = CogneeClient()
-
-        self.agent_id = self.register_agent()
-        self.publish_agent_card()
-
-    @x402_required(price=UVD.amount("0.02"))
-    async def get_transcript(self, request: TranscriptRequest):
-        # Query SQLite
-        transcript = self.db.execute(
-            "SELECT * FROM transcripts WHERE stream_id = ?",
-            (request.stream_id,)
-        ).fetchone()
-
-        # Enrich with Cognee topics
-        topics = await self.cognee.search(transcript.text)
-
-        # Format with CrewAI
-        crew = Crew(agents=[self.enricher, self.analyzer])
-        result = crew.kickoff(inputs={
-            "transcript": transcript,
-            "topics": topics
-        })
-
-        return TranscriptResponse(data=result)
-```
-
-### 2. AbracadabraBuyer (Client Agent)
-
-**Lógica**: Compra logs de Karma-Hello cuando detecta menciones sin contexto del chat.
-
-```python
-async def auto_buy_logic(self):
-    # Buscar transcripciones con menciones a usuarios
-    transcripts_with_mentions = self.db.execute("""
-        SELECT * FROM transcripts
-        WHERE text LIKE '%@%'
-        AND has_chat_logs = FALSE
-    """).fetchall()
-
-    for transcript in transcripts_with_mentions:
-        # Buy logs from Karma-Hello
-        karma_card = await self.a2a_client.discover(
-            "karma-hello-seller.ultravioletadao.xyz"
-        )
-
-        response = await self.buy_logs(
-            karma_card,
-            stream_id=transcript.stream_id
-        )
-
-        # Enrich knowledge graph
-        await self.cognee.add_relation(
-            transcript_id=transcript.id,
-            logs=response.data
-        )
-```
-
----
-
-## 📡 API
-
-### AgentCard
-```http
-GET /.well-known/agent-card
-```
-
-### Get Transcript (Protected by x402)
-```http
-POST /api/transcripts
-X-Payment: {"kind": "evm-eip3009-UVD", "payload": {...}}
+```bash
+POST /get_transcription
+Content-Type: application/json
 
 {
-  "stream_id": "12345",
+  "stream_id": "stream_20251023_001",
+  "date": "2025-10-23",
+  "include_summary": true,
   "include_topics": true,
-  "include_entities": true
+  "language": "en"
 }
 ```
 
-**Response**:
+**Response:**
 ```json
 {
-  "stream_id": "12345",
-  "transcript": {
-    "text": "Hoy vamos a programar un smart contract...",
-    "segments": [
-      {
-        "timestamp": 1730000125.5,
-        "text": "Hoy vamos a programar",
-        "confidence": 0.98
-      }
-    ],
-    "topics": ["smart contracts", "solidity", "blockchain"],
-    "entities": ["Ethereum", "Solidity", "Foundry"],
-    "sentiment": {
-      "overall": "positive",
-      "score": 0.85
+  "stream_id": "stream_20251023_001",
+  "duration_seconds": 7200,
+  "language": "en",
+  "transcript": [
+    {
+      "start": 0,
+      "end": 15,
+      "speaker": "host",
+      "text": "Welcome everyone to today's stream! We're going to build trustless AI agents..."
     }
-  },
-  "seller_agent_id": 2
+  ],
+  "summary": "Stream covering the architecture and implementation of Karmacadabra...",
+  "key_topics": ["Avalanche blockchain", "ERC-8004 Extended", "Gasless micropayments"],
+  "metadata": {
+    "source": "local_file",
+    "filename": "transcription_20251023.json",
+    "seller": "0x940DDDf6fB28E611b132FbBedbc4854CC7C22648",
+    "timestamp": "2025-10-23T15:30:00Z"
+  }
 }
 ```
 
----
+**Response Headers:**
+```
+X-Price: 0.035
+X-Currency: GLUE
+X-Segment-Count: 15
+X-Duration: 7200
+```
 
-## ⚙️ Configuración
+## Pricing
 
-**.env**:
+**Pricing Formula:**
+```
+price = BASE_PRICE + (PRICE_PER_SEGMENT × segment_count)
+price = min(price, MAX_PRICE)
+```
+
+**Default Configuration:**
+- Base price: 0.02 GLUE
+- Per segment: 0.001 GLUE
+- Max price: 300.0 GLUE
+
+**Examples:**
+- 10 segments: 0.02 + (0.001 × 10) = 0.03 GLUE
+- 100 segments: 0.02 + (0.001 × 100) = 0.12 GLUE
+- 1,000 segments: 0.02 + (0.001 × 1,000) = 1.02 GLUE
+
+## Data Sources
+
+### Local Files (Testing)
+
+Located in `../data/abracadabra/`:
+
+```
+transcription_YYYYMMDD.json
+{
+  "stream_id": "stream_20251023_001",
+  "duration_seconds": 7200,
+  "language": "en",
+  "transcript": [
+    {
+      "start": 0,
+      "end": 15,
+      "speaker": "host",
+      "text": "Welcome everyone to today's stream! We're going to build trustless AI agents..."
+    }
+  ],
+  "summary": "Stream covering the architecture and implementation of Karmacadabra...",
+  "key_topics": ["Avalanche blockchain", "ERC-8004 Extended", "Gasless micropayments"],
+  "metadata": {
+    "transcription_method": "whisper_large_v3",
+    "confidence_avg": 0.94
+  }
+}
+```
+
+### SQLite (Production)
+
+**Database:** `analytics.db` (from `z:\ultravioleta\ai\cursor\abracadabra\`)
+
+**Tables:**
+- `transcriptions` - Complete transcriptions with metadata
+- `segments` - Individual transcript segments
+- `topics` - Extracted topics
+- `analytics` - Engagement metrics
+
+## Wallet Information
+
+**Seller Wallet:** `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`
+- **Balance:** 55,000 GLUE
+- **Purpose:** Receive payments from buyers
+
+## Integration Example
+
+### Python Client
+
+```python
+import httpx
+
+async def buy_transcription():
+    async with httpx.AsyncClient() as client:
+        # Discover seller
+        agent_card = await client.get(
+            "http://abracadabra.ultravioletadao.xyz/.well-known/agent-card"
+        )
+        print(f"Found seller: {agent_card.json()['name']}")
+
+        # Get transcription
+        response = await client.post(
+            "http://abracadabra.ultravioletadao.xyz/get_transcription",
+            json={
+                "date": "2025-10-23",
+                "include_summary": True,
+                "include_topics": True
+            }
+        )
+
+        transcription = response.json()
+        price = response.headers.get("X-Price")
+
+        print(f"Received {len(transcription['transcript'])} segments")
+        print(f"Duration: {transcription['duration_seconds']} seconds")
+        print(f"Price: {price} GLUE")
+
+        return transcription
+```
+
+## Testing
+
+### Quick Test (Mock Mode)
+
 ```bash
-# SQLite Database
-SQLITE_DB_PATH=z:\ultravioleta\ai\cursor\abracadabra\analytics.db
+# Just run the server
+python main.py
 
-# Cognee
-COGNEE_API_KEY=...
-COGNEE_LLM_MODEL=gpt-4o
-
-# Agent
-SELLER_PRIVATE_KEY=0x...
-SELLER_DOMAIN=abracadabra-seller.ultravioletadao.xyz
-SELLER_WALLET=0x...
-
-# Buyer
-BUYER_PRIVATE_KEY=0x...
-BUYER_WALLET=0x...
+# In another terminal, test endpoints
+curl http://localhost:8003/
+curl http://localhost:8003/.well-known/agent-card
 ```
 
----
-
-## 🚀 Uso
+### Integration Test
 
 ```bash
-# Install
-pip install -r requirements.txt
-
-# Register
-python scripts/register_seller.py
-
-# Run seller
-python main.py --mode seller --port 8082
-
-# Run buyer
-python main.py --mode buyer
+# Test with sample data
+curl -X POST http://localhost:8003/get_transcription \
+  -H "Content-Type: application/json" \
+  -d '{
+    "date": "2025-10-23",
+    "include_summary": true
+  }'
 ```
+
+## Environment Variables
+
+| Variable | Description | Default |
+|----------|-------------|---------|
+| `PRIVATE_KEY` | Seller wallet private key | (from AWS Secrets) |
+| `AGENT_DOMAIN` | Agent domain name | abracadabra.ultravioletadao.xyz |
+| `RPC_URL_FUJI` | Avalanche Fuji RPC | publicnode.com |
+| `CHAIN_ID` | Chain ID | 43113 (Fuji) |
+| `GLUE_TOKEN_ADDRESS` | GLUE token address | 0x3D19A... |
+| `IDENTITY_REGISTRY` | Identity Registry | 0xB0a405... |
+| `FACILITATOR_URL` | x402 facilitator | facilitator.ultravioletadao.xyz |
+| `USE_LOCAL_FILES` | Use local files vs SQLite | true |
+| `LOCAL_DATA_PATH` | Path to local data files | ../data/abracadabra |
+| `SQLITE_DB_PATH` | SQLite database path | analytics.db |
+| `HOST` | Server host | 0.0.0.0 |
+| `PORT` | Server port | 8003 |
+| `BASE_PRICE` | Base price in GLUE | 0.02 |
+| `PRICE_PER_SEGMENT` | Price per segment | 0.001 |
+| `MAX_PRICE` | Maximum price | 300.0 |
+
+## Troubleshooting
+
+### "Agent not registered"
+- Run registration: `python scripts/register_seller.py`
+- Or manually register via ERC-8004 Identity Registry
+
+### "No transcriptions found"
+- Check `LOCAL_DATA_PATH` points to correct directory
+- Verify sample data files exist in `../data/abracadabra/`
+- Try specifying a specific date: `{"date": "2025-10-23"}`
+
+### "SQLite connection failed"
+- Check `SQLITE_DB_PATH` is correct
+- Ensure SQLite database exists
+- For testing, use `USE_LOCAL_FILES=true` instead
+
+### "Insufficient balance"
+- Seller wallet needs GLUE for operations
+- Check balance: `curl http://localhost:8003/health`
+- Fund wallet from GLUE token contract
+
+## Roadmap
+
+- [ ] x402 payment middleware integration
+- [ ] Validation request before data delivery
+- [ ] Multi-tier service offerings (summary, topics, clips)
+- [ ] Rate limiting
+- [ ] API key authentication
+- [ ] Webhook notifications for purchases
+
+## License
+
+MIT
 
 ---
 
-## 📚 Estructura
-
-```
-abracadabra-agent/
-├── README.md
-├── agents/
-│   ├── abracadabra_seller.py
-│   ├── abracadabra_buyer.py
-│   └── base_agent.py
-├── scripts/
-│   ├── register_seller.py
-│   └── register_buyer.py
-├── requirements.txt
-├── .env.example
-└── main.py
-```
-
----
-
-**Ver [MASTER_PLAN.md](../MASTER_PLAN.md) para más detalles del ecosistema.**
+**Built with ❤️ by Ultravioleta DAO**
