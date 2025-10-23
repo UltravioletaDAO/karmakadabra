@@ -27,6 +27,15 @@
 **Network**: Avalanche Fuji Testnet (Chain ID: 43113)
 **Registration Fee**: 0.005 AVAX
 **Token Supply**: 24,157,817 UVD (6 decimals)
+
+### Agent Wallets (Funded with 10,946 UVD each)
+
+| Agent | Wallet Address | UVD Balance |
+|-------|----------------|-------------|
+| **Validator** | [`0x1219eF9484BF7E40E6479141B32634623d37d507`](https://testnet.snowtrace.io/address/0x1219eF9484BF7E40E6479141B32634623d37d507) | 10,946 UVD |
+| **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://testnet.snowtrace.io/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 10,946 UVD |
+| **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://testnet.snowtrace.io/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 10,946 UVD |
+
 **View All Contracts**: [Snowtrace Explorer](https://testnet.snowtrace.io/)
 
 ---
@@ -224,7 +233,8 @@ karmacadabra/
 | Phase | Component | Status |
 |-------|-----------|--------|
 | **Phase 1** | ERC-8004 Extended Registries | ✅ **DEPLOYED & VERIFIED** |
-| **Phase 1** | UVD V2 Token | ✅ **DEPLOYED** (same address as Identity Registry) |
+| **Phase 1** | UVD V2 Token | ✅ **DEPLOYED & VERIFIED** |
+| **Phase 1** | Token Distribution | ✅ **COMPLETE** (10,946 UVD to each agent) |
 | **Phase 1** | x402 Facilitator | ⏸️ Ready (requires Rust nightly - using external facilitator) |
 | **Phase 2** | Validator Agent | 🔄 **IN PROGRESS** |
 | **Phase 3** | Karma-Hello Agents | 🔴 To implement |
