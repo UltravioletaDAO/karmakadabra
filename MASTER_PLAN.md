@@ -54,9 +54,9 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 
 **Evolution:** From 4 system agents → 48+ user agents creating self-organizing microeconomy
 
-**Key New Components (all need implementation):**
-- Voice Extractor Agent (🔥 CRITICAL - bootstrap needed)
-- Profile Extraction Pipeline (CrewAI crew)
+**Key New Components:**
+- Voice Extractor Agent (audio extraction service)
+- **Skill-Extractor Agent** 🔥 **NEXT TASK** - Full economic agent (buys from Karma-Hello, sells skill profiles)
 - Agent Card Generator (auto-gen from profiles)
 - User Agent Factory (mass deployment)
 - 48 User Agents (one per chat participant)
@@ -87,22 +87,71 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 ### Sprint 2 (Weeks 3-4): System Agents
 
 **Order (sequential):**
-1. Validator Agent (validates foundation)
-2. Client Agent (reference buyer)
-3. Data Source Integration (static demo files)
-4. Karma-Hello Seller
-5. Abracadabra Seller
-6. Voice Extractor (enables user agents)
+1. ✅ Validator Agent (validates foundation) - COMPLETE
+2. ✅ Client Agent (reference buyer) - COMPLETE
+3. ✅ Data Source Integration (static demo files) - COMPLETE
+4. ✅ Karma-Hello Seller - COMPLETE
+5. ✅ Abracadabra Seller - COMPLETE
+6. 📋 Voice Extractor (audio extraction service)
+7. 📋 Skill-Extractor Agent (**NEXT TASK** - System Agent #6)
 
-**Milestone 2.3: Client Agent** ✅ Wallet created and funded
-- Address: `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`
-- Balance: 55,000 GLUE
-- Purpose: Generic buyer (no selling)
+**Progress:** 5 of 7 milestones complete (71%)
+
+**Milestone 2.7: Skill-Extractor Agent** 🔥 **NEXT IMPLEMENTATION**
+
+**What it is:**
+- Full economic agent (buys AND sells)
+- System Agent #6 in the ecosystem
+- Extracts skills/interests from chat logs using CrewAI
+
+**Economic Model:**
+```
+Buys from: Karma-Hello (0.01 GLUE/user for chat logs)
+Sells to: Client agents, User agents (0.05 GLUE/profile)
+Net profit: 0.04 GLUE per extraction (400% margin)
+```
+
+**Service Catalog:**
+- Basic Profile (0.02 GLUE): Top 3 interests + top 3 skills
+- Standard Profile (0.03 GLUE): Full interests + skills + tools
+- Complete Profile (0.05 GLUE): Full + monetization opportunities
+- Enterprise Analysis (0.50 GLUE): Deep-dive competitive analysis
+
+**Wallet Information:**
+- Address: TBD (to be created in implementation)
+- Initial Balance: 55,000 GLUE
+- ERC-8004 Registration: System Agent #6
+
+**Technical Stack:**
+- FastAPI server (port 8004)
+- CrewAI crew: SkillAnalyst + InterestIdentifier + MonetizationAdvisor
+- Dual data source: Local files (testing) + direct Karma-Hello purchase (production)
+- A2A protocol discovery
+- x402 payment protocol (both buying and selling)
+
+**Integration:**
+- Buys from: `karma-hello-agent` (chat logs via x402)
+- Sells to: `client-agent`, user agents (skill profiles via x402)
+- Collaborates with: `voice-extractor-agent` (combined profiles)
+
+**Files to create:**
+- `skill-extractor-agent/main.py` - SkillExtractorAgent class
+- `skill-extractor-agent/.env.example` - Configuration
+- `skill-extractor-agent/requirements.txt` - Dependencies
+- `skill-extractor-agent/README.md` - Documentation (already exists)
+
+**Implementation order:**
+1. Create wallet and fund with 55,000 GLUE
+2. Implement SkillExtractorSeller class (sells profiles)
+3. Implement SkillExtractorBuyer class (buys logs from Karma-Hello)
+4. Create CrewAI crew for skill extraction
+5. Test with sample data from `data/karma-hello/`
+6. Register as System Agent #6 on-chain
 
 ### Sprint 3 (Weeks 5-6): User Agent System
 
 **Milestones:**
-1. Profile extraction (48 users from Oct 21 stream)
+1. Automated profile extraction (using Skill-Extractor Agent for 48 users)
 2. Agent Card auto-generator
 3. User agent template + factory
 4. Mass deployment (48 agents)
