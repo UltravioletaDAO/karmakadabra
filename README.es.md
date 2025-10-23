@@ -246,6 +246,57 @@ karmacadabra/
 
 ---
 
+## 🧰 Caja de Herramientas para Desarrolladores
+
+Scripts de utilidad para gestionar wallets, tokens y despliegues de agentes:
+
+### Generador de Wallets
+Genera nuevas wallets compatibles con EVM para agentes:
+
+```bash
+# Generar wallet y auto-guardar en .env
+python generate-wallet.py client-agent --auto-save
+
+# Generar para múltiples agentes
+python generate-wallet.py client-agent-2 --auto-save
+python generate-wallet.py validator-2 --auto-save
+
+# Modo interactivo (pregunta antes de guardar)
+python generate-wallet.py mi-agente
+```
+
+**Características**:
+- Crea wallets compatibles con Ethereum (funciona en todas las cadenas EVM)
+- Auto-guarda clave privada y dirección en archivo `.env` del agente
+- Muestra advertencias de seguridad y mejores prácticas
+- Muestra información de testnet Fuji y próximos pasos
+- Reutilizable para agentes ilimitados
+
+### Distribuidor de Tokens UVD
+Distribuye tokens UVD a las wallets de los agentes:
+
+```bash
+cd erc-20
+python distribute-uvd.py
+```
+
+**Características**:
+- Carga automáticamente direcciones de wallet desde archivos `.env` de agentes
+- Distribuye 10,946 UVD a cada agente
+- Muestra saldos antes/después
+- Enlaces de transacciones en Snowtrace
+- Soporta: validator, karma-hello-agent, abracadabra-agent, client-agent
+
+**Agentes**:
+| Agente | Financiado | Saldo |
+|--------|------------|-------|
+| Validator | ✅ | 10,946 UVD |
+| Karma-Hello | ✅ | 10,946 UVD |
+| Abracadabra | ✅ | 10,946 UVD |
+| Client-Agent | ⏳ | Pendiente |
+
+---
+
 ## 🔧 Requisitos
 
 - **Python** 3.11+
