@@ -72,15 +72,15 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 
 **Goal:** Build core infrastructure for all agents
 
-| Task | Effort | Deliverable |
-|------|--------|-------------|
-| Create base_agent.py with ERC8004BaseAgent | 2-3 days | Working base class |
-| Web3.py contract integration | 1 day | Read/write Fuji contracts |
-| EIP-712 payment signing | 2 days | Sign payment authorizations |
-| x402 HTTP client (Python) | 1-2 days | Send payments in headers |
-| A2A AgentCard implementation | 2 days | Publish/discover agents |
-| First CrewAI crew | 1 day | Pattern for other crews |
-| Integration tests | 1 day | Foundation verified |
+| Task | Effort | Status | Deliverable |
+|------|--------|--------|-------------|
+| Create base_agent.py with ERC8004BaseAgent | 2-3 days | ✅ DONE | shared/base_agent.py (600+ lines) |
+| Web3.py contract integration | 1 day | ✅ DONE | Included in base_agent.py |
+| EIP-712 payment signing | 2 days | ✅ DONE | shared/payment_signer.py (470+ lines) |
+| x402 HTTP client (Python) | 1-2 days | 🔴 TODO | Send payments in headers |
+| A2A AgentCard implementation | 2 days | 🔴 TODO | Publish/discover agents |
+| First CrewAI crew | 1 day | 🔴 TODO | Pattern for other crews |
+| Integration tests | 1 day | 🔴 TODO | Foundation verified |
 
 **Output:** `shared/base_agent.py`, `shared/eip712_signer.py`, `shared/x402_client.py`, `shared/a2a_protocol.py`
 

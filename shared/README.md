@@ -66,6 +66,66 @@ private_key = get_private_key("validator-agent")
 
 ---
 
+### `payment_signer.py` - EIP-712 Payment Signing
+
+EIP-712/EIP-3009 signature creation for gasless GLUE Token payments.
+
+**Features:**
+- ✅ EIP-712 domain separator generation
+- ✅ `transferWithAuthorization` signature creation
+- ✅ Random nonce generation
+- ✅ Time window management
+- ✅ Signature verification
+- ✅ GLUE amount conversion utilities
+
+**Usage:**
+```python
+from shared import PaymentSigner, sign_payment
+
+# Method 1: Using PaymentSigner class
+signer = PaymentSigner(
+    glue_token_address="0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743",
+    chain_id=43113
+)
+
+signature = signer.sign_transfer_authorization(
+    from_address="0xAlice...",
+    to_address="0xBob...",
+    value=signer.glue_amount("0.01"),  # 0.01 GLUE
+    private_key="0x..."
+)
+
+# Method 2: Using convenience function
+signature = sign_payment(
+    from_address="0xAlice...",
+    to_address="0xBob...",
+    amount_glue="0.01",
+    private_key="0x..."
+)
+
+# Use signature in x402 payment header or facilitator call
+print(f"v={signature['v']}, r={signature['r']}, s={signature['s']}")
+```
+
+**Signature Output:**
+```python
+{
+    'from': '0xAlice...',
+    'to': '0xBob...',
+    'value': 10000,  # 0.01 GLUE in smallest units
+    'validAfter': 1698765432,
+    'validBefore': 1698769032,
+    'nonce': '0xab77...',
+    'v': 28,
+    'r': '0x9be1...',
+    's': '0x2414...',
+    'signature': '9be1...2414...',
+    'amount_human': '0.010000'
+}
+```
+
+---
+
 ### `transaction_logger.py` - On-Chain Transaction Logging
 
 Utility for logging transaction metadata on-chain via TransactionLogger contract.
