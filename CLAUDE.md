@@ -20,6 +20,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Why**: This codebase is demonstrated in public streams. Exposing private keys would compromise wallets.
 
+### Gas Funding for Agents
+**When agents need AVAX for gas fees:**
+
+- ✅ **Use ERC-20 deployer wallet** (stored in AWS Secrets Manager under `erc-20` key)
+- ✅ This wallet has AVAX for deploying contracts and can fund agent wallets
+- ✅ Access via: `distribute-token.py` (automatically uses AWS Secrets Manager)
+- ❌ **DO NOT store ERC-20 deployer key in .env files**
+- ⚠️ **Rotate ERC-20 key separately**: Use `python rotate-system.py --rotate-erc20` (NOT rotated by default)
+
+**Why separate rotation**: ERC-20 deployer owns the GLUE token contract. Rotating it requires redeploying the entire token, so it's only rotated when specifically needed.
+
 ### Documentation Synchronization
 **ALWAYS update both language versions in parallel:**
 

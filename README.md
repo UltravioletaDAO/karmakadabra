@@ -555,6 +555,9 @@ python rotate-system.py --refill
 
 # Refill wallets with GLUE (execute)
 python rotate-system.py --refill --confirm
+
+# Rotate ERC-20 deployer wallet only (separate from agent rotation)
+python rotate-system.py --rotate-erc20 --confirm
 ```
 
 **What it does**:
@@ -579,6 +582,12 @@ python rotate-system.py --refill --confirm
 - ⚠️ Requires typing 'ROTATE' to confirm destructive changes
 - ⚠️ Invalidates ALL existing wallets and contracts
 - ✅ Safe dry-run mode shows exactly what would happen
+
+**Gas Funding**:
+- 💰 **Need AVAX for gas?** Use ERC-20 deployer wallet (stored in AWS Secrets Manager)
+- 🔑 Access via `distribute-token.py` (automatically fetches from AWS)
+- ⚠️ **ERC-20 deployer is NOT rotated by default** (owns GLUE token contract)
+- 🔄 Rotate separately: `python rotate-system.py --rotate-erc20 --confirm`
 
 **Example output**:
 ```

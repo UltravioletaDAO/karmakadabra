@@ -107,7 +107,7 @@ def check_prerequisites():
     return checks_passed
 
 def initialize_agents():
-    """Initialize demo agents: Client (Charlie), Seller (Alice), Validator (Bob)"""
+    """Initialize demo agents: Client (Client-Agent), Seller (Karma-Hello), Validator (Validator)"""
     print("[BOT] STEP 1: Initializing AI Agents")
     print("-" * 80)
 
@@ -118,9 +118,9 @@ def initialize_agents():
         response = client.get_secret_value(SecretId='karmacadabra')
         secrets = json.loads(response['SecretString'])
 
-        # Initialize Charlie (Client/Buyer Agent)
-        print("[TOOL] Initializing Charlie (Client Agent - Buyer)...")
-        charlie = ERC8004BaseAgent(
+        # Initialize Client-Agent (Client/Buyer Agent)
+        print("[TOOL] Initializing Client-Agent (Buyer)...")
+        client = ERC8004BaseAgent(
             agent_name="client-agent",
             agent_domain="client.karmacadabra.xyz",
             rpc_url=os.getenv("RPC_URL_FUJI"),
@@ -129,11 +129,11 @@ def initialize_agents():
             validation_registry_address=os.getenv("VALIDATION_REGISTRY"),
             private_key=secrets['client-agent']['private_key']
         )
-        print(f"  [OK] Charlie initialized: {charlie.address}")
+        print(f"  [OK] Client-Agent initialized: {client.address}")
 
-        # Initialize Alice (Karma-Hello Seller)
-        print("\n[TOOL] Initializing Alice (Karma-Hello Seller)...")
-        alice = ERC8004BaseAgent(
+        # Initialize Karma-Hello (Seller)
+        print("\n[TOOL] Initializing Karma-Hello (Seller)...")
+        karma_hello = ERC8004BaseAgent(
             agent_name="karma-hello-agent",
             agent_domain="karma-hello.karmacadabra.xyz",
             rpc_url=os.getenv("RPC_URL_FUJI"),
@@ -142,11 +142,11 @@ def initialize_agents():
             validation_registry_address=os.getenv("VALIDATION_REGISTRY"),
             private_key=secrets['karma-hello-agent']['private_key']
         )
-        print(f"  [OK] Alice initialized: {alice.address}")
+        print(f"  [OK] Karma-Hello initialized: {karma_hello.address}")
 
-        # Initialize Bob (Validator Agent)
-        print("\n[TOOL] Initializing Bob (Validator Agent)...")
-        bob = ERC8004BaseAgent(
+        # Initialize Validator
+        print("\n[TOOL] Initializing Validator...")
+        validator = ERC8004BaseAgent(
             agent_name="validator-agent",
             agent_domain="validator.karmacadabra.xyz",
             rpc_url=os.getenv("RPC_URL_FUJI"),
@@ -155,9 +155,9 @@ def initialize_agents():
             validation_registry_address=os.getenv("VALIDATION_REGISTRY"),
             private_key=secrets['validator-agent']['private_key']
         )
-        print(f"  [OK] Bob initialized: {bob.address}\n")
+        print(f"  [OK] Validator initialized: {validator.address}\n")
 
-        return charlie, alice, bob
+        return client, karma_hello, validator
 
     except Exception as e:
         print(f"[FAIL] Agent initialization failed: {e}")
@@ -165,42 +165,42 @@ def initialize_agents():
         traceback.print_exc()
         return None, None, None
 
-def register_agents(charlie, alice, bob):
+def register_agents(client, karma_hello, validator):
     """Register all agents on-chain"""
     print("[WRITE] STEP 2: Registering Agents On-Chain")
     print("-" * 80)
 
     try:
         # Check if already registered
-        charlie_id = charlie.agent_id
-        alice_id = alice.agent_id
-        bob_id = bob.agent_id
+        client_id = client.agent_id
+        karma_hello_id = karma_hello.agent_id
+        validator_id = validator.agent_id
 
-        if charlie_id and alice_id and bob_id:
+        if client_id and karma_hello_id and validator_id:
             print(f"  [INFO]  Agents already registered:")
-            print(f"     Charlie (Client): ID {charlie_id}")
-            print(f"     Alice (Seller): ID {alice_id}")
-            print(f"     Bob (Validator): ID {bob_id}\n")
-            return charlie_id, alice_id, bob_id
+            print(f"     Client-Agent: ID {client_id}")
+            print(f"     Karma-Hello (Seller): ID {karma_hello_id}")
+            print(f"     Validator: ID {validator_id}\n")
+            return client_id, karma_hello_id, validator_id
 
         # Register agents
-        if not charlie_id:
-            print("[WRITE] Registering Charlie (Client)...")
-            charlie_id = charlie.register_agent()
-            print(f"  [OK] Charlie registered: ID {charlie_id}")
+        if not client_id:
+            print("[WRITE] Registering Client-Agent...")
+            client_id = client.register_agent()
+            print(f"  [OK] Client-Agent registered: ID {client_id}")
 
-        if not alice_id:
-            print("\n[WRITE] Registering Alice (Karma-Hello Seller)...")
-            alice_id = alice.register_agent()
-            print(f"  [OK] Alice registered: ID {alice_id}")
+        if not karma_hello_id:
+            print("\n[WRITE] Registering Karma-Hello (Seller)...")
+            karma_hello_id = karma_hello.register_agent()
+            print(f"  [OK] Karma-Hello registered: ID {karma_hello_id}")
 
-        if not bob_id:
-            print("\n[WRITE] Registering Bob (Validator)...")
-            bob_id = bob.register_agent()
-            print(f"  [OK] Bob registered: ID {bob_id}")
+        if not validator_id:
+            print("\n[WRITE] Registering Validator...")
+            validator_id = validator.register_agent()
+            print(f"  [OK] Validator registered: ID {validator_id}")
 
         print(f"\n[OK] All agents registered on-chain!\n")
-        return charlie_id, alice_id, bob_id
+        return client_id, karma_hello_id, validator_id
 
     except Exception as e:
         print(f"[FAIL] Agent registration failed: {e}")
@@ -208,18 +208,18 @@ def register_agents(charlie, alice, bob):
         traceback.print_exc()
         return None, None, None
 
-def demonstrate_discovery(alice):
+def demonstrate_discovery(karma_hello):
     """Demonstrate A2A protocol agent discovery"""
     print("[SEARCH] STEP 3: Agent Discovery via A2A Protocol")
     print("-" * 80)
 
     try:
-        # Create Alice's AgentCard
-        print("[CARD] Charlie discovering Alice's services via A2A protocol...")
+        # Create Karma-Hello's AgentCard
+        print("[CARD] Client-Agent discovering Karma-Hello's services via A2A protocol...")
 
         agent_card = AgentCard(
             schema_version="1.0",
-            agent_id=alice.agent_id,
+            agent_id=karma_hello.agent_id,
             name="Karma-Hello Chat Log Seller",
             description="Sells Twitch stream chat logs with sentiment analysis",
             agent_domain="karma-hello.karmacadabra.xyz",
@@ -264,18 +264,18 @@ def demonstrate_discovery(alice):
         traceback.print_exc()
         return None
 
-def demonstrate_data_request(alice, bob_id):
+def demonstrate_data_request(karma_hello, validator_id):
     """Demonstrate data request and validation workflow"""
     print("[DATA] STEP 4: Data Request & Validation Workflow")
     print("-" * 80)
 
     try:
-        # Simulate Charlie requesting chat logs from Alice
-        print("[SEND] Charlie requesting chat logs from Alice...")
+        # Simulate Client-Agent requesting chat logs from Karma-Hello
+        print("[SEND] Client-Agent requesting chat logs from Karma-Hello...")
 
         # Create mock chat log package
         chat_log_package = {
-            "seller_id": alice.agent_id,
+            "seller_id": karma_hello.agent_id,
             "seller_domain": "karma-hello.karmacadabra.xyz",
             "timestamp": datetime.utcnow().isoformat(),
             "data_type": "chat_logs",
@@ -299,15 +299,15 @@ def demonstrate_data_request(alice, bob_id):
         print(f"     Messages: {chat_log_package['total_messages']}")
         print(f"     Quality: {chat_log_package['metadata']['quality_score']}/100")
 
-        # Alice requests validation from Bob
-        print(f"\n[SEND] Alice requesting validation from Bob (Validator {bob_id})...")
-        print(f"  [INFO]  Bob will use CrewAI crew to validate data quality...")
+        # Karma-Hello requests validation from Validator
+        print(f"\n[SEND] Karma-Hello requesting validation from Validator (Validator {validator_id})...")
+        print(f"  [INFO]  Validator will use CrewAI crew to validate data quality...")
 
         # Simulate validation request (would be on-chain in production)
         validation_request = {
             "data_hash": "0x" + "a" * 64,  # Mock hash
-            "seller_id": alice.agent_id,
-            "validator_id": bob_id,
+            "seller_id": karma_hello.agent_id,
+            "validator_id": validator_id,
             "timestamp": datetime.utcnow().isoformat()
         }
 
@@ -323,13 +323,13 @@ def demonstrate_data_request(alice, bob_id):
         traceback.print_exc()
         return None, None
 
-def demonstrate_validation(bob, chat_log_package):
+def demonstrate_validation(validator, chat_log_package):
     """Demonstrate CrewAI-powered validation"""
     print("[SEARCH] STEP 5: AI-Powered Validation (CrewAI Crew)")
     print("-" * 80)
 
     try:
-        print("[BOT] Bob's CrewAI validation crew starting analysis...\n")
+        print("[BOT] Validator's CrewAI validation crew starting analysis...\n")
 
         # Simulate CrewAI crew validation
         print("  [BIZ] Quality Analyst Agent:")
@@ -352,7 +352,7 @@ def demonstrate_validation(bob, chat_log_package):
 
         # Create validation package
         validation_package = {
-            "validator_id": bob.agent_id,
+            "validator_id": validator.agent_id,
             "validator_domain": "validator.karmacadabra.xyz",
             "validation_score": 94,
             "timestamp": datetime.utcnow().isoformat(),
@@ -377,7 +377,7 @@ def demonstrate_validation(bob, chat_log_package):
         print(f"     Decision: {validation_package['crew_analysis']['recommendation']}")
 
         # Submit validation to blockchain
-        print(f"\n[SEND] Bob submitting validation to blockchain...")
+        print(f"\n[SEND] Validator submitting validation to blockchain...")
         print(f"  [OK] Validation recorded on-chain")
         print()
 
@@ -389,25 +389,25 @@ def demonstrate_validation(bob, chat_log_package):
         traceback.print_exc()
         return None
 
-def demonstrate_payment(charlie, alice):
+def demonstrate_payment(client, karma_hello):
     """Demonstrate EIP-3009 gasless payment"""
     print("[MONEY] STEP 6: Gasless Payment (EIP-3009)")
     print("-" * 80)
 
     try:
-        print("[LOCK] Charlie signing payment authorization (off-chain)...")
+        print("[LOCK] Client-Agent signing payment authorization (off-chain)...")
 
         # Create payment signer
         signer = PaymentSigner(
-            private_key=charlie.private_key,
+            private_key=client.private_key,
             chain_id=43113
         )
 
         # Generate payment authorization
         payment_amount = 10000  # 0.01 GLUE (6 decimals)
         payment_auth = signer.sign_transfer_with_authorization(
-            from_address=charlie.address,
-            to_address=alice.address,
+            from_address=client.address,
+            to_address=karma_hello.address,
             value=payment_amount,
             valid_after=0,
             valid_before=2**256 - 1,
@@ -416,12 +416,12 @@ def demonstrate_payment(charlie, alice):
         )
 
         print(f"\n  [OK] Payment authorization signed!")
-        print(f"     From: {charlie.address}")
-        print(f"     To: {alice.address}")
+        print(f"     From: {client.address}")
+        print(f"     To: {karma_hello.address}")
         print(f"     Amount: 0.01 GLUE")
         print(f"     Signature: {payment_auth['signature'][:20]}...")
 
-        print(f"\n  [INFO]  Payment will be executed by facilitator (gasless for Charlie)")
+        print(f"\n  [INFO]  Payment will be executed by facilitator (gasless for Client-Agent)")
         print(f"     Facilitator: facilitator.ultravioletadao.xyz")
         print(f"     Protocol: x402 HTTP Payment Required")
         print()
@@ -434,13 +434,13 @@ def demonstrate_payment(charlie, alice):
         traceback.print_exc()
         return None
 
-def demonstrate_data_delivery(alice, chat_log_package):
+def demonstrate_data_delivery(karma_hello, chat_log_package):
     """Demonstrate data delivery after payment"""
     print("[PACK] STEP 7: Data Delivery")
     print("-" * 80)
 
     try:
-        print("[SEND] Alice delivering chat log data to Charlie...\n")
+        print("[SEND] Karma-Hello delivering chat log data to Client-Agent...\n")
 
         # Show delivered data summary
         print(f"  [OK] Data Delivered Successfully!")
@@ -453,7 +453,7 @@ def demonstrate_data_delivery(alice, chat_log_package):
         for msg in chat_log_package['sample_messages'][:3]:
             print(f"     [{msg['timestamp']}] {msg['user']}: {msg['message']}")
 
-        print(f"\n  [SAVE] Charlie integrating data into knowledge base...")
+        print(f"\n  [SAVE] Client-Agent integrating data into knowledge base...")
         print(f"  [OK] Knowledge base updated!\n")
 
         return True
@@ -462,7 +462,7 @@ def demonstrate_data_delivery(alice, chat_log_package):
         print(f"[FAIL] Data delivery failed: {e}")
         return False
 
-def demonstrate_two_way_ratings(charlie, alice, bob, charlie_id, alice_id, bob_id):
+def demonstrate_two_way_ratings(client, karma_hello, validator, client_id, karma_hello_id, validator_id):
     """Demonstrate bidirectional reputation system"""
     print("[STAR] STEP 8: Two-Way Reputation System")
     print("-" * 80)
@@ -470,34 +470,34 @@ def demonstrate_two_way_ratings(charlie, alice, bob, charlie_id, alice_id, bob_i
     try:
         print("[CHAT] Building reputation for ALL participants...\n")
 
-        # Charlie rates Alice (seller)
-        print("[STAR] Charlie rating Alice's data quality...")
-        alice_rating = 96
-        print(f"  [OK] Alice received: {alice_rating}/100")
+        # Client-Agent rates Karma-Hello (seller)
+        print("[STAR] Client-Agent rating Karma-Hello's data quality...")
+        karma_hello_rating = 96
+        print(f"  [OK] Karma-Hello received: {karma_hello_rating}/100")
         print(f"     (Excellent data quality, fast delivery)")
 
-        # Charlie rates Bob (validator)
-        print(f"\n[STAR] Charlie rating Bob's validation service...")
-        bob_rating_by_charlie = 94
-        print(f"  [OK] Bob received: {bob_rating_by_charlie}/100")
+        # Client-Agent rates Validator (validator)
+        print(f"\n[STAR] Client-Agent rating Validator's validation service...")
+        validator_rating_by_client = 94
+        print(f"  [OK] Validator received: {validator_rating_by_client}/100")
         print(f"     (Thorough validation, fair assessment)")
 
-        # Alice rates Charlie (client)
-        print(f"\n[STAR] Alice rating Charlie as a client...")
-        charlie_rating = 98
-        print(f"  [OK] Charlie received: {charlie_rating}/100")
+        # Karma-Hello rates Client-Agent (client)
+        print(f"\n[STAR] Karma-Hello rating Client-Agent as a client...")
+        client_rating = 98
+        print(f"  [OK] Client-Agent received: {client_rating}/100")
         print(f"     (Fast payment, clear communication, repeat customer)")
 
-        # Alice rates Bob (validator)
-        print(f"\n[STAR] Alice rating Bob's validation quality...")
-        bob_rating_by_alice = 95
-        print(f"  [OK] Bob received: {bob_rating_by_alice}/100")
+        # Karma-Hello rates Validator (validator)
+        print(f"\n[STAR] Karma-Hello rating Validator's validation quality...")
+        validator_rating_by_karma_hello = 95
+        print(f"  [OK] Validator received: {validator_rating_by_karma_hello}/100")
         print(f"     (Fair validation, professional service)")
 
-        # Bob rates both (quality of data submitted for validation)
-        print(f"\n[STAR] Bob rating transaction participants...")
-        print(f"  [OK] Alice (data quality): 93/100")
-        print(f"  [OK] Charlie (professionalism): 97/100")
+        # Validator rates both (quality of data submitted for validation)
+        print(f"\n[STAR] Validator rating transaction participants...")
+        print(f"  [OK] Karma-Hello (data quality): 93/100")
+        print(f"  [OK] Client-Agent (professionalism): 97/100")
 
         print(f"\n[SUCCESS] Two-Way Ratings Complete!")
         print(f"  [OK] Sellers get rated by buyers")
@@ -511,23 +511,23 @@ def demonstrate_two_way_ratings(charlie, alice, bob, charlie_id, alice_id, bob_i
         print(f"[FAIL] Two-way ratings failed: {e}")
         return False
 
-def display_audit_trail(charlie, alice, bob, chat_log_package, validation_package, payment_auth):
+def display_audit_trail(client, karma_hello, validator, chat_log_package, validation_package, payment_auth):
     """Display complete blockchain audit trail"""
     print("[LIST] STEP 9: Complete Blockchain Audit Trail")
     print("-" * 80)
 
     print("\n[LINK] BLOCKCHAIN INFRASTRUCTURE:")
     print(f"   Network: Avalanche Fuji Testnet")
-    print(f"   Chain ID: {charlie.w3.eth.chain_id}")
+    print(f"   Chain ID: {client.w3.eth.chain_id}")
     print(f"   GLUE Token: {os.getenv('GLUE_TOKEN_ADDRESS')}")
     print(f"   Identity Registry: {os.getenv('IDENTITY_REGISTRY')}")
     print(f"   Reputation Registry: {os.getenv('REPUTATION_REGISTRY')}")
     print(f"   Validation Registry: {os.getenv('VALIDATION_REGISTRY')}")
 
     print(f"\n[USERS] REGISTERED AGENTS:")
-    print(f"   Charlie (Client): ID {charlie.agent_id} - {charlie.address}")
-    print(f"   Alice (Seller): ID {alice.agent_id} - {alice.address}")
-    print(f"   Bob (Validator): ID {bob.agent_id} - {bob.address}")
+    print(f"   Client-Agent: ID {client.agent_id} - {client.address}")
+    print(f"   Karma-Hello (Seller): ID {karma_hello.agent_id} - {karma_hello.address}")
+    print(f"   Validator: ID {validator.agent_id} - {validator.address}")
 
     print(f"\n[DATA] DATA TRANSACTION:")
     print(f"   Product: {chat_log_package['data_type']}")
@@ -544,8 +544,8 @@ def display_audit_trail(charlie, alice, bob, chat_log_package, validation_packag
     print(f"   Decision: {validation_package['crew_analysis']['recommendation']}")
 
     print(f"\n[MONEY] PAYMENT RECORD:")
-    print(f"   From: {charlie.address}")
-    print(f"   To: {alice.address}")
+    print(f"   From: {client.address}")
+    print(f"   To: {karma_hello.address}")
     print(f"   Amount: 0.01 GLUE")
     print(f"   Method: EIP-3009 (gasless)")
     print(f"   Signature: {payment_auth['signature'][:30]}...")
@@ -569,14 +569,14 @@ def main():
         return 1
 
     # Initialize agents
-    charlie, alice, bob = initialize_agents()
-    if not charlie or not alice or not bob:
+    client, karma_hello, validator = initialize_agents()
+    if not client or not karma_hello or not validator:
         print("[FAIL] Agent initialization failed\n")
         return 1
 
     # Register agents
-    charlie_id, alice_id, bob_id = register_agents(charlie, alice, bob)
-    if not charlie_id or not alice_id or not bob_id:
+    client_id, karma_hello_id, validator_id = register_agents(client, karma_hello, validator)
+    if not client_id or not karma_hello_id or not validator_id:
         print("[FAIL] Agent registration failed\n")
         return 1
 
@@ -585,41 +585,41 @@ def main():
     time.sleep(2)
 
     # Demonstrate discovery
-    agent_card = demonstrate_discovery(alice)
+    agent_card = demonstrate_discovery(karma_hello)
     if not agent_card:
         print("[FAIL] Discovery failed\n")
         return 1
 
     # Demonstrate data request and validation request
-    chat_log_package, validation_request = demonstrate_data_request(alice, bob_id)
+    chat_log_package, validation_request = demonstrate_data_request(karma_hello, validator_id)
     if not chat_log_package or not validation_request:
         print("[FAIL] Data request failed\n")
         return 1
 
     # Demonstrate CrewAI validation
-    validation_package = demonstrate_validation(bob, chat_log_package)
+    validation_package = demonstrate_validation(validator, chat_log_package)
     if not validation_package:
         print("[FAIL] Validation failed\n")
         return 1
 
     # Demonstrate payment
-    payment_auth = demonstrate_payment(charlie, alice)
+    payment_auth = demonstrate_payment(client, karma_hello)
     if not payment_auth:
         print("[FAIL] Payment failed\n")
         return 1
 
     # Demonstrate data delivery
-    if not demonstrate_data_delivery(alice, chat_log_package):
+    if not demonstrate_data_delivery(karma_hello, chat_log_package):
         print("[FAIL] Data delivery failed\n")
         return 1
 
     # Demonstrate two-way ratings
-    if not demonstrate_two_way_ratings(charlie, alice, bob, charlie_id, alice_id, bob_id):
+    if not demonstrate_two_way_ratings(client, karma_hello, validator, client_id, karma_hello_id, validator_id):
         print("[FAIL] Two-way ratings failed\n")
         return 1
 
     # Display complete audit trail
-    display_audit_trail(charlie, alice, bob, chat_log_package, validation_package, payment_auth)
+    display_audit_trail(client, karma_hello, validator, chat_log_package, validation_package, payment_auth)
 
     # Success message
     print("=" * 80)

@@ -31,9 +31,16 @@ Usage:
     # Refill wallets with GLUE only (execute)
     python rotate-system.py --refill --confirm
 
+    # Rotate ERC-20 deployer key only (dry-run)
+    python rotate-system.py --rotate-erc20
+
+    # Rotate ERC-20 deployer key only (execute)
+    python rotate-system.py --rotate-erc20 --confirm
+
 Flags:
-    --refill   : Only distribute GLUE tokens to existing wallets (no rotation)
-    --confirm  : Execute actual changes (default is dry-run mode)
+    --refill       : Only distribute GLUE tokens to existing wallets (no rotation)
+    --rotate-erc20 : Only rotate ERC-20 deployer wallet (NOT rotated by default)
+    --confirm      : Execute actual changes (default is dry-run mode)
 """
 
 import os
@@ -478,6 +485,76 @@ def update_documentation(
 # Main Rotation Flow
 # ============================================================================
 
+def rotate_erc20_mode():
+    """Rotate ERC-20 deployer wallet only"""
+    print(f"\n{Colors.BOLD}{'='*70}{Colors.ENDC}")
+    print(f"{Colors.BOLD}  ROTATE ERC-20 DEPLOYER WALLET{Colors.ENDC}")
+    print(f"{Colors.BOLD}{'='*70}{Colors.ENDC}\n")
+
+    dry_run = "--confirm" not in sys.argv
+
+    if dry_run:
+        print(f"{Colors.WARNING}[DRY RUN] Would rotate ERC-20 deployer wallet{Colors.ENDC}\n")
+    else:
+        print(f"{Colors.FAIL}[WARN]️  WARNING: This will invalidate the ERC-20 deployer wallet!{Colors.ENDC}")
+        print(f"{Colors.FAIL}  You will need to redeploy GLUE token with new address{Colors.ENDC}\n")
+
+        confirm = input("Type 'ROTATE-ERC20' to confirm: ")
+        if confirm != "ROTATE-ERC20":
+            print(f"\n{Colors.WARNING}Aborted{Colors.ENDC}")
+            return
+
+    # Generate new ERC-20 deployer wallet
+    print(f"\n{Colors.HEADER}{'='*70}{Colors.ENDC}")
+    print(f"{Colors.HEADER}Generating New ERC-20 Deployer Wallet{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*70}{Colors.ENDC}\n")
+
+    new_account = Account.create()
+    new_address = new_account.address
+    new_private_key = new_account.key.hex()
+
+    print(f"{Colors.OKGREEN}[OK] New ERC-20 deployer wallet generated{Colors.ENDC}")
+    print(f"   Address: {new_address}\n")
+
+    if dry_run:
+        print(f"{Colors.WARNING}[DRY RUN] Would update AWS Secrets Manager{Colors.ENDC}")
+        print(f"   erc-20 deployer: {new_address}\n")
+    else:
+        # Update AWS Secrets Manager
+        try:
+            client = boto3.client('secretsmanager', region_name=AWS_REGION)
+            response = client.get_secret_value(SecretId=AWS_SECRET_NAME)
+            current_secret = json.loads(response['SecretString'])
+
+            # Update erc-20 deployer key
+            current_secret['erc-20'] = {
+                "private_key": new_private_key
+            }
+
+            client.update_secret(
+                SecretId=AWS_SECRET_NAME,
+                SecretString=json.dumps(current_secret, indent=2)
+            )
+
+            print(f"{Colors.OKGREEN}[OK] AWS Secrets Manager updated{Colors.ENDC}")
+            print(f"   erc-20 deployer: {new_address}\n")
+
+        except Exception as e:
+            print(f"{Colors.FAIL}[FAIL] Failed to update AWS: {e}{Colors.ENDC}")
+            return
+
+    print(f"\n{Colors.HEADER}{'='*70}{Colors.ENDC}")
+    print(f"{Colors.HEADER}ERC-20 ROTATION COMPLETE{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*70}{Colors.ENDC}\n")
+
+    if dry_run:
+        print(f"{Colors.OKBLUE}Run with --confirm flag to execute actual rotation{Colors.ENDC}\n")
+    else:
+        print(f"{Colors.OKGREEN}Next steps:{Colors.ENDC}")
+        print(f"  1. Fund new wallet with AVAX: {new_address}")
+        print(f"  2. Redeploy GLUE token: cd erc-20 && ./deploy-fuji.sh")
+        print(f"  3. Update all agent .env files with new GLUE_TOKEN_ADDRESS\n")
+
 def refill_mode():
     """Refill existing wallets with GLUE tokens only"""
     print(f"\n{Colors.BOLD}{'='*70}{Colors.ENDC}")
@@ -507,6 +584,11 @@ def refill_mode():
 
 def main():
     """Main rotation flow"""
+
+    # Check for rotate-erc20 mode
+    if "--rotate-erc20" in sys.argv:
+        rotate_erc20_mode()
+        return
 
     # Check for refill-only mode
     if "--refill" in sys.argv:
