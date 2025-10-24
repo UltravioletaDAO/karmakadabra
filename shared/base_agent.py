@@ -618,6 +618,227 @@ class ERC8004BaseAgent:
         return tx_hash.hex()
 
     # =========================================================================
+    # BUYER CAPABILITIES - Standardized methods for purchasing from other agents
+    # =========================================================================
+
+    async def discover_agent(self, agent_url: str) -> Optional[Dict]:
+        """
+        Discover another agent via A2A protocol
+
+        Args:
+            agent_url: Base URL of the agent (e.g., "http://localhost:8002")
+
+        Returns:
+            AgentCard data or None if discovery fails
+        """
+        try:
+            import httpx
+            agent_card_url = f"{agent_url}/.well-known/agent-card"
+            logger.info(f"[{self.agent_name}] Discovering agent at {agent_card_url}")
+
+            async with httpx.AsyncClient() as client:
+                response = await client.get(agent_card_url, timeout=10.0)
+
+                if response.status_code == 200:
+                    card_data = response.json()
+                    logger.info(f"[{self.agent_name}] Discovered: {card_data.get('name', 'Unknown')}")
+                    return card_data
+                else:
+                    logger.error(f"[{self.agent_name}] Discovery failed: {response.status_code}")
+                    return None
+        except Exception as e:
+            logger.error(f"[{self.agent_name}] Discovery error: {e}")
+            return None
+
+    async def buy_from_agent(
+        self,
+        agent_url: str,
+        endpoint: str,
+        request_data: Dict,
+        expected_price_glue: str = "0.01",
+        timeout: float = 30.0
+    ) -> Optional[Dict]:
+        """
+        Purchase data/service from another agent
+
+        Args:
+            agent_url: Base URL of seller agent
+            endpoint: API endpoint (e.g., "/get_chat_logs")
+            request_data: Request payload
+            expected_price_glue: Expected price in GLUE
+            timeout: Request timeout in seconds
+
+        Returns:
+            Response data or None if purchase fails
+
+        Example:
+            >>> logs = await agent.buy_from_agent(
+            ...     "http://localhost:8002",
+            ...     "/get_chat_logs",
+            ...     {"users": ["alice"], "limit": 100},
+            ...     "0.01"
+            ... )
+        """
+        try:
+            import httpx
+            full_url = f"{agent_url}{endpoint}"
+            logger.info(f"[{self.agent_name}] Buying from {full_url}")
+            logger.info(f"[{self.agent_name}] Expected price: {expected_price_glue} GLUE")
+
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    full_url,
+                    json=request_data,
+                    timeout=timeout
+                )
+
+                if response.status_code == 200:
+                    data = response.json()
+                    price_header = response.headers.get("X-Price", "unknown")
+                    logger.info(f"[{self.agent_name}] Purchase successful! Price: {price_header}")
+                    return data
+                else:
+                    logger.error(f"[{self.agent_name}] Purchase failed: {response.status_code}")
+                    return None
+        except Exception as e:
+            logger.error(f"[{self.agent_name}] Purchase error: {e}")
+            return None
+
+    def save_purchased_data(self, key: str, data: Dict, directory: str = "./purchased_data") -> str:
+        """
+        Save purchased data to local cache
+
+        Args:
+            key: Unique key for this data (e.g., "karma-hello_20251024")
+            data: Data to save
+            directory: Cache directory path
+
+        Returns:
+            filepath: Path to saved file
+
+        Example:
+            >>> agent.save_purchased_data(
+            ...     "karma-hello_logs_20251024",
+            ...     {"messages": [...]}
+            ... )
+        """
+        import json
+        from pathlib import Path
+        from datetime import datetime
+
+        cache_dir = Path(directory)
+        cache_dir.mkdir(parents=True, exist_ok=True)
+
+        timestamp = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+        filename = f"{key}_{timestamp}.json"
+        filepath = cache_dir / filename
+
+        with open(filepath, "w", encoding="utf-8") as f:
+            json.dump({
+                "key": key,
+                "timestamp": datetime.utcnow().isoformat(),
+                "data": data
+            }, f, indent=2)
+
+        logger.info(f"[{self.agent_name}] Saved purchased data: {filepath}")
+        return str(filepath)
+
+    # =========================================================================
+    # SELLER CAPABILITIES - Standardized methods for selling to other agents
+    # =========================================================================
+
+    def create_agent_card(
+        self,
+        agent_id: int,
+        name: str,
+        description: str,
+        skills: list,
+        url: str = None
+    ) -> Dict:
+        """
+        Create A2A AgentCard for this agent
+
+        Args:
+            agent_id: On-chain agent ID
+            name: Agent display name
+            description: Agent description
+            skills: List of Skill dicts (from a2a_protocol.py)
+            url: Agent URL (defaults to self.agent_domain)
+
+        Returns:
+            AgentCard dict ready for JSON serialization
+
+        Example:
+            >>> from shared.a2a_protocol import Skill, Price
+            >>> card = agent.create_agent_card(
+            ...     agent_id=1,
+            ...     name="Data Seller",
+            ...     description="Sells high-quality data",
+            ...     skills=[{
+            ...         "skillId": "sell_logs",
+            ...         "name": "sell_logs",
+            ...         "description": "Sell chat logs",
+            ...         "price": {"amount": "0.01", "currency": "GLUE"}
+            ...     }]
+            ... )
+        """
+        return {
+            "agentId": agent_id,
+            "name": name,
+            "description": description,
+            "domain": self.agent_domain,
+            "url": url or f"https://{self.agent_domain}",
+            "skills": skills
+        }
+
+    def create_fastapi_app(self, title: str, description: str, version: str = "1.0.0"):
+        """
+        Create a standardized FastAPI app for this agent
+
+        Args:
+            title: App title
+            description: App description
+            version: API version
+
+        Returns:
+            FastAPI app instance with standard endpoints
+
+        Example:
+            >>> app = agent.create_fastapi_app(
+            ...     "Karma-Hello Agent",
+            ...     "Sells Twitch chat logs"
+            ... )
+            >>> @app.post("/get_chat_logs")
+            ... async def get_logs(request: LogRequest):
+            ...     return await agent.process_sale(...)
+        """
+        from fastapi import FastAPI
+
+        app = FastAPI(title=title, description=description, version=version)
+
+        # Add standard health endpoint
+        @app.get("/")
+        async def root():
+            return {
+                "service": title,
+                "status": "running",
+                "address": self.address,
+                "agent_id": self.agent_id,
+                "domain": self.agent_domain
+            }
+
+        @app.get("/health")
+        async def health():
+            return {
+                "status": "healthy",
+                "agent": self.agent_name,
+                "address": self.address,
+                "balance": str(self.get_balance()) + " AVAX"
+            }
+
+        return app
+
+    # =========================================================================
     # UTILITY METHODS
     # =========================================================================
 

@@ -1,13 +1,21 @@
 # Agent Buyer+Seller Reference Implementation
 
-**Status**: ✅ Implemented across all agents
+**Status**: ✅ Implemented in `ERC8004BaseAgent` - ALL agents inherit by default
 **Purpose**: Standard pattern for autonomous agents that both buy and sell services
+**Base Class**: `shared/base_agent.py` (lines 620-839)
 
 ---
 
 ## Overview
 
 All Karmacadabra agents follow the **Buyer+Seller pattern**: they sell specialized services while buying inputs from other agents. This creates a self-sustaining agent economy where agents transact autonomously.
+
+**As of October 2025**: Buyer+Seller capabilities are **built into the base agent class**. Every agent automatically has:
+- `discover_agent(url)` - A2A discovery
+- `buy_from_agent(url, endpoint, data, price)` - Generic purchase
+- `save_purchased_data(key, data)` - Cache management
+- `create_agent_card(...)` - A2A AgentCard generation
+- `create_fastapi_app(...)` - FastAPI app with standard endpoints
 
 ### Why This Pattern?
 
@@ -19,9 +27,69 @@ All Karmacadabra agents follow the **Buyer+Seller pattern**: they sell specializ
 
 ---
 
+## Base Agent API (Inherited by All Agents)
+
+**Every agent automatically inherits buyer+seller capabilities from `ERC8004BaseAgent`:**
+
+### Buyer Methods (from base_agent.py:620-744)
+
+```python
+# Discovery
+agent_card = await self.discover_agent("http://localhost:8002")
+# Returns: {"agentId": 1, "name": "Karma-Hello", "skills": [...]}
+
+# Purchase
+data = await self.buy_from_agent(
+    agent_url="http://localhost:8002",
+    endpoint="/get_chat_logs",
+    request_data={"users": ["alice"], "limit": 100},
+    expected_price_glue="0.01"
+)
+# Returns: {"messages": [...]} or None
+
+# Cache
+filepath = self.save_purchased_data(
+    key="karma-hello_logs_20251024",
+    data=purchased_data,
+    directory="./purchased_data"
+)
+# Returns: "./purchased_data/karma-hello_logs_20251024_20251024_143022.json"
+```
+
+### Seller Methods (from base_agent.py:746-839)
+
+```python
+# Create AgentCard
+card = self.create_agent_card(
+    agent_id=1,
+    name="Data Seller",
+    description="Sells high-quality data",
+    skills=[{
+        "skillId": "sell_logs",
+        "name": "sell_logs",
+        "description": "Sell chat logs",
+        "price": {"amount": "0.01", "currency": "GLUE"}
+    }]
+)
+
+# Create FastAPI app with standard endpoints
+app = self.create_fastapi_app(
+    title="Karma-Hello Agent",
+    description="Sells Twitch chat logs"
+)
+# Automatically includes / and /health endpoints
+
+# Add your service endpoints
+@app.post("/get_chat_logs")
+async def get_logs(request: LogRequest):
+    return await self.process_and_sell_logs(request)
+```
+
+---
+
 ## Reference Implementation: Skill-Extractor Agent
 
-**Best example of the pattern in action:**
+**Example showing buyer+seller pattern using base agent methods:**
 
 ```python
 class SkillExtractorAgent(ERC8004BaseAgent):
