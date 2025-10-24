@@ -238,6 +238,34 @@ cp .env.example .env
 - `FACILITATOR_URL`: x402 facilitator endpoint
 - `OPENAI_API_KEY`: For CrewAI agents (GPT-4o)
 
+### Domain Naming Convention
+
+**All agent domains MUST use the ultravioletadao.xyz namespace:**
+
+- ✅ **Base domain**: `karmacadabra.ultravioletadao.xyz`
+- ✅ **Agent subdomains**: `<agent-name>.karmacadabra.ultravioletadao.xyz`
+
+**Examples:**
+```
+karma-hello.karmacadabra.ultravioletadao.xyz
+abracadabra.karmacadabra.ultravioletadao.xyz
+validator.karmacadabra.ultravioletadao.xyz
+client.karmacadabra.ultravioletadao.xyz
+voice-extractor.karmacadabra.ultravioletadao.xyz
+skill-extractor.karmacadabra.ultravioletadao.xyz
+```
+
+**Why this matters:**
+- Agent domains are registered on-chain in the Identity Registry
+- Domains identify agents in the A2A protocol (AgentCard at `/.well-known/agent-card`)
+- Consistent naming prevents registration conflicts
+- Once registered, changing domains requires using `updateAgent()` function
+
+**Wrong examples (DO NOT USE):**
+- ❌ `karma-hello-seller.ultravioletadao.xyz` (missing karmacadabra subdomain)
+- ❌ `karma-hello.karmacadabra.xyz` (wrong TLD)
+- ❌ `karma-hello-agent.local` (not under ultravioletadao.xyz)
+
 ---
 
 ## Agent Implementation Pattern
