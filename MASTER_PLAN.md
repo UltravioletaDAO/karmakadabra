@@ -132,6 +132,132 @@ Net profit: 0.04 GLUE per extraction (400% margin)
 - Initial Balance: 55,000 GLUE (budgeted)
 - ERC-8004 Registration: System Agent #6 (pending wallet creation)
 
+---
+
+### Sprint 2.8: Testing & Validation 🔥 **IN PROGRESS**
+
+**Goal:** Verify all Sprint 2 agents work correctly before moving to Sprint 3
+
+**Testing Strategy - 3 Levels:**
+
+#### ✅ Level 1: Unit Tests (No External Dependencies) - **COMPLETE**
+
+**Objective:** Test each agent's internal logic with mock data
+
+**Test Coverage:**
+- ✅ Sprint 1 Foundation: 26 passing unit tests
+- ✅ Validator Agent: `test_validator.py` with --quick mode
+- ✅ Client Agent: `client-agent/test_client.py` (6/6 tests passing)
+- ✅ Karma-Hello Agent: `karma-hello-agent/test_karma_hello.py` (8/8 tests passing)
+- ✅ Abracadabra Agent: `abracadabra-agent/test_abracadabra.py` (5/5 tests passing)
+- ✅ Voice-Extractor Agent: `voice-extractor-agent/test_voice_extractor.py` (5/5 tests passing)
+- ✅ Skill-Extractor Agent: `skill-extractor-agent/test_skill_extractor.py` (6/6 tests passing)
+
+**Results:** ✅ **30/30 tests passing** - All agents validated
+
+**What to test:**
+- ✅ Agent initialization (without on-chain registration)
+- ✅ Data parsing and validation
+- ✅ Price calculation logic
+- ✅ AgentCard generation
+- ✅ Mock buyer/seller flows
+- ❌ No OpenAI calls (use mock CrewAI responses)
+- ❌ No blockchain transactions (use mock Web3)
+- ❌ No inter-agent communication
+
+**Implementation:**
+Each agent gets a `test_[agent].py` file with:
+```python
+# Mock mode - no external dependencies
+python test_karma_hello.py --mock
+python test_abracadabra.py --mock
+python test_voice_extractor.py --mock
+python test_skill_extractor.py --mock
+```
+
+**Success Criteria:** All agents pass unit tests with mock data
+
+---
+
+#### 📋 Level 2: Integration Tests (Agents Running)
+
+**Objective:** Test agents as running servers with local data
+
+**Test Coverage:**
+- Start each agent individually
+- Test HTTP endpoints (/, /health, /.well-known/agent-card)
+- Test service endpoints with local data files
+- Verify response formats and headers
+
+**What to test:**
+- ✅ Server starts successfully
+- ✅ Health endpoints respond
+- ✅ AgentCard returns valid JSON
+- ✅ Service endpoints work with local files
+- ❌ No payment verification
+- ❌ No on-chain transactions
+
+**Implementation:**
+```bash
+# Terminal 1: Start agent
+cd karma-hello-agent && python main.py
+
+# Terminal 2: Run integration tests
+python test_karma_hello.py --live
+```
+
+**Success Criteria:** All agents serve data from local files
+
+---
+
+#### 📋 Level 3: End-to-End Tests (Full Flow)
+
+**Objective:** Test complete buyer→validator→seller flow
+
+**Test Scenarios:**
+1. **Discovery Flow:**
+   - Client discovers Karma-Hello via A2A protocol
+   - Client discovers Validator via A2A protocol
+   - Verify AgentCard parsing
+
+2. **Validation Flow:**
+   - Client requests validation from Validator
+   - Validator analyzes sample data
+   - Returns validation score (mock on-chain submission)
+
+3. **Purchase Flow (Simulated):**
+   - Client generates payment authorization (EIP-712 signature)
+   - Seller receives payment header
+   - Seller returns data
+   - Client saves purchased data
+
+4. **Cross-Agent Flow:**
+   - Voice-Extractor buys logs from Karma-Hello
+   - Voice-Extractor processes and returns profile
+   - Skill-Extractor buys logs from Karma-Hello
+   - Skill-Extractor processes and returns profile
+
+**What to test:**
+- ✅ Multi-agent orchestration
+- ✅ A2A protocol discovery
+- ✅ Payment signature generation (no on-chain execution)
+- ✅ Data flow between agents
+- ⚠️  Mock facilitator (no real blockchain transactions)
+
+**Success Criteria:** Complete buyer→validator→seller flow works with mock payments
+
+---
+
+**Current Status:** ✅ Level 1 complete (30/30 tests passing)
+
+**Next Steps:**
+1. ✅ ~~Create unit tests for all 5 agents~~ - COMPLETE
+2. ✅ ~~Run all Level 1 tests~~ - COMPLETE (30/30 passing)
+3. ⏭️  Proceed to Level 2 (integration tests) - Run agents as servers
+4. ⏭️  Then Level 3 (end-to-end flow testing)
+
+---
+
 ### Sprint 3 (Weeks 5-6): User Agent System
 
 **Milestones:**
