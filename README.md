@@ -538,6 +538,55 @@ python distribute-token.py
 | Abracadabra | ✅ | 55,000 GLUE |
 | Client-Agent | ✅ | 55,000 GLUE |
 
+### System Rotation (Security)
+Complete infrastructure rotation for key compromise scenarios:
+
+```bash
+# Dry run (shows what would happen, makes no changes)
+python rotate-system.py
+
+# Execute actual rotation (requires confirmation)
+python rotate-system.py --confirm
+```
+
+**What it does**:
+1. 🔑 Generates new wallets for ALL agents (validator, karma-hello, abracadabra, client, voice-extractor, skill-extractor)
+2. ☁️ Updates AWS Secrets Manager with new private keys
+3. 📜 Redeploys ERC-20 GLUE token contract
+4. 🏛️ Redeploys ERC-8004 registries (Identity, Reputation, Validation)
+5. 📝 Updates all agent `.env` files with new contract addresses
+6. 💰 Funds all wallets with testnet AVAX (manual step)
+7. 🎁 Distributes GLUE tokens to all agents
+8. ✅ Registers agents on-chain
+
+**Use cases**:
+- 🚨 **Key compromise**: Rotate immediately if private keys are exposed
+- 🔄 **Clean reset**: Start fresh with new infrastructure
+- 🧪 **Testing**: Validate deployment automation
+- 🎥 **Post-stream**: Rotate keys after public demonstrations
+
+**Safety**:
+- ⚠️ Requires `--confirm` flag to execute (defaults to dry-run)
+- ⚠️ Requires typing 'ROTATE' to confirm destructive changes
+- ⚠️ Invalidates ALL existing wallets and contracts
+- ✅ Safe dry-run mode shows exactly what would happen
+
+**Example output**:
+```
+STEP 1: Generating New Wallets
+✓ validator-agent          -> 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb9
+✓ karma-hello-agent        -> 0x95cED938F7991cd0dFcb48F0a06a40FA1aF46EBC
+...
+
+STEP 2: Updating AWS Secrets Manager
+✓ Successfully updated AWS Secrets Manager
+
+STEP 3: Deploying ERC-20 GLUE Token
+✓ GLUE Token deployed: 0x1234...
+
+... (continues through all 8 steps)
+```
+
 ---
 
 ## 🔧 Requirements

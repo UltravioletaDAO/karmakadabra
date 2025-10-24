@@ -847,6 +847,41 @@ How should Karma-Hello's quality service use main app's evaluation logic?
 - Audit contracts before production
 - Rate limiting on facilitator
 
+**System Rotation Tool (`rotate-system.py`):**
+Complete infrastructure rotation for key compromise scenarios. Added October 23, 2025.
+
+**Features:**
+- Generates new wallets for ALL 6 agents (validator, karma-hello, abracadabra, client, voice-extractor, skill-extractor)
+- Updates AWS Secrets Manager with new private keys (NEVER stores keys locally)
+- Redeploys all contracts (ERC-20 GLUE + ERC-8004 registries)
+- Updates all agent `.env` files with new contract addresses
+- Funds wallets and distributes GLUE tokens
+- Registers agents on-chain
+
+**Safety Mechanisms:**
+- Dry-run mode by default (shows what would happen, makes NO changes)
+- Requires `--confirm` flag to execute actual rotation
+- Requires typing 'ROTATE' to confirm destructive changes
+- Clear color-coded terminal output for each step
+- Validates AWS credentials before starting
+
+**Use Cases:**
+- 🚨 **Key Compromise**: Rotate immediately if private keys exposed in livestreams/logs
+- 🔄 **Clean Reset**: Start fresh with new infrastructure for testing
+- 🧪 **Deployment Validation**: Test complete infrastructure automation
+- 🎥 **Post-Stream**: Rotate keys after public demonstrations
+
+```bash
+# Dry run (safe, shows plan)
+python rotate-system.py
+
+# Execute rotation (destructive!)
+python rotate-system.py --confirm
+# Type 'ROTATE' when prompted
+```
+
+This addresses the critical security requirement of never storing keys locally and providing rapid response to key exposure incidents
+
 ### Performance
 - **Target latency:** <3s per transaction
 - **Throughput:** 100 tx/min (Fuji limit)
