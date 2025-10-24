@@ -65,9 +65,10 @@ All smart contracts are live and verified on Snowtrace. Agent wallets have been 
 
 ### ✅ Sprint 1: Foundation (COMPLETE - October 2025)
 
-**Python Shared Utilities** (`shared/`) - **3,100+ lines** of production-ready code:
+**Python Shared Utilities** (`shared/`) - **3,300+ lines** of production-ready code:
 
-1. **`base_agent.py`** (600+ lines) - ERC-8004 integration, reputation system, Web3.py, AWS Secrets
+1. **`base_agent.py`** (857 lines) - ERC-8004 integration, **buyer+seller pattern built-in**, reputation system, Web3.py, AWS Secrets
+   - **ALL agents inherit**: `discover_agent()`, `buy_from_agent()`, `save_purchased_data()`, `create_agent_card()`, `create_fastapi_app()`
 2. **`payment_signer.py`** (470+ lines) - EIP-712 signing, EIP-3009 payment signatures
 3. **`x402_client.py`** (530+ lines) - x402 HTTP payment protocol client
 4. **`a2a_protocol.py`** (650+ lines) - Agent discovery, AgentCard, Skills
@@ -117,29 +118,34 @@ python test_validator.py --live   # Test with running validator
 - Port: 8001
 
 #### ✅ Sprint 2.2: Client Agent (COMPLETE)
-**Generic buyer agent for marketplace** - `client-agent/` - **440+ lines**
+**Buyer+Seller orchestrator - comprehensive user insights marketplace** - `client-agent/` - **485 lines**
 
 **What it does:**
-- Discovers sellers via A2A protocol (`/.well-known/agent-card`)
-- Requests validation before purchases
-- Handles x402 payment flow with signed authorizations
-- Saves purchased data to organized directory structure
+- **BUYS** data from 5 agents using **inherited base agent methods** (0.211 GLUE cost)
+  - Chat logs from Karma-Hello (0.01 GLUE)
+  - Skills from Skill-Extractor (0.10 GLUE)
+  - Personality from Voice-Extractor (0.10 GLUE)
+  - Validation from Validator (0.001 GLUE)
+- **SELLS** comprehensive user reports synthesized from multiple sources (1.00 GLUE)
+- **Economics**: 0.789 GLUE profit per report (374% margin)
+
+**Key Features:**
+- Uses **inherited buyer methods**: `discover_agent()`, `buy_from_agent()`, `save_purchased_data()`
+- Uses **inherited seller methods**: `create_agent_card()`, `create_fastapi_app()`
+- Multi-agent orchestration (buys from 5 agents, synthesizes 1 report)
+- A2A protocol discovery + x402 payment handling
+- Demonstrates complete buyer+seller pattern
 
 **Key Files:**
-1. `main.py` (170+ lines) - ClientAgent class with discover/validate/purchase
+1. `main.py` (485 lines) - ClientAgent class with complete buyer+seller orchestration
 2. `.env.example` (40+ lines) - Configuration template
 3. `README.md` (230+ lines) - Usage documentation
 
-**Key Methods:**
-- `discover_seller()` - A2A protocol discovery
-- `request_validation()` - Validator integration
-- `save_data()` - Data storage with metadata
-
 **Deployment:**
 - Wallet: `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`
-- Balance: 55,000 GLUE
-- Max price: 1.0 GLUE (configurable)
-- Min validation score: 0.7 (configurable)
+- Balance: 220,000 GLUE
+- Sells at: 1.00 GLUE per comprehensive report
+- Spends: 0.211 GLUE per report generation
 
 #### ✅ Sprint 2.3: Data Integration (COMPLETE)
 **Sample data files for testing** - `data/` - **495+ lines**

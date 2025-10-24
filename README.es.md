@@ -65,9 +65,10 @@ Todos los contratos inteligentes están en vivo y verificados en Snowtrace. Las 
 
 ### ✅ Sprint 1: Fundamentos (COMPLETO - Octubre 2025)
 
-**Utilidades Compartidas en Python** (`shared/`) - **3,100+ líneas** de código listo para producción:
+**Utilidades Compartidas en Python** (`shared/`) - **3,300+ líneas** de código listo para producción:
 
-1. **`base_agent.py`** (600+ líneas) - Integración ERC-8004, sistema de reputación, Web3.py, AWS Secrets
+1. **`base_agent.py`** (857 líneas) - Integración ERC-8004, **patrón comprador+vendedor integrado**, sistema de reputación, Web3.py, AWS Secrets
+   - **TODOS los agentes heredan**: `discover_agent()`, `buy_from_agent()`, `save_purchased_data()`, `create_agent_card()`, `create_fastapi_app()`
 2. **`payment_signer.py`** (470+ líneas) - Firma EIP-712, firmas de pago EIP-3009
 3. **`x402_client.py`** (530+ líneas) - Cliente de protocolo de pago HTTP x402
 4. **`a2a_protocol.py`** (650+ líneas) - Descubrimiento de agentes, AgentCard, Skills
@@ -117,29 +118,34 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Puerto: 8001
 
 #### ✅ Sprint 2.2: Agente Cliente (COMPLETO)
-**Agente comprador genérico para el mercado** - `client-agent/` - **440+ líneas**
+**Orquestador comprador+vendedor - mercado de insights comprehensivos de usuarios** - `client-agent/` - **485 líneas**
 
 **Qué hace:**
-- Descubre vendedores vía protocolo A2A (`/.well-known/agent-card`)
-- Solicita validación antes de compras
-- Maneja flujo de pago x402 con autorizaciones firmadas
-- Guarda datos comprados en estructura de directorios organizada
+- **COMPRA** datos de 5 agentes usando **métodos heredados del agente base** (costo 0.211 GLUE)
+  - Logs de chat de Karma-Hello (0.01 GLUE)
+  - Habilidades de Skill-Extractor (0.10 GLUE)
+  - Personalidad de Voice-Extractor (0.10 GLUE)
+  - Validación de Validator (0.001 GLUE)
+- **VENDE** reportes comprehensivos de usuarios sintetizados desde múltiples fuentes (1.00 GLUE)
+- **Economía**: 0.789 GLUE de beneficio por reporte (margen del 374%)
+
+**Características clave:**
+- Usa **métodos heredados de comprador**: `discover_agent()`, `buy_from_agent()`, `save_purchased_data()`
+- Usa **métodos heredados de vendedor**: `create_agent_card()`, `create_fastapi_app()`
+- Orquestación multi-agente (compra de 5 agentes, sintetiza 1 reporte)
+- Descubrimiento por protocolo A2A + manejo de pagos x402
+- Demuestra el patrón completo comprador+vendedor
 
 **Archivos clave:**
-1. `main.py` (170+ líneas) - Clase ClientAgent con discover/validate/purchase
+1. `main.py` (485 líneas) - Clase ClientAgent con orquestación completa comprador+vendedor
 2. `.env.example` (40+ líneas) - Plantilla de configuración
 3. `README.md` (230+ líneas) - Documentación de uso
 
-**Métodos clave:**
-- `discover_seller()` - Descubrimiento por protocolo A2A
-- `request_validation()` - Integración con validador
-- `save_data()` - Almacenamiento de datos con metadatos
-
 **Despliegue:**
 - Wallet: `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`
-- Balance: 55,000 GLUE
-- Precio máximo: 1.0 GLUE (configurable)
-- Puntuación mínima de validación: 0.7 (configurable)
+- Balance: 220,000 GLUE
+- Vende a: 1.00 GLUE por reporte comprehensivo
+- Gasta: 0.211 GLUE por generación de reporte
 
 #### ✅ Sprint 2.3: Integración de Datos (COMPLETO)
 **Archivos de datos de muestra para pruebas** - `data/` - **495+ líneas**
