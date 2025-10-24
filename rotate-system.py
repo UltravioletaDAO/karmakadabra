@@ -19,9 +19,21 @@ This script performs a complete system rotation:
 [WARN]️  Use this when keys are compromised or for clean system reset.
 
 Usage:
-    python rotate-system.py [--confirm]
+    # Full system rotation (dry-run)
+    python rotate-system.py
 
-    Without --confirm flag, runs in dry-run mode (shows what would happen)
+    # Full system rotation (execute)
+    python rotate-system.py --confirm
+
+    # Refill wallets with GLUE only (dry-run)
+    python rotate-system.py --refill
+
+    # Refill wallets with GLUE only (execute)
+    python rotate-system.py --refill --confirm
+
+Flags:
+    --refill   : Only distribute GLUE tokens to existing wallets (no rotation)
+    --confirm  : Execute actual changes (default is dry-run mode)
 """
 
 import os
@@ -378,8 +390,40 @@ def distribute_glue(wallets: Dict[str, Dict[str, str]], dry_run: bool = True) ->
 # Main Rotation Flow
 # ============================================================================
 
+def refill_mode():
+    """Refill existing wallets with GLUE tokens only"""
+    print(f"\n{Colors.BOLD}{'='*70}{Colors.ENDC}")
+    print(f"{Colors.BOLD}  KARMACADABRA WALLET REFILL{Colors.ENDC}")
+    print(f"{Colors.BOLD}{'='*70}{Colors.ENDC}\n")
+
+    dry_run = "--confirm" not in sys.argv
+
+    if dry_run:
+        print(f"{Colors.WARNING}[DRY RUN] Would distribute GLUE tokens to all agents{Colors.ENDC}\n")
+    else:
+        print(f"{Colors.OKGREEN}Distributing GLUE tokens to existing wallets...{Colors.ENDC}\n")
+
+    # Just run token distribution
+    if not distribute_glue({}, dry_run):
+        print(f"\n{Colors.FAIL}[FAIL] Token distribution failed{Colors.ENDC}")
+        return
+
+    print(f"\n{Colors.HEADER}{'='*70}{Colors.ENDC}")
+    print(f"{Colors.HEADER}REFILL COMPLETE{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*70}{Colors.ENDC}\n")
+
+    if dry_run:
+        print(f"{Colors.OKBLUE}Run with --confirm flag to execute actual distribution{Colors.ENDC}\n")
+    else:
+        print(f"{Colors.OKGREEN}All wallets refilled with GLUE tokens{Colors.ENDC}\n")
+
 def main():
     """Main rotation flow"""
+
+    # Check for refill-only mode
+    if "--refill" in sys.argv:
+        refill_mode()
+        return
 
     # Check for confirmation flag
     dry_run = "--confirm" not in sys.argv

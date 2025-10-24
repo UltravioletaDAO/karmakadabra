@@ -888,6 +888,7 @@ Complete infrastructure rotation for key compromise scenarios. Added October 23,
 - Updates all agent `.env` files with new contract addresses
 - Funds wallets and distributes GLUE tokens
 - Registers agents on-chain
+- **Refill Mode** (`--refill` flag): Top up existing wallets with GLUE tokens without full rotation
 
 **Safety Mechanisms:**
 - Dry-run mode by default (shows what would happen, makes NO changes)
@@ -899,6 +900,7 @@ Complete infrastructure rotation for key compromise scenarios. Added October 23,
 **Use Cases:**
 - 🚨 **Key Compromise**: Rotate immediately if private keys exposed in livestreams/logs
 - 🔄 **Clean Reset**: Start fresh with new infrastructure for testing
+- 💰 **Wallet Refill**: Top up agent wallets with GLUE tokens without full rotation (use `--refill` flag)
 - 🧪 **Deployment Validation**: Test complete infrastructure automation
 - 🎥 **Post-Stream**: Rotate keys after public demonstrations
 
@@ -909,6 +911,12 @@ python rotate-system.py
 # Execute rotation (destructive!)
 python rotate-system.py --confirm
 # Type 'ROTATE' when prompted
+
+# Refill wallets with GLUE only (dry-run)
+python rotate-system.py --refill
+
+# Refill wallets with GLUE only (execute)
+python rotate-system.py --refill --confirm
 ```
 
 This addresses the critical security requirement of never storing keys locally and providing rapid response to key exposure incidents

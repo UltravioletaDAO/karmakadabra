@@ -547,6 +547,12 @@ python rotate-system.py
 
 # Execute actual rotation (requires confirmation)
 python rotate-system.py --confirm
+
+# Refill wallets with GLUE only (no rotation)
+python rotate-system.py --refill
+
+# Refill wallets with GLUE (execute)
+python rotate-system.py --refill --confirm
 ```
 
 **What it does**:
@@ -564,6 +570,7 @@ python rotate-system.py --confirm
 - 🔄 **Clean reset**: Start fresh with new infrastructure
 - 🧪 **Testing**: Validate deployment automation
 - 🎥 **Post-stream**: Rotate keys after public demonstrations
+- 💰 **Wallet refill**: Top up agent wallets with GLUE tokens (use `--refill` flag)
 
 **Safety**:
 - ⚠️ Requires `--confirm` flag to execute (defaults to dry-run)

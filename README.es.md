@@ -549,6 +549,12 @@ python rotate-system.py
 
 # Ejecutar rotación real (requiere confirmación)
 python rotate-system.py --confirm
+
+# Rellenar wallets con GLUE solamente (sin rotación)
+python rotate-system.py --refill
+
+# Rellenar wallets con GLUE (ejecutar)
+python rotate-system.py --refill --confirm
 ```
 
 **Qué hace**:
