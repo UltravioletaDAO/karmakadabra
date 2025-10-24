@@ -31,14 +31,16 @@
 
 ### Billeteras de Agentes (Financiadas con Tokens GLUE)
 
-| Agente | Dirección de Billetera | Saldo GLUE |
-|--------|------------------------|------------|
-| **Validator** | [`0x1219eF9484BF7E40E6479141B32634623d37d507`](https://testnet.snowtrace.io/address/0x1219eF9484BF7E40E6479141B32634623d37d507) | 55,000 GLUE |
-| **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://testnet.snowtrace.io/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 55,000 GLUE |
-| **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://testnet.snowtrace.io/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 55,000 GLUE |
-| **Client-Agent** | [`0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`](https://testnet.snowtrace.io/address/0xCf30021812F27132d36dc791E0eC17f34B4eE8BA) | 220,000 GLUE |
-| **Voice-Extractor** | [`0xDd63D5840090B98D9EB86f2c31974f9d6c270b17`](https://testnet.snowtrace.io/address/0xDd63D5840090B98D9EB86f2c31974f9d6c270b17) | 110,000 GLUE |
-| **Skill-Extractor** | [`0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9`](https://testnet.snowtrace.io/address/0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9) | 55,000 GLUE |
+| Agente | Dirección de Billetera | Saldo GLUE | Dominio |
+|--------|------------------------|------------|---------|
+| **Client Agent** | [`0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`](https://testnet.snowtrace.io/address/0xCf30021812F27132d36dc791E0eC17f34B4eE8BA) | 220,000 GLUE | `client.karmacadabra.ultravioletadao.xyz` |
+| **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://testnet.snowtrace.io/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 55,000 GLUE | `karma-hello.karmacadabra.ultravioletadao.xyz` |
+| **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://testnet.snowtrace.io/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 55,000 GLUE | `abracadabra.karmacadabra.ultravioletadao.xyz` |
+| **Validator** | [`0x1219eF9484BF7E40E6479141B32634623d37d507`](https://testnet.snowtrace.io/address/0x1219eF9484BF7E40E6479141B32634623d37d507) | 55,000 GLUE | `validator.karmacadabra.ultravioletadao.xyz` |
+| **Voice-Extractor** | [`0xDd63D5840090B98D9EB86f2c31974f9d6c270b17`](https://testnet.snowtrace.io/address/0xDd63D5840090B98D9EB86f2c31974f9d6c270b17) | 110,000 GLUE | `voice-extractor.karmacadabra.ultravioletadao.xyz` |
+| **Skill-Extractor** | [`0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9`](https://testnet.snowtrace.io/address/0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9) | 55,000 GLUE | `skill-extractor.karmacadabra.ultravioletadao.xyz` |
+
+**Convención de Dominio**: Todos los agentes usan el formato `<nombre-agente>.karmacadabra.ultravioletadao.xyz` (registrado en la blockchain)
 
 **Ver Todos los Contratos**: [Explorador Snowtrace](https://testnet.snowtrace.io/)
 
@@ -309,7 +311,14 @@ python main.py
 
 ## 🔐 AWS Secrets Manager (Seguridad)
 
-Todas las claves privadas de los agentes están almacenadas centralmente en **AWS Secrets Manager** por seguridad. Los agentes obtienen automáticamente las claves de AWS cuando los archivos `.env` están vacíos, o usan claves locales si están llenas (para pruebas).
+⚠️ **POLÍTICA DE SEGURIDAD CRÍTICA**: Las claves privadas **NUNCA se almacenan en archivos `.env`**. Todas las claves deben estar en AWS Secrets Manager.
+
+**Por qué AWS Secrets Manager:**
+- ✅ Almacenamiento seguro centralizado para todas las claves privadas de agentes
+- ✅ Sin claves en repositorios git (incluso archivos de ejemplo tienen `PRIVATE_KEY=` vacío)
+- ✅ Soporte de rotación automática vía `rotate-system.py`
+- ✅ Registro de auditoría de quién accedió a las claves y cuándo
+- ✅ Seguro para transmisiones públicas en vivo (sin exposición accidental de claves)
 
 ### Configuración Rápida
 
@@ -322,18 +331,32 @@ aws configure
 python scripts/setup-secrets.py
 # Crea el secreto 'karmacadabra' con todas las claves privadas
 
-# 3. (Opcional) Limpiar archivos .env locales
+# 3. Limpiar archivos .env locales (REQUERIDO)
 python scripts/clear-env-keys.py
-# Vacía PRIVATE_KEY en todos los archivos .env
+# Establece PRIVATE_KEY= (vacío) en todos los archivos .env
 
 # 4. Probar recuperación
 python -m shared.secrets_manager validator-agent
 # [AWS Secrets] Retrieved key for 'validator-agent' from AWS
 ```
 
-**Cómo funciona:**
-- Si `PRIVATE_KEY` en `.env` está **lleno** → usa clave local (desarrollo)
-- Si `PRIVATE_KEY` en `.env` está **vacío** → obtiene desde AWS (producción)
+**Estructura de Almacenamiento de Claves:**
+```json
+{
+  "erc-20": {"private_key": "0x..."},
+  "client-agent": {"private_key": "0x..."},
+  "karma-hello-agent": {"private_key": "0x..."},
+  "abracadabra-agent": {"private_key": "0x..."},
+  "validator-agent": {"private_key": "0x..."},
+  "voice-extractor-agent": {"private_key": "0x..."},
+  "skill-extractor-agent": {"private_key": "0x..."}
+}
+```
+
+**Notas Importantes:**
+- Clave del deployer ERC-20 almacenada por separado (posee el contrato del token GLUE)
+- Rotar clave ERC-20 solo cuando sea necesario: `python rotate-system.py --rotate-erc20`
+- Todos los archivos `.env` deben tener `PRIVATE_KEY=` (vacío) - scripts obtienen automáticamente de AWS
 
 **Guía completa**: Ver [shared/AWS_SECRETS_SETUP.md](./shared/AWS_SECRETS_SETUP.md)
 
