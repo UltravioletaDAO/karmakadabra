@@ -44,8 +44,8 @@ logger = logging.getLogger(__name__)
 
 # Configuration
 CONFIG = {
-    "agent_name": os.getenv("AGENT_NAME", "validator"),
-    "agent_domain": os.getenv("AGENT_DOMAIN", "validator.ultravioletadao.xyz"),
+    "agent_name": os.getenv("AGENT_NAME", "validator-agent"),
+    "agent_domain": os.getenv("AGENT_DOMAIN", "validator.karmacadabra.ultravioletadao.xyz"),
     "private_key": os.getenv("PRIVATE_KEY") or None,
     "rpc_url": os.getenv("RPC_URL_FUJI"),
     "chain_id": int(os.getenv("CHAIN_ID", "43113")),
@@ -91,24 +91,44 @@ class ValidatorAgent(ERC8004BaseAgent):
         """Initialize validator agent"""
         super().__init__(
             agent_name=config["agent_name"],
+            agent_domain=config["agent_domain"],
             private_key=config["private_key"],
             rpc_url=config["rpc_url"],
             chain_id=config["chain_id"],
             identity_registry_address=config["identity_registry"],
             reputation_registry_address=config["reputation_registry"],
-            validation_registry_address=config["validation_registry"],
-            glue_token_address=config["glue_token"]
+            validation_registry_address=config["validation_registry"]
         )
 
         self.config = config
         self.validation_fee = config["validation_fee"]
 
-        # Initialize CrewAI crews
-        self.quality_crew = QualityValidationCrew(model=config["openai_model"])
-        self.fraud_crew = FraudDetectionCrew(model=config["openai_model"])
-        self.price_crew = PriceReviewCrew(model=config["openai_model"])
+        # Initialize CrewAI crews (lazy loading - only when OpenAI key is valid)
+        self.quality_crew = None
+        self.fraud_crew = None
+        self.price_crew = None
+        self._crews_initialized = False
 
         logger.info(f"Validator agent initialized: {self.address}")
+
+    def _initialize_crews(self):
+        """Initialize CrewAI crews (lazy loading)"""
+        if self._crews_initialized:
+            return
+
+        openai_key = os.getenv("OPENAI_API_KEY", "")
+        if not openai_key or openai_key == "your_openai_api_key_here":
+            raise ValueError("Valid OPENAI_API_KEY required for validation. Set in .env file.")
+
+        try:
+            self.quality_crew = QualityValidationCrew(model=self.config["openai_model"])
+            self.fraud_crew = FraudDetectionCrew(model=self.config["openai_model"])
+            self.price_crew = PriceReviewCrew(model=self.config["openai_model"])
+            self._crews_initialized = True
+            logger.info("CrewAI validation crews initialized")
+        except Exception as e:
+            logger.error(f"Failed to initialize CrewAI crews: {e}")
+            raise
 
     def register_on_chain(self) -> int:
         """Register validator agent on-chain"""
@@ -171,6 +191,8 @@ class ValidatorAgent(ERC8004BaseAgent):
         logger.info(f"Starting validation {validation_id} for {request.data_type}")
 
         try:
+            # Initialize crews on first validation request
+            self._initialize_crews()
             # Run validation crews in parallel
             quality_task = asyncio.create_task(
                 self._run_quality_validation(request)
