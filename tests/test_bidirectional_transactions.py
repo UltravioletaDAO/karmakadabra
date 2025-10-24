@@ -27,7 +27,7 @@ TEST_CONFIG = {
     "skill_extractor_url": "http://localhost:8004",
     "voice_extractor_url": "http://localhost:8005",
     "validator_url": "http://localhost:8001",
-    "timeout": 30.0
+    "timeout": 60.0  # Doubled from 30.0 for CrewAI validation processing
 }
 
 

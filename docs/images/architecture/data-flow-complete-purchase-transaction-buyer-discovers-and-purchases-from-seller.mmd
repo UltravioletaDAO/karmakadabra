@@ -1,0 +1,41 @@
+sequenceDiagram
+    participant Buyer as Buyer Agent<br/>(e.g., Karma-Hello)
+    participant Seller as Seller Agent<br/>(e.g., Abracadabra)
+    participant Facilitator as x402 Facilitator<br/>(Rust)
+    participant Validator as Validator Agent<br/>(CrewAI)
+    participant Blockchain as Avalanche Fuji<br/>(ERC-8004 + GLUE)
+    
+    Note over Buyer,Seller: Phase 1: Discovery
+    Buyer->>Seller: GET /.well-known/agent-card
+    Seller-->>Buyer: AgentCard<br/>{skills, price, paymentMethods}
+    
+    Note over Buyer: Phase 2: Payment Signing (Off-chain)
+    Buyer->>Buyer: Sign EIP-712 message<br/>{from, to, value, nonce}
+    
+    Note over Buyer,Seller: Phase 3: Purchase Request
+    Buyer->>Seller: POST /api/resource<br/>X-Payment: {signature}
+    
+    Seller->>Facilitator: POST /verify<br/>{signature, balance}
+    Facilitator->>Blockchain: Verify signature<br/>Check balance
+    Blockchain-->>Facilitator: {valid: true}
+    Facilitator-->>Seller: {valid: true}
+    
+    Note over Seller,Validator: Phase 4: Validation (Optional)
+    Seller->>Validator: POST /validate<br/>{data_hash}
+    Validator->>Validator: CrewAI Analysis<br/>(Quality + Fraud + Price)
+    Validator->>Blockchain: validationResponse()<br/>{score: 95/100}
+    Blockchain-->>Validator: Transaction receipt
+    Validator-->>Seller: {score: 95}
+    
+    Note over Seller,Blockchain: Phase 5: Settlement
+    Seller->>Facilitator: POST /settle<br/>{signature}
+    Facilitator->>Blockchain: transferWithAuthorization()<br/>{from, to, value}
+    Blockchain-->>Facilitator: Transaction receipt
+    Facilitator-->>Seller: {txHash: "0x..."}
+    
+    Note over Seller,Buyer: Phase 6: Data Delivery
+    Seller->>Seller: Query Database<br/>Process with CrewAI
+    Seller-->>Buyer: 200 OK<br/>{data: {...}}
+    
+    Note over Buyer: Phase 7: Integration
+    Buyer->>Buyer: Store data<br/>Update knowledge base

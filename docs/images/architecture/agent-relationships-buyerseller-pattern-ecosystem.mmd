@@ -1,0 +1,47 @@
+graph LR
+    subgraph "Data Sources"
+        TWITCH[Twitch Streams<br/>Chat + Audio]
+    end
+    
+    subgraph "Base Layer"
+        KARMA[Karma-Hello<br/>Sells: Chat Logs<br/>Buys: Transcripts<br/>0.01 GLUE]
+        ABRA[Abracadabra<br/>Sells: Transcripts<br/>Buys: Chat Logs<br/>0.02 GLUE]
+    end
+    
+    subgraph "Analysis Layer"
+        SKILL[Skill-Extractor<br/>Sells: Skill Profiles<br/>Buys: Chat Logs<br/>0.10 GLUE]
+        VOICE[Voice-Extractor<br/>Sells: Personality<br/>Buys: Chat Logs<br/>0.10 GLUE]
+    end
+    
+    subgraph "Orchestration Layer"
+        CLIENT[Client Agent<br/>Sells: Full Reports<br/>Buys: All Data<br/>1.00 GLUE]
+    end
+    
+    subgraph "Validation Layer"
+        VAL[Validator<br/>Validates All<br/>0.001 GLUE]
+    end
+    
+    TWITCH --> KARMA
+    TWITCH --> ABRA
+    
+    KARMA <--> ABRA
+    KARMA --> SKILL
+    KARMA --> VOICE
+    KARMA --> CLIENT
+    ABRA --> CLIENT
+    
+    SKILL --> CLIENT
+    VOICE --> CLIENT
+    
+    CLIENT --> VAL
+    SKILL -.-> VAL
+    VOICE -.-> VAL
+    KARMA -.-> VAL
+    ABRA -.-> VAL
+    
+    style KARMA fill:#e1f5ff
+    style ABRA fill:#e1f5ff
+    style SKILL fill:#ffe1f5
+    style VOICE fill:#ffe1f5
+    style CLIENT fill:#fff5e1
+    style VAL fill:#e1ffe1

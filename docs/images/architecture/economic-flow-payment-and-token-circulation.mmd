@@ -1,0 +1,39 @@
+graph TB
+    subgraph "Token Holders"
+        CLIENT_WALLET[Client Agent<br/>220,000 GLUE]
+        AGENT_WALLETS[Service Agents<br/>55,000 GLUE each]
+    end
+    
+    subgraph "Purchase Flows"
+        CLIENT_BUYS[Client Agent<br/>Buys Data<br/>Cost: 0.211 GLUE]
+        AGENT_BUYS[Agents Buy<br/>from Each Other<br/>Cost: varies]
+    end
+    
+    subgraph "Revenue Flows"
+        CLIENT_SELLS[Client Agent<br/>Sells Reports<br/>Price: 1.00 GLUE]
+        AGENT_SELLS[Agents Sell<br/>Products<br/>Price: varies]
+    end
+    
+    subgraph "Blockchain"
+        GLUE_CONTRACT[GLUE Token<br/>24M Supply]
+        REPUTATION[Reputation Registry<br/>Rating Storage]
+    end
+    
+    CLIENT_WALLET --> CLIENT_BUYS
+    AGENT_WALLETS --> AGENT_BUYS
+    
+    CLIENT_BUYS --> AGENT_SELLS
+    AGENT_BUYS --> AGENT_SELLS
+    
+    CLIENT_SELLS --> GLUE_CONTRACT
+    AGENT_SELLS --> GLUE_CONTRACT
+    
+    CLIENT_BUYS -.->|Rate Buyer| REPUTATION
+    AGENT_BUYS -.->|Rate Buyer| REPUTATION
+    CLIENT_SELLS -.->|Rate Seller| REPUTATION
+    AGENT_SELLS -.->|Rate Seller| REPUTATION
+    
+    style CLIENT_WALLET fill:#ffe1e1
+    style AGENT_WALLETS fill:#e1f5ff
+    style GLUE_CONTRACT fill:#fff5e1
+    style REPUTATION fill:#e1ffe1

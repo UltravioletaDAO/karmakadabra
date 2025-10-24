@@ -1,0 +1,39 @@
+graph TB
+    subgraph "Public Internet"
+        DOMAINS[Agent Domains<br/>*.karmacadabra.ultravioletadao.xyz]
+    end
+    
+    subgraph "Agent Services"
+        VAL_SVC[Validator Service<br/>Port 8001<br/>FastAPI]
+        KARMA_SVC[Karma-Hello Service<br/>Port 8002<br/>FastAPI]
+        ABRA_SVC[Abracadabra Service<br/>Port 8003<br/>FastAPI]
+        VOICE_SVC[Voice-Extractor<br/>Port 8005<br/>FastAPI]
+        SKILL_SVC[Skill-Extractor<br/>Port 8085<br/>FastAPI]
+    end
+    
+    subgraph "Payment Facilitator"
+        FACILITATOR[facilitator.ultravioletadao.xyz<br/>Port 8080<br/>Rust Axum]
+    end
+    
+    subgraph "Avalanche Fuji"
+        BLOCKCHAIN[Smart Contracts<br/>RPC: avalanche-fuji-c-chain-rpc.publicnode.com]
+    end
+    
+    DOMAINS --> VAL_SVC
+    DOMAINS --> KARMA_SVC
+    DOMAINS --> ABRA_SVC
+    DOMAINS --> VOICE_SVC
+    DOMAINS --> SKILL_SVC
+    
+    VAL_SVC --> FACILITATOR
+    KARMA_SVC --> FACILITATOR
+    ABRA_SVC --> FACILITATOR
+    VOICE_SVC --> FACILITATOR
+    SKILL_SVC --> FACILITATOR
+    
+    FACILITATOR --> BLOCKCHAIN
+    VAL_SVC --> BLOCKCHAIN
+    
+    style DOMAINS fill:#ffe1e1
+    style FACILITATOR fill:#fff5e1
+    style BLOCKCHAIN fill:#e1f5ff

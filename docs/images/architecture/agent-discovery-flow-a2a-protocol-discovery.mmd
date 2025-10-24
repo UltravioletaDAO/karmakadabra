@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant Buyer as Buyer Agent
+    participant DNS as DNS Server
+    participant Seller as Seller Agent
+    participant Registry as Identity Registry
+    
+    Note over Buyer: Buyer wants to purchase data
+    
+    Buyer->>DNS: Resolve<br/>karma-hello.karmacadabra.ultravioletadao.xyz
+    DNS-->>Buyer: IP Address
+    
+    Buyer->>Seller: GET /.well-known/agent-card
+    Seller->>Registry: Query agent_id<br/>by domain
+    Registry-->>Seller: agent_id: 2
+    Seller-->>Buyer: AgentCard<br/>{agentId, skills, price}
+    
+    Note over Buyer: Parse AgentCard
+    
+    Buyer->>Buyer: Extract:<br/>- Skill name<br/>- Price (0.01 GLUE)<br/>- Payment method (x402-eip3009)
+    
+    Note over Buyer: Buyer signs payment
+    
+    Buyer->>Buyer: Sign EIP-712<br/>transferWithAuthorization
+    
+    Buyer->>Seller: POST /api/<skill><br/>X-Payment: {signature}
+    
+    Seller-->>Buyer: 200 OK<br/>{data}

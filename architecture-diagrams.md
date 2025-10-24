@@ -5,6 +5,8 @@
 **Deployed on**: Avalanche Fuji Testnet  
 **Last Updated**: October 2025
 
+📸 **PNG Exports**: All diagrams are available as high-resolution PNG images in [`docs/images/architecture/`](./docs/images/architecture/)
+
 ---
 
 ## 📊 High-Level Architecture

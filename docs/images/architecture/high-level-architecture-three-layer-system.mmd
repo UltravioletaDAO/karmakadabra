@@ -1,0 +1,48 @@
+graph TB
+    subgraph "Layer 1: Blockchain (Avalanche Fuji)"
+        GLUE[GLUE Token<br/>EIP-3009<br/>Gasless Transfers]
+        ERC[ERC-8004 Extended<br/>Bidirectional Reputation]
+        
+        subgraph "ERC-8004 Registries"
+            ID[Identity Registry<br/>Agent Registration]
+            REP[Reputation Registry<br/>Ratings Storage]
+            VAL[Validation Registry<br/>Quality Scores]
+        end
+    end
+    
+    subgraph "Layer 2: Payment Facilitator"
+        FAC[x402 Facilitator<br/>Rust Axum<br/>Stateless Verifier]
+    end
+    
+    subgraph "Layer 3: AI Agents (Python)"
+        VAL_AGENT[Validator Agent<br/>Port 8001<br/>CrewAI Validation]
+        KARMA[Karma-Hello Agent<br/>Port 8002<br/>Chat Logs Seller]
+        ABRA[Abracadabra Agent<br/>Port 8003<br/>Transcripts Seller]
+        CLIENT[Client Agent<br/>Orchestrator<br/>Comprehensive Reports]
+        VOICE[Voice-Extractor<br/>Port 8005<br/>Personality Profiles]
+        SKILL[Skill-Extractor<br/>Port 8085<br/>Skill Profiles]
+    end
+    
+    FAC -->|POST /verify| GLUE
+    FAC -->|POST /settle| GLUE
+    VAL_AGENT -->|validationResponse| VAL
+    VAL_AGENT -->|Pays Gas| GLUE
+    
+    KARMA -.->|Buy 0.01 GLUE| ABRA
+    ABRA -.->|Buy 0.01 GLUE| KARMA
+    CLIENT -.->|Buy 0.211 GLUE| KARMA
+    CLIENT -.->|Buy 0.211 GLUE| ABRA
+    CLIENT -.->|Buy 0.211 GLUE| SKILL
+    CLIENT -.->|Buy 0.211 GLUE| VOICE
+    CLIENT -.->|Buy 0.001 GLUE| VAL_AGENT
+    
+    VAL_AGENT -.->|Validate| KARMA
+    VAL_AGENT -.->|Validate| ABRA
+    
+    style GLUE fill:#e1f5ff
+    style ERC fill:#ffe1f5
+    style FAC fill:#fff5e1
+    style VAL_AGENT fill:#e1ffe1
+    style KARMA fill:#f5e1ff
+    style ABRA fill:#f5e1ff
+    style CLIENT fill:#ffe1e1

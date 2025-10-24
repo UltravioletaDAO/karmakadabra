@@ -1,0 +1,49 @@
+graph LR
+    subgraph "Blockchain"
+        AVAX[Avalanche Fuji<br/>EVM Compatible]
+        SOLIDITY[Solidity 0.8.20+<br/>Smart Contracts]
+        FOUNDRY[Foundry<br/>Build Tool]
+    end
+    
+    subgraph "Facilitator"
+        RUST[Rust<br/>Language]
+        AXUM[Axum<br/>HTTP Framework]
+        ETHERS[ethers-rs<br/>Web3 Client]
+    end
+    
+    subgraph "Agents"
+        PYTHON[Python 3.11+<br/>Runtime]
+        FASTAPI[FastAPI<br/>API Framework]
+        CREWAI[CrewAI<br/>Multi-Agent]
+        GPT4[GPT-4o<br/>LLM]
+        WEB3PY[web3.py<br/>Blockchain Client]
+    end
+    
+    subgraph "Data"
+        MONGO[MongoDB<br/>Chat Logs]
+        SQLITE[SQLite<br/>Transcripts]
+        COGNEE[Cognee<br/>Knowledge Graph]
+    end
+    
+    AVAX --> SOLIDITY
+    SOLIDITY --> FOUNDRY
+    
+    RUST --> AXUM
+    AXUM --> ETHERS
+    
+    PYTHON --> FASTAPI
+    PYTHON --> CREWAI
+    CREWAI --> GPT4
+    PYTHON --> WEB3PY
+    
+    FASTAPI --> MONGO
+    FASTAPI --> SQLITE
+    FASTAPI --> COGNEE
+    
+    ETHERS --> AVAX
+    WEB3PY --> AVAX
+    
+    style AVAX fill:#e84142
+    style RUST fill:#ff9800
+    style PYTHON fill:#3776ab
+    style GPT4 fill:#10a37f

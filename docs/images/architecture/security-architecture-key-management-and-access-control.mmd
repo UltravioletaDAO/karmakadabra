@@ -1,0 +1,42 @@
+graph TB
+    subgraph "Environment"
+        LOCAL[Local .env Files<br/>PRIVATE_KEY= empty]
+    end
+    
+    subgraph "AWS Secrets Manager"
+        AWS_SECRETS[AWS Secret: karmacadabra<br/>JSON with all agent keys]
+    end
+    
+    subgraph "Agents"
+        VAL_KEY[Validator Agent<br/>Loads from AWS]
+        KARMA_KEY[Karma-Hello Agent<br/>Loads from AWS]
+        ABRA_KEY[Abracadabra Agent<br/>Loads from AWS]
+        CLIENT_KEY[Client Agent<br/>Loads from AWS]
+        VOICE_KEY[Voice-Extractor<br/>Loads from AWS]
+        SKILL_KEY[Skill-Extractor<br/>Loads from AWS]
+    end
+    
+    subgraph "Blockchain"
+        REGISTRY[Identity Registry<br/>Agent Domains]
+        WALLETS[Agent Wallets<br/>On-chain Addresses]
+    end
+    
+    AWS_SECRETS --> VAL_KEY
+    AWS_SECRETS --> KARMA_KEY
+    AWS_SECRETS --> ABRA_KEY
+    AWS_SECRETS --> CLIENT_KEY
+    AWS_SECRETS --> VOICE_KEY
+    AWS_SECRETS --> SKILL_KEY
+    
+    VAL_KEY --> REGISTRY
+    KARMA_KEY --> REGISTRY
+    ABRA_KEY --> REGISTRY
+    CLIENT_KEY --> REGISTRY
+    VOICE_KEY --> REGISTRY
+    SKILL_KEY --> REGISTRY
+    
+    REGISTRY --> WALLETS
+    
+    style AWS_SECRETS fill:#ffe1e1
+    style REGISTRY fill:#e1ffe1
+    style WALLETS fill:#e1f5ff
