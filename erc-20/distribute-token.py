@@ -15,6 +15,7 @@ import os
 from web3 import Web3
 from dotenv import load_dotenv
 import json
+import boto3
 
 # Load environment
 load_dotenv()
@@ -23,7 +24,22 @@ load_dotenv()
 RPC_URL = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
 CHAIN_ID = 43113
 UVD_TOKEN_ADDRESS = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"  # GLUE Token
-OWNER_PRIVATE_KEY = os.getenv("PRIVATE_KEY")
+
+# Get owner private key from AWS Secrets Manager (NEVER store in .env)
+def get_owner_private_key():
+    """Get erc-20 deployer private key from AWS Secrets Manager"""
+    try:
+        client = boto3.client('secretsmanager', region_name='us-east-1')
+        response = client.get_secret_value(SecretId='karmacadabra')
+        secrets = json.loads(response['SecretString'])
+        if 'erc-20' in secrets:
+            return secrets['erc-20']['private_key']
+    except Exception as e:
+        print(f"[!] Failed to get key from AWS: {e}")
+    # Fallback to .env if AWS fails
+    return os.getenv("PRIVATE_KEY")
+
+OWNER_PRIVATE_KEY = get_owner_private_key()
 
 # Amount to distribute per agent (with 6 decimals)
 # All agents get 55,000 GLUE each
@@ -33,6 +49,7 @@ AGENT_AMOUNTS = {
     "abracadabra-agent": 55_000 * 10**6,    # 55,000.000000 GLUE
     "client-agent": 55_000 * 10**6,         # 55,000.000000 GLUE
     "voice-extractor-agent": 55_000 * 10**6, # 55,000.000000 GLUE
+    "skill-extractor-agent": 55_000 * 10**6, # 55,000.000000 GLUE
 }
 
 # Agent wallet addresses (extracted from .env files)
@@ -42,6 +59,7 @@ AGENT_WALLETS = {
     "abracadabra-agent": None,
     "client-agent": None,  # Generic buyer agent
     "voice-extractor-agent": None,  # Voice/personality extraction agent
+    "skill-extractor-agent": None,  # Skill/competency extraction agent
 }
 
 # GLUE Token ABI (minimal - only transfer function needed)
@@ -78,19 +96,20 @@ def load_agent_wallets():
     import re
 
     agent_dirs = {
-        "validator-agent": "../validator-agent/.env",
+        "validator-agent": "../validator/.env",
         "karma-hello-agent": "../karma-hello-agent/.env",
         "abracadabra-agent": "../abracadabra-agent/.env",
         "client-agent": "../client-agent/.env",
-        "voice-extractor-agent": "../voice-extractor-agent/.env"
+        "voice-extractor-agent": "../voice-extractor-agent/.env",
+        "skill-extractor-agent": "../skill-extractor-agent/.env"
     }
 
     for agent_name, env_path in agent_dirs.items():
         try:
             with open(env_path, 'r', encoding='utf-8') as f:
                 content = f.read()
-                # Look for AGENT_WALLET_ADDRESS or derive from PRIVATE_KEY
-                wallet_match = re.search(r'AGENT_WALLET_ADDRESS=(\w+)', content)
+                # Look for AGENT_WALLET_ADDRESS or AGENT_ADDRESS
+                wallet_match = re.search(r'AGENT_(?:WALLET_)?ADDRESS=(0x[a-fA-F0-9]{40})', content)
                 if wallet_match:
                     AGENT_WALLETS[agent_name] = wallet_match.group(1)
                 else:
