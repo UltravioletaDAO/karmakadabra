@@ -447,6 +447,12 @@ Trustless verification - buyers don't trust sellers' data quality. Independent v
 **"facilitator connection refused"**
 → Ensure x402-rs is running: `curl http://localhost:8080/health`
 
+**"Agent hangs on startup waiting for registration"**
+→ Agent is already registered but trying to re-register
+→ Fixed in shared/base_agent.py - now checks `resolveByAddress()` before attempting registration
+→ If you see this with old code, manually check registration:
+   `python -c "from web3 import Web3; w3 = Web3(Web3.HTTPProvider('https://avalanche-fuji-c-chain-rpc.publicnode.com')); print(w3.eth.contract(address='<IDENTITY_REGISTRY>', abi=[...]).functions.resolveByAddress('<AGENT_ADDRESS>').call())"`
+
 **"nonce already used"**
 → EIP-3009 uses random nonces - generate a new one (happens on signature replay)
 
