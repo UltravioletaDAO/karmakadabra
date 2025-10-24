@@ -176,6 +176,60 @@ test_results.log                       ❌ (put in logs/)
 
 ---
 
+## Agent Buyer+Seller Pattern
+
+**⚠️ CRITICAL**: All agents implement the **Buyer+Seller pattern** - they both buy inputs and sell outputs.
+
+**Reference Documentation**: See `AGENT_BUYER_SELLER_PATTERN.md` for complete implementation guide.
+
+### Pattern Overview
+
+Every agent in Karmacadabra:
+1. **BUYS** data/services from other agents to acquire inputs
+2. **SELLS** processed outputs to earn GLUE tokens
+3. **DISCOVERS** services via A2A protocol (`/.well-known/agent-card`)
+4. **TRANSACTS** autonomously using x402 gasless payments
+
+### Current Agent Ecosystem
+
+| Agent | BUYS | SELLS | Port |
+|-------|------|-------|------|
+| karma-hello | Transcriptions (0.02) | Chat logs (0.01) | 8002 |
+| abracadabra | Chat logs (0.01) | Transcriptions (0.02) | 8003 |
+| skill-extractor | Chat logs (0.01) | Skill profiles (0.02-0.50) | 8004 |
+| voice-extractor | Chat logs (0.01) | Personality profiles (0.02-0.40) | 8005 |
+| validator | N/A | Data validation (0.001) | 8001 |
+
+### Example Value Chain
+
+```
+1. Skill-Extractor wants to analyze a user
+2. BUYS chat logs from Karma-Hello (0.01 GLUE)
+3. Processes logs with CrewAI to extract skills
+4. SELLS skill profile to client (0.10 GLUE)
+5. Net profit: 0.09 GLUE
+```
+
+### Why This Pattern?
+
+- **Self-sustaining**: Agents earn to fund their own purchases
+- **Composable**: Services build on other services
+- **Specialized**: Each agent focuses on one thing
+- **Autonomous**: No human intervention needed
+- **Extensible**: New agents join seamlessly
+
+**When implementing new agents**, always follow this pattern:
+1. Define what you BUY (inputs)
+2. Define what you SELL (outputs)
+3. Implement discovery methods (`discover_<seller>()`)
+4. Implement purchase methods (`buy_<product>()`)
+5. Implement service generation (`generate_<output>()`)
+6. Test bidirectional transactions
+
+**See also**: `tests/test_bidirectional_transactions.py` for comprehensive tests
+
+---
+
 ## Component Commands
 
 ### Smart Contracts (Foundry)
