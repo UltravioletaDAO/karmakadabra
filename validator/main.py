@@ -133,7 +133,7 @@ class ValidatorAgent(ERC8004BaseAgent):
     def register_on_chain(self) -> int:
         """Register validator agent on-chain"""
         try:
-            agent_id = self.register_agent(domain=self.config["agent_domain"])
+            agent_id = self.register_agent()
             logger.info(f"Validator registered on-chain with ID: {agent_id}")
             return agent_id
         except Exception as e:
