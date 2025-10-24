@@ -1,0 +1,106 @@
+=======================================================================
+VALIDATOR AGENT - DEMO OUTPUT
+=======================================================================
+
+TEST 1: High-Quality Chat Logs
+----------------------------------------------------------------------
+Input:
+  - Data Type: chat_logs
+  - Seller: 0x2C3e071df446B25B821F59425152838ae4931E75
+  - Buyer: 0xCf30021812F27132d36dc791E0eC17f34B4eE8BA
+  - Price: 0.01 GLUE
+  - Content: 5 messages, 3 users, 4 minutes duration
+
+Validation Process:
+  [1/3] Quality Crew analyzing... (15s)
+    -> Quality Analyst: Data is well-structured
+    -> Completeness Checker: All fields present
+    -> Format Validator: Valid JSON format
+    -> Quality Score: 0.85/1.0
+
+  [2/3] Fraud Crew analyzing... (12s)
+    -> Fraud Analyst: No scam indicators
+    -> Pattern Analyzer: Normal conversation patterns
+    -> Authenticity Checker: Genuine human messages
+    -> Fraud Score: 0.10/1.0 (low risk)
+
+  [3/3] Price Crew analyzing... (10s)
+    -> Price Analyst: Fair pricing for quantity
+    -> Value Assessor: Good value for data
+    -> Market Comparator: Within market range
+    -> Price Score: 0.80/1.0
+
+Results:
+  Validation ID: val_1698765432_0x2C3e07
+  Overall Score: 0.78/1.0
+  Recommendation: APPROVE
+  
+  Reasoning: Quality: High-quality data with complete records (0.85) | 
+             Fraud: No suspicious patterns detected (0.10) | 
+             Price: Fair market value (0.80) | 
+             Overall: 0.78/1.0
+
+  On-Chain Submission:
+    -> Calling ValidationRegistry.validationResponse()
+    -> Validator pays gas: 0.008 AVAX
+    -> Transaction: 0xabc123def456...
+    -> Status: CONFIRMED
+
+=======================================================================
+
+TEST 2: Suspicious/Malicious Data
+----------------------------------------------------------------------
+Input:
+  - Data Type: chat_logs
+  - Content: "Click here to win!", "Send private keys", etc.
+
+Validation Process:
+  [1/3] Quality Crew: 0.30/1.0 (poor quality, spam-like)
+  [2/3] Fraud Crew: 0.85/1.0 (HIGH RISK - scam detected!)
+  [3/3] Price Crew: 0.20/1.0 (overpriced for spam)
+
+Results:
+  Overall Score: 0.25/1.0
+  Recommendation: REJECT
+  
+  Reasoning: FRAUD DETECTED - Scam/phishing content identified
+  Red Flags:
+    - Phishing language detected
+    - Request for private information
+    - Too-good-to-be-true claims
+  
+  No on-chain submission (rejected before blockchain)
+
+=======================================================================
+
+TEST 3: Overpriced Data
+----------------------------------------------------------------------
+Input:
+  - Content: Single message "Hello"
+  - Price: 10.0 GLUE (way too high!)
+
+Validation Process:
+  [1/3] Quality Crew: 0.50/1.0 (minimal data)
+  [2/3] Fraud Crew: 0.20/1.0 (no fraud, just overpriced)
+  [3/3] Price Crew: 0.15/1.0 (significantly overpriced!)
+
+Results:
+  Overall Score: 0.40/1.0
+  Recommendation: REJECT
+  
+  Reasoning: Price is unreasonable for data quantity
+  Fair Price Range: 0.001-0.005 GLUE
+  Current Price: 10.0 GLUE (2000x overpriced!)
+
+=======================================================================
+
+VALIDATOR STATISTICS
+----------------------------------------------------------------------
+Total Validations: 3
+Approved: 1 (33%)
+Rejected: 2 (67%)
+Average Response Time: 37 seconds
+Gas Spent: 0.008 AVAX
+On-Chain Submissions: 1
+
+=======================================================================
