@@ -417,7 +417,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
 
 # Initialize agent
 config = {
-    "private_key": os.getenv("PRIVATE_KEY"),
+    "private_key": os.getenv("PRIVATE_KEY") or None,
     "rpc_url_fuji": os.getenv("RPC_URL_FUJI"),
     "chain_id": int(os.getenv("CHAIN_ID", 43113)),
     "identity_registry": os.getenv("IDENTITY_REGISTRY"),
