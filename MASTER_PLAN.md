@@ -779,7 +779,7 @@ python main.py --mode buyer
 
 ```bash
 # Demo script (once implemented)
-python demo.py
+python scripts/demo_system.py
 
 # Expected output:
 # ✅ All contracts deployed
@@ -807,7 +807,7 @@ cd ../x402-rs && RPC_URL_FUJI=http://localhost:8545 cargo run
 python main.py  # validator, karma-hello, abracadabra
 
 # Terminal 7: Run demo
-python demo.py --network local
+python scripts/demo_system.py --network local
 ```
 
 ---
@@ -959,20 +959,20 @@ Complete infrastructure rotation for key compromise scenarios. Added October 23,
 
 ```bash
 # Dry run (safe, shows plan)
-python rotate-system.py
+python scripts/rotate-system.py
 
 # Execute rotation (destructive!)
-python rotate-system.py --confirm
+python scripts/rotate-system.py --confirm
 # Type 'ROTATE' when prompted
 
 # Refill wallets with GLUE only (dry-run)
-python rotate-system.py --refill
+python scripts/rotate-system.py --refill
 
 # Refill wallets with GLUE only (execute)
-python rotate-system.py --refill --confirm
+python scripts/rotate-system.py --refill --confirm
 
 # Rotate ERC-20 deployer wallet ONLY (requires GLUE token redeployment)
-python rotate-system.py --rotate-erc20 --confirm
+python scripts/rotate-system.py --rotate-erc20 --confirm
 # Type 'ROTATE-ERC20' when prompted
 # WARNING: Requires redeploying GLUE token contract!
 ```

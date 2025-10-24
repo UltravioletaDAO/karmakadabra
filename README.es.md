@@ -355,7 +355,7 @@ python -m shared.secrets_manager validator-agent
 
 **Notas Importantes:**
 - Clave del deployer ERC-20 almacenada por separado (posee el contrato del token GLUE)
-- Rotar clave ERC-20 solo cuando sea necesario: `python rotate-system.py --rotate-erc20`
+- Rotar clave ERC-20 solo cuando sea necesario: `python scripts/rotate-system.py --rotate-erc20`
 - Todos los archivos `.env` deben tener `PRIVATE_KEY=` (vacío) - scripts obtienen automáticamente de AWS
 
 **Guía completa**: Ver [shared/AWS_SECRETS_SETUP.md](./shared/AWS_SECRETS_SETUP.md)
@@ -524,14 +524,14 @@ Genera nuevas wallets compatibles con EVM para agentes:
 
 ```bash
 # Generar wallet y auto-guardar en .env
-python generate-wallet.py client-agent --auto-save
+python scripts/generate-wallet.py client-agent --auto-save
 
 # Generar para múltiples agentes
-python generate-wallet.py client-agent-2 --auto-save
-python generate-wallet.py validator-2 --auto-save
+python scripts/generate-wallet.py client-agent-2 --auto-save
+python scripts/generate-wallet.py validator-2 --auto-save
 
 # Modo interactivo (pregunta antes de guardar)
-python generate-wallet.py mi-agente
+python scripts/generate-wallet.py mi-agente
 ```
 
 **Características**:
@@ -570,19 +570,19 @@ Rotación completa de infraestructura para escenarios de compromiso de claves:
 
 ```bash
 # Ejecución en seco (muestra qué pasaría, sin hacer cambios)
-python rotate-system.py
+python scripts/rotate-system.py
 
 # Ejecutar rotación real (requiere confirmación)
-python rotate-system.py --confirm
+python scripts/rotate-system.py --confirm
 
 # Rellenar wallets con GLUE solamente (sin rotación)
-python rotate-system.py --refill
+python scripts/rotate-system.py --refill
 
 # Rellenar wallets con GLUE (ejecutar)
-python rotate-system.py --refill --confirm
+python scripts/rotate-system.py --refill --confirm
 
 # Rotar wallet del deployer ERC-20 solamente (separado de la rotación de agentes)
-python rotate-system.py --rotate-erc20 --confirm
+python scripts/rotate-system.py --rotate-erc20 --confirm
 ```
 
 **Qué hace**:
@@ -611,7 +611,7 @@ python rotate-system.py --rotate-erc20 --confirm
 - 💰 **¿Necesitas AVAX para gas?** Usa la wallet del deployer ERC-20 (almacenada en AWS Secrets Manager)
 - 🔑 Acceso vía `distribute-token.py` (obtiene automáticamente desde AWS)
 - ⚠️ **El deployer ERC-20 NO se rota por defecto** (es dueño del contrato GLUE)
-- 🔄 Rotar separadamente: `python rotate-system.py --rotate-erc20 --confirm`
+- 🔄 Rotar separadamente: `python scripts/rotate-system.py --rotate-erc20 --confirm`
 
 **Ejemplo de salida**:
 ```
@@ -677,7 +677,7 @@ cargo run
 
 ### 4. Ejecutar Demo
 ```bash
-python demo.py
+python scripts/demo_system.py
 ```
 
 Ver [QUICKSTART.md](./QUICKSTART.md) para instrucciones detalladas.

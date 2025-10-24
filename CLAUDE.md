@@ -27,7 +27,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ This wallet has AVAX for deploying contracts and can fund agent wallets
 - ✅ Access via: `distribute-token.py` (automatically uses AWS Secrets Manager)
 - ❌ **DO NOT store ERC-20 deployer key in .env files**
-- ⚠️ **Rotate ERC-20 key separately**: Use `python rotate-system.py --rotate-erc20` (NOT rotated by default)
+- ⚠️ **Rotate ERC-20 key separately**: Use `python scripts/rotate-system.py --rotate-erc20` (NOT rotated by default)
 
 **Why separate rotation**: ERC-20 deployer owns the GLUE token contract. Rotating it requires redeploying the entire token, so it's only rotated when specifically needed.
 
@@ -64,6 +64,63 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Why**: This project serves both English and Spanish-speaking communities. Outdated translations create confusion and undermine trust.
 
 **Enforcement**: Before committing documentation changes, verify both READMEs have been updated. If you modify one, you MUST modify the other.
+
+### File Organization
+**ALWAYS maintain clean root directory structure:**
+
+**📁 Root Directory Structure:**
+```
+karmacadabra/
+├── tests/          # ALL test files go here
+├── scripts/        # ALL utility scripts go here
+├── logs/           # ALL log files go here
+├── data/           # Sample/test data
+├── .claude/        # Claude Code configuration
+├── shared/         # Shared libraries (base_agent, a2a_protocol, etc.)
+├── *-agent/        # Agent implementations (karma-hello-agent, validator, etc.)
+├── erc-20/         # GLUE token contracts
+├── erc-8004/       # ERC-8004 registry contracts
+├── x402-rs/        # x402 facilitator (Rust)
+├── *.md            # Documentation files (README, MASTER_PLAN, etc.)
+├── .env            # Environment configuration (gitignored)
+├── .gitignore      # Git ignore rules
+└── LICENSE         # Project license
+```
+
+**RULES:**
+- ✅ **tests/** - ALL test files: `test_*.py`, `*_test.py`, test scripts
+- ✅ **scripts/** - ALL utility scripts: setup, deployment, wallet management, system utilities
+- ✅ **logs/** - ALL log files: `*.log`, debug outputs, test results (gitignored)
+- ✅ **Root** - ONLY: agent folders, contract folders, documentation (*.md), config files (.env, .gitignore)
+- ❌ **Never in root**: individual test files, utility scripts, log files, temporary files
+
+**Examples:**
+```bash
+# Tests
+tests/test_level3_e2e.py              ✅
+tests/test_integration_level2.py      ✅
+test_validator.py                     ❌ (put in tests/)
+
+# Scripts
+scripts/generate-wallet.py            ✅
+scripts/rotate-system.py               ✅
+setup_agents.py                        ❌ (put in scripts/)
+
+# Logs
+logs/validator_port8010.log            ✅
+logs/debug_output.log                  ✅
+test_results.log                       ❌ (put in logs/)
+```
+
+**When creating new files:**
+1. Test file? → `tests/`
+2. Utility script? → `scripts/`
+3. Log/debug output? → `logs/`
+4. Documentation? → Root (*.md)
+5. Agent code? → `<agent-name>/`
+6. Shared library? → `shared/`
+
+**Why this matters**: Clean root directory improves navigation, prevents clutter, and makes the project structure immediately clear to contributors.
 
 ---
 
