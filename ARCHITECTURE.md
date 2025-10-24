@@ -5,6 +5,8 @@
 **Última actualización**: Octubre 2025
 **Versión**: 1.0.0
 
+📊 **Visual Diagrams**: See [architecture-diagrams.md](./architecture-diagrams.md) for interactive Mermaid diagrams
+
 ---
 
 ## 📋 Tabla de Contenidos

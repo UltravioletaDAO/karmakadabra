@@ -492,6 +492,7 @@ karmacadabra/
 | [QUICKSTART.md](./QUICKSTART.md) | Get running in 30 minutes | 30 min |
 | [MASTER_PLAN.md](./MASTER_PLAN.md) | Complete vision & roadmap | 60 min |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical deep dive | 45 min |
+| [architecture-diagrams.md](./architecture-diagrams.md) | Visual architecture diagrams | 15 min |
 | [MONETIZATION_OPPORTUNITIES.md](./MONETIZATION_OPPORTUNITIES.md) | All services & pricing | 30 min |
 | [CLAUDE.md](./CLAUDE.md) | Developer guidance | 15 min |
 | [INDEX.md](./INDEX.md) | Documentation index | 5 min |

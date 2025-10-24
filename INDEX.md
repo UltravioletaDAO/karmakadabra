@@ -162,6 +162,9 @@ x402-rs/
 
 ## 📊 Diagramas
 
+### Diagramas Visuales Interactivos
+📊 **[architecture-diagrams.md](./architecture-diagrams.md)** - Diagramas Mermaid completos
+
 ### Flujo de Pago Completo
 Ver: [ARCHITECTURE.md#flujos-de-datos](./ARCHITECTURE.md#-flujos-de-datos)
 

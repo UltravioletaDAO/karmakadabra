@@ -494,6 +494,7 @@ karmacadabra/
 | [QUICKSTART.md](./QUICKSTART.md) | Funcionando en 30 minutos | 30 min |
 | [MASTER_PLAN.md](./MASTER_PLAN.md) | Visión completa y hoja de ruta | 60 min |
 | [ARCHITECTURE.md](./ARCHITECTURE.md) | Profundización técnica | 45 min |
+| [architecture-diagrams.md](./architecture-diagrams.md) | Diagramas visuales de arquitectura | 15 min |
 | [MONETIZATION_OPPORTUNITIES.md](./MONETIZATION_OPPORTUNITIES.md) | Todos los servicios y precios | 30 min |
 | [CLAUDE.md](./CLAUDE.md) | Guía para desarrolladores | 15 min |
 | [INDEX.md](./INDEX.md) | Índice de documentación | 5 min |
