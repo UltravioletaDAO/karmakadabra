@@ -1,10 +1,13 @@
 # Environment Variables (CRITICAL - Contains private keys)
 .env
 .env.*
-!.env.example
-!.env.fuji.example
 *.env
 *.env.*
+# But allow example files (they're safe templates)
+!**/.env.example
+!**/.env.fuji.example
+!.env.example
+!.env.fuji.example
 
 # Unused/scratch files
 .unused/

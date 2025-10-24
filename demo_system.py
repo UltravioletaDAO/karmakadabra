@@ -122,7 +122,7 @@ def initialize_agents():
         print("[TOOL] Initializing Client-Agent (Buyer)...")
         client = ERC8004BaseAgent(
             agent_name="client-agent",
-            agent_domain="client.karmacadabra.xyz",
+            agent_domain="client.karmacadabra.ultravioletadao.xyz",
             rpc_url=os.getenv("RPC_URL_FUJI"),
             identity_registry_address=os.getenv("IDENTITY_REGISTRY"),
             reputation_registry_address=os.getenv("REPUTATION_REGISTRY"),
@@ -135,7 +135,7 @@ def initialize_agents():
         print("\n[TOOL] Initializing Karma-Hello (Seller)...")
         karma_hello = ERC8004BaseAgent(
             agent_name="karma-hello-agent",
-            agent_domain="karma-hello.karmacadabra.xyz",
+            agent_domain="karma-hello.karmacadabra.ultravioletadao.xyz",
             rpc_url=os.getenv("RPC_URL_FUJI"),
             identity_registry_address=os.getenv("IDENTITY_REGISTRY"),
             reputation_registry_address=os.getenv("REPUTATION_REGISTRY"),
@@ -148,7 +148,7 @@ def initialize_agents():
         print("\n[TOOL] Initializing Validator...")
         validator = ERC8004BaseAgent(
             agent_name="validator-agent",
-            agent_domain="validator.karmacadabra.xyz",
+            agent_domain="validator.karmacadabra.ultravioletadao.xyz",
             rpc_url=os.getenv("RPC_URL_FUJI"),
             identity_registry_address=os.getenv("IDENTITY_REGISTRY"),
             reputation_registry_address=os.getenv("REPUTATION_REGISTRY"),
@@ -222,7 +222,7 @@ def demonstrate_discovery(karma_hello):
             agent_id=karma_hello.agent_id,
             name="Karma-Hello Chat Log Seller",
             description="Sells Twitch stream chat logs with sentiment analysis",
-            agent_domain="karma-hello.karmacadabra.xyz",
+            agent_domain="karma-hello.karmacadabra.ultravioletadao.xyz",
             skills=[
                 {
                     "id": "chat-logs",
@@ -276,7 +276,7 @@ def demonstrate_data_request(karma_hello, validator_id):
         # Create mock chat log package
         chat_log_package = {
             "seller_id": karma_hello.agent_id,
-            "seller_domain": "karma-hello.karmacadabra.xyz",
+            "seller_domain": "karma-hello.karmacadabra.ultravioletadao.xyz",
             "timestamp": datetime.utcnow().isoformat(),
             "data_type": "chat_logs",
             "stream_id": "20251023_demo_stream",
@@ -353,7 +353,7 @@ def demonstrate_validation(validator, chat_log_package):
         # Create validation package
         validation_package = {
             "validator_id": validator.agent_id,
-            "validator_domain": "validator.karmacadabra.xyz",
+            "validator_domain": "validator.karmacadabra.ultravioletadao.xyz",
             "validation_score": 94,
             "timestamp": datetime.utcnow().isoformat(),
             "crew_analysis": {
