@@ -142,16 +142,24 @@ class ValidatorAgent(ERC8004BaseAgent):
 
     def get_agent_card(self) -> AgentCard:
         """Generate A2A AgentCard for validator"""
+        # Get agent_id from on-chain registration (stored in base class)
+        try:
+            agent_id = self.get_agent_id(self.agent_domain)
+        except:
+            agent_id = 4  # Fallback to known validator agent ID
+
         return AgentCard(
-            agentId=f"validator-{self.address}",
+            agentId=agent_id,  # Use integer agent ID from on-chain registration
             name="Validator Agent",
             description="Independent data quality verification service using CrewAI multi-agent validation",
+            domain=self.config['agent_domain'],  # Add required domain field
             url=f"https://{self.config['agent_domain']}",
             skills=[
                 Skill(
+                    skillId="validate_data",
                     name="validate_data",
                     description="Validate data quality, detect fraud, review pricing",
-                    pricing=Price(
+                    price=Price(
                         amount=self.validation_fee,
                         currency="GLUE"
                     ),

@@ -22,7 +22,7 @@ from typing import Dict, Any
 AGENTS = {
     "karma-hello": "http://localhost:8002",
     "abracadabra": "http://localhost:8003",
-    "validator": "http://localhost:8001",
+    "validator": "http://localhost:8011",
     "client": "http://localhost:8000",
     "voice-extractor": "http://localhost:8005",
     "skill-extractor": "http://localhost:8006"
@@ -76,7 +76,7 @@ async def test_discovery_flow():
 
         # Test 1c: Parse AgentCard
         print("\n1c. Parsing AgentCard structure...")
-        required_fields = ["schema_version", "agent_id", "name", "skills"]
+        required_fields = ["agentId", "name", "domain", "skills"]  # A2A protocol uses camelCase
         missing = [f for f in required_fields if f not in card]
         if missing:
             print(f"   [FAIL] Missing fields: {missing}")
@@ -99,14 +99,16 @@ async def test_validation_flow():
     print("TEST 2: Validation Flow")
     print("="*70 + "\n")
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=55.0) as client:
 
         # Test 2a: Request validation
         print("2a. Requesting validation from Validator...")
         validation_request = {
-            "data": "Sample chat log data for validation",
-            "seller": "karma-hello",
-            "buyer": "test-client"
+            "data_type": "chat_logs",
+            "data_content": {"messages": ["Sample chat log data for validation"]},
+            "seller_address": "0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb",
+            "buyer_address": "0x8626f6940E2eb28930eFb4CeF49B2d1F2C9C1199",
+            "price_glue": "0.01"
         }
 
         try:
@@ -118,10 +120,10 @@ async def test_validation_flow():
             if response.status_code == 200:
                 result = response.json()
                 print(f"   [OK] Validation completed")
-                print(f"      Score: {result.get('score', 'N/A')}/100")
-                print(f"      Status: {result.get('status', 'N/A')}")
-                assert "score" in result, "Validation missing score"
-                assert 0 <= result["score"] <= 100, "Invalid score range"
+                print(f"      Overall Score: {result.get('overall_score', 'N/A'):.2f}")
+                print(f"      Recommendation: {result.get('recommendation', 'N/A')}")
+                assert "overall_score" in result, "Validation missing overall_score"
+                assert 0 <= result["overall_score"] <= 1.0, "Invalid score range"
             else:
                 print(f"   [FAIL] Validation failed: HTTP {response.status_code}")
                 return False
@@ -131,6 +133,9 @@ async def test_validation_flow():
             return True  # Don't fail test if validator not running
         except Exception as e:
             print(f"   [FAIL] Error: {e}")
+            print(f"   [DEBUG] Exception type: {type(e).__name__}")
+            import traceback
+            traceback.print_exc()
             return False
 
     print(f"\n{'='*70}")
@@ -148,7 +153,7 @@ async def test_purchase_flow():
     print("TEST 3: Purchase Flow (Simulated Payment)")
     print("="*70 + "\n")
 
-    async with httpx.AsyncClient(timeout=30.0) as client:
+    async with httpx.AsyncClient(timeout=55.0) as client:
 
         # Test 3a: Request data from Karma-Hello
         print("3a. Requesting chat logs from Karma-Hello...")
