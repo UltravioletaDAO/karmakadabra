@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 CONFIG = {
     "agent_name": os.getenv("AGENT_NAME", "client-agent"),
     "agent_domain": os.getenv("AGENT_DOMAIN", "client.ultravioletadao.xyz"),
-    "private_key": os.getenv("PRIVATE_KEY", ""),
+    "private_key": os.getenv("PRIVATE_KEY") or None,
     "rpc_url": os.getenv("RPC_URL_FUJI"),
     "chain_id": int(os.getenv("CHAIN_ID", "43113")),
     "identity_registry": os.getenv("IDENTITY_REGISTRY"),
