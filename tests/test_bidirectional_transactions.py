@@ -68,7 +68,7 @@ class AgentBalanceTracker:
         print("="*60)
 
         for tx in self.transactions:
-            print(f"{tx['buyer']:20} → {tx['seller']:20} : {tx['amount']:6} GLUE ({tx['service']})")
+            print(f"{tx['buyer']:20} -> {tx['seller']:20} : {tx['amount']:6} GLUE ({tx['service']})")
 
         print("\n" + "="*60)
         print("FINAL BALANCES")
@@ -99,7 +99,7 @@ async def ensure_agents_running():
             try:
                 response = await client.get(f"{url}/health", timeout=5.0)
                 if response.status_code == 200:
-                    print(f"✅ {name} is running at {url}")
+                    print(f"[OK] {name} is running at {url}")
                 else:
                     pytest.skip(f"{name} not healthy at {url}")
             except Exception as e:
@@ -127,7 +127,7 @@ async def test_skill_extractor_buys_logs(ensure_agents_running):
     4. Skill-Extractor processes logs into skill profile
     """
     print("\n" + "="*60)
-    print("TEST 1: Skill-Extractor → Karma-Hello")
+    print("TEST 1: Skill-Extractor -> Karma-Hello")
     print("="*60)
 
     async with httpx.AsyncClient() as client:
@@ -140,7 +140,7 @@ async def test_skill_extractor_buys_logs(ensure_agents_running):
         assert response.status_code == 200, "Failed to discover Karma-Hello"
 
         agent_card = response.json()
-        print(f"   ✅ Found: {agent_card.get('name', 'Unknown')}")
+        print(f"   [OK] Found: {agent_card.get('name', 'Unknown')}")
         print(f"   Skills: {len(agent_card.get('skills', []))}")
 
         # Step 2: Purchase chat logs
@@ -162,7 +162,7 @@ async def test_skill_extractor_buys_logs(ensure_agents_running):
         logs = response.json()
         price = response.headers.get("X-Price", "0.01")
 
-        print(f"   ✅ Purchased logs")
+        print(f"   [OK] Purchased logs")
         print(f"   Messages: {logs.get('total_messages', 0)}")
         print(f"   Users: {logs.get('unique_users', 0)}")
         print(f"   Price: {price} GLUE")
@@ -178,7 +178,7 @@ async def test_skill_extractor_buys_logs(ensure_agents_running):
         # Step 3: Verify data structure
         assert "messages" in logs
         assert "metadata" in logs
-        print("   ✅ Log structure validated")
+        print("   [OK] Log structure validated")
 
 
 # ============================================================================
@@ -196,7 +196,7 @@ async def test_voice_extractor_buys_logs(ensure_agents_running):
     3. Processes into linguistic profile
     """
     print("\n" + "="*60)
-    print("TEST 2: Voice-Extractor → Karma-Hello")
+    print("TEST 2: Voice-Extractor -> Karma-Hello")
     print("="*60)
 
     async with httpx.AsyncClient() as client:
@@ -216,7 +216,7 @@ async def test_voice_extractor_buys_logs(ensure_agents_running):
 
         assert response.status_code == 200
         logs = response.json()
-        print(f"   ✅ Purchased {logs.get('total_messages', 0)} messages")
+        print(f"   [OK] Purchased {logs.get('total_messages', 0)} messages")
 
         balance_tracker.record_transaction(
             "voice-extractor",
@@ -241,7 +241,7 @@ async def test_abracadabra_buys_logs(ensure_agents_running):
     3. Enriches transcription analysis
     """
     print("\n" + "="*60)
-    print("TEST 3: Abracadabra → Karma-Hello")
+    print("TEST 3: Abracadabra -> Karma-Hello")
     print("="*60)
 
     async with httpx.AsyncClient() as client:
@@ -254,7 +254,7 @@ async def test_abracadabra_buys_logs(ensure_agents_running):
 
         assert response.status_code == 200
         logs = response.json()
-        print(f"   ✅ Abracadabra purchased logs: {logs.get('total_messages', 0)} messages")
+        print(f"   [OK] Abracadabra purchased logs: {logs.get('total_messages', 0)} messages")
 
         balance_tracker.record_transaction(
             "abracadabra",
@@ -284,7 +284,7 @@ async def test_karma_hello_buys_transcription(ensure_agents_running):
     3. Enriches its own data with audio context
     """
     print("\n" + "="*60)
-    print("TEST 4: Karma-Hello → Abracadabra (CIRCULAR)")
+    print("TEST 4: Karma-Hello -> Abracadabra (CIRCULAR)")
     print("="*60)
 
     async with httpx.AsyncClient() as client:
@@ -295,7 +295,7 @@ async def test_karma_hello_buys_transcription(ensure_agents_running):
             timeout=TEST_CONFIG["timeout"]
         )
         assert agent_card.status_code == 200
-        print(f"   ✅ Found Abracadabra")
+        print(f"   [OK] Found Abracadabra")
 
         # Step 2: Purchase transcription
         print("2. Karma-Hello purchasing transcription...")
@@ -307,7 +307,7 @@ async def test_karma_hello_buys_transcription(ensure_agents_running):
 
         assert response.status_code == 200
         transcription = response.json()
-        print(f"   ✅ Purchased transcription")
+        print(f"   [OK] Purchased transcription")
         print(f"   Duration: {transcription.get('duration_seconds', 0)}s")
         print(f"   Segments: {len(transcription.get('transcript', []))}")
 
@@ -337,7 +337,7 @@ async def test_skill_extractor_sells_profile(ensure_agents_running):
     This tests the SELLER side of Skill-Extractor
     """
     print("\n" + "="*60)
-    print("TEST 5: Client → Skill-Extractor (Value Chain)")
+    print("TEST 5: Client -> Skill-Extractor (Value Chain)")
     print("="*60)
 
     async with httpx.AsyncClient() as client:
@@ -348,7 +348,7 @@ async def test_skill_extractor_sells_profile(ensure_agents_running):
             timeout=TEST_CONFIG["timeout"]
         )
         assert agent_card.status_code == 200
-        print(f"   ✅ Found Skill-Extractor")
+        print(f"   [OK] Found Skill-Extractor")
 
         # Purchase skill profile
         print("2. Client purchasing skill profile...")
@@ -364,7 +364,7 @@ async def test_skill_extractor_sells_profile(ensure_agents_running):
 
         assert response.status_code == 200
         profile = response.json()
-        print(f"   ✅ Purchased profile for {profile.get('user_id', 'unknown')}")
+        print(f"   [OK] Purchased profile for {profile.get('user_id', 'unknown')}")
         print(f"   Skills found: {len(profile.get('skills', []))}")
         print(f"   Monetization opportunities: {len(profile.get('monetization_opportunities', []))}")
 
@@ -379,7 +379,7 @@ async def test_skill_extractor_sells_profile(ensure_agents_running):
         # Validate structure
         assert "skills" in profile
         assert "monetization_opportunities" in profile
-        print("   ✅ Profile structure validated")
+        print("   [OK] Profile structure validated")
 
 
 # ============================================================================
@@ -398,7 +398,7 @@ async def test_voice_extractor_sells_profile(ensure_agents_running):
     4. Net: Earns 0.09 GLUE profit
     """
     print("\n" + "="*60)
-    print("TEST 6: Client → Voice-Extractor (Value Chain)")
+    print("TEST 6: Client -> Voice-Extractor (Value Chain)")
     print("="*60)
 
     async with httpx.AsyncClient() as client:
@@ -415,7 +415,7 @@ async def test_voice_extractor_sells_profile(ensure_agents_running):
 
         assert response.status_code == 200
         profile = response.json()
-        print(f"   ✅ Purchased profile for {profile.get('username', 'unknown')}")
+        print(f"   [OK] Purchased profile for {profile.get('username', 'unknown')}")
         print(f"   Analysis categories: {len(profile.get('analysis', {}).keys())}")
 
         balance_tracker.record_transaction(
@@ -444,7 +444,7 @@ async def test_validator_service(ensure_agents_running):
     Note: Validator is a pure seller, doesn't buy from other agents
     """
     print("\n" + "="*60)
-    print("TEST 7: Agent → Validator (Verification)")
+    print("TEST 7: Agent -> Validator (Verification)")
     print("="*60)
 
     async with httpx.AsyncClient() as client:
@@ -472,7 +472,7 @@ async def test_validator_service(ensure_agents_running):
         assert response.status_code == 200
         validation = response.json()
 
-        print(f"   ✅ Validation complete")
+        print(f"   [OK] Validation complete")
         print(f"   Quality score: {validation.get('quality_score', 0):.2f}")
         print(f"   Fraud score: {validation.get('fraud_score', 0):.2f}")
         print(f"   Overall score: {validation.get('overall_score', 0):.2f}")
@@ -528,7 +528,7 @@ async def test_orchestrated_workflow(ensure_agents_running):
         )
         assert response.status_code == 200
         comprehensive_data["logs"] = response.json()
-        print(f"   ✅ Got {comprehensive_data['logs'].get('total_messages', 0)} messages")
+        print(f"   [OK] Got {comprehensive_data['logs'].get('total_messages', 0)} messages")
 
         # Step 2: Buy transcription
         print("2. Orchestrator buying transcription...")
@@ -539,7 +539,7 @@ async def test_orchestrated_workflow(ensure_agents_running):
         )
         assert response.status_code == 200
         comprehensive_data["transcription"] = response.json()
-        print(f"   ✅ Got transcription ({comprehensive_data['transcription'].get('duration_seconds', 0)}s)")
+        print(f"   [OK] Got transcription ({comprehensive_data['transcription'].get('duration_seconds', 0)}s)")
 
         # Step 3: Buy skill profile
         print("3. Orchestrator buying skill profile...")
@@ -550,7 +550,7 @@ async def test_orchestrated_workflow(ensure_agents_running):
         )
         assert response.status_code == 200
         comprehensive_data["skills"] = response.json()
-        print(f"   ✅ Got {len(comprehensive_data['skills'].get('skills', []))} skills")
+        print(f"   [OK] Got {len(comprehensive_data['skills'].get('skills', []))} skills")
 
         # Step 4: Buy personality profile
         print("4. Orchestrator buying personality profile...")
@@ -561,7 +561,7 @@ async def test_orchestrated_workflow(ensure_agents_running):
         )
         assert response.status_code == 200
         comprehensive_data["personality"] = response.json()
-        print(f"   ✅ Got personality analysis")
+        print(f"   [OK] Got personality analysis")
 
         # Step 5: Validate with Validator (optional)
         print("5. Orchestrator validating data quality...")
@@ -575,13 +575,13 @@ async def test_orchestrated_workflow(ensure_agents_running):
 
         # Step 6: Synthesize report
         print("\n6. Synthesizing comprehensive report...")
-        print("   ✅ Combined data from 4 agents")
+        print("   [OK] Combined data from 4 agents")
         print(f"   Total cost: 0.23 GLUE")
 
         # Step 7: Sell to client
         print("7. Selling comprehensive report to client...")
         balance_tracker.record_transaction("client", "orchestrator", Decimal("1.00"), "comprehensive_report")
-        print(f"   ✅ Sold for 1.00 GLUE")
+        print(f"   [OK] Sold for 1.00 GLUE")
         print(f"   Net profit: 0.77 GLUE")
 
 
@@ -619,7 +619,7 @@ async def test_all_agents_discoverable(ensure_agents_running):
             assert response.status_code == 200, f"{name} not discoverable"
 
             agent_card = response.json()
-            print(f"   ✅ {name} discovered")
+            print(f"   [OK] {name} discovered")
             print(f"   Agent ID: {agent_card.get('agentId', 'N/A')}")
             print(f"   Domain: {agent_card.get('domain', 'N/A')}")
             print(f"   Skills: {len(agent_card.get('skills', []))}")
