@@ -459,6 +459,18 @@ Trustless verification - buyers don't trust sellers' data quality. Independent v
 **CrewAI timeouts**
 → Check OPENAI_API_KEY is valid, model is gpt-4o (not gpt-3.5)
 
+**Validator health endpoint not responding**
+→ Validator (port 8001) starts but /health endpoint returns "Server disconnected"
+→ Status: Known issue, validator needs debugging
+→ Likely causes: FastAPI app initialization issue, CrewAI dependency loading, or missing OpenAI key
+→ Workaround: Check validator logs directly: `cd validator && python main.py` (will show startup errors)
+
+**Client-agent doesn't run as a server**
+→ The `client-agent/` is a buyer agent, not a seller
+→ It doesn't expose HTTP endpoints or listen on a port
+→ Use it to test purchasing flows: `cd client-agent && python main.py`
+→ It's a library/CLI tool, not a FastAPI server
+
 ---
 
 ## Documentation Map
