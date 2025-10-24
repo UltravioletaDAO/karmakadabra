@@ -7,13 +7,13 @@ SECURITY: Complete infrastructure rotation for key compromise scenarios
 
 This script performs a complete system rotation:
 1. Generates new wallets for all agents
-2. Updates AWS Secrets Manager
+2. Updates AWS Secrets Manager with new private keys
 3. Redeploys ERC-20 GLUE token contract
 4. Redeploys ERC-8004 registries (Identity, Reputation, Validation)
-5. Updates all agent .env files
+5. Updates all agent .env files with new contract addresses
 6. Funds all wallets with testnet AVAX
 7. Distributes GLUE tokens to all agents
-8. Registers agents on-chain
+8. Updates MASTER_PLAN.md with new contract & wallet addresses
 
 [WARN]️  WARNING: This will invalidate ALL existing wallets and contracts!
 [WARN]️  Use this when keys are compromised or for clean system reset.
@@ -387,6 +387,94 @@ def distribute_glue(wallets: Dict[str, Dict[str, str]], dry_run: bool = True) ->
         return False
 
 # ============================================================================
+# Step 8: Update Documentation
+# ============================================================================
+
+def update_documentation(
+    wallets: Dict[str, Dict[str, str]],
+    glue_address: str,
+    registries: Dict[str, str],
+    dry_run: bool = True
+) -> bool:
+    """Update MASTER_PLAN.md with new contract addresses and agent wallets"""
+    print(f"\n{Colors.HEADER}{'='*70}{Colors.ENDC}")
+    print(f"{Colors.HEADER}STEP 8: Updating Documentation{Colors.ENDC}")
+    print(f"{Colors.HEADER}{'='*70}{Colors.ENDC}\n")
+
+    if dry_run:
+        print(f"{Colors.WARNING}[DRY RUN] Would update MASTER_PLAN.md with new addresses{Colors.ENDC}")
+        return True
+
+    try:
+        master_plan_path = Path("MASTER_PLAN.md")
+
+        if not master_plan_path.exists():
+            print(f"{Colors.WARNING}[WARN] MASTER_PLAN.md not found{Colors.ENDC}")
+            return True
+
+        # Read current content
+        with open(master_plan_path, 'r', encoding='utf-8') as f:
+            content = f.read()
+
+        # Update contract addresses table using regex
+        import re
+
+        # Update GLUE Token address
+        content = re.sub(
+            r'(\*\*GLUE Token \(EIP-3009\)\*\* \| )`0x[a-fA-F0-9]{40}`',
+            r'\1`' + glue_address + '`',
+            content
+        )
+
+        # Update Identity Registry
+        content = re.sub(
+            r'(\*\*Identity Registry\*\* \| )`0x[a-fA-F0-9]{40}`',
+            r'\1`' + registries.get('identity', '') + '`',
+            content
+        )
+
+        # Update Reputation Registry
+        content = re.sub(
+            r'(\*\*Reputation Registry\*\* \| )`0x[a-fA-F0-9]{40}`',
+            r'\1`' + registries.get('reputation', '') + '`',
+            content
+        )
+
+        # Update Validation Registry
+        content = re.sub(
+            r'(\*\*Validation Registry\*\* \| )`0x[a-fA-F0-9]{40}`',
+            r'\1`' + registries.get('validation', '') + '`',
+            content
+        )
+
+        # Update agent wallet addresses in table
+        agent_name_mapping = {
+            "validator-agent": "Validator",
+            "karma-hello-agent": "Karma-Hello",
+            "abracadabra-agent": "Abracadabra",
+            "client-agent": "Client Agent"
+        }
+
+        for agent, display_name in agent_name_mapping.items():
+            if agent in wallets:
+                content = re.sub(
+                    r'(\| \*\*' + re.escape(display_name) + r'\*\* \| )`0x[a-fA-F0-9]{40}`',
+                    r'\1`' + wallets[agent]['address'] + '`',
+                    content
+                )
+
+        # Write back
+        with open(master_plan_path, 'w', encoding='utf-8') as f:
+            f.write(content)
+
+        print(f"{Colors.OKGREEN}[OK] Updated MASTER_PLAN.md{Colors.ENDC}")
+        return True
+
+    except Exception as e:
+        print(f"{Colors.FAIL}[FAIL] Failed to update documentation: {e}{Colors.ENDC}")
+        return False
+
+# ============================================================================
 # Main Rotation Flow
 # ============================================================================
 
@@ -474,6 +562,9 @@ def main():
 
     if not distribute_glue(wallets, dry_run):
         print(f"\n{Colors.WARNING}[WARN] Token distribution may require manual intervention{Colors.ENDC}")
+
+    if not update_documentation(wallets, glue_address, registries, dry_run):
+        print(f"\n{Colors.WARNING}[WARN] Documentation update failed{Colors.ENDC}")
 
     # Summary
     print(f"\n{Colors.HEADER}{'='*70}{Colors.ENDC}")

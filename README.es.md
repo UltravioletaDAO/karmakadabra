@@ -565,7 +565,7 @@ python rotate-system.py --refill --confirm
 5. 📝 Actualiza todos los archivos `.env` de agentes con nuevas direcciones de contratos
 6. 💰 Fondea todas las wallets con AVAX de testnet (paso manual)
 7. 🎁 Distribuye tokens GLUE a todos los agentes
-8. ✅ Registra agentes en blockchain
+8. 📄 Actualiza MASTER_PLAN.md con nuevas direcciones de contratos y wallets
 
 **Casos de uso**:
 - 🚨 **Compromiso de claves**: Rotar inmediatamente si claves privadas fueron expuestas

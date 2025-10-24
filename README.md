@@ -563,7 +563,7 @@ python rotate-system.py --refill --confirm
 5. 📝 Updates all agent `.env` files with new contract addresses
 6. 💰 Funds all wallets with testnet AVAX (manual step)
 7. 🎁 Distributes GLUE tokens to all agents
-8. ✅ Registers agents on-chain
+8. 📄 Updates MASTER_PLAN.md with new contract & wallet addresses
 
 **Use cases**:
 - 🚨 **Key compromise**: Rotate immediately if private keys are exposed
