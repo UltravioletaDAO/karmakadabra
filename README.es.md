@@ -77,9 +77,9 @@ Todos los contratos inteligentes están en vivo y verificados en Snowtrace. Las 
 - Guía de Testing: [`shared/tests/README.md`](./shared/tests/README.md)
 - Arquitectura: [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 
-### 🔵 Fase 2: Desarrollo de Agentes (EN PROGRESO - Octubre 2025)
+### ✅ Fase 2: Desarrollo de Agentes (COMPLETA - Octubre 2025)
 
-**Sprint 2: Agentes del Sistema** - Construyendo la infraestructura del mercado
+**Sprint 2: Agentes del Sistema** - Infraestructura del mercado completa (7/7 hitos)
 
 #### ✅ Sprint 2.1: Agente Validador (COMPLETO)
 **Servicio independiente de verificación de calidad de datos** - `validator/` - **1,545+ líneas**
@@ -155,22 +155,91 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Transcripción: 15 segmentos, 7200 segundos (2 horas)
 - Ambos comparten `stream_id: stream_20251023_001` para pruebas de datos complementarios
 
-#### 📋 Sprint 2.4: Agente Vendedor Karma-Hello (PRÓXIMO)
-**Vendedor de logs de chat de Twitch** - Vende logs desde MongoDB vía protocolo x402
+#### ✅ Sprint 2.4: Agente Karma-Hello (COMPLETO)
+**Vendedor + comprador de logs de chat de Twitch** - `karma-hello-agent/` - **720+ líneas**
 
-**Características planificadas:**
-- Servidor FastAPI con middleware x402
-- Integración con MongoDB para logs de producción
+**Qué hace:**
+- **VENDE** logs de chat desde MongoDB vía protocolo x402
+- **COMPRA** transcripciones del agente Abracadabra
+- Servidor FastAPI con soporte de protocolo A2A
 - Respaldo de archivos locales para pruebas
-- Múltiples niveles de servicio (0.01-200 GLUE)
+- Precios multi-nivel (0.01-200 GLUE)
 
-#### 📋 Sprint 2.5: Agente Vendedor Abracadabra
-**Vendedor de transcripciones de streams** - Vende transcripciones desde SQLite+Cognee vía protocolo x402
+**Características clave:**
+- Integración con MongoDB para logs de producción
+- Capacidades de comprador añadidas (compra transcripciones)
+- Almacenamiento: directorio `purchased_transcriptions/`
+- Puerto: 8002
 
-#### 📋 Sprint 2.6: Agente Extractor de Voz
-**Servicio de procesamiento de audio** - Extrae audio de video para Abracadabra
+**Deployment:**
+- Billetera: `0x2C3e071df446B25B821F59425152838ae4931E75`
+- Saldo: 55,000 GLUE
 
-**Progreso:** 3 de 6 hitos completados (50%)
+#### ✅ Sprint 2.5: Agente Abracadabra (COMPLETO)
+**Vendedor + comprador de transcripciones de streams** - `abracadabra-agent/` - **720+ líneas**
+
+**Qué hace:**
+- **VENDE** transcripciones desde SQLite+Cognee vía protocolo x402
+- **COMPRA** logs de chat del agente Karma-Hello
+- Servidor FastAPI con soporte de protocolo A2A
+- Precios multi-nivel (0.02-300 GLUE)
+
+**Características clave:**
+- Integración con SQLite para almacenamiento de transcripciones
+- Capacidades de comprador añadidas (compra logs de chat)
+- Almacenamiento: directorio `purchased_chat_logs/`
+- Puerto: 8003
+
+**Deployment:**
+- Billetera: `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`
+- Saldo: 55,000 GLUE
+
+#### ✅ Sprint 2.6: Agente Voice-Extractor (COMPLETO)
+**Perfilador de personalidad lingüística** - `voice-extractor-agent/` - **523+ líneas**
+
+**Qué hace:**
+- **COMPRA** logs de chat de Karma-Hello (0.01 GLUE)
+- **VENDE** perfiles de personalidad lingüística (0.02-0.40 GLUE)
+- Análisis psicolingüístico de 8 categorías
+- Precios multi-nivel (basic, standard, complete, enterprise)
+
+**Características clave:**
+- Análisis basado en CrewAI (simplificado para MVP)
+- Descubrimiento vía protocolo A2A
+- Integración con protocolo de pago x402
+- Puerto: 8005
+
+**Modelo Económico:**
+- Beneficio neto: 0.03 GLUE por extracción (margen del 300%)
+- Saldo inicial: 55,000 GLUE (presupuestado)
+
+#### ✅ Sprint 2.7: Agente Skill-Extractor (COMPLETO)
+**Perfilador de habilidades y competencias** - `skill-extractor-agent/` - **790+ líneas**
+
+**Qué hace:**
+- **COMPRA** logs de chat de Karma-Hello (0.01 GLUE)
+- **VENDE** perfiles de habilidades/competencias (0.02-0.50 GLUE)
+- Marco de extracción de 5 categorías
+- Precios multi-nivel (basic, standard, complete, enterprise)
+
+**Características clave:**
+- Extracción de intereses + identificación de habilidades
+- Auditoría de herramientas/plataformas + análisis de monetización
+- Análisis multi-agente basado en CrewAI
+- Puerto: 8085
+
+**5 Categorías de Análisis:**
+1. Extracción de Intereses (temas recurrentes, profundidad de engagement)
+2. Identificación de Habilidades y Sub-habilidades (jerarquía de 2 niveles)
+3. Herramientas y Plataformas (auditoría completa de stack tecnológico)
+4. Estilo de Interacción (patrones de colaboración)
+5. Potencial de Monetización (análisis de viabilidad comercial)
+
+**Modelo Económico:**
+- Beneficio neto: 0.04 GLUE por extracción (margen del 400%)
+- Saldo inicial: 55,000 GLUE (presupuestado)
+
+**Progreso:** ✅ **7 de 7 hitos completados (100%)** - SPRINT 2 COMPLETO
 
 
 ---

@@ -77,9 +77,9 @@ All smart contracts are live and verified on Snowtrace. Agent wallets have been 
 - Testing Guide: [`shared/tests/README.md`](./shared/tests/README.md)
 - Architecture: [`ARCHITECTURE.md`](./ARCHITECTURE.md)
 
-### 🔵 Phase 2: Agent Development (IN PROGRESS - October 2025)
+### ✅ Phase 2: Agent Development (COMPLETE - October 2025)
 
-**Sprint 2: System Agents** - Building the marketplace infrastructure
+**Sprint 2: System Agents** - Marketplace infrastructure complete (7/7 milestones)
 
 #### ✅ Sprint 2.1: Validator Agent (COMPLETE)
 **Independent data quality verification service** - `validator/` - **1,545+ lines**
@@ -155,22 +155,91 @@ python test_validator.py --live   # Test with running validator
 - Transcription: 15 segments, 7200 seconds (2 hours)
 - Both share `stream_id: stream_20251023_001` for complementary data testing
 
-#### 📋 Sprint 2.4: Karma-Hello Seller Agent (NEXT)
-**Twitch chat log seller** - Sells logs from MongoDB via x402 protocol
+#### ✅ Sprint 2.4: Karma-Hello Agent (COMPLETE)
+**Twitch chat log seller + buyer** - `karma-hello-agent/` - **720+ lines**
 
-**Planned features:**
-- FastAPI server with x402 middleware
-- MongoDB integration for production logs
+**What it does:**
+- **SELLS** chat logs from MongoDB via x402 protocol
+- **BUYS** transcriptions from Abracadabra agent
+- FastAPI server with A2A protocol support
 - Local file fallback for testing
-- Multiple service tiers (0.01-200 GLUE)
+- Multi-tier pricing (0.01-200 GLUE)
 
-#### 📋 Sprint 2.5: Abracadabra Seller Agent
-**Stream transcript seller** - Sells transcripts from SQLite+Cognee via x402 protocol
+**Key Features:**
+- MongoDB integration for production logs
+- Buyer capabilities added (purchases transcriptions)
+- Storage: `purchased_transcriptions/` directory
+- Port: 8002
 
-#### 📋 Sprint 2.6: Voice Extractor Agent
-**Audio processing service** - Extracts audio from video for Abracadabra
+**Deployment:**
+- Wallet: `0x2C3e071df446B25B821F59425152838ae4931E75`
+- Balance: 55,000 GLUE
 
-**Progress:** 3 of 6 milestones complete (50%)
+#### ✅ Sprint 2.5: Abracadabra Agent (COMPLETE)
+**Stream transcript seller + buyer** - `abracadabra-agent/` - **720+ lines**
+
+**What it does:**
+- **SELLS** transcripts from SQLite+Cognee via x402 protocol
+- **BUYS** chat logs from Karma-Hello agent
+- FastAPI server with A2A protocol support
+- Multi-tier pricing (0.02-300 GLUE)
+
+**Key Features:**
+- SQLite integration for transcript storage
+- Buyer capabilities added (purchases chat logs)
+- Storage: `purchased_chat_logs/` directory
+- Port: 8003
+
+**Deployment:**
+- Wallet: `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`
+- Balance: 55,000 GLUE
+
+#### ✅ Sprint 2.6: Voice-Extractor Agent (COMPLETE)
+**Linguistic personality profiler** - `voice-extractor-agent/` - **523+ lines**
+
+**What it does:**
+- **BUYS** chat logs from Karma-Hello (0.01 GLUE)
+- **SELLS** linguistic personality profiles (0.02-0.40 GLUE)
+- 8-category psycholinguistic analysis
+- Multi-tier pricing (basic, standard, complete, enterprise)
+
+**Key Features:**
+- CrewAI-based analysis (simplified for MVP)
+- A2A protocol discovery
+- x402 payment integration
+- Port: 8005
+
+**Economic Model:**
+- Net profit: 0.03 GLUE per extraction (300% margin)
+- Initial balance: 55,000 GLUE (budgeted)
+
+#### ✅ Sprint 2.7: Skill-Extractor Agent (COMPLETE)
+**Skill and competency profiler** - `skill-extractor-agent/` - **790+ lines**
+
+**What it does:**
+- **BUYS** chat logs from Karma-Hello (0.01 GLUE)
+- **SELLS** skill/competency profiles (0.02-0.50 GLUE)
+- 5-category extraction framework
+- Multi-tier pricing (basic, standard, complete, enterprise)
+
+**Key Features:**
+- Interest extraction + skill identification
+- Tools/platforms audit + monetization analysis
+- CrewAI-based multi-agent analysis
+- Port: 8085
+
+**5 Analysis Categories:**
+1. Interest Extraction (recurring topics, engagement depth)
+2. Skill & Sub-Skill Identification (2-level hierarchy)
+3. Tools & Platforms (comprehensive tech stack audit)
+4. Interaction Style (collaboration patterns)
+5. Monetization Potential (commercial viability analysis)
+
+**Economic Model:**
+- Net profit: 0.04 GLUE per extraction (400% margin)
+- Initial balance: 55,000 GLUE (budgeted)
+
+**Progress:** ✅ **7 of 7 milestones complete (100%)** - SPRINT 2 COMPLETE
 
 
 ---
