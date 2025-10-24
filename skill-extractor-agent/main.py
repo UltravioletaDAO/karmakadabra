@@ -87,23 +87,25 @@ class SkillExtractorAgent(ERC8004BaseAgent):
 
         # Initialize base agent (registers on-chain)
         super().__init__(
-            private_key=config.get("private_key"),
+            agent_name="skill-extractor-agent",
+            agent_domain=config["agent_domain"],
             rpc_url=config["rpc_url_fuji"],
             chain_id=config["chain_id"],
-            identity_registry=config["identity_registry"],
-            reputation_registry=config["reputation_registry"],
-            validation_registry=config["validation_registry"],
-            glue_token_address=config["glue_token_address"],
-            facilitator_url=config["facilitator_url"]
+            identity_registry_address=config["identity_registry"],
+            reputation_registry_address=config["reputation_registry"],
+            validation_registry_address=config["validation_registry"],
+            private_key=config.get("private_key")
         )
 
         self.config = config
         self.use_local_files = config.get("use_local_files", False)
         self.karma_hello_url = config.get("karma_hello_url")
+        self.glue_token_address = config["glue_token_address"]
+        self.facilitator_url = config["facilitator_url"]
 
         # Register agent identity
         try:
-            self.agent_id = self.register_agent(config["agent_domain"])
+            self.agent_id = self.register_agent()
             print(f"✅ Agent registered on-chain: ID {self.agent_id}")
         except Exception as e:
             print(f"⚠️  Agent registration failed (may already be registered): {e}")
@@ -111,7 +113,6 @@ class SkillExtractorAgent(ERC8004BaseAgent):
 
         print(f"🚀 Skill-Extractor Agent initialized")
         print(f"   Address: {self.address}")
-        print(f"   Balance: {self.get_glue_balance()} GLUE")
 
     def get_agent_card(self) -> Dict[str, Any]:
         """Return A2A AgentCard for discovery"""
@@ -606,7 +607,7 @@ async def root():
         "status": "healthy",
         "agent_id": str(agent.agent_id) if agent.agent_id else "unregistered",
         "address": agent.address,
-        "balance": f"{agent.get_glue_balance()} GLUE",
+        "balance": f"{agent.get_balance()} AVAX",
         "data_source": "local_files" if agent.use_local_files else "karma-hello"
     }
 
@@ -670,7 +671,7 @@ if __name__ == "__main__":
     print(f"{'='*70}")
     print(f"  Address: {agent.address}")
     print(f"  Agent ID: {agent.agent_id}")
-    print(f"  Balance: {agent.get_glue_balance()} GLUE")
+    print(f"  Balance: {agent.get_balance()} AVAX")
     print(f"  Data Source: {'Local Files' if agent.use_local_files else 'Karma-Hello'}")
     print(f"  Server: http://{host}:{port}")
     print(f"{'='*70}\n")

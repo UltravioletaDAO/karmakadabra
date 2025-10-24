@@ -86,18 +86,21 @@ class KarmaHelloSeller(ERC8004BaseAgent):
 
         # Initialize base agent (registers on-chain)
         super().__init__(
-            private_key=config.get("private_key"),
+            agent_name="karma-hello-agent",
+            agent_domain=config["agent_domain"],
             rpc_url=config["rpc_url_fuji"],
             chain_id=config["chain_id"],
-            identity_registry=config["identity_registry"],
-            reputation_registry=config["reputation_registry"],
-            validation_registry=config["validation_registry"],
-            glue_token_address=config["glue_token_address"],
-            facilitator_url=config["facilitator_url"]
+            identity_registry_address=config["identity_registry"],
+            reputation_registry_address=config["reputation_registry"],
+            validation_registry_address=config["validation_registry"],
+            private_key=config.get("private_key")
         )
 
         self.config = config
         self.use_local_files = config.get("use_local_files", True)
+        self.glue_token_address = config["glue_token_address"]
+        self.facilitator_url = config["facilitator_url"]
+        self.abracadabra_url = config.get("abracadabra_url")
 
         # Setup data source
         if self.use_local_files:
@@ -113,7 +116,7 @@ class KarmaHelloSeller(ERC8004BaseAgent):
 
         # Register agent identity
         try:
-            self.agent_id = self.register_agent(config["agent_domain"])
+            self.agent_id = self.register_agent()
             print(f" Agent registered on-chain: ID {self.agent_id}")
         except Exception as e:
             print(f"�  Agent registration failed (may already be registered): {e}")
@@ -121,7 +124,6 @@ class KarmaHelloSeller(ERC8004BaseAgent):
 
         print(f"> Karma-Hello Seller initialized")
         print(f"   Address: {self.address}")
-        print(f"   Balance: {self.get_glue_balance()} GLUE")
 
     def get_agent_card(self) -> Dict[str, Any]:
         """Return A2A AgentCard for discovery"""
@@ -433,7 +435,7 @@ config = {
     "validation_registry": os.getenv("VALIDATION_REGISTRY"),
     "glue_token_address": os.getenv("GLUE_TOKEN_ADDRESS"),
     "facilitator_url": os.getenv("FACILITATOR_URL"),
-    "agent_domain": os.getenv("AGENT_DOMAIN"),
+    "agent_domain": os.getenv("AGENT_DOMAIN", "karma-hello.ultravioletadao.xyz"),
     "mongo_uri": os.getenv("MONGO_URI"),
     "mongo_db": os.getenv("MONGO_DB", "karma_hello"),
     "mongo_collection": os.getenv("MONGO_COLLECTION", "chat_logs"),
@@ -462,7 +464,7 @@ async def root():
         "status": "healthy",
         "agent_id": str(agent.agent_id) if agent.agent_id else "unregistered",
         "address": agent.address,
-        "balance": f"{agent.get_glue_balance()} GLUE",
+        "balance": f"{agent.get_balance()} AVAX",
         "data_source": "local_files" if agent.use_local_files else "mongodb"
     }
 
@@ -560,7 +562,7 @@ if __name__ == "__main__":
     print(f"{'='*70}")
     print(f"  Address: {agent.address}")
     print(f"  Agent ID: {agent.agent_id}")
-    print(f"  Balance: {agent.get_glue_balance()} GLUE")
+    print(f"  Balance: {agent.get_balance()} AVAX")
     print(f"  Data Source: {'Local Files' if agent.use_local_files else 'MongoDB'}")
     print(f"  Server: http://{host}:{port}")
     print(f"{'='*70}\n")

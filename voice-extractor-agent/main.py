@@ -81,31 +81,32 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
 
         # Initialize base agent (registers on-chain)
         super().__init__(
-            private_key=config.get("private_key"),
+            agent_name="voice-extractor-agent",
+            agent_domain=config["agent_domain"],
             rpc_url=config["rpc_url_fuji"],
             chain_id=config["chain_id"],
-            identity_registry=config["identity_registry"],
-            reputation_registry=config["reputation_registry"],
-            validation_registry=config["validation_registry"],
-            glue_token_address=config["glue_token_address"],
-            facilitator_url=config["facilitator_url"]
+            identity_registry_address=config["identity_registry"],
+            reputation_registry_address=config["reputation_registry"],
+            validation_registry_address=config["validation_registry"],
+            private_key=config.get("private_key")
         )
 
         self.config = config
         self.use_local_files = config.get("use_local_files", False)
         self.karma_hello_url = config.get("karma_hello_url")
+        self.glue_token_address = config["glue_token_address"]
+        self.facilitator_url = config["facilitator_url"]
 
         # Register agent identity
         try:
-            self.agent_id = self.register_agent(config["agent_domain"])
+            self.agent_id = self.register_agent()
             print(f" Agent registered on-chain: ID {self.agent_id}")
         except Exception as e:
-            print(f"   Agent registration failed (may already be registered): {e}")
+            print(f"ï¿½  Agent registration failed (may already be registered): {e}")
             self.agent_id = None
 
         print(f"> Voice-Extractor Agent initialized")
         print(f"   Address: {self.address}")
-        print(f"   Balance: {self.get_glue_balance()} GLUE")
 
     def get_agent_card(self) -> Dict[str, Any]:
         """Return A2A AgentCard for discovery"""
@@ -176,7 +177,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
         import httpx
 
         if not self.karma_hello_url:
-            print("   KARMA_HELLO_URL not configured")
+            print("ï¿½  KARMA_HELLO_URL not configured")
             return None
 
         agent_card_url = f"{self.karma_hello_url}/.well-known/agent-card"
@@ -188,7 +189,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
                     print(f" Discovered Karma-Hello: {self.karma_hello_url}")
                     return response.json()
                 else:
-                    print(f"   Karma-Hello not found")
+                    print(f"ï¿½  Karma-Hello not found")
                     return None
         except Exception as e:
             print(f"L Error discovering Karma-Hello: {e}")
@@ -277,7 +278,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
         """
 
         # Step 1: Buy chat logs from Karma-Hello
-        print(f"= Analyzing linguistic profile for {username}...")
+        print(f"Analyzing linguistic profile for {username}...")
 
         if not self.use_local_files:
             logs = await self.buy_user_logs(username, date_range)
@@ -345,8 +346,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
                 "emojis_emoticons": {
                     "score": 0.70,
                     "usage_rate": 0.25,
-                    "favorites": ["=
-", "=M", "=%"]
+                    "favorites": [":)", ":D", ";)"]
                 },
                 "technical_language": {
                     "score": 0.80,
@@ -408,7 +408,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
         with open(cache_file, "w", encoding="utf-8") as f:
             json.dump(profile.model_dump(), f, indent=2)
 
-        print(f"=¾ Cached profile for {username}")
+        print(f"=ï¿½ Cached profile for {username}")
 
 
 # ============================================================================
@@ -452,7 +452,7 @@ async def root():
         "status": "healthy",
         "agent_id": str(agent.agent_id) if agent.agent_id else "unregistered",
         "address": agent.address,
-        "balance": f"{agent.get_glue_balance()} GLUE",
+        "balance": f"{agent.get_balance()} AVAX",
         "data_source": "local_files" if agent.use_local_files else "karma-hello"
     }
 
@@ -515,7 +515,7 @@ if __name__ == "__main__":
     print(f"{'='*70}")
     print(f"  Address: {agent.address}")
     print(f"  Agent ID: {agent.agent_id}")
-    print(f"  Balance: {agent.get_glue_balance()} GLUE")
+    print(f"  Balance: {agent.get_balance()} AVAX")
     print(f"  Data Source: {'Local Files' if agent.use_local_files else 'Karma-Hello'}")
     print(f"  Server: http://{host}:{port}")
     print(f"{'='*70}\n")
