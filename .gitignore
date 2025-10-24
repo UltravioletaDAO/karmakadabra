@@ -148,6 +148,10 @@ abracadabra-agent/transcripts/20251021/*/*.wav
 *.wav
 *.avi
 *.mov
+
+# Allow architecture diagrams (documentation assets)
+!docs/images/architecture/*.png
+
 *.png
 *.jpg
 *.jpeg
