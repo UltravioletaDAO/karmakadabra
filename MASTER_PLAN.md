@@ -179,9 +179,11 @@ python test_skill_extractor.py --mock
 
 ---
 
-#### 📋 Level 2: Integration Tests (Agents Running)
+#### 🔴 Level 2: Integration Tests (Agents Running) - **BLOCKED**
 
 **Objective:** Test agents as running servers with local data
+
+**Status:** ❌ Blocked by implementation issues discovered during testing
 
 **Test Coverage:**
 - Start each agent individually
@@ -248,13 +250,35 @@ python test_karma_hello.py --live
 
 ---
 
-**Current Status:** ✅ Level 1 complete (30/30 tests passing)
+**Current Status:** ✅ Level 1 complete (30/30 tests passing) | ❌ Level 2 blocked
+
+**Blocker Found:**
+During Level 2 testing, discovered that agents cannot start as servers due to **signature mismatch**:
+
+```python
+# base_agent.py expects:
+def __init__(self, agent_name: str, agent_domain: str, rpc_url: str = None,
+             identity_registry_address: str = None, ...)
+
+# But agents are calling with:
+super().__init__(
+    private_key=config.get("private_key"),  # ❌ Wrong - no agent_name/domain
+    rpc_url=config["rpc_url_fuji"],          # ✅ Correct
+    identity_registry=config["..."],         # ❌ Wrong - should be identity_registry_address
+    glue_token_address=config["..."],        # ❌ Wrong - not accepted by base_agent
+    facilitator_url=config["..."]            # ❌ Wrong - not accepted by base_agent
+)
+```
+
+**Impact:** All 4 agents (Karma-Hello, Abracadabra, Voice-Extractor, Skill-Extractor) fail to initialize
 
 **Next Steps:**
 1. ✅ ~~Create unit tests for all 5 agents~~ - COMPLETE
 2. ✅ ~~Run all Level 1 tests~~ - COMPLETE (30/30 passing)
-3. ⏭️  Proceed to Level 2 (integration tests) - Run agents as servers
-4. ⏭️  Then Level 3 (end-to-end flow testing)
+3. ❌ Level 2 blocked - **Fix agent initialization signatures**
+4. 🔧 **CRITICAL:** Fix all agents to match base_agent.py signature
+5. ⏭️  Then re-run Level 2 (integration tests)
+6. ⏭️  Then Level 3 (end-to-end flow testing)
 
 ---
 
