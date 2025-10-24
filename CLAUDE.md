@@ -31,6 +31,29 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Why separate rotation**: ERC-20 deployer owns the GLUE token contract. Rotating it requires redeploying the entire token, so it's only rotated when specifically needed.
 
+### Contract Address Safety
+**⚠️ NEVER SEND AVAX OR TOKENS TO CONTRACT ADDRESSES**
+
+**ABSOLUTE RULES:**
+- ❌ **NEVER send AVAX to contract addresses** (0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618, etc.)
+- ❌ **NEVER send test AVAX to contract addresses**
+- ❌ **NEVER send tokens (GLUE or any ERC-20) to contract addresses**
+- ⚠️ **Funds sent to contracts are PERMANENTLY LOST** if there's no withdrawal function
+- ✅ **Only send AVAX/tokens to externally owned addresses (EOAs)** - wallet addresses controlled by private keys
+- ✅ **Check contract code for withdrawal functions** before sending any funds
+
+**Why**: Smart contracts without withdrawal mechanisms cannot return funds. Once AVAX/tokens are sent to these contracts, they are stuck forever with no recovery method.
+
+**Current Issue**: The Identity Registry contract (0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) has accumulated 0.015 AVAX from registration fees that cannot be withdrawn. This is a design flaw - registration fees should either:
+1. Go to a treasury wallet (EOA) that can redistribute funds
+2. Have a withdrawal function in the contract
+3. Be set to zero if fees are not needed
+
+**How to identify contract addresses:**
+- Contract addresses are created when you deploy with `forge create` or similar
+- They appear as "To: [Contract 0x...]" on block explorers like Snowtrace
+- EOA addresses appear as "To: 0x..." without "[Contract]" label
+
 ### Documentation Synchronization
 **ALWAYS update both language versions in parallel:**
 
@@ -387,6 +410,11 @@ Trustless verification - buyers don't trust sellers' data quality. Independent v
 
 **"agent not found in registry"**
 → Run `python scripts/register_*.py` to register on-chain first
+
+**"AddressAlreadyRegistered" during newAgent()**
+→ Agent address is already registered with a different domain
+→ Use `updateAgent()` to change the domain, not `newAgent()`
+→ Check registration: `cast call <IDENTITY_REGISTRY> "resolveByAddress(address)" <AGENT_ADDRESS>`
 
 **"facilitator connection refused"**
 → Ensure x402-rs is running: `curl http://localhost:8080/health`
