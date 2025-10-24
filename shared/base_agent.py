@@ -178,6 +178,21 @@ class ERC8004BaseAgent:
                 "inputs": [],
                 "outputs": [{"name": "", "type": "uint256"}],
                 "stateMutability": "view"
+            },
+            {
+                "type": "function",
+                "name": "resolveByAddress",
+                "inputs": [{"name": "agentAddress", "type": "address"}],
+                "outputs": [{
+                    "name": "agentInfo",
+                    "type": "tuple",
+                    "components": [
+                        {"name": "agentId", "type": "uint256"},
+                        {"name": "agentDomain", "type": "string"},
+                        {"name": "agentAddress", "type": "address"}
+                    ]
+                }],
+                "stateMutability": "view"
             }
         ]
 
@@ -280,6 +295,20 @@ class ERC8004BaseAgent:
         logger.info(f"[{self.agent_name}] Registering agent...")
         logger.info(f"   Domain: {self.agent_domain}")
         logger.info(f"   Address: {self.address}")
+
+        # Check if already registered
+        try:
+            result = self.identity_registry.functions.resolveByAddress(self.address).call()
+            agent_id, domain, address = result
+            if agent_id > 0:
+                logger.info(f"   Agent already registered!")
+                logger.info(f"   Agent ID: {agent_id}")
+                logger.info(f"   Domain: {domain}")
+                self.agent_id = agent_id
+                return agent_id
+        except Exception:
+            # Not registered yet, continue with registration
+            pass
 
         # Get registration fee
         registration_fee = self.identity_registry.functions.REGISTRATION_FEE().call()
