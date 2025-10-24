@@ -17,16 +17,26 @@
 
 **Deployed:** October 22, 2025 | **Chain ID:** 43113 | **Registration Fee:** 0.005 AVAX
 
+⚠️ **CRITICAL: Never Send AVAX/Tokens to Contract Addresses**
+- Contract addresses **cannot withdraw funds** without explicit withdrawal functions
+- Identity Registry currently holds **0.015 AVAX permanently stuck** (3 × 0.005 AVAX registration fees)
+- **ONLY send funds to EOAs** (externally owned addresses - wallet addresses with private keys)
+- See `CLAUDE.md` for detailed safety guidelines
+
 ### Agent Wallets
 
-| Agent | Address | GLUE Balance | Status |
-|-------|---------|--------------|--------|
-| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 55,000 | ✅ Funded |
-| **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 55,000 | ✅ Funded |
-| **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 55,000 | ✅ Funded |
-| **Client Agent** | `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA` | 55,000 | ✅ Funded |
+| Agent | Address | GLUE Balance | Domain | Status |
+|-------|---------|--------------|--------|--------|
+| **Client Agent** | `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA` | 55,000 | `client.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
+| **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 55,000 | `karma-hello.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
+| **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 55,000 | `abracadabra.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
+| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 55,000 | `validator.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
+| **Voice Extractor** | `0xYOUR_ADDRESS_HERE` | 55,000 | `voice-extractor.karmacadabra.ultravioletadao.xyz` | ⏳ Pending |
+| **Skill Extractor** | `0xYOUR_ADDRESS_HERE` | 55,000 | `skill-extractor.karmacadabra.ultravioletadao.xyz` | ⏳ Pending |
 
-**Total Distributed:** 220,000 GLUE (4 agents) | **Owner Remaining:** 23,937,817 GLUE
+**Total Distributed:** 220,000 GLUE (4 agents funded) | **Budgeted:** 110,000 GLUE (2 agents pending) | **Owner Remaining:** 23,937,817 GLUE
+
+**Domain Convention:** All agents use `<agent-name>.karmacadabra.ultravioletadao.xyz` format (required for on-chain registration)
 
 ---
 
@@ -872,11 +882,25 @@ How should Karma-Hello's quality service use main app's evaluation logic?
 ## 📝 Implementation Notes
 
 ### Security
-- **Never commit `.env` files** - use .gitignore
-- Use test wallets for Fuji only
-- Rotate keys before mainnet
+
+**Private Key Management:**
+- ⚠️ **NEVER store private keys in `.env` files** - ALL keys must be in AWS Secrets Manager
+- ⚠️ **NEVER commit keys to git** - Even example files should have `PRIVATE_KEY=` (empty)
+- ✅ **Use AWS Secrets Manager** - All agent keys stored under `karmacadabra` secret
+- ✅ **ERC-20 deployer key** - Stored in AWS under `erc-20` key (rotate separately)
+- ✅ **Agent keys** - Stored as `<agent-name>-agent` (e.g., `karma-hello-agent`)
+
+**Deployment Security:**
+- Use test wallets for Fuji testnet only
+- Rotate keys before mainnet deployment
 - Audit contracts before production
-- Rate limiting on facilitator
+- Rate limiting on x402 facilitator
+- All deployment scripts fetch keys from AWS automatically
+
+**Domain Naming Convention:**
+- ALL agent domains MUST use: `<agent-name>.karmacadabra.ultravioletadao.xyz`
+- Domains are registered on-chain (immutable, requires `updateAgent()` to change)
+- See `CLAUDE.md` for complete domain guidelines
 
 **System Rotation Tool (`rotate-system.py`):**
 Complete infrastructure rotation for key compromise scenarios. Added October 23, 2025.
@@ -917,7 +941,17 @@ python rotate-system.py --refill
 
 # Refill wallets with GLUE only (execute)
 python rotate-system.py --refill --confirm
+
+# Rotate ERC-20 deployer wallet ONLY (requires GLUE token redeployment)
+python rotate-system.py --rotate-erc20 --confirm
+# Type 'ROTATE-ERC20' when prompted
+# WARNING: Requires redeploying GLUE token contract!
 ```
+
+**Important Notes:**
+- ERC-20 deployer is **NOT rotated by default** (owns GLUE token contract)
+- Use `--rotate-erc20` flag ONLY when specifically needed
+- Rotating ERC-20 deployer requires redeploying entire GLUE token
 
 This addresses the critical security requirement of never storing keys locally and providing rapid response to key exposure incidents
 
