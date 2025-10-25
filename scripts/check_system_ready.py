@@ -102,17 +102,45 @@ def main():
     print(f"  Identity Registry: {identity_registry_address}")
     print(f"  GLUE Token: {glue_token_address}")
 
-    # Check service agents (in agents/ folder)
+    # Load agent addresses from AWS Secrets Manager
     print("\n" + "=" * 80)
     print("SERVICE AGENTS (agents/ folder)")
     print("=" * 80)
 
-    service_agents = {
-        'karma-hello': os.getenv('KARMA_HELLO_ADDRESS'),
-        'skill-extractor': os.getenv('SKILL_EXTRACTOR_ADDRESS'),
-        'voice-extractor': os.getenv('VOICE_EXTRACTOR_ADDRESS'),
-        'validator': os.getenv('VALIDATOR_ADDRESS'),
-    }
+    print("\nLoading agent addresses from AWS Secrets Manager...")
+    try:
+        import boto3
+        client = boto3.client('secretsmanager', region_name='us-east-1')
+        response = client.get_secret_value(SecretId='karmacadabra')
+        secrets = json.loads(response['SecretString'])
+
+        # Map secret keys to agent addresses
+        from eth_account import Account
+        service_agents = {}
+
+        agent_map = {
+            'karma-hello': 'karma-hello-agent',
+            'skill-extractor': 'skill-extractor-agent',
+            'voice-extractor': 'voice-extractor-agent',
+            'validator': 'validator-agent',
+        }
+
+        for agent_name, secret_key in agent_map.items():
+            if secret_key in secrets:
+                pk = secrets[secret_key]['private_key']
+                account = Account.from_key(pk)
+                service_agents[agent_name] = account.address
+            else:
+                service_agents[agent_name] = None
+
+    except Exception as e:
+        print(f"[FAIL] Could not load from AWS: {e}")
+        service_agents = {
+            'karma-hello': None,
+            'skill-extractor': None,
+            'voice-extractor': None,
+            'validator': None,
+        }
 
     results = {}
     for name, address in service_agents.items():
