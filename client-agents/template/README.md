@@ -187,7 +187,7 @@ Each file contains:
 
 ```python
 # Discover Karma-Hello
-card = await client.discover_seller("https://karma-hello.ultravioletadao.xyz")
+card = await client.discover_seller("https://karma-hello.karmacadabra.ultravioletadao.xyz")
 
 # Find chat logs skill
 skill = [s for s in card.skills if s.name == "get_chat_logs"][0]

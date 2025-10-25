@@ -582,7 +582,7 @@ FACILITATOR_URL=https://facilitator.ultravioletadao.xyz
 OPENAI_API_KEY=sk-...
 
 # Karma-Hello Integration
-KARMA_HELLO_URL=https://karma-hello.ultravioletadao.xyz
+KARMA_HELLO_URL=https://karma-hello.karmacadabra.ultravioletadao.xyz
 ```
 
 ### Registration
@@ -655,7 +655,7 @@ A2A protocol agent card.
     }
   ],
   "payment_methods": ["eip3009"],
-  "endpoint": "https://voice-extractor.ultravioletadao.xyz"
+  "endpoint": "https://voice-extractor.karmacadabra.ultravioletadao.xyz"
 }
 ```
 

@@ -188,3 +188,9 @@ done
 
 **Status**: ✅ Fixed in all agent .env and .env.example files
 **Agents now start successfully!** 🎉
+
+---
+
+## Related Documentation
+
+- **PORT_MIGRATION_9000.md** - Port changes from 8000 range to 9000 range (2025-10-25)

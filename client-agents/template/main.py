@@ -11,7 +11,9 @@ base agent capabilities.
 import os
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))
+# Add project root to Python path (client-agents/template -> client-agents -> karmacadabra)
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 import asyncio
 from typing import Optional, Dict, Any, List

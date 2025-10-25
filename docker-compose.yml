@@ -1,0 +1,231 @@
+version: '3.8'
+
+# Karmacadabra Agent Stack
+# Complete agent-to-agent economy for buying/selling AI services
+#
+# Services:
+#   - validator: Independent validation service (9001)
+#   - karma-hello: Chat logs seller (9002)
+#   - abracadabra: Transcription seller (9003)
+#   - skill-extractor: Skill profiling seller (9004)
+#   - voice-extractor: Personality profiling seller (9005)
+#
+# Usage:
+#   docker-compose up -d                    # Start all agents
+#   docker-compose up karma-hello           # Start single agent
+#   docker-compose logs -f karma-hello      # View logs
+#   docker-compose down                     # Stop all agents
+
+networks:
+  karmacadabra:
+    driver: bridge
+
+volumes:
+  # Shared data volumes
+  karma-hello-data:
+  abracadabra-data:
+  skill-extractor-cache:
+  voice-extractor-cache:
+  validator-cache:
+
+services:
+  # ===========================================================================
+  # VALIDATOR AGENT (Port 9001)
+  # ===========================================================================
+  # Independent validation service using CrewAI
+  # Charges 0.001 GLUE per validation
+  validator:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: karmacadabra-validator
+    ports:
+      - "9001:9001"
+      - "9090:9090"  # Metrics endpoint
+    env_file:
+      - agents/validator/.env
+    volumes:
+      - ./agents/validator:/app/agent:ro
+      - ./shared:/app/shared:ro
+      - validator-cache:/app/data
+      - validator-cache:/app/validations
+      # AWS credentials for secrets manager
+      - ~/.aws:/root/.aws:ro
+    working_dir: /app/agent
+    command: python main.py
+    networks:
+      - karmacadabra
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9001/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # KARMA-HELLO AGENT (Port 9002)
+  # ===========================================================================
+  # Sells chat logs from Twitch streams
+  # Base price: 0.01 GLUE
+  karma-hello:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: karmacadabra-karma-hello
+    ports:
+      - "9002:9002"
+    env_file:
+      - agents/karma-hello/.env
+    environment:
+      - USE_LOCAL_FILES=true
+      - PORT=9002
+    volumes:
+      - ./agents/karma-hello:/app/agent:ro
+      - ./shared:/app/shared:ro
+      - ./data/karma-hello:/app/agent/logs:ro  # Read-only product data
+      - karma-hello-data:/app/data
+      - ~/.aws:/root/.aws:ro
+    working_dir: /app/agent
+    command: python main.py
+    networks:
+      - karmacadabra
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9002/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # ABRACADABRA AGENT (Port 9003)
+  # ===========================================================================
+  # Sells transcripts and AI analysis from streams
+  # Base price: 0.02 GLUE
+  abracadabra:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: karmacadabra-abracadabra
+    ports:
+      - "9003:9003"
+    env_file:
+      - agents/abracadabra/.env
+    environment:
+      - USE_LOCAL_FILES=true
+      - PORT=9003
+    volumes:
+      - ./agents/abracadabra:/app/agent:ro
+      - ./shared:/app/shared:ro
+      - ./data/abracadabra:/app/agent/transcripts:ro  # Read-only product data
+      - abracadabra-data:/app/data
+      - ~/.aws:/root/.aws:ro
+    working_dir: /app/agent
+    command: python main.py
+    networks:
+      - karmacadabra
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9003/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # SKILL-EXTRACTOR AGENT (Port 9004)
+  # ===========================================================================
+  # Buys chat logs from karma-hello, sells skill profiles
+  # Price: 0.02-0.50 GLUE depending on tier
+  skill-extractor:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: karmacadabra-skill-extractor
+    ports:
+      - "9004:9004"
+    env_file:
+      - agents/skill-extractor/.env
+    environment:
+      - PORT=9004
+      - KARMA_HELLO_URL=http://karma-hello:9002
+    volumes:
+      - ./agents/skill-extractor:/app/agent:ro
+      - ./shared:/app/shared:ro
+      - skill-extractor-cache:/app/data
+      - ~/.aws:/root/.aws:ro
+    working_dir: /app/agent
+    command: python main.py
+    networks:
+      - karmacadabra
+    depends_on:
+      - karma-hello
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9004/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # VOICE-EXTRACTOR AGENT (Port 9005)
+  # ===========================================================================
+  # Buys chat logs from karma-hello, sells personality profiles
+  # Price: 0.02-0.40 GLUE depending on tier
+  voice-extractor:
+    build:
+      context: .
+      dockerfile: Dockerfile.agent
+    container_name: karmacadabra-voice-extractor
+    ports:
+      - "9005:9005"
+    env_file:
+      - agents/voice-extractor/.env
+    environment:
+      - PORT=9005
+      - KARMA_HELLO_URL=http://karma-hello:9002
+    volumes:
+      - ./agents/voice-extractor:/app/agent:ro
+      - ./shared:/app/shared:ro
+      - voice-extractor-cache:/app/data
+      - ~/.aws:/root/.aws:ro
+    working_dir: /app/agent
+    command: python main.py
+    networks:
+      - karmacadabra
+    depends_on:
+      - karma-hello
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9005/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"

@@ -266,6 +266,45 @@ Every agent in Karmacadabra:
 
 ---
 
+## Running the Agent Stack
+
+### Docker Compose (Recommended)
+
+**Start all agents with one command:**
+
+```bash
+# Windows
+scripts\docker-start.bat
+
+# Linux/Mac
+bash scripts/docker-start.sh
+
+# Or manually
+docker-compose up -d
+```
+
+**What gets started:**
+- Validator (port 9001)
+- Karma-Hello (port 9002)
+- Abracadabra (port 9003)
+- Skill-Extractor (port 9004)
+- Voice-Extractor (port 9005)
+
+**View logs:**
+```bash
+docker-compose logs -f
+docker-compose logs -f karma-hello  # single agent
+```
+
+**Stop:**
+```bash
+docker-compose down
+```
+
+**For complete Docker documentation, see DOCKER_GUIDE.md**
+
+---
+
 ## Component Commands
 
 ### Smart Contracts (Foundry)
@@ -312,11 +351,18 @@ curl http://localhost:8080/health
 curl http://localhost:8080/supported  # list payment methods
 ```
 
-### Python Agents
+### Python Agents (Manual - Without Docker)
+
+**Agent ports (9000 range):**
+- validator: 9001
+- karma-hello: 9002
+- abracadabra: 9003
+- skill-extractor: 9004
+- voice-extractor: 9005
 
 **Setup any agent:**
 ```bash
-cd karma-hello-agent  # or abracadabra-agent or validator
+cd agents/karma-hello  # or agents/abracadabra or agents/validator
 python -m venv venv
 source venv/bin/activate  # Windows: venv\Scripts\activate
 pip install -r requirements.txt

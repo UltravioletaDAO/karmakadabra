@@ -173,3 +173,7 @@ keystore/
 .openai
 openai_key.txt
 nul
+
+# Docker
+.dockerignore
+docker-compose.override.yml

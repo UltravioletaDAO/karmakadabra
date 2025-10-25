@@ -292,6 +292,45 @@ Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 
 **✨ Contracts already deployed!** You can start building agents immediately.
 
+### Option 1: Docker Compose (Fastest - Recommended)
+
+Run all 5 agents with one command:
+
+```bash
+# 1. Clone repository
+git clone https://github.com/ultravioletadao/karmacadabra.git
+cd karmacadabra
+
+# 2. Create .env files from examples
+for agent in validator karma-hello abracadabra skill-extractor voice-extractor; do
+  cp agents/$agent/.env.example agents/$agent/.env
+done
+
+# 3. Configure AWS credentials (for private keys & OpenAI keys)
+aws configure
+
+# 4. Start all agents
+docker-compose up -d
+
+# 5. Check status
+docker-compose ps
+curl http://localhost:9002/health  # karma-hello
+```
+
+**Agents running:**
+- Validator (9001)
+- Karma-Hello (9002)
+- Abracadabra (9003)
+- Skill-Extractor (9004)
+- Voice-Extractor (9005)
+
+**View logs:** `docker-compose logs -f`
+**Stop:** `docker-compose down`
+
+**Full Docker guide**: See [DOCKER_GUIDE.md](./DOCKER_GUIDE.md)
+
+### Option 2: Manual Setup
+
 ```bash
 # 1. Clone repository
 git clone https://github.com/ultravioletadao/karmacadabra.git

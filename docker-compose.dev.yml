@@ -1,0 +1,52 @@
+version: '3.8'
+
+# Development docker-compose override
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+#
+# Features:
+#   - Hot reload (code changes reflect immediately)
+#   - Verbose logging
+#   - Development-friendly settings
+#   - Local file access
+
+services:
+  validator:
+    volumes:
+      # Override to make code writable for hot reload
+      - ./agents/validator:/app/agent:rw
+      - ./shared:/app/shared:rw
+    environment:
+      - LOG_LEVEL=DEBUG
+      - CREW_VERBOSE=true
+
+  karma-hello:
+    volumes:
+      - ./agents/karma-hello:/app/agent:rw
+      - ./shared:/app/shared:rw
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  abracadabra:
+    volumes:
+      - ./agents/abracadabra:/app/agent:rw
+      - ./shared:/app/shared:rw
+    environment:
+      - LOG_LEVEL=DEBUG
+
+  skill-extractor:
+    volumes:
+      - ./agents/skill-extractor:/app/agent:rw
+      - ./shared:/app/shared:rw
+    environment:
+      - LOG_LEVEL=DEBUG
+      - CREW_VERBOSE=true
+      - USE_LOCAL_FILES=true
+
+  voice-extractor:
+    volumes:
+      - ./agents/voice-extractor:/app/agent:rw
+      - ./shared:/app/shared:rw
+    environment:
+      - LOG_LEVEL=DEBUG
+      - CREW_VERBOSE=true
+      - USE_LOCAL_FILES=true

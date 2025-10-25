@@ -435,7 +435,7 @@ OPENAI_API_KEY=sk-...
 MODEL=gpt-4o
 
 # Data Source
-KARMA_HELLO_URL=https://karma-hello.ultravioletadao.xyz
+KARMA_HELLO_URL=https://karma-hello.karmacadabra.ultravioletadao.xyz
 KARMA_HELLO_API=/api/logs
 
 # Service Config
