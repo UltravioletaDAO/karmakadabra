@@ -166,3 +166,4 @@ keystore/
 # OpenAI / API keys
 .openai
 openai_key.txt
+nul
