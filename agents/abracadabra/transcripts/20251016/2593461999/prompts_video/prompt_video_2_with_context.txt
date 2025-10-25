@@ -1,0 +1,34 @@
+Scene 2 Context:
+
+Previous scene context:
+**Scene 1 Prompt:**
+
+*The scene opens with a close-up shot of a pair of nimble hands typing swiftly on a sleek, backlit keyboard. The ambient glow from multiple monitors casts a futuristic blue hue across the workspace. The camera slowly zooms out, revealing multiple screens displaying real-time code deployment across various platforms like AWS and Cherry Servers.*
+
+*As the camera continues to pull back, it reveals a young tech-savvy protagonist, Alejandro, with a focused yet exhilarated expression. The room is dimly lit, save for the pulsating neon lights that shift colors in sync with the rhythm of electronic music softly playing in the background.*
+
+*The camera pans over to a holographic display that materializes in front of Alejandro, showcasing a visual representation of the AI constructing nodes autonomously. The visuals are fluid and dynamic, seamlessly transitioning between different stages of deployment.*
+
+*Suddenly, the scene transitions to a wide shot, capturing the entire high-tech room. The monitors, holograms, and Alejandro are all in view, illustrating the seamless integration of human ingenuity and artificial intelligence.*
+
+*The camera gently tilts upward, focusing on the ceiling where LED strips animate a digital rain of code, symbolizing the rapid advancement and interconnectedness of technology.*
+
+*The scene concludes as the camera slowly fades to black, leaving the soft hum of computer fans and the distant melody of the electronic track lingering in the air.*
+
+**Sound Effects/Music Direction:**  
+- Subtle electronic music to emphasize
+
+
+Final Prompt:
+**Scene 2 Prompt:**
+
+*The scene opens with a medium shot of Alejandro, still seated at his high-tech workstation. The camera captures his face, illuminated by the soft glow of the monitors, as he speaks enthusiastically into a sleek, futuristic headset. His words sync with the subtitled translation: "I've evolved mentally with these technologies in ways I hadn't before. We're building the future, guaranteed."*
+
+*The camera slowly circles Alejandro, revealing a virtual assistant hovering beside him—a translucent AI figure composed of cascading digital code. It nods as if understanding his every word, embodying the concept of agent-to-agent communication.*
+
+*The ambient electronic music transitions to a crescendo, punctuating Alejandro’s excitement as the camera zooms into his eyes, reflecting the spiraling data streams of the AI. The camera pulls back to reveal the room's ceiling, where the digital rain of code intensifies, symbolizing the exponential growth of technology.*
+
+*The scene gently fades to black, the rhythm of the electronic music echoing, as the virtual assistant dissipates into a swirl of numbers and symbols.*
+
+**Sound Effects/Music Direction:**  
+- The electronic music swells with intensity during Alejandro's speech, creating a sense of urgency and anticipation.

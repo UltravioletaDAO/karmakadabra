@@ -1,0 +1,29 @@
+Scene 7 Context:
+
+Previous scene context:
+**Video Prompt for Scene 6:**
+
+The scene opens with a slow zoom-in on Martin's hand as he places a sticky note on the bulletin board from Scene 5, which reads "ERC-8004 Builders: The Future." The ambient lighting remains warm, creating an inviting yet intense atmosphere. 
+
+The camera then smoothly tracks sideways to reveal Martin's focused expression, his eyes scanning a transparent digital screen projecting holographic charts of AI economy growth. The charts are vibrant with shades of blue and green, matching the previous digital aesthetics.
+
+A subtle electronic rhythm begins to play, harmonizing with the ambient hum from Scene 5. As the camera pans out, it captures Martin stepping back, the bulletin board and holographic screen both in view, establishing continuity and emphasizing his pivotal role in the unfolding digital revolution.
+
+Scene before that:
+**Video Prompt for Scene 5:**
+
+The scene opens with a tight close-up of a sleek digital tablet, the camera gently panning to reveal a live feed of the X-402 Scan interface. The screen pulsates with vibrant blues and greens as transaction numbers climb rapidly. 
+
+A quick cut to Martin's face shows a mix of awe and determination, the ambient light casting a hopeful glow on his features. The camera smoothly zooms out, revealing a wall of futuristic screens displaying global transaction maps, each dotted with active nodes.
+
+A soft electronic pulse underscores the scene, merging with the ambient hum of technology. The camera finally pans to a bulletin board filled with sticky notes of future plans, creating a seamless transition to the next scene.
+
+
+Final Prompt:
+**Video Prompt for Scene 7:**
+
+The scene begins with a close-up of a sleek holographic interface displaying the Life Crawler project. The camera smoothly glides over the interface, highlighting dynamic icons and organized galleries of photos and playlists in vibrant blues and greens, maintaining digital consistency.
+
+The camera then gently tilts up to capture Martin's profile as he gestures with his hand, activating a swirling 3D model of interconnected AI agents above the interface. A soft electronic chime accentuates this, blending with the ambient hum.
+
+The lighting shifts to a cooler hue, symbolizing innovation, as the camera pulls back, revealing Martin surrounded by a halo of floating data visuals, seamlessly connecting to the narrative of technological orchestration.

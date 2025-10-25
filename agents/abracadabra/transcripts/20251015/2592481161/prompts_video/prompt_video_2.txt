@@ -1,0 +1,9 @@
+**Scene 2: "The Immutable Code"**
+
+[0:00 - 0:01] **Crossfade from Scene 1**: The mystical void dissolves into a dimly lit, high-tech room. The camera sweeps in from the right, revealing a holographic interface floating in mid-air. The interface glows with complex code and diagrams, casting a soft blue light onto the surrounding walls.
+
+[0:01 - 0:03] **Steady Zoom**: The camera zooms in on a section of the code labeled "Smart Contract". A subtle digital hum underscores the futuristic atmosphere, enhancing the sense of technological wonder.
+
+[0:03 - 0:05] **Focus Shift**: The camera shifts focus to a reflective surface displaying 0xultravioleta’s face as he observes the code. His expression is one of intense concentration, emphasizing his deep connection to the arcane and the digital.
+
+[0:05 - 0:07] **Lighting Transition**: The blue glow intensifies as lines of code begin to animate, symbolizing the contract's deployment. The scene ends with a soft, resonant chime, suggesting the gravity and permanence of what's being created.

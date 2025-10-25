@@ -1,0 +1,35 @@
+Scene 7 Context:
+
+Previous scene context:
+**Scene 6: "The Breach"**
+
+[0:00 - 0:01] **Crossfade from Black**: From the darkness, a close-up of a digital security dashboard filled with fluctuating graphs and alerts. The screen glows with a red hue, indicating critical status.
+
+[0:01 - 0:03] **Rapid Zoom-In**: The camera zooms swiftly towards a flashing alert: "UNAUTHORIZED ACCESS DETECTED". The urgency is accentuated by a piercing alarm sound, synced with the flashing text.
+
+[0:03 - 0:05] **Cut to Reaction**: Quick cut to a wide-angle view of Better Bank's control room. The camera sweeps across a team frantically typing at their terminals, bathed in the unsettling red glow of emergency lights.
+
+[0:05 - 0:07] **Slow Pullback and Fade**: The camera slowly pulls back through the control room window, revealing the city skyline at dusk. A tense electronic drone builds, then fades, as the scene transitions to black, leaving a sense of looming disaster.
+
+Scene before that:
+**Scene 5: "The Unveiling"**
+
+[0:00 - 0:01] **Crossfade from Black**: Transition to a dimly lit screen displaying a cryptocurrency trading platform. The interface buzzes with activity, data streaming rapidly across the display, echoing the chaos from the breach.
+
+[0:01 - 0:03] **Zoom-In and Sound**: The camera zooms in on a mysterious wallet address highlighted in neon green, a symbol of intrigue. A soft electronic hum underscores the suspense, resonating with the screen's glow.
+
+[0:03 - 0:05] **Quick Cut to Reaction**: Snap to 0xultravioleta's eyes, narrowing with suspicion, reflecting the green light. The camera captures a subtle flicker of realization as the narrative threads connect.
+
+[0:05 - 0:07] **Pullback and Transition**: The camera pulls back to reveal the bustling digital landscape around him, filled with swirling data streams. The ambient hum crescendos, then fades, as the scene transitions to black, leaving an air of mystery and anticipation.
+
+
+Final Prompt:
+**Scene 7: "The Fallout"**
+
+[0:00 - 0:01] **Crossfade from Black**: The transition opens to a close-up of a digital clock on the control room wall, its red digits ticking down ominously. The room is subtly illuminated by the flickering emergency lights from Scene 6.
+
+[0:01 - 0:03] **Pan Down and Focus**: The camera pans down to reveal a whiteboard filled with complex calculations and hastily scribbled notes. The urgent scribbling of a marker is heard, enhancing the tension.
+
+[0:03 - 0:05] **Quick Cut to Reaction**: Cut to a close-up of a technician's face, drenched in red light, eyes wide with alarm as they glance repeatedly between the whiteboard and their terminal.
+
+[0:05 - 0:07] **Pullback and Transition**: The camera pulls back to show the entire team in the control room, a cacophony of frantic typing and hushed conversations filling the air. An electronic drone builds, underscoring the impending crisis. The scene fades to black, leaving an echo of urgency and unresolved tension.

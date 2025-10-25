@@ -1,0 +1,35 @@
+Scene 11 Context:
+
+Previous scene context:
+**Scene 10: "The Consequence"**
+
+[0:00 - 0:02] **Crossfade from Black**: We open with a close-up of a digital clock on a wall, counting down ominously. The room is bathed in the same red emergency glow, a visual thread from the previous scenes. The rhythmic ticking of the clock underscores the urgency.
+
+[0:02 - 0:04] **Swift Pan and Focus**: The camera swiftly pans to a translucent holographic display in the center of the room, projecting spiraling numbers and graphs, visually echoing the earlier chaotic dashboard. A low, pulsating bass drone heightens tension.
+
+[0:04 - 0:05] **Cut to Wide Shot**: A wide shot reveals a modern office, its sleek surfaces reflecting the red glow. A group of executives stand frozen, eyes locked on the display, their expressions a mix of disbelief and dread.
+
+[0:05 - 0:07] **Slow Zoom and Fade**: The camera begins a slow zoom towards the holographic display, focusing on a rapidly fluctuating line graph. As the numbers erratically spike, the screen flickers, and the scene fades to black, leaving a haunting echo of ticking in the silence.
+
+Scene before that:
+**Scene 9: "The Unveiling"**
+
+[0:00 - 0:02] **Crossfade from Black**: The scene begins with a close-up of a dimly lit financial dashboard, displaying volatile graphs and a series of alerts. The red emergency glow persists, casting a foreboding hue over the screen.
+
+[0:02 - 0:04] **Dolly In and Focus**: The camera dollies in on a highlighted line of text reading "Tax-Free Liquidity Alert," with the electronic drone subtly humming beneath.
+
+[0:04 - 0:05] **Cut to Close-Up**: Quick cut to a close-up of an eye, the pupil dilating in shock as it reflects the chaotic data.
+
+[0:05 - 0:07] **Pull Back and Fade**: The camera pulls back to reveal a frenetic trading floor, traders in red-lit panic as alarms blare. The scene fades to black, leaving a trail of urgency and revelation.
+
+
+Final Prompt:
+**Scene 11: "The Revelation"**
+
+[0:00 - 0:01] **Crossfade from Black**: We open on a close-up of a spinning digital coin, its surface etched with cryptic symbols. The persistent red glow from previous scenes casts a sinister sheen on the coin.
+
+[0:01 - 0:03] **Quick Tilt-Up**: The camera tilts up to reveal a dimly lit boardroom, where the coin transforms into a holographic map. It pulses softly, highlighting a network of transactions leading to a central node labeled "Tornado Cash."
+
+[0:03 - 0:05] **Cut to Medium Shot**: A figure, partially obscured in shadow, watches intently. The sound of a heartbeat intensifies, syncing with the pulsing map.
+
+[0:05 - 0:07] **Slow Zoom and Fade**: Zoom in on the map's central node, which flickers ominously. The heartbeat fades, replaced by the faint ticking from Scene 10, as the screen dissolves into darkness.

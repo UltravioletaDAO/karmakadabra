@@ -1,0 +1,25 @@
+🎮 *STREAM HIGHLIGHTS - 0XULTRAVIOLETA*
+
+• **Migración de Servidores y Downtime en AWS**: Ultravioleta discute la migración de servidores de AWS a Cherry Servers para reducir costos. Comenta sobre la caída de AWS US-East-1 y cómo esto afecta la sincronización de RPC en Celo Network. Destaca la importancia de monitorear el uptime y cómo reiniciar procesos cuando hay downtime.
+
+• **Historia de Hackeo en AWS**: Comparte una anécdota de cuando fue hackeado mientras trabajaba en Banco Santander, con servidores desplegados para minar Monero. Detalla cómo AWS cubrió los costos del ataque malicioso y reflexiona sobre la importancia de manejar credenciales de manera segura, usando variables de ambiente.
+
+• **Protocolo ERC-8004 y X-402**: Describe el futuro de la reputación en Internet a través de un sistema bidireccional de calificación entre agentes de IA, usando smart contracts en blockchain. Explica cómo su implementación de este sistema fue reconocida en un curso y destaca el potencial de crecimiento de transacciones en X-402.
+
+💡 *IDEAS CREATIVAS E INNOVACIONES*
+
+• **Sistema de Reputación Bidireccional**: Implementación de un sistema de reputación donde agentes de IA como Alice, Bob y Charlie se califican mutuamente, creando un ecosistema de confianza en la blockchain. Esto es parte del protocolo X-402 y representa un avance significativo en la gestión de reputaciones digitales.
+
+• **Facilitador de X-402**: Plan para convertirse en un facilitador en el protocolo X-402 usando código open source. La idea es manejar transacciones y verificaciones sin mantener fondos del usuario, aprovechando la naturaleza descentralizada y segura de la blockchain.
+
+• **Life Crawler Project**: Desarrollo de un proyecto que analiza el disco duro de Ultravioleta, utilizando un agente de Front End Developer para crear una galería de fotos ordenada cronológicamente y un buscador de música sin duplicados. Este proyecto muestra cómo la orquestación de agentes de IA puede automatizar tareas complejas.
+
+🔥 *MOMENTOS DESTACADOS*
+
+• **Lección de Seguridad en AWS**: La historia de hackeo en AWS resalta la importancia de la seguridad en la gestión de credenciales, enseñando a la audiencia a proteger sus llaves y certificados.
+
+• **Visión del Futuro con ERC-8004**: Ultravioleta enfatiza cómo las tecnologías emergentes como ERC-8004 y X-402 están sentando las bases para el futuro de la economía digital, comparándolo con los primeros días de Internet.
+
+⚡ *CONCLUSIÓN*
+
+• **Innovación y Crecimiento en Blockchain**: El stream subraya la importancia de estar al tanto de las innovaciones en blockchain y cómo estas pueden tener un impacto significativo en el futuro digital. La implementación de sistemas de reputación bidireccional y la participación en protocolos emergentes como ERC-8004 y X-402 son claves para formar parte de esta revolución tecnológica.

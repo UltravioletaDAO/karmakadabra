@@ -1,0 +1,22 @@
+🎮 *STREAM HIGHLIGHTS - 0XULTRAVIOLETA*
+
+• **Explotación de Better Bank**: El streamer discutió un artículo sobre Better Bank, que sufrió una pérdida de 5,000,000 de dólares debido a la explotación de su sistema de acuñación de staking de bonos. La crítica se centró en la falta de acción tras las recomendaciones de los auditores, quienes habían advertido sobre vulnerabilidades críticas que fueron ignoradas, lo que permitió al atacante manipular la piscina de liquidez y cosechar recompensas infinitas.
+
+• **Auditorías y Contratos Inteligentes**: Se resaltó la importancia de auditar contratos inteligentes antes de su despliegue en blockchain, ya que son inmutables. Better Bank había contratado auditores, pero no implementó las recomendaciones críticas, lo que resultó en una explotación devastadora. La falta de atención a los findings de los auditores fue un error clave.
+
+• **Técnicas de Explotación**: La explotación no fue sofisticada, sino una manipulación básica donde el atacante creó pares de liquidez falsos, permitiendo intercambios masivos sin impuestos, debido a que las sanciones fiscales solo aplicaban a pares aprobados oficialmente. Esta brecha fue utilizada para drenar el protocolo de Better Bank, mostrando la necesidad de un diseño más robusto.
+
+💡 *IDEAS CREATIVAS E INNOVACIONES*
+• **Auditorías Preventivas y Responsables**: Se propuso que las empresas no solo contraten auditorías para contratos inteligentes, sino que también implementen las recomendaciones de manera obligatoria. Fomentar la transparencia y la responsabilidad en el manejo de findings críticos para evitar explotaciones similares.
+ 
+• **Sistemas de Bonificación Seguros**: Discutió la creación de sistemas de staking y bonificación que incluyan mecanismos de seguridad que detecten y limiten la creación de piscinas de liquidez falsas. Propuso implementar sanciones fiscales para intercambios no autorizados y asegurar que las recompensas no sean generadas por actividades fraudulentas.
+
+• **Mejoras en la Lógica de Impuestos**: Sugerencia de aplicar tarifas e impuestos automáticamente a cualquier par de liquidez, sin distinción de su origen, para evitar tratamientos privilegiados. Esta medida busca cerrar brechas que permiten explotaciones masivas.
+
+🔥 *MOMENTOS DESTACADOS*
+• **Devolución Sorprendente**: El atacante devolvió una cantidad significativa de tokens, lo que fue calificado como un gesto inusual en el mundo DeFi, generando sospechas sobre las verdaderas intenciones detrás de la explotación. Este acto fue debatido intensamente por la comunidad, destacando la rareza de tales acciones.
+ 
+• **Uso de Tornado Cash**: Se mencionó el uso de Tornado Cash para financiar la billetera del atacante, lo que sugirió una premeditación bien planificada. La discusión se centró en el papel de estas herramientas en la privacidad y el lavado de dinero, generando un debate sobre su ética y legalidad.
+
+⚡ *CONCLUSIÓN*
+• **Lecciones Aprendidas**: La explotación de Better Bank subraya la importancia crítica de las auditorías en la seguridad de contratos inteligentes y la implementación de recomendaciones. La necesidad de diseñar sistemas que puedan identificar y mitigar manipulaciones fraudulentas en tiempo real es vital para la protección de los protocolos DeFi. Además, el caso resalta la importancia de una gobernanza sólida y transparente en la toma de decisiones críticas, asegurando que las advertencias de seguridad sean priorizadas adecuadamente.

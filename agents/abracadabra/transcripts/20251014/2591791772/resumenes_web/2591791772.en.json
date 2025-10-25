@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "language": "en",
+    "language_name": "English",
+    "streamer": "0xultravioleta",
+    "video_id": "2591791772",
+    "fecha_stream": "20251014",
+    "fecha_formateada": "14/10/2025",
+    "titulo_stream": "TODO + VALIDADOR DE NEAR CON META POOL!",
+    "twitch_url": "https://www.twitch.tv/videos/2591791772",
+    "fecha_generacion": "2025-10-21T09:55:24.910337",
+    "version": "3.0"
+  },
+  "resumenes": {
+    "web": {
+      "contenido": "## Issue with the Validators\n\nIn the latest stream, Ultravioleta shared a critical incident that affected one of our validators. It turns out that an essential PSE key was lost, leaving the validator out of commission for five months. Although the initial capital wasn't lost, the rewards that weren't generated are a significant blow. This reminds us of the importance of having well-configured and verified backups. Even though work is underway with the foundation to resolve the issue, the incident underscores the need to improve our backup systems.\n\n## Personal and Professional Impact\n\nUltravioleta spoke openly about how this error could affect their position at State Capital. The financial loss is significant and could have repercussions on their career. This moment of vulnerability reminds us that we can all make mistakes, and it's crucial to learn from them. Additionally, the need for a more automated and flexible validator infrastructure was highlighted, although there are always risks involved.\n\n## Technical Aspects of the Error\n\nThe problem arose during an Avalanche update that required a new Signer Key. An error in key management and incorrect configuration resulted in the creation of a wrong key when recycling a server. This left the validator inactive, as the original key could not be recovered. This incident teaches us the importance of careful and precise key management in our operations.\n\n## Personal Reflection and Emotional Management\n\nUltravioleta shared their internal struggle following the error, emphasizing the importance of allowing ourselves to feel and express emotions. They criticized the idea that men shouldn't show weakness, stressing that expressing emotions is crucial for mental health. This is a powerful reminder that, in addition to technical strength, we also need to take care of our emotional health.\n\n## Market Crash\n\nThe stream also touched on the topic of the recent market flash crash, triggered by rumors of interest rate hikes in China. Although Ultravioleta's portfolio was affected, they highlighted the importance of not over-leveraging and maintaining a long-term perspective on investments.\n\n## Conclusion\n\nThe lessons learned from this incident are clear: we need to improve our backup and validator management processes to avoid future issues. Additionally, it's essential to take care of our emotional health during high-pressure moments. This error, although costly, is an opportunity to strengthen both our technical infrastructure and our personal resilience.",
+      "longitud": 2535
+    }
+  }
+}

@@ -1,0 +1,23 @@
+Scene 4 Context:
+
+Previous scene context:
+**Scene 3:**
+
+*EXT. COSMIC LANDSCAPE - NIGHT*
+
+The scene opens with a quick zoom-in from a cosmic sky, filled with swirling galaxies and shimmering stars, down to an isolated rocky terrain. The camera tilts down to reveal a HOLOGRAPHIC INTERFACE hovering above the ground, displaying cryptic data and error logs. Pulsating neon blue light flickers from the interface, casting dynamic shadows across the rocks. A soft, suspenseful synth hum underscores the tension. The camera dollies around the interface, capturing a ghostly image of the protagonist’s face reflected in the hologram, eyes filled with determination. As the synth hum intensifies, the interface glitches and fades, mirroring the chaos of the protagonist's past mistakes. The scene concludes with a seamless crossfade to darkness, as the hum dissipates, leaving a lingering echo of urgency.
+
+Scene before that:
+**Scene 2:**
+
+*INT. VOID OF MAGIC - NIGHT*
+
+The scene opens with a close-up of a swirling vortex of violet and cyan mist, emanating from the ground as ethereal music sets a mystical tone. The camera pulls back to reveal 0xultravioleta, standing in full figure, centered in the frame with a slightly ascending perspective. She stands tall, arms open in a cross, fingers delicately curved as if weaving energy. A circle of luminous runes floats above her head, casting a halo of light onto the hooded figure, obscuring her eyes in shadow. Lightning filaments arc from the circle to her palms, illuminating the dark void. The scene transitions with a pulse of light, hinting at her control over the unfolding ethereal ritual.
+
+
+Final Prompt:
+**Scene 4:**
+
+*INT. VOID OF MAGIC - NIGHT*
+
+The scene opens with a full-figure shot of 0xultravioleta, centered and slightly towering from a low angle. Her arms are extended in a mystical cross, fingers gracefully curved as if channeling energy. The camera slowly circles around her, capturing the dynamic flow of her dark, flowing robe and the luminous runes orbiting above her hooded head. Strands of electric blue lightning connect her palms to the mystical circle, casting a radiant, violet-tinted glow. The atmosphere is thick with a swirling violet mist, and a deep, resonant hum underscores the moment, echoing the tension of her uncertain future. As the camera closes in, the scene fades with a pulse of brilliant white light, hinting at the power she’s about to unleash.

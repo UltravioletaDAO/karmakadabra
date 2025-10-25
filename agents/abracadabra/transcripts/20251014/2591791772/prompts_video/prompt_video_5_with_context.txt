@@ -1,0 +1,23 @@
+Scene 5 Context:
+
+Previous scene context:
+**Scene 4:**
+
+*INT. VOID OF MAGIC - NIGHT*
+
+The scene opens with a full-figure shot of 0xultravioleta, centered and slightly towering from a low angle. Her arms are extended in a mystical cross, fingers gracefully curved as if channeling energy. The camera slowly circles around her, capturing the dynamic flow of her dark, flowing robe and the luminous runes orbiting above her hooded head. Strands of electric blue lightning connect her palms to the mystical circle, casting a radiant, violet-tinted glow. The atmosphere is thick with a swirling violet mist, and a deep, resonant hum underscores the moment, echoing the tension of her uncertain future. As the camera closes in, the scene fades with a pulse of brilliant white light, hinting at the power she’s about to unleash.
+
+Scene before that:
+**Scene 3:**
+
+*EXT. COSMIC LANDSCAPE - NIGHT*
+
+The scene opens with a quick zoom-in from a cosmic sky, filled with swirling galaxies and shimmering stars, down to an isolated rocky terrain. The camera tilts down to reveal a HOLOGRAPHIC INTERFACE hovering above the ground, displaying cryptic data and error logs. Pulsating neon blue light flickers from the interface, casting dynamic shadows across the rocks. A soft, suspenseful synth hum underscores the tension. The camera dollies around the interface, capturing a ghostly image of the protagonist’s face reflected in the hologram, eyes filled with determination. As the synth hum intensifies, the interface glitches and fades, mirroring the chaos of the protagonist's past mistakes. The scene concludes with a seamless crossfade to darkness, as the hum dissipates, leaving a lingering echo of urgency.
+
+
+Final Prompt:
+**Scene 5:**
+
+*INT. DATA CHAMBER - NIGHT*
+
+The scene begins with a swift lateral tracking shot across a dimly lit chamber, walls lined with flickering digital displays. The camera steadies on a holographic console, where lines of code cascade down like digital rain. A soft, mechanical tick-tock fills the air, building tension. The lighting is a cool, metallic blue, casting sharp shadows that dance rhythmically with the holographic glow. The camera cuts to an over-the-shoulder shot of 0xultravioleta, now seated at the console, her eyes reflecting the code. Her fingers hover over the interface, poised yet hesitant. As she taps a sequence, the console emits a deep, resonant chime, and the scene transitions with a rapid zoom into the digital display, pulling us into the next layer of the narrative.

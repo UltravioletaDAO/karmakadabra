@@ -1,0 +1,9 @@
+**Scene 11: "The Revelation"**
+
+[0:00 - 0:01] **Crossfade from Black**: We open on a close-up of a spinning digital coin, its surface etched with cryptic symbols. The persistent red glow from previous scenes casts a sinister sheen on the coin.
+
+[0:01 - 0:03] **Quick Tilt-Up**: The camera tilts up to reveal a dimly lit boardroom, where the coin transforms into a holographic map. It pulses softly, highlighting a network of transactions leading to a central node labeled "Tornado Cash."
+
+[0:03 - 0:05] **Cut to Medium Shot**: A figure, partially obscured in shadow, watches intently. The sound of a heartbeat intensifies, syncing with the pulsing map.
+
+[0:05 - 0:07] **Slow Zoom and Fade**: Zoom in on the map's central node, which flickers ominously. The heartbeat fades, replaced by the faint ticking from Scene 10, as the screen dissolves into darkness.

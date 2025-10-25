@@ -1,0 +1,124 @@
+{
+  "metadata": {
+    "stream_id": "2591791772",
+    "extracted_at": "2025-10-14T00:00:00",
+    "total_ideas": 2,
+    "extractor_version": "2.0",
+    "streamer": "0xultravioleta"
+  },
+  "ideas": [
+    {
+      "id": "sistema-backup-automatico-validadores",
+      "title": "Sistema de Backup Automático para Validadores",
+      "summary": "Desarrollar un sistema que automatice el backup de llaves críticas para validadores.",
+      "description": "El Sistema de Backup Automático para Validadores es una solución innovadora destinada a proteger las llaves cruciales para la operación continua de validadores en redes blockchain. Este sistema no solo realiza copias de seguridad automáticas de las llaves, sino que también ofrece una gestión inteligente de las mismas, asegurando que las operaciones nunca se interrumpan por pérdida de datos. Al proporcionar una capa adicional de seguridad, este sistema permite a los operadores de validadores centrarse en la optimización y expansión de sus nodos, mientras el sistema de backup garantiza la integridad y disponibilidad de las llaves. Además, el sistema puede integrarse fácilmente en infraestructuras existentes, permitiendo una adopción sin fricciones.",
+      "idea_type": "feature",
+      "category": "technical",
+      "related_projects": [
+        "State Capital"
+      ],
+      "user_intent_detected": true,
+      "scores": {
+        "revenue_potential": 6,
+        "community_impact": 7,
+        "feasibility": 4,
+        "strategic_alignment": 5,
+        "novelty": 4,
+        "overall_score": 76
+      },
+      "priority": "high",
+      "effort_estimate": "M",
+      "est_timeline_weeks": 4,
+      "dependencies": [
+        "Infraestructura cloud segura",
+        "Acceso a APIs de blockchain"
+      ],
+      "risks": [
+        "Riesgo de vulnerabilidades de seguridad no anticipadas",
+        "Riesgo de baja adopción debido a la competencia"
+      ],
+      "monetization_model": [
+        "Suscripción mensual",
+        "Tarifas por uso"
+      ],
+      "public_build_potential": true,
+      "actionability_status": "ready",
+      "owner_suggestion": "DevOps",
+      "first_30_days_plan": [
+        "Paso concreto mejorado 1: Realizar un análisis detallado de necesidades y requerimientos técnicos",
+        "Paso concreto mejorado 2: Desarrollar un prototipo funcional del sistema de backup",
+        "Paso concreto mejorado 3: Realizar pruebas de seguridad exhaustivas y ajustar el sistema según los resultados"
+      ],
+      "eval_metrics": [
+        "Número de usuarios activos",
+        "Tasa de retención de usuarios"
+      ],
+      "tags": [
+        "blockchain",
+        "seguridad",
+        "automatización",
+        "backup",
+        "validadores"
+      ],
+      "alignment_notes": "Mejora la resiliencia operativa y previene pérdidas económicas.",
+      "privacy_sensitivity": "medium",
+      "confidence": 0.9
+    },
+    {
+      "id": "educacion-emocional-para-tecnicos",
+      "title": "Programa de Educación Emocional para Técnicos",
+      "summary": "Implementar un programa de educación emocional para técnicos en el sector tecnológico.",
+      "description": "El Programa de Educación Emocional para Técnicos se centra en equipar a los profesionales técnicos con herramientas esenciales para el manejo del estrés y las emociones en entornos de alta presión. A través de talleres interactivos y sesiones de coaching, los participantes aprenderán técnicas de relajación, la importancia de la expresión emocional y estrategias para fomentar un ambiente de trabajo saludable. Este programa no solo mejora el bienestar individual, sino que también incrementa la productividad y la cohesión del equipo al fomentar una cultura laboral más empática y colaborativa.",
+      "idea_type": "contenido",
+      "category": "content",
+      "user_intent_detected": true,
+      "scores": {
+        "revenue_potential": 4,
+        "community_impact": 8,
+        "feasibility": 5,
+        "strategic_alignment": 4,
+        "novelty": 3,
+        "overall_score": 73
+      },
+      "priority": "medium",
+      "effort_estimate": "S",
+      "est_timeline_weeks": 2,
+      "dependencies": [
+        "Facilitadores capacitados en educación emocional",
+        "Plataforma para gestionar inscripciones y contenido"
+      ],
+      "risks": [
+        "Resistencia al cambio cultural dentro de empresas",
+        "Falta de compromiso por parte de los participantes"
+      ],
+      "monetization_model": [
+        "Suscripción mensual",
+        "Tasa por taller",
+        "Licenciamiento a empresas"
+      ],
+      "public_build_potential": true,
+      "actionability_status": "ready",
+      "owner_suggestion": "Comunidad",
+      "first_30_days_plan": [
+        "Paso concreto mejorado 1: Realizar un estudio de mercado para identificar las necesidades específicas de los técnicos",
+        "Paso concreto mejorado 2: Desarrollar un currículo básico del programa con un piloto para feedback inicial",
+        "Paso concreto mejorado 3: Identificar e iniciar contacto con empresas potenciales colaboradoras para implementar programas piloto"
+      ],
+      "eval_metrics": [
+        "Tasa de finalización del programa",
+        "Satisfacción del participante",
+        "Mejora en la productividad reportada"
+      ],
+      "tags": [
+        "educación emocional",
+        "gestión del estrés",
+        "técnicos",
+        "productividad",
+        "bienestar laboral"
+      ],
+      "alignment_notes": "Fomenta un entorno de trabajo más saludable y productivo.",
+      "privacy_sensitivity": "low",
+      "confidence": 0.85
+    }
+  ]
+}

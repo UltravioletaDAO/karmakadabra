@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "language": "pt",
+    "language_name": "Portuguese",
+    "streamer": "0xultravioleta",
+    "video_id": "2591791772",
+    "fecha_stream": "20251014",
+    "fecha_formateada": "14/10/2025",
+    "titulo_stream": "TODO + VALIDADOR DE NEAR CON META POOL!",
+    "twitch_url": "https://www.twitch.tv/videos/2591791772",
+    "fecha_generacion": "2025-10-21T09:55:43.484488",
+    "version": "3.0"
+  },
+  "resumenes": {
+    "web": {
+      "contenido": "## Problema com os Validadores\n\nNo último stream, Ultravioleta compartilhou um incidente crítico que afetou um dos nossos validadores. Acontece que uma chave PSE essencial foi perdida, deixando o validador fora de combate durante cinco meses. Embora o capital inicial não tenha sido perdido, as recompensas que não foram geradas são um golpe importante. Isso nos lembra da importância de ter backups bem configurados e verificados. Apesar de estar trabalhando com a fundação para resolver o problema, o incidente destaca a necessidade de melhorar nossos sistemas de backup.\n\n## Impacto Pessoal e Profissional\n\nUltravioleta falou abertamente sobre como esse erro poderia afetar sua posição na State Capital. A perda econômica é significativa e poderia ter repercussões em sua carreira. Este momento de vulnerabilidade nos lembra que todos podemos cometer erros, e é crucial aprender com eles. Além disso, destacou-se a necessidade de ter uma infraestrutura de validadores mais automatizada e flexível, embora sempre haja riscos envolvidos.\n\n## Aspectos Técnicos do Erro\n\nO problema surgiu durante uma atualização do Avalanche que requeria uma nova Signer Key. Um erro no manejo das chaves e uma configuração incorreta resultaram na criação de uma chave errada ao reciclar um servidor. Isso deixou o validador inativo, pois a chave original não pôde ser recuperada. Este incidente nos ensina a importância de ter um manejo cuidadoso e preciso das chaves em nossas operações.\n\n## Reflexão Pessoal e Gestão Emocional\n\nUltravioleta compartilhou sua luta interna após o erro, sublinhando a importância de nos permitirmos sentir e expressar emoções. Criticou a ideia de que os homens não devem mostrar fraqueza, enfatizando que expressar emoções é crucial para a saúde mental. Este é um lembrete poderoso de que, além da fortaleza técnica, também precisamos cuidar de nossa saúde emocional.\n\n## Crash do Mercado\n\nO stream também abordou o tema do recente flash crash do mercado, provocado por rumores de aumentos nas taxas de juros na China. Embora o portfólio de Ultravioleta tenha sido afetado, destacou a importância de não se sobrealavancar e manter uma perspectiva de longo prazo em investimentos.\n\n## Conclusão\n\nAs lições aprendidas deste incidente são claras: precisamos melhorar nossos processos de backup e gestão de validadores para evitar futuros problemas. Além disso, é fundamental cuidar de nossa saúde emocional em momentos de alta pressão. Este erro, embora custoso, é uma oportunidade para fortalecer tanto nossa infraestrutura técnica quanto nossa resiliência pessoal.",
+      "longitud": 2579
+    }
+  }
+}

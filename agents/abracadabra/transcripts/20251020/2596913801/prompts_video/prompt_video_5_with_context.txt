@@ -1,0 +1,29 @@
+Scene 5 Context:
+
+Previous scene context:
+**Video Prompt for Scene 4:**
+
+The scene opens with a close-up of a sleek, futuristic digital tablet displaying a vibrant blockchain interface. The camera gently tracks Martin’s finger as it scrolls through the list of transactions, highlighting the unique IDs of Alice, Bob, and Charlie. The room is softly lit, casting a warm glow that mirrors his pride.
+
+A quick cut reveals a side view of Martin's face, his eyes reflecting the colorful data. The camera then smoothly transitions to an over-the-shoulder shot, showcasing the tablet’s screen filled with ratings and comments, his achievement proudly displayed.
+
+As the scene concludes, a soft, triumphant electronic melody begins to play. The camera pans up to capture Martin’s satisfied expression, the ambient office sounds fading into the background, signifying his success and innovation.
+
+Scene before that:
+**Video Prompt for Scene 3:**
+
+The scene opens with a close-up of MARTIN's hands, hovering hesitantly over the keyboard, the dim office lights casting shadows that mirror his inner turmoil. The camera tilts up to capture MARTIN's pensive face, his eyes reflecting the digital chaos of the past, narrated over a soft, reflective electronic melody.
+
+As MARTIN recalls his AWS breach, the camera smoothly transitions to a flashback: a rapid montage of server names appearing and disappearing on his screen, each accompanied by a soft whoosh sound. The lighting flickers slightly, mirroring the instability of the memory.
+
+The scene concludes with a focus on MARTIN's determined expression, the dim office now brighter, symbolizing his resolve, as the soft electronic beat fades, leaving a sense of resilience.
+
+
+Final Prompt:
+**Video Prompt for Scene 5:**
+
+The scene opens with a tight close-up of a sleek digital tablet, the camera gently panning to reveal a live feed of the X-402 Scan interface. The screen pulsates with vibrant blues and greens as transaction numbers climb rapidly. 
+
+A quick cut to Martin's face shows a mix of awe and determination, the ambient light casting a hopeful glow on his features. The camera smoothly zooms out, revealing a wall of futuristic screens displaying global transaction maps, each dotted with active nodes.
+
+A soft electronic pulse underscores the scene, merging with the ambient hum of technology. The camera finally pans to a bulletin board filled with sticky notes of future plans, creating a seamless transition to the next scene.

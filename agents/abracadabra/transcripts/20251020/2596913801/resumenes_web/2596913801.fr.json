@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "language": "fr",
+    "language_name": "French",
+    "streamer": "0xultravioleta",
+    "video_id": "2596913801",
+    "fecha_stream": "20251020",
+    "fecha_formateada": "20/10/2025",
+    "titulo_stream": "HISTORIA DE LA DAO, ERC8004 + A2A + X402",
+    "twitch_url": "https://www.twitch.tv/videos/2596913801",
+    "fecha_generacion": "2025-10-21T23:02:40.688621",
+    "version": "3.0"
+  },
+  "resumenes": {
+    "web": {
+      "contenido": "## Mises à jour des Projets et Migration des Serveurs\n\nLors du dernier stream intitulé \"HISTOIRE DE LA DAO, ERC8004 + A2A + X402\", Ultravioleta nous a emmenés dans un voyage fascinant sur les changements et avancées que nous observons dans l'organisation. Nous avons commencé par une mise à jour importante : la migration de nos serveurs d'AWS vers Cherry Servers. Ce mouvement est stratégique pour réduire les coûts et optimiser notre infrastructure cloud. Ultravioleta nous a rappelé que ces décisions sont essentielles pour maintenir l'efficacité et la résilience de nos projets, surtout après les récents problèmes avec AWS US-East-1 qui ont affecté la synchronisation sur le réseau Celo.\n\n## Sécurité dans le Cloud et Leçons Apprises\n\nUn moment clé du stream a été lorsque Ultravioleta a partagé une histoire personnelle de piratage alors qu'il travaillait chez Banco Santander. Ce récit n'était pas seulement une leçon d'humilité, mais aussi un rappel de l'importance de gérer nos identifiants avec soin. Ultravioleta a souligné comment AWS a couvert les coûts de l'attaque, mais nous a exhortés tous à intégrer nos clés comme variables d'environnement pour améliorer la sécurité.\n\n## Innovations en Blockchain : ERC-8004 et X-402\n\nLe stream nous a également introduits aux possibilités passionnantes de l'ERC-8004 et du protocole X-402. Ces systèmes sont conçus pour révolutionner la réputation sur Internet grâce à un système de notation bidirectionnelle entre agents d'IA. Ultravioleta a souligné comment ces technologies ne sont pas seulement innovantes, mais ont aussi le potentiel de transformer l'économie numérique. C'est une opportunité qui, selon lui, est comparable aux premiers jours de l'Internet et pourrait être une source de richesse générationnelle.\n\n## Progrès du Projet Life Crawler\n\nEnfin, Ultravioleta nous a mis à jour sur le projet Life Crawler, qui continue de progresser avec force. Ce projet utilise l'intelligence artificielle pour organiser et analyser des données personnelles, créant une galerie de photos et un moteur de recherche de musique sans doublons. C'est un exemple parfait de la manière dont l'orchestration des agents d'IA peut automatiser des tâches complexes.\n\nEn résumé, le stream était un mélange de leçons apprises, d'innovations passionnantes et de mises à jour clés qui nous maintiennent à la pointe de la technologie blockchain et de l'intelligence artificielle. Restons attentifs à ces développements et continuons à contribuer à la croissance de notre communauté.",
+      "longitud": 2520
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "metadata": {
+    "stream_id": "2592630137",
+    "extracted_at": "2025-10-15T00:00:00",
+    "total_ideas": 2,
+    "extractor_version": "2.0",
+    "streamer": "0xultravioleta"
+  },
+  "ideas": [
+    {
+      "id": "analisis-semanal-articulos-rect",
+      "title": "Análisis semanal de artículos de Rect en español",
+      "summary": "Realizar análisis semanales de artículos de Rect para la comunidad hispanohablante.",
+      "description": "La propuesta consiste en organizar una sesión semanal dedicada al análisis de artículos de Rect, que no solo facilite la comprensión del contenido técnico, sino que también enriquezca la experiencia de aprendizaje mediante ejemplos prácticos y perspectivas de expertos. Esta iniciativa busca fomentar un espacio interactivo donde los participantes puedan discutir, compartir conocimientos y mantenerse actualizados con las últimas tendencias en el ámbito de Rect. Con el tiempo, estas sesiones pueden convertirse en un punto de encuentro clave para la comunidad hispanohablante interesada en el desarrollo de tecnologías avanzadas.",
+      "idea_type": "contenido",
+      "category": "content",
+      "related_projects": [
+        "Rect"
+      ],
+      "user_intent_detected": true,
+      "scores": {
+        "revenue_potential": 3,
+        "community_impact": 5,
+        "feasibility": 5,
+        "strategic_alignment": 4,
+        "novelty": 3,
+        "overall_score": 78
+      },
+      "priority": "high",
+      "effort_estimate": "XS",
+      "est_timeline_weeks": 1,
+      "dependencies": [
+        "Profesionales expertos en Rect",
+        "Plataforma de transmisión en vivo"
+      ],
+      "risks": [
+        "Riesgo de falta de interés sostenido",
+        "Riesgo de contenido desactualizado"
+      ],
+      "monetization_model": [
+        "suscripción",
+        "donaciones"
+      ],
+      "public_build_potential": true,
+      "actionability_status": "ready",
+      "owner_suggestion": "Comunidad",
+      "first_30_days_plan": [
+        "Paso concreto mejorado 1: Identificar y contactar a expertos en Rect para colaborar",
+        "Paso concreto mejorado 2: Desarrollar un calendario de temas y artículos a tratar",
+        "Paso concreto mejorado 3: Promocionar la primera sesión a través de redes sociales y foros"
+      ],
+      "eval_metrics": [
+        "número de participantes por sesión",
+        "tasa de retención de audiencia"
+      ],
+      "tags": [
+        "educación",
+        "comunidad",
+        "tecnología",
+        "análisis",
+        "aprendizaje"
+      ],
+      "alignment_notes": "Encaja con la visión de educar a la comunidad",
+      "privacy_sensitivity": "none",
+      "confidence": 0.9
+    },
+    {
+      "id": "sistema-staking-near-con-incentivos-uvd",
+      "title": "Sistema de staking de Near con incentivos UVD",
+      "summary": "Desarrollar un sistema de staking de Near que ofrezca incentivos en UVD.",
+      "description": "El sistema de staking de Near con incentivos UVD se presenta como una herramienta innovadora diseñada para potenciar la participación de los usuarios dentro del ecosistema Near. Al permitir que los usuarios stakeen sus criptomonedas Near, la plataforma no solo incrementa la seguridad y estabilidad de la red, sino que también ofrece recompensas en UVD, un token que puede tener múltiples usos dentro del ecosistema y más allá. Esta estructura de incentivos no solo fomenta la lealtad de los usuarios, sino que también puede atraer nuevas audiencias interesadas en maximizar sus ingresos pasivos a través de las criptomonedas. Además, al integrar UVD como recompensa, se crea una sinergia que puede utilizarse para fomentar otros servicios o productos relacionados, incrementando el valor agregado para los stakeholders.",
+      "idea_type": "producto",
+      "category": "technical",
+      "related_projects": [
+        "Near",
+        "UVD"
+      ],
+      "user_intent_detected": true,
+      "scores": {
+        "revenue_potential": 5,
+        "community_impact": 4,
+        "feasibility": 3,
+        "strategic_alignment": 5,
+        "novelty": 4,
+        "overall_score": 81
+      },
+      "priority": "high",
+      "effort_estimate": "M",
+      "est_timeline_weeks": 8,
+      "dependencies": [
+        "Integración segura con la blockchain de Near",
+        "Desarrollo de una interfaz de usuario amigable"
+      ],
+      "risks": [
+        "Fluctuación del valor de UVD afectando los incentivos",
+        "Riesgo de cumplimiento regulatorio en diferentes jurisdicciones"
+      ],
+      "monetization_model": [
+        "Comisiones por transacción",
+        "Venta de servicios premium"
+      ],
+      "public_build_potential": true,
+      "actionability_status": "ready",
+      "owner_suggestion": "DevOps",
+      "first_30_days_plan": [
+        "Estudio de mercado para entender las necesidades de los usuarios de Near",
+        "Desarrollo del prototipo del sistema de staking con UVD",
+        "Creación de una campaña de marketing inicial para generar interés"
+      ],
+      "eval_metrics": [
+        "Número de usuarios que participan en el staking",
+        "Valor total de Near stakeado en la plataforma"
+      ],
+      "tags": [
+        "blockchain",
+        "staking",
+        "incentivos",
+        "ecosistema",
+        "Near"
+      ],
+      "alignment_notes": "Alineado con la estrategia de aumentar el uso de Near",
+      "privacy_sensitivity": "low",
+      "confidence": 0.85
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+Scene 4 Context:
+
+Previous scene context:
+**Scene 3: "The Breach"**
+
+[0:00 - 0:01] **Immediate Cut**: Transition from the glowing code to a dimly lit control room filled with flickering monitors. The camera glides smoothly from left to right, capturing a row of screens displaying chaotic graphs and warning alerts, a stark contrast to the previous scene’s calm.
+
+[0:01 - 0:03] **Close-Up and Sound**: The camera zooms in on a central monitor showing a red alert, pulsating dangerously. A tense, rapid digital beep syncs with each pulse, heightening urgency.
+
+[0:03 - 0:05] **Dramatic Pullback**: The camera pulls back to reveal 0xultravioleta standing before the monitors, his eyes reflecting the screen's red glow. His expression transitions from concern to determination. Shadows play across his face, emphasizing the stakes.
+
+[0:05 - 0:07] **Lighting and Atmosphere**: A sudden flicker of overhead lights creates a strobe effect. A low, ominous synth note swells as the scene fades out, leaving a lingering sense of impending action and the high-tech vulnerability.
+
+Scene before that:
+**Scene 2: "The Immutable Code"**
+
+[0:00 - 0:01] **Crossfade from Scene 1**: The mystical void dissolves into a dimly lit, high-tech room. The camera sweeps in from the right, revealing a holographic interface floating in mid-air. The interface glows with complex code and diagrams, casting a soft blue light onto the surrounding walls.
+
+[0:01 - 0:03] **Steady Zoom**: The camera zooms in on a section of the code labeled "Smart Contract". A subtle digital hum underscores the futuristic atmosphere, enhancing the sense of technological wonder.
+
+[0:03 - 0:05] **Focus Shift**: The camera shifts focus to a reflective surface displaying 0xultravioleta’s face as he observes the code. His expression is one of intense concentration, emphasizing his deep connection to the arcane and the digital.
+
+[0:05 - 0:07] **Lighting Transition**: The blue glow intensifies as lines of code begin to animate, symbolizing the contract's deployment. The scene ends with a soft, resonant chime, suggesting the gravity and permanence of what's being created.
+
+
+Final Prompt:
+**Scene 4: "The Reckoning"**
+
+[0:00 - 0:01] **Cut from Black**: The scene opens with a sharp cut to a close-up of a digital report on a tablet. The camera hovers over it, revealing detailed security audit findings highlighted in red, underscoring their critical nature.
+
+[0:01 - 0:03] **Slow Pan**: The camera pans right to a conference table strewn with papers and devices. The room is bathed in a harsh, fluorescent light contrasting with the previous dim atmosphere, symbolizing the cold reality of negligence.
+
+[0:03 - 0:05] **Overhead Shot**: A top-down view captures 0xultravioleta and a group of executives, their expressions a mix of disbelief and denial. A faint, tense ticking sound builds in the background, mirroring the impending consequences.
+
+[0:05 - 0:07] **Focus and Fade**: The camera focuses on 0xultravioleta's clenched jaw, his resolute determination clear. The light dims slightly, and the ticking fades as the scene transitions to black, suggesting the weight of the unfolding crisis.

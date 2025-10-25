@@ -1,0 +1,19 @@
+🎮 *STREAM HIGHLIGHTS - 0XULTRAVIOLETA*
+
+• **Problema con los Validadores**: Ultravioleta compartió una experiencia devastadora donde perdió una llave PSE de un validador crítico, bloqueando su capacidad de validar por cinco meses. Esto resultó en la pérdida de recompensas significativas, aunque el capital inicial no se vio afectado. A pesar de trabajar con la fundación para encontrar una solución, el incidente resalta la importancia de verificar los backups y la configuración correcta de las llaves.
+
+• **Impacto Personal y Profesional**: Este error podría afectar su posición en State Capital, ya que implica una pérdida económica considerable. Ultravioleta expresó su angustia por el error y su potencial impacto en su carrera. Se discutió la importancia de la automatización y flexibilidad en la infraestructura de validadores, aunque este incidente ha demostrado los riesgos asociados.
+
+• **Aspectos Técnicos del Error**: El problema técnico surgió al implementar un upgrade de Avalanche que requirió una nueva Signer Key. Un error en el manejo de llaves, combinado con una configuración incorrecta, resultó en la creación de una llave incorrecta al reciclar un servidor. Esto dejó al validador inactivo, ya que la llave original no se pudo recuperar.
+
+💡 *IDEAS CREATIVAS E INNOVACIONES*
+• **Mejora de Backup y Recuperación de Llaves**: Propuesta de implementar un sistema de backup más robusto para evitar la pérdida de llaves críticas en validadores. Esto podría incluir verificaciones automáticas y alertas para garantizar que las llaves se gestionen correctamente.
+• **Automatización y Seguridad en Despliegues**: Sugerencia de desarrollar scripts o herramientas que aseguren que todos los componentes críticos estén adecuadamente respaldados antes de cualquier despliegue o actualización. Esto podría minimizar errores humanos y garantizar la continuidad operativa.
+• **Soporte Emocional y Gestión del Estrés**: Reflexión sobre la importancia de reconocer y gestionar las emociones en el entorno laboral, especialmente en situaciones de alta presión. Propuesta de integrar sesiones de apoyo emocional o talleres para ayudar al equipo a manejar el estrés y fomentar un ambiente de trabajo saludable.
+
+🔥 *MOMENTOS DESTACADOS*
+• **Reflexión Personal**: Ultravioleta compartió su lucha interna después del error, destacando la importancia de permitirnos sentir y expresar emociones. Criticó la noción de que los hombres no deben mostrar debilidad, subrayando que expresar emociones es crucial para la salud mental.
+• **Crash del Mercado**: Comentó sobre el reciente flash crash del mercado debido a rumores de incrementos en las tasas de interés en China. Aunque el portafolio de Ultravioleta se vio afectado, destacó la importancia de no sobreapalancarse y mantener una perspectiva a largo plazo en inversiones.
+
+⚡ *CONCLUSIÓN*
+• **Lecciones Aprendidas**: Ultravioleta subrayó la importancia de aprender de los errores y mejorar los procesos para evitar incidentes futuros. Aunque el error fue costoso, es una oportunidad para fortalecer la gestión de validadores y la resiliencia personal. El enfoque en la salud emocional y la preparación técnica puede ayudar a mitigar riesgos y fomentar un entorno más seguro y productivo.

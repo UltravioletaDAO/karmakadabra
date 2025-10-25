@@ -1,0 +1,29 @@
+Scene 6 Context:
+
+Previous scene context:
+**Video Prompt for Scene 5:**
+
+The scene opens with a tight close-up of a sleek digital tablet, the camera gently panning to reveal a live feed of the X-402 Scan interface. The screen pulsates with vibrant blues and greens as transaction numbers climb rapidly. 
+
+A quick cut to Martin's face shows a mix of awe and determination, the ambient light casting a hopeful glow on his features. The camera smoothly zooms out, revealing a wall of futuristic screens displaying global transaction maps, each dotted with active nodes.
+
+A soft electronic pulse underscores the scene, merging with the ambient hum of technology. The camera finally pans to a bulletin board filled with sticky notes of future plans, creating a seamless transition to the next scene.
+
+Scene before that:
+**Video Prompt for Scene 4:**
+
+The scene opens with a close-up of a sleek, futuristic digital tablet displaying a vibrant blockchain interface. The camera gently tracks Martin’s finger as it scrolls through the list of transactions, highlighting the unique IDs of Alice, Bob, and Charlie. The room is softly lit, casting a warm glow that mirrors his pride.
+
+A quick cut reveals a side view of Martin's face, his eyes reflecting the colorful data. The camera then smoothly transitions to an over-the-shoulder shot, showcasing the tablet’s screen filled with ratings and comments, his achievement proudly displayed.
+
+As the scene concludes, a soft, triumphant electronic melody begins to play. The camera pans up to capture Martin’s satisfied expression, the ambient office sounds fading into the background, signifying his success and innovation.
+
+
+Final Prompt:
+**Video Prompt for Scene 6:**
+
+The scene opens with a slow zoom-in on Martin's hand as he places a sticky note on the bulletin board from Scene 5, which reads "ERC-8004 Builders: The Future." The ambient lighting remains warm, creating an inviting yet intense atmosphere. 
+
+The camera then smoothly tracks sideways to reveal Martin's focused expression, his eyes scanning a transparent digital screen projecting holographic charts of AI economy growth. The charts are vibrant with shades of blue and green, matching the previous digital aesthetics.
+
+A subtle electronic rhythm begins to play, harmonizing with the ambient hum from Scene 5. As the camera pans out, it captures Martin stepping back, the bulletin board and holographic screen both in view, establishing continuity and emphasizing his pivotal role in the unfolding digital revolution.

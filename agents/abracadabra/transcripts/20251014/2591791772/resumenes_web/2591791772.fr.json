@@ -1,0 +1,20 @@
+{
+  "metadata": {
+    "language": "fr",
+    "language_name": "French",
+    "streamer": "0xultravioleta",
+    "video_id": "2591791772",
+    "fecha_stream": "20251014",
+    "fecha_formateada": "14/10/2025",
+    "titulo_stream": "TODO + VALIDADOR DE NEAR CON META POOL!",
+    "twitch_url": "https://www.twitch.tv/videos/2591791772",
+    "fecha_generacion": "2025-10-21T09:55:35.125034",
+    "version": "3.0"
+  },
+  "resumenes": {
+    "web": {
+      "contenido": "## Problème avec les Validateurs\n\nLors du dernier stream, Ultravioleta a partagé un incident critique qui a affecté l'un de nos validateurs. Il s'avère qu'une clé PSE essentielle a été perdue, mettant le validateur hors service pendant cinq mois. Bien que le capital initial ne soit pas perdu, les récompenses non générées représentent un coup important. Cela nous rappelle l'importance d'avoir des sauvegardes bien configurées et vérifiées. Bien que des travaux soient en cours avec la fondation pour résoudre le problème, l'incident souligne la nécessité d'améliorer nos systèmes de sauvegarde.\n\n## Impact Personnel et Professionnel\n\nUltravioleta a parlé ouvertement de la manière dont cette erreur pourrait affecter sa position chez State Capital. La perte économique est significative et pourrait avoir des répercussions sur sa carrière. Ce moment de vulnérabilité nous rappelle que nous pouvons tous commettre des erreurs, et il est crucial d'apprendre d'elles. De plus, il a été souligné la nécessité d'avoir une infrastructure de validateurs plus automatisée et flexible, bien qu'il y ait toujours des risques impliqués.\n\n## Aspects Techniques de l'Erreur\n\nLe problème est survenu lors d'une mise à jour d'Avalanche qui nécessitait une nouvelle Signer Key. Une erreur dans la gestion des clés et une configuration incorrecte ont entraîné la création d'une clé erronée lors du recyclage d'un serveur. Cela a laissé le validateur inactif, car la clé originale n'a pas pu être récupérée. Cet incident nous enseigne l'importance d'une gestion soigneuse et précise des clés dans nos opérations.\n\n## Réflexion Personnelle et Gestion Émotionnelle\n\nUltravioleta a partagé sa lutte interne après l'erreur, soulignant l'importance de nous permettre de ressentir et d'exprimer des émotions. Il a critiqué l'idée que les hommes ne doivent pas montrer de faiblesse, en insistant sur le fait qu'exprimer des émotions est crucial pour la santé mentale. C'est un rappel puissant que, outre la force technique, nous devons également prendre soin de notre santé émotionnelle.\n\n## Crash du Marché\n\nLe stream a également abordé le sujet du récent flash crash du marché, provoqué par des rumeurs d'augmentations des taux d'intérêt en Chine. Bien que le portefeuille d'Ultravioleta ait été affecté, il a souligné l'importance de ne pas trop s'endetter et de garder une perspective à long terme dans les investissements.\n\n## Conclusion\n\nLes leçons tirées de cet incident sont claires : nous devons améliorer nos processus de sauvegarde et de gestion des validateurs pour éviter de futurs problèmes. De plus, il est fondamental de prendre soin de notre santé émotionnelle en période de forte pression. Cette erreur, bien que coûteuse, est une opportunité pour renforcer à la fois notre infrastructure technique et notre résilience personnelle.",
+      "longitud": 2826
+    }
+  }
+}

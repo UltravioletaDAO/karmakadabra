@@ -1,0 +1,35 @@
+Scene 5 Context:
+
+Previous scene context:
+**Scene 4: "The Reckoning"**
+
+[0:00 - 0:01] **Cut from Black**: The scene opens with a sharp cut to a close-up of a digital report on a tablet. The camera hovers over it, revealing detailed security audit findings highlighted in red, underscoring their critical nature.
+
+[0:01 - 0:03] **Slow Pan**: The camera pans right to a conference table strewn with papers and devices. The room is bathed in a harsh, fluorescent light contrasting with the previous dim atmosphere, symbolizing the cold reality of negligence.
+
+[0:03 - 0:05] **Overhead Shot**: A top-down view captures 0xultravioleta and a group of executives, their expressions a mix of disbelief and denial. A faint, tense ticking sound builds in the background, mirroring the impending consequences.
+
+[0:05 - 0:07] **Focus and Fade**: The camera focuses on 0xultravioleta's clenched jaw, his resolute determination clear. The light dims slightly, and the ticking fades as the scene transitions to black, suggesting the weight of the unfolding crisis.
+
+Scene before that:
+**Scene 3: "The Breach"**
+
+[0:00 - 0:01] **Immediate Cut**: Transition from the glowing code to a dimly lit control room filled with flickering monitors. The camera glides smoothly from left to right, capturing a row of screens displaying chaotic graphs and warning alerts, a stark contrast to the previous scene’s calm.
+
+[0:01 - 0:03] **Close-Up and Sound**: The camera zooms in on a central monitor showing a red alert, pulsating dangerously. A tense, rapid digital beep syncs with each pulse, heightening urgency.
+
+[0:03 - 0:05] **Dramatic Pullback**: The camera pulls back to reveal 0xultravioleta standing before the monitors, his eyes reflecting the screen's red glow. His expression transitions from concern to determination. Shadows play across his face, emphasizing the stakes.
+
+[0:05 - 0:07] **Lighting and Atmosphere**: A sudden flicker of overhead lights creates a strobe effect. A low, ominous synth note swells as the scene fades out, leaving a lingering sense of impending action and the high-tech vulnerability.
+
+
+Final Prompt:
+**Scene 5: "The Unveiling"**
+
+[0:00 - 0:01] **Crossfade from Black**: Transition to a dimly lit screen displaying a cryptocurrency trading platform. The interface buzzes with activity, data streaming rapidly across the display, echoing the chaos from the breach.
+
+[0:01 - 0:03] **Zoom-In and Sound**: The camera zooms in on a mysterious wallet address highlighted in neon green, a symbol of intrigue. A soft electronic hum underscores the suspense, resonating with the screen's glow.
+
+[0:03 - 0:05] **Quick Cut to Reaction**: Snap to 0xultravioleta's eyes, narrowing with suspicion, reflecting the green light. The camera captures a subtle flicker of realization as the narrative threads connect.
+
+[0:05 - 0:07] **Pullback and Transition**: The camera pulls back to reveal the bustling digital landscape around him, filled with swirling data streams. The ambient hum crescendos, then fades, as the scene transitions to black, leaving an air of mystery and anticipation.

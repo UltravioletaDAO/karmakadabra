@@ -1,0 +1,157 @@
+{
+  "version": "1.0",
+  "created_at": "2025-10-21T21:26:15.599524",
+  "last_updated": "2025-10-21T21:57:48.808559",
+  "processing_steps": {
+    "audio_downloaded": {
+      "done": false,
+      "timestamp": null,
+      "details": null
+    },
+    "transcription_aws": {
+      "done": false,
+      "timestamp": null,
+      "details": null
+    },
+    "transcription_whisper": {
+      "done": false,
+      "timestamp": null,
+      "details": null
+    },
+    "analysis_complete": {
+      "done": false,
+      "timestamp": null,
+      "details": null
+    },
+    "images_generated": {
+      "done": false,
+      "timestamp": null,
+      "count": 10,
+      "target": 20
+    },
+    "video_prompts_generated": {
+      "done": true,
+      "timestamp": "2025-10-21T21:51:52.215182",
+      "count": 11,
+      "target": 11
+    },
+    "tweet_generated": {
+      "done": true,
+      "timestamp": "2025-10-21T21:51:54.308288",
+      "details": "en el último stream de 0xultravioleta, exploramos un torbellino de proyectos, desde ganar el mundial"
+    },
+    "youtube_summaries": {
+      "done": false,
+      "timestamp": null,
+      "count": 0
+    },
+    "telegram_summary_sent": {
+      "done": true,
+      "timestamp": "2025-10-21T21:56:05.458117",
+      "message_id": null
+    },
+    "telegram_critique_sent": {
+      "done": true,
+      "timestamp": "2025-10-21T21:56:05.459084",
+      "message_id": null
+    },
+    "telegram_images_sent": {
+      "done": true,
+      "timestamp": "2025-10-21T21:56:34.182128",
+      "count": 10
+    },
+    "local_summaries_saved": {
+      "done": true,
+      "timestamp": "2025-10-21T21:53:28.773080",
+      "files": [
+        "resumen_telegram.txt",
+        "analisis_critico_marketing.txt",
+        "resumen_completo.txt"
+      ]
+    },
+    "web_summaries_saved_local": {
+      "done": true,
+      "timestamp": "2025-10-21T21:53:28.773593",
+      "files": [
+        "resumenes_web/2594296459.es.json",
+        "resumenes_web/2594296459.en.json",
+        "resumenes_web/2594296459.fr.json",
+        "resumenes_web/2594296459.pt.json"
+      ],
+      "languages": [
+        "es",
+        "en",
+        "fr",
+        "pt"
+      ]
+    },
+    "web_summaries_uploaded_s3": {
+      "done": true,
+      "timestamp": "2025-10-21T21:53:29.761185",
+      "urls": {
+        "es": {
+          "especifico": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/0xultravioleta/20251017/2594296459.es.json",
+          "especifico_s3": "s3://ultravioletadao/stream-summaries/0xultravioleta/20251017/2594296459.es.json"
+        },
+        "en": {
+          "especifico": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/0xultravioleta/20251017/2594296459.en.json",
+          "especifico_s3": "s3://ultravioletadao/stream-summaries/0xultravioleta/20251017/2594296459.en.json"
+        },
+        "fr": {
+          "especifico": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/0xultravioleta/20251017/2594296459.fr.json",
+          "especifico_s3": "s3://ultravioletadao/stream-summaries/0xultravioleta/20251017/2594296459.fr.json"
+        },
+        "pt": {
+          "especifico": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/0xultravioleta/20251017/2594296459.pt.json",
+          "especifico_s3": "s3://ultravioletadao/stream-summaries/0xultravioleta/20251017/2594296459.pt.json"
+        },
+        "indices_idioma": {
+          "es": {
+            "url": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/index_es.json",
+            "s3_key": "s3://ultravioletadao/stream-summaries/index_es.json",
+            "total_streams": 42
+          },
+          "en": {
+            "url": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/index_en.json",
+            "s3_key": "s3://ultravioletadao/stream-summaries/index_en.json",
+            "total_streams": 42
+          },
+          "fr": {
+            "url": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/index_fr.json",
+            "s3_key": "s3://ultravioletadao/stream-summaries/index_fr.json",
+            "total_streams": 42
+          },
+          "pt": {
+            "url": "https://ultravioletadao.s3.us-east-1.amazonaws.com/stream-summaries/index_pt.json",
+            "s3_key": "s3://ultravioletadao/stream-summaries/index_pt.json",
+            "total_streams": 42
+          }
+        }
+      },
+      "languages": [
+        "es",
+        "en",
+        "fr",
+        "pt"
+      ]
+    },
+    "ideas_extracted": {
+      "done": true,
+      "timestamp": "2025-10-21T21:56:56.188974",
+      "details": {},
+      "files": [
+        "ideas_extraidas.json"
+      ],
+      "count": 0
+    },
+    "cognee_indexed": {
+      "done": true,
+      "timestamp": "2025-10-21T21:57:48.808559",
+      "details": {
+        "indexed_by": "post_processing.py"
+      }
+    }
+  },
+  "errors": [],
+  "warnings": []
+}

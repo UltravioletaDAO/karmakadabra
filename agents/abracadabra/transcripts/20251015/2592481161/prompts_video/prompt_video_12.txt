@@ -1,0 +1,9 @@
+**Scene 12: "The Catalyst"**
+
+[0:00 - 0:01] **Crossfade from Darkness**: We open on a close-up of a pair of eyes, intensely focused, reflecting the pulsing map from Scene 11. The red emergency glow softly illuminates their determination, creating a sense of urgency.
+
+[0:01 - 0:03] **Fast Zoom Out**: The camera rapidly zooms out to reveal the figure from Scene 11 seated at a sleek terminal. Holographic screens flicker around them, displaying cascading data streams and transaction logs.
+
+[0:03 - 0:05] **Cut to Overhead Shot**: The camera shifts to an overhead view, capturing the intricate network of connections on the screens. A soft electronic hum underscores the scene, building tension.
+
+[0:05 - 0:07] **Dramatic Push-In**: Push in on a screen highlighting "Tornado Cash" as an alert flashes red. The sound of typing crescendos, merging with the hum, before the screen abruptly cuts to black, leaving a resonant echo of urgency.

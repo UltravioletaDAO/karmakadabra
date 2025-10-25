@@ -1,0 +1,16 @@
+Scene 2 Context:
+
+Previous scene context:
+**Video Prompt for Scene 1:**
+
+The scene opens on a wide shot of a bustling tech office, filled with the soft hum of computers and distant chatter. The camera smoothly pans across desks cluttered with monitors displaying complex server migrations. As it moves, it seamlessly transitions to a close-up of a young, focused engineer, MARTIN, typing furiously on his keyboard. The warm overhead lighting casts a soft glow on his concentrated expression. A subtle electronic soundtrack underscores his meticulous work. 
+
+As MARTIN pauses and leans back, the camera subtly tilts upwards, revealing a wall clock striking 3:00 PM, hinting at the passage of time and the urgency of his task. The scene fades as the camera pulls back to reveal the office's vibrant, collaborative energy, maintaining narrative continuity with the previous scene's focus on server migration challenges.
+
+
+Final Prompt:
+**Video Prompt for Scene 2:**
+
+The scene opens with a tight close-up of MARTIN's tense face, beads of sweat forming under the warm office lights. His eyes flicker with concern as he stares at a monitor displaying a failed server connection. The camera gently pulls back, revealing the error messages flashing ominously on the screen. A soft, tense electronic beat underscores the scene, enhancing the urgency.
+
+As MARTIN exhales heavily, the camera pans to a side view, capturing a dimly lit corner of the office where a digital clock reads 3:05 PM. The camera then smoothly transitions to a wide shot, showcasing MARTIN's isolated workstation amidst the distant hum of the busy office. The overhead lights flicker slightly, adding to the tense atmosphere, as MARTIN resumes typing, determined to solve the issue before the downtime extends.

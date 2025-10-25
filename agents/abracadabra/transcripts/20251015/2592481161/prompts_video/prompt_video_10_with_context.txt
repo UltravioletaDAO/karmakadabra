@@ -1,0 +1,35 @@
+Scene 10 Context:
+
+Previous scene context:
+**Scene 9: "The Unveiling"**
+
+[0:00 - 0:02] **Crossfade from Black**: The scene begins with a close-up of a dimly lit financial dashboard, displaying volatile graphs and a series of alerts. The red emergency glow persists, casting a foreboding hue over the screen.
+
+[0:02 - 0:04] **Dolly In and Focus**: The camera dollies in on a highlighted line of text reading "Tax-Free Liquidity Alert," with the electronic drone subtly humming beneath.
+
+[0:04 - 0:05] **Cut to Close-Up**: Quick cut to a close-up of an eye, the pupil dilating in shock as it reflects the chaotic data.
+
+[0:05 - 0:07] **Pull Back and Fade**: The camera pulls back to reveal a frenetic trading floor, traders in red-lit panic as alarms blare. The scene fades to black, leaving a trail of urgency and revelation.
+
+Scene before that:
+**Scene 8: "The Deception"**
+
+[0:00 - 0:01] **Crossfade from Black**: The scene opens on a close-up of a computer screen displaying a liquidity pool interface, bathed in the same red emergency glow from Scene 7. The interface shows a newly created pool named "FavorExchange."
+
+[0:01 - 0:03] **Slow Zoom and Focus**: The camera slowly zooms into the screen, focusing on two tokens: "Favor" and a nondescript token labeled "NullValue." The eerie hum of an electronic drone persists.
+
+[0:03 - 0:05] **Cut to Hands Typing**: Quick cut to a pair of hands typing swiftly on a keyboard. The ambient red light casts deep shadows, adding to the air of secrecy.
+
+[0:05 - 0:07] **Wide Shot and Fade**: The camera pulls back to reveal a shadowy figure in a dimly lit room, their face obscured. A monitor reflects the flickering red light. The electronic drone intensifies before the scene fades to black, leaving a sense of clandestine success.
+
+
+Final Prompt:
+**Scene 10: "The Consequence"**
+
+[0:00 - 0:02] **Crossfade from Black**: We open with a close-up of a digital clock on a wall, counting down ominously. The room is bathed in the same red emergency glow, a visual thread from the previous scenes. The rhythmic ticking of the clock underscores the urgency.
+
+[0:02 - 0:04] **Swift Pan and Focus**: The camera swiftly pans to a translucent holographic display in the center of the room, projecting spiraling numbers and graphs, visually echoing the earlier chaotic dashboard. A low, pulsating bass drone heightens tension.
+
+[0:04 - 0:05] **Cut to Wide Shot**: A wide shot reveals a modern office, its sleek surfaces reflecting the red glow. A group of executives stand frozen, eyes locked on the display, their expressions a mix of disbelief and dread.
+
+[0:05 - 0:07] **Slow Zoom and Fade**: The camera begins a slow zoom towards the holographic display, focusing on a rapidly fluctuating line graph. As the numbers erratically spike, the screen flickers, and the scene fades to black, leaving a haunting echo of ticking in the silence.

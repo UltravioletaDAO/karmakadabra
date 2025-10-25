@@ -1,0 +1,9 @@
+**Scene 8: "The Deception"**
+
+[0:00 - 0:01] **Crossfade from Black**: The scene opens on a close-up of a computer screen displaying a liquidity pool interface, bathed in the same red emergency glow from Scene 7. The interface shows a newly created pool named "FavorExchange."
+
+[0:01 - 0:03] **Slow Zoom and Focus**: The camera slowly zooms into the screen, focusing on two tokens: "Favor" and a nondescript token labeled "NullValue." The eerie hum of an electronic drone persists.
+
+[0:03 - 0:05] **Cut to Hands Typing**: Quick cut to a pair of hands typing swiftly on a keyboard. The ambient red light casts deep shadows, adding to the air of secrecy.
+
+[0:05 - 0:07] **Wide Shot and Fade**: The camera pulls back to reveal a shadowy figure in a dimly lit room, their face obscured. A monitor reflects the flickering red light. The electronic drone intensifies before the scene fades to black, leaving a sense of clandestine success.
