@@ -90,11 +90,11 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 
 ### ✅ Sprint 2.8: Testing & Validation - COMPLETE
 
-### ❌ Sprint 2.9 (Week 5): Coinbase Payments MCP - **DEFERRED** - Installation Blocker
+### 🔥 Sprint 3 (Weeks 5-6): User Agent System - **CURRENT SPRINT**
 
-### 📋 Sprint 3 (Weeks 6-7): User Agent System - NEXT
+### 📋 Sprint 4 (Weeks 7-8): Visualization - NEXT
 
-### 📋 Sprint 4 (Weeks 8-9): Visualization - FUTURE
+### ⏸️ Sprint 5 (Future): Coinbase Payments MCP - **DEFERRED** - Awaiting Testnet Support
 
 ---
 
@@ -373,9 +373,29 @@ Fixed critical Pydantic validation errors and port conflicts that prevented vali
 
 ---
 
-### Sprint 2.9 (Week 5): Coinbase Payments MCP Integration ❌ **DEFERRED** - Installation Blocker
+### Sprint 3 (Weeks 5-6): User Agent System 🔥 **CURRENT SPRINT**
 
-**Goal:** Enable fiat payments via Coinbase MCP to massively expand user base before deploying 48 user agents
+**Milestones:**
+1. Automated profile extraction (using Skill-Extractor Agent for 48 users)
+2. Agent Card auto-generator
+3. User agent template + factory
+4. Mass deployment (48 agents)
+5. Bootstrap marketplace test
+
+### Sprint 4 (Weeks 7-8): Visualization
+
+**Components:**
+1. Contract interaction viewer (real-time Fuji events)
+2. Agent network graph (D3.js)
+3. Transaction flow tracer
+4. Agent directory (search/filter)
+5. Dashboard overview (metrics)
+
+---
+
+### Sprint 5 (Future): Coinbase Payments MCP Integration ⏸️ **DEFERRED** - Awaiting Testnet Support
+
+**Goal:** Enable fiat payments via Coinbase MCP to massively expand user base
 
 **POC Result:** ❌ **NO-GO** - Installation blocker on Windows prevents testing
 
@@ -403,13 +423,13 @@ Impact: Cannot answer any of the 5 critical questions
 4. ❌ Can 48 agents use it programmatically? - **NOT TESTED** (installation blocked)
 5. ❌ Does it integrate with x402-rs? - **NOT TESTED** (installation blocked)
 
-**Decision:** ❌ **DEFER Sprint 2.9** indefinitely
+**Decision:** ⏸️ **DEFER Sprint 5** until conditions met
 
 **Reasoning:**
 - 🔴 Installation blocker prevents POC completion
 - 🔴 Cannot validate critical assumptions (testnet, GLUE token, fees)
-- 🔴 Alternative (x402 MCP example) lacks fiat on-ramp feature (the core value)
-- 🟡 Risk too high to commit development effort without testing
+- 🔴 Alternative fiat on-ramps don't support Avalanche Fuji testnet
+- 🟡 Mainnet migration requires $10K-$50K security audit (premature)
 - 🟢 Existing x402scan embedded wallet works well for crypto users
 
 **Actions Taken:**
@@ -436,23 +456,12 @@ Impact: Cannot answer any of the 5 critical questions
 - Real AVAX for all 48+ agents
 - Testing with real money (expensive)
 
-**Alternative Paths Forward:**
-1. ❌ **Mainnet migration** - Premature, requires $10K-$50K audit before market validation
-2. ❌ **Manual fiat distribution** - Not scalable, violates trustless architecture
-3. ✅ **Crypto-only payments (status quo)** - Working, safe, proven ✅ **RECOMMENDED**
-
-**Impact on Roadmap:**
-- ❌ Fiat payments NOT available for Sprint 3 (User Agent System)
-- ❌ User onboarding remains crypto-native (15-20 min first-time setup)
-- ❌ Addressable market remains limited (crypto users only)
-- ✅ No wasted development effort on broken integration
-- ✅ Can revisit in Q1 2026 or when installer is fixed
-
-**Recommendation:** ✅ **Proceed to Sprint 3 (User Agent System) with existing payment infrastructure**
+**Recommendation:** ✅ **Continue with crypto-only payments** until revisit criteria met
 
 **Full Analysis:**
 - POC Results: `plans/COINBASE_MCP_POC_RESULTS.md`
 - Alternative Fiat On-Ramps Research: `plans/ALTERNATIVE_FIAT_ONRAMPS_RESEARCH.md`
+- Sprint 2.9 Summary: `plans/SPRINT_2_9_SUMMARY.md`
 - GitHub Issue Draft: `plans/GITHUB_ISSUE_PAYMENTS_MCP.md`
 - Original Integration Plan: `plans/COINBASE_PAYMENTS_MCP_INTEGRATION.md` (for future reference)
 
@@ -462,26 +471,6 @@ Impact: Cannot answer any of the 5 critical questions
 - ✅ Karmacadabra proves market demand (1,000+ transactions/month on testnet)
 - ✅ External funding secured ($50K+ for audit + mainnet migration)
 - ✅ Halliday adds Fuji testnet support (Intent Orchestration Protocol)
-
----
-
-### Sprint 3 (Weeks 6-7): User Agent System
-
-**Milestones:**
-1. Automated profile extraction (using Skill-Extractor Agent for 48 users)
-2. Agent Card auto-generator
-3. User agent template + factory
-4. Mass deployment (48 agents)
-5. Bootstrap marketplace test
-
-### Sprint 4 (Weeks 8-9): Visualization
-
-**Components:**
-1. Contract interaction viewer (real-time Fuji events)
-2. Agent network graph (D3.js)
-3. Transaction flow tracer
-4. Agent directory (search/filter)
-5. Dashboard overview (metrics)
 
 ---
 
