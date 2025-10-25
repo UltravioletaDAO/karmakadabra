@@ -135,7 +135,7 @@ def main():
 
     # Load agent addresses from .env files
     print("\n" + "=" * 80)
-    print("SERVICE AGENTS (agents/ folder)")
+    print("ALL AGENTS")
     print("=" * 80)
 
     print("\nLoading agent addresses from .env files...")
@@ -145,9 +145,11 @@ def main():
     service_agents = {}
     agent_dirs = {
         'karma-hello': project_root / 'agents' / 'karma-hello' / '.env',
+        'abracadabra': project_root / 'agents' / 'abracadabra' / '.env',
         'skill-extractor': project_root / 'agents' / 'skill-extractor' / '.env',
         'voice-extractor': project_root / 'agents' / 'voice-extractor' / '.env',
         'validator': project_root / 'agents' / 'validator' / '.env',
+        'client': project_root / 'client-agents' / 'template' / '.env',
     }
 
     for agent_name, env_path in agent_dirs.items():
