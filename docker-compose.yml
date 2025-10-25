@@ -47,7 +47,7 @@ services:
     environment:
       - PYTHONPATH=/app
     volumes:
-      - ./agents/validator:/app/agent:ro
+      - ./validator:/app/agent:ro
       - ./shared:/app/shared:ro
       - validator-cache:/app/data
       - validator-cache:/app/validations
