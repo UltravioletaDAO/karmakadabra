@@ -7,13 +7,17 @@ Verifies: funding, registrations, agent availability
 import os
 import sys
 from pathlib import Path
-sys.path.append(str(Path(__file__).parent.parent))
+
+# Set project root and load .env from there
+project_root = Path(__file__).parent.parent
+sys.path.append(str(project_root))
 
 from web3 import Web3
 from dotenv import load_dotenv
 import json
 
-load_dotenv()
+# Explicitly load .env from project root
+load_dotenv(project_root / '.env')
 
 # Contract ABIs (minimal for checks)
 IDENTITY_REGISTRY_ABI = [
@@ -83,10 +87,17 @@ def main():
 
     print(f"\n✅ Connected to Avalanche Fuji")
     print(f"Latest block: {w3.eth.block_number:,}")
+    print(f"Chain ID: {w3.eth.chain_id}")
 
     # Load contracts
     identity_registry_address = os.getenv("IDENTITY_REGISTRY")
     glue_token_address = os.getenv("GLUE_TOKEN_ADDRESS")
+
+    if not identity_registry_address or not glue_token_address:
+        print("\n❌ ERROR: Contract addresses not found in .env")
+        print(f"   IDENTITY_REGISTRY: {identity_registry_address}")
+        print(f"   GLUE_TOKEN_ADDRESS: {glue_token_address}")
+        return
 
     identity_registry = w3.eth.contract(
         address=Web3.to_checksum_address(identity_registry_address),
