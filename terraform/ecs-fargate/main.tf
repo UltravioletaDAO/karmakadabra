@@ -1,0 +1,394 @@
+# ============================================================================
+# ECS FARGATE CLUSTER - Main Infrastructure
+# ============================================================================
+# COST-OPTIMIZED CONFIGURATION:
+# - Fargate Spot (70% cheaper than on-demand)
+# - Smallest task sizes (0.25 vCPU / 0.5GB RAM)
+# - Conservative auto-scaling (max 3 tasks per service)
+# - Container Insights enabled (essential observability)
+# - Service Connect for inter-agent communication (no ALB needed)
+#
+# MONTHLY COST ESTIMATE:
+# - 5 agents x $5-8/month (Spot) = $25-40
+# - ALB: ~$16/month
+# - NAT Gateway: ~$32/month
+# - CloudWatch Logs (7 days): ~$5/month
+# - Container Insights: ~$3/month
+# TOTAL: ~$81-96/month (can be reduced further by scaling down)
+
+terraform {
+  required_version = ">= 1.0"
+
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+
+  # Backend configuration (uncomment and configure for production)
+  # backend "s3" {
+  #   bucket         = "karmacadabra-terraform-state"
+  #   key            = "ecs-fargate/terraform.tfstate"
+  #   region         = "us-east-1"
+  #   encrypt        = true
+  #   dynamodb_table = "karmacadabra-terraform-locks"
+  # }
+}
+
+provider "aws" {
+  region = var.aws_region
+
+  default_tags {
+    tags = var.tags
+  }
+}
+
+# ----------------------------------------------------------------------------
+# Data Sources
+# ----------------------------------------------------------------------------
+
+data "aws_caller_identity" "current" {}
+data "aws_region" "current" {}
+
+data "aws_secretsmanager_secret" "karmacadabra" {
+  name = var.secrets_manager_secret_name
+}
+
+data "aws_secretsmanager_secret_version" "karmacadabra" {
+  secret_id = data.aws_secretsmanager_secret.karmacadabra.id
+}
+
+# ----------------------------------------------------------------------------
+# ECS Cluster
+# ----------------------------------------------------------------------------
+
+resource "aws_ecs_cluster" "main" {
+  name = "${var.project_name}-${var.environment}"
+
+  setting {
+    name  = "containerInsights"
+    value = var.enable_container_insights ? "enabled" : "disabled"
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-${var.environment}-cluster"
+  })
+}
+
+# ----------------------------------------------------------------------------
+# ECS Cluster Capacity Providers (CRITICAL FOR COST)
+# ----------------------------------------------------------------------------
+# Fargate Spot provides 70% cost savings vs on-demand
+
+resource "aws_ecs_cluster_capacity_providers" "main" {
+  cluster_name = aws_ecs_cluster.main.name
+
+  capacity_providers = var.use_fargate_spot ? ["FARGATE_SPOT", "FARGATE"] : ["FARGATE"]
+
+  default_capacity_provider_strategy {
+    capacity_provider = var.use_fargate_spot ? "FARGATE_SPOT" : "FARGATE"
+    weight            = var.use_fargate_spot ? var.fargate_spot_weight : 100
+    base              = var.fargate_spot_base_capacity
+  }
+
+  dynamic "default_capacity_provider_strategy" {
+    for_each = var.use_fargate_spot ? [1] : []
+    content {
+      capacity_provider = "FARGATE"
+      weight            = var.fargate_ondemand_weight
+    }
+  }
+}
+
+# ----------------------------------------------------------------------------
+# Service Discovery Namespace (for Service Connect)
+# ----------------------------------------------------------------------------
+
+resource "aws_service_discovery_private_dns_namespace" "main" {
+  count = var.enable_service_connect ? 1 : 0
+
+  name = var.service_connect_namespace
+  vpc  = aws_vpc.main.id
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-${var.environment}-service-discovery"
+  })
+}
+
+# ----------------------------------------------------------------------------
+# ECS Task Definitions (one per agent)
+# ----------------------------------------------------------------------------
+
+resource "aws_ecs_task_definition" "agents" {
+  for_each = var.agents
+
+  family                   = "${var.project_name}-${var.environment}-${each.key}"
+  network_mode             = "awsvpc"
+  requires_compatibilities = ["FARGATE"]
+  cpu                      = var.task_cpu
+  memory                   = var.task_memory
+  execution_role_arn       = aws_iam_role.ecs_task_execution.arn
+  task_role_arn            = aws_iam_role.ecs_task.arn
+
+  # Container definition
+  container_definitions = jsonencode([
+    {
+      name  = each.key
+      image = "${aws_ecr_repository.agents[each.key].repository_url}:latest"
+
+      essential = true
+
+      portMappings = [
+        {
+          containerPort = each.value.port
+          hostPort      = each.value.port
+          protocol      = "tcp"
+          name          = each.key # For Service Connect
+        }
+      ]
+
+      # Environment variables (non-secret)
+      environment = [
+        {
+          name  = "PORT"
+          value = tostring(each.value.port)
+        },
+        {
+          name  = "PYTHONPATH"
+          value = "/app"
+        },
+        {
+          name  = "USE_LOCAL_FILES"
+          value = "true"
+        },
+        {
+          name  = "AGENT_NAME"
+          value = each.key
+        },
+        {
+          name  = "ENVIRONMENT"
+          value = var.environment
+        },
+        {
+          name  = "AWS_REGION"
+          value = var.aws_region
+        }
+      ]
+
+      # Secrets from AWS Secrets Manager
+      secrets = [
+        {
+          name      = "PRIVATE_KEY"
+          valueFrom = "${data.aws_secretsmanager_secret.karmacadabra.arn}:${each.key}:private_key::"
+        },
+        {
+          name      = "OPENAI_API_KEY"
+          valueFrom = "${data.aws_secretsmanager_secret.karmacadabra.arn}:${each.key}:openai_api_key::"
+        }
+      ]
+
+      # Health check
+      healthCheck = {
+        command = [
+          "CMD-SHELL",
+          "curl -f http://localhost:${each.value.port}${each.value.health_check_path} || exit 1"
+        ]
+        interval    = 30
+        timeout     = 5
+        retries     = 3
+        startPeriod = 60
+      }
+
+      # Logging configuration
+      logConfiguration = {
+        logDriver = "awslogs"
+        options = {
+          "awslogs-group"         = aws_cloudwatch_log_group.agents[each.key].name
+          "awslogs-region"        = var.aws_region
+          "awslogs-stream-prefix" = "ecs"
+        }
+      }
+
+      # X-Ray sidecar (optional)
+      # Uncomment to enable X-Ray tracing
+      # {
+      #   name      = "xray-daemon"
+      #   image     = "amazon/aws-xray-daemon"
+      #   cpu       = 32
+      #   memory    = 256
+      #   essential = false
+      #   portMappings = [{
+      #     containerPort = 2000
+      #     protocol      = "udp"
+      #   }]
+      # }
+    }
+  ])
+
+  # Runtime platform
+  runtime_platform {
+    operating_system_family = "LINUX"
+    cpu_architecture        = "X86_64"
+  }
+
+  tags = merge(var.tags, {
+    Name  = "${var.project_name}-${var.environment}-${each.key}-task"
+    Agent = each.key
+  })
+}
+
+# ----------------------------------------------------------------------------
+# ECS Services (one per agent)
+# ----------------------------------------------------------------------------
+
+resource "aws_ecs_service" "agents" {
+  for_each = var.agents
+
+  name            = "${var.project_name}-${var.environment}-${each.key}"
+  cluster         = aws_ecs_cluster.main.id
+  task_definition = aws_ecs_task_definition.agents[each.key].arn
+  desired_count   = var.desired_count_per_service
+  launch_type     = null # Use capacity provider strategy instead
+
+  # Capacity provider strategy (Fargate Spot)
+  dynamic "capacity_provider_strategy" {
+    for_each = var.use_fargate_spot ? [1] : []
+    content {
+      capacity_provider = "FARGATE_SPOT"
+      weight            = var.fargate_spot_weight
+      base              = var.fargate_spot_base_capacity
+    }
+  }
+
+  dynamic "capacity_provider_strategy" {
+    for_each = var.use_fargate_spot ? [1] : []
+    content {
+      capacity_provider = "FARGATE"
+      weight            = var.fargate_ondemand_weight
+    }
+  }
+
+  # Network configuration
+  network_configuration {
+    subnets          = aws_subnet.private[*].id
+    security_groups  = [aws_security_group.ecs_tasks.id]
+    assign_public_ip = false # Private subnet, use NAT for outbound
+  }
+
+  # Load balancer configuration
+  load_balancer {
+    target_group_arn = aws_lb_target_group.agents[each.key].arn
+    container_name   = each.key
+    container_port   = each.value.port
+  }
+
+  # Service Connect (for inter-agent communication)
+  dynamic "service_connect_configuration" {
+    for_each = var.enable_service_connect ? [1] : []
+    content {
+      enabled   = true
+      namespace = aws_service_discovery_private_dns_namespace.main[0].arn
+
+      service {
+        port_name      = each.key
+        discovery_name = each.key
+        client_alias {
+          port     = each.value.port
+          dns_name = each.key
+        }
+      }
+    }
+  }
+
+  # Enable ECS Exec for debugging
+  enable_execute_command = var.enable_execute_command
+
+  # Deployment configuration
+  deployment_configuration {
+    maximum_percent         = 200
+    minimum_healthy_percent = 100
+  }
+
+  # Health check grace period
+  health_check_grace_period_seconds = 60
+
+  # Force new deployment on task definition change
+  force_new_deployment = true
+
+  # Propagate tags from task definition
+  propagate_tags = "TASK_DEFINITION"
+
+  tags = merge(var.tags, {
+    Name  = "${var.project_name}-${var.environment}-${each.key}-service"
+    Agent = each.key
+  })
+
+  depends_on = [
+    aws_lb_listener.http,
+    aws_iam_role_policy.ecs_secrets_access,
+    aws_iam_role_policy.task_secrets_access
+  ]
+}
+
+# ----------------------------------------------------------------------------
+# Auto-Scaling Targets
+# ----------------------------------------------------------------------------
+
+resource "aws_appautoscaling_target" "ecs_service" {
+  for_each = var.enable_autoscaling ? var.agents : {}
+
+  max_capacity       = var.autoscaling_max_capacity
+  min_capacity       = var.autoscaling_min_capacity
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.agents[each.key].name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  service_namespace  = "ecs"
+}
+
+# ----------------------------------------------------------------------------
+# Auto-Scaling Policies - CPU-based
+# ----------------------------------------------------------------------------
+
+resource "aws_appautoscaling_policy" "cpu" {
+  for_each = var.enable_autoscaling ? var.agents : {}
+
+  name               = "${var.project_name}-${var.environment}-${each.key}-cpu-scaling"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_service[each.key].resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_service[each.key].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_service[each.key].service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value       = var.autoscaling_cpu_target
+    scale_in_cooldown  = 300 # 5 minutes
+    scale_out_cooldown = 60  # 1 minute
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+  }
+}
+
+# ----------------------------------------------------------------------------
+# Auto-Scaling Policies - Memory-based
+# ----------------------------------------------------------------------------
+
+resource "aws_appautoscaling_policy" "memory" {
+  for_each = var.enable_autoscaling ? var.agents : {}
+
+  name               = "${var.project_name}-${var.environment}-${each.key}-memory-scaling"
+  policy_type        = "TargetTrackingScaling"
+  resource_id        = aws_appautoscaling_target.ecs_service[each.key].resource_id
+  scalable_dimension = aws_appautoscaling_target.ecs_service[each.key].scalable_dimension
+  service_namespace  = aws_appautoscaling_target.ecs_service[each.key].service_namespace
+
+  target_tracking_scaling_policy_configuration {
+    target_value       = var.autoscaling_memory_target
+    scale_in_cooldown  = 300 # 5 minutes
+    scale_out_cooldown = 60  # 1 minute
+
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageMemoryUtilization"
+    }
+  }
+}
