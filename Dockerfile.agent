@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
+# Set Python path to include /app for shared module imports
+ENV PYTHONPATH=/app
+
 # Copy shared library first (for caching)
 COPY shared/ /app/shared/
 

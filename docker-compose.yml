@@ -44,6 +44,8 @@ services:
       - "9090:9090"  # Metrics endpoint
     env_file:
       - agents/validator/.env
+    environment:
+      - PYTHONPATH=/app
     volumes:
       - ./agents/validator:/app/agent:ro
       - ./shared:/app/shared:ro
@@ -83,6 +85,7 @@ services:
     env_file:
       - agents/karma-hello/.env
     environment:
+      - PYTHONPATH=/app
       - USE_LOCAL_FILES=true
       - PORT=9002
     volumes:
@@ -123,6 +126,7 @@ services:
     env_file:
       - agents/abracadabra/.env
     environment:
+      - PYTHONPATH=/app
       - USE_LOCAL_FILES=true
       - PORT=9003
     volumes:
@@ -163,6 +167,7 @@ services:
     env_file:
       - agents/skill-extractor/.env
     environment:
+      - PYTHONPATH=/app
       - PORT=9004
       - KARMA_HELLO_URL=http://karma-hello:9002
     volumes:
@@ -204,6 +209,7 @@ services:
     env_file:
       - agents/voice-extractor/.env
     environment:
+      - PYTHONPATH=/app
       - PORT=9005
       - KARMA_HELLO_URL=http://karma-hello:9002
     volumes:
