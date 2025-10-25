@@ -23,8 +23,9 @@ from pydantic import BaseModel, Field
 import uvicorn
 from dotenv import load_dotenv
 
-# Add parent directory to path for shared imports
-sys.path.append(str(Path(__file__).parent.parent))
+# Add project root to path for shared imports
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
 
 from shared.base_agent import ERC8004BaseAgent
 
