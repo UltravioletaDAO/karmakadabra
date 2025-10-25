@@ -31,6 +31,34 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Why separate rotation**: ERC-20 deployer owns the GLUE token contract. Rotating it requires redeploying the entire token, so it's only rotated when specifically needed.
 
+### .env Files: Public Addresses vs Private Keys
+**IMPORTANT DISTINCTION: Public addresses are NOT secret**
+
+**SAFE to store in .env files:**
+- ✅ **Public addresses** (`AGENT_ADDRESS=0x...`) - These are visible on blockchain anyway
+- ✅ **Contract addresses** - Public information
+- ✅ **RPC URLs** - Public endpoints
+- ✅ **Domain names** - Public DNS records
+
+**NEVER store in .env files:**
+- ❌ **Private keys** (`PRIVATE_KEY=`) - ALWAYS leave empty
+- ❌ **Mnemonics/seed phrases** - NEVER in any file
+- ❌ **API keys** (OpenAI, etc.) - Use environment variables or AWS Secrets Manager
+
+**Pattern used in this project:**
+```bash
+# ✅ CORRECT .env pattern
+PRIVATE_KEY=  # Leave empty - fetched from AWS Secrets Manager
+AGENT_ADDRESS=0x2C3e071df446B25B821F59425152838ae4931E75  # Public address (safe to store)
+```
+
+**Why public addresses in .env?**
+- Makes it easy to reference addresses without AWS lookups
+- Useful for quick checks and scripts (`python scripts/check_system_ready.py`)
+- No security risk - addresses are visible on blockchain explorers anyway
+
+**All .env files updated:** karma-hello, skill-extractor, voice-extractor, abracadabra, validator all follow this pattern.
+
 ### Contract Address Safety
 **⚠️ NEVER SEND AVAX OR TOKENS TO CONTRACT ADDRESSES**
 

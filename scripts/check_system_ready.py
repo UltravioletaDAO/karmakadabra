@@ -102,45 +102,36 @@ def main():
     print(f"  Identity Registry: {identity_registry_address}")
     print(f"  GLUE Token: {glue_token_address}")
 
-    # Load agent addresses from AWS Secrets Manager
+    # Load agent addresses from .env files
     print("\n" + "=" * 80)
     print("SERVICE AGENTS (agents/ folder)")
     print("=" * 80)
 
-    print("\nLoading agent addresses from AWS Secrets Manager...")
-    try:
-        import boto3
-        client = boto3.client('secretsmanager', region_name='us-east-1')
-        response = client.get_secret_value(SecretId='karmacadabra')
-        secrets = json.loads(response['SecretString'])
+    print("\nLoading agent addresses from .env files...")
+    import re
+    project_root = Path(__file__).parent.parent
 
-        # Map secret keys to agent addresses
-        from eth_account import Account
-        service_agents = {}
+    service_agents = {}
+    agent_dirs = {
+        'karma-hello': project_root / 'agents' / 'karma-hello' / '.env',
+        'skill-extractor': project_root / 'agents' / 'skill-extractor' / '.env',
+        'voice-extractor': project_root / 'agents' / 'voice-extractor' / '.env',
+        'validator': project_root / 'agents' / 'validator' / '.env',
+    }
 
-        agent_map = {
-            'karma-hello': 'karma-hello-agent',
-            'skill-extractor': 'skill-extractor-agent',
-            'voice-extractor': 'voice-extractor-agent',
-            'validator': 'validator-agent',
-        }
-
-        for agent_name, secret_key in agent_map.items():
-            if secret_key in secrets:
-                pk = secrets[secret_key]['private_key']
-                account = Account.from_key(pk)
-                service_agents[agent_name] = account.address
-            else:
-                service_agents[agent_name] = None
-
-    except Exception as e:
-        print(f"[FAIL] Could not load from AWS: {e}")
-        service_agents = {
-            'karma-hello': None,
-            'skill-extractor': None,
-            'voice-extractor': None,
-            'validator': None,
-        }
+    for agent_name, env_path in agent_dirs.items():
+        try:
+            with open(env_path, 'r') as f:
+                content = f.read()
+                # Look for AGENT_ADDRESS or VALIDATOR_WALLET
+                addr_match = re.search(r'(?:AGENT_ADDRESS|VALIDATOR_WALLET)=(\s*)(0x[a-fA-F0-9]{40})', content)
+                if addr_match:
+                    service_agents[agent_name] = addr_match.group(2)
+                else:
+                    service_agents[agent_name] = None
+        except FileNotFoundError:
+            print(f"  [SKIP] {env_path} not found")
+            service_agents[agent_name] = None
 
     results = {}
     for name, address in service_agents.items():
