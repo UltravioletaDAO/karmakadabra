@@ -13,15 +13,35 @@ print("ADD OPENAI API KEYS TO AWS SECRETS MANAGER")
 print("=" * 80)
 print()
 
-# OpenAI API keys from keys.txt
+# OpenAI API keys - MUST be passed as command line arguments or environment variables
+# NEVER hardcode API keys in this file
+#
+# Usage:
+#   export KARMA_HELLO_KEY="REMOVED_FOR_SECURITY..."
+#   export ABRACADABRA_KEY="REMOVED_FOR_SECURITY..."
+#   python add_openai_keys_to_aws.py
+#
+# Or pass via command line (TODO: implement argparse)
+import os
+
 openai_keys = {
-    'karma-hello-agent': 'REMOVED_FOR_SECURITY',
-    'abracadabra-agent': 'REMOVED_FOR_SECURITY',
-    'validator-agent': 'REMOVED_FOR_SECURITY',
-    'voice-extractor-agent': 'REMOVED_FOR_SECURITY',
-    'skill-extractor-agent': 'REMOVED_FOR_SECURITY',
-    'client-agent': 'REMOVED_FOR_SECURITY'
+    'karma-hello-agent': os.getenv('KARMA_HELLO_KEY'),
+    'abracadabra-agent': os.getenv('ABRACADABRA_KEY'),
+    'validator-agent': os.getenv('VALIDATOR_KEY'),
+    'voice-extractor-agent': os.getenv('VOICE_EXTRACTOR_KEY'),
+    'skill-extractor-agent': os.getenv('SKILL_EXTRACTOR_KEY'),
+    'client-agent': os.getenv('CLIENT_KEY')
 }
+
+# Validate that all keys are provided
+missing_keys = [k for k, v in openai_keys.items() if not v]
+if missing_keys:
+    print(f"ERROR: Missing environment variables for: {', '.join(missing_keys)}")
+    print("Please set environment variables before running this script:")
+    for k in missing_keys:
+        env_var = k.upper().replace('-AGENT', '_KEY').replace('-', '_')
+        print(f"  export {env_var}=REMOVED_FOR_SECURITY...")
+    exit(1)
 
 print("OpenAI API keys to add:")
 for agent_name in openai_keys.keys():
