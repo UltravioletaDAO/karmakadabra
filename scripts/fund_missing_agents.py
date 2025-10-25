@@ -67,16 +67,43 @@ except Exception as e:
     sys.exit(1)
 
 print("[2/3] Checking agent balances...")
+# Minimum balance threshold - only fund if below this
+MIN_AVAX_THRESHOLD = 0.05
+
+agents_needing_funding = {}
+agents_already_funded = {}
+
 for agent_name, info in agents_to_fund.items():
     current_balance = w3.eth.get_balance(info['address'])
     current_avax = w3.from_wei(current_balance, 'ether')
-    print(f"     {agent_name:20} {info['address']}")
-    print(f"     Current: {current_avax:.4f} AVAX | Will fund: {info['amount']} AVAX")
+
+    if current_avax < MIN_AVAX_THRESHOLD:
+        agents_needing_funding[agent_name] = info
+        print(f"  ❌ {agent_name:20} {current_avax:.4f} AVAX - NEEDS FUNDING")
+    else:
+        agents_already_funded[agent_name] = current_avax
+        print(f"  ✅ {agent_name:20} {current_avax:.4f} AVAX - Already funded")
+
 print()
+
+# If no agents need funding, exit
+if not agents_needing_funding:
+    print("[OK] All agents already have sufficient AVAX!")
+    print(f"     Minimum threshold: {MIN_AVAX_THRESHOLD} AVAX")
+    print()
+    for agent_name, balance in agents_already_funded.items():
+        print(f"     {agent_name}: {balance:.4f} AVAX")
+    print()
+    print("Nothing to do. System is ready!")
+    sys.exit(0)
+
+# Update agents_to_fund to only include agents that actually need funding
+agents_to_fund = agents_needing_funding
 
 # Confirm
 print("[3/3] Ready to fund agents...")
-print(f"     Total AVAX to send: {sum(a['amount'] for a in agents_to_fund.values())} AVAX")
+print(f"     Agents to fund: {len(agents_to_fund)}")
+print(f"     Total AVAX to send: {sum(a['amount'] for a in agents_to_fund.values()):.2f} AVAX")
 print(f"     Plus gas fees: ~0.001 AVAX per transaction")
 print()
 

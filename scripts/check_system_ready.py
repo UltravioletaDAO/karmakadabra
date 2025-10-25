@@ -164,8 +164,8 @@ def main():
         not_registered = [name for name, r in results.items() if not r['registered']]
 
         if not_funded:
-            print(f"  1. Fund agents: {', '.join(not_funded)}")
-            print(f"     python erc-20/distribute-token.py --avax {' '.join(not_funded)}")
+            print(f"  1. Fund agents with AVAX: {', '.join(not_funded)}")
+            print(f"     python scripts/fund_missing_agents.py --confirm")
 
         if not_registered:
             print(f"  2. Register agents: {', '.join(not_registered)}")
