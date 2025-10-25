@@ -16,9 +16,20 @@ w3 = Web3(Web3.HTTPProvider(RPC_URL))
 # Contract ABIs
 IDENTITY_ABI = [
     {
-        "inputs": [{"internalType": "address", "name": "_agentAddress", "type": "address"}],
+        "inputs": [{"internalType": "address", "name": "agentAddress", "type": "address"}],
         "name": "resolveByAddress",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "outputs": [
+            {
+                "components": [
+                    {"internalType": "uint256", "name": "agentId", "type": "uint256"},
+                    {"internalType": "string", "name": "agentDomain", "type": "string"},
+                    {"internalType": "address", "name": "agentAddress", "type": "address"}
+                ],
+                "internalType": "struct IIdentityRegistry.AgentInfo",
+                "name": "agentInfo",
+                "type": "tuple"
+            }
+        ],
         "stateMutability": "view",
         "type": "function"
     },
@@ -75,10 +86,18 @@ print(f"  Identity Registry: {IDENTITY_REGISTRY}")
 print(f"  GLUE Token: {GLUE_TOKEN}")
 print()
 
-# Check GLUE total supply
+# Check GLUE decimals and total supply
 try:
+    decimals = 6  # GLUE uses 6 decimals like USDC
     total_supply = glue.functions.totalSupply().call()
-    print(f"GLUE Total Supply: {total_supply / 10**18:,.0f} tokens")
+    print(f"GLUE Decimals: {decimals}")
+    print(f"GLUE Total Supply: {total_supply / 10**decimals:,.0f} tokens")
+    print(f"GLUE Total Supply (raw): {total_supply:,}")
+
+    # Check owner wallet balance
+    OWNER_WALLET = "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
+    owner_balance = glue.functions.balanceOf(Web3.to_checksum_address(OWNER_WALLET)).call()
+    print(f"Owner Wallet ({OWNER_WALLET}): {owner_balance / 10**decimals:,.0f} GLUE")
 except Exception as e:
     print(f"ERROR getting GLUE supply: {e}")
 print()
@@ -106,28 +125,31 @@ for name, address in agents.items():
     avax_balance = w3.eth.get_balance(Web3.to_checksum_address(address))
     print(f"  AVAX: {w3.from_wei(avax_balance, 'ether'):.4f}")
 
-    # GLUE balance
+    # GLUE balance (6 decimals)
     try:
         glue_balance = glue.functions.balanceOf(Web3.to_checksum_address(address)).call()
-        print(f"  GLUE: {glue_balance / 10**18:,.0f}")
+        print(f"  GLUE: {glue_balance / 10**6:,.2f}")
     except Exception as e:
         print(f"  GLUE ERROR: {e}")
 
     # Registration
     try:
-        agent_id = identity.functions.resolveByAddress(Web3.to_checksum_address(address)).call()
+        agent_info = identity.functions.resolveByAddress(Web3.to_checksum_address(address)).call()
+        agent_id = agent_info[0]  # agentId
+        domain = agent_info[1]     # agentDomain
+        reg_address = agent_info[2]  # agentAddress
+
         if agent_id > 0:
             print(f"  Registered: YES (ID #{agent_id})")
-            # Get domain
-            try:
-                domain = identity.functions.getAgentDomain(agent_id).call()
-                print(f"  Domain: {domain}")
-            except Exception as e:
-                print(f"  Domain ERROR: {e}")
+            print(f"  Domain: {domain}")
         else:
             print(f"  Registered: NO (ID = 0)")
     except Exception as e:
-        print(f"  Registration ERROR: {e}")
+        # Agent not registered - this is expected for some
+        if "AgentNotFound" in str(e):
+            print(f"  Registered: NO")
+        else:
+            print(f"  Registration ERROR: {e}")
 
     print()
 

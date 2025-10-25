@@ -22,9 +22,20 @@ load_dotenv(project_root / '.env')
 # Contract ABIs (minimal for checks)
 IDENTITY_REGISTRY_ABI = [
     {
-        "inputs": [{"internalType": "address", "name": "_agentAddress", "type": "address"}],
+        "inputs": [{"internalType": "address", "name": "agentAddress", "type": "address"}],
         "name": "resolveByAddress",
-        "outputs": [{"internalType": "uint256", "name": "", "type": "uint256"}],
+        "outputs": [
+            {
+                "components": [
+                    {"internalType": "uint256", "name": "agentId", "type": "uint256"},
+                    {"internalType": "string", "name": "agentDomain", "type": "string"},
+                    {"internalType": "address", "name": "agentAddress", "type": "address"}
+                ],
+                "internalType": "struct IIdentityRegistry.AgentInfo",
+                "name": "agentInfo",
+                "type": "tuple"
+            }
+        ],
         "stateMutability": "view",
         "type": "function"
     }
@@ -51,25 +62,34 @@ def check_agent_status(w3, agent_name, agent_address, identity_registry, glue_to
     status = "✅" if avax_balance_ether >= 0.01 else "❌"
     print(f"  AVAX: {avax_balance_ether:.4f} {status}")
 
-    # Check GLUE balance
+    # Check GLUE balance (6 decimals like USDC)
     glue_balance = glue_token.functions.balanceOf(agent_address).call()
-    glue_balance_tokens = glue_balance / 10**18
+    glue_balance_tokens = glue_balance / 10**6
     print(f"  GLUE: {glue_balance_tokens:,.0f}")
 
     # Check registration
+    agent_id = 0
+    domain = ""
     try:
-        agent_id = identity_registry.functions.resolveByAddress(agent_address).call()
+        agent_info = identity_registry.functions.resolveByAddress(agent_address).call()
+        agent_id = agent_info[0]  # agentId
+        domain = agent_info[1]     # agentDomain
+
         if agent_id > 0:
             print(f"  Registration: ✅ ID #{agent_id}")
+            print(f"  Domain: {domain}")
         else:
             print(f"  Registration: ❌ NOT REGISTERED")
     except Exception as e:
-        print(f"  Registration: ❌ ERROR - {e}")
+        if "AgentNotFound" in str(e):
+            print(f"  Registration: ❌ NOT REGISTERED")
+        else:
+            print(f"  Registration: ❌ ERROR - {e}")
 
     return {
         'has_avax': avax_balance_ether >= 0.01,
         'has_glue': glue_balance_tokens > 0,
-        'registered': agent_id > 0 if 'agent_id' in locals() else False
+        'registered': agent_id > 0
     }
 
 def main():
