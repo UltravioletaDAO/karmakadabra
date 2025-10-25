@@ -121,7 +121,7 @@ def main():
 
     for agent_name, env_path in agent_dirs.items():
         try:
-            with open(env_path, 'r') as f:
+            with open(env_path, 'r', encoding='utf-8') as f:
                 content = f.read()
                 # Look for AGENT_ADDRESS or VALIDATOR_WALLET
                 addr_match = re.search(r'(?:AGENT_ADDRESS|VALIDATOR_WALLET)=(\s*)(0x[a-fA-F0-9]{40})', content)
@@ -131,6 +131,9 @@ def main():
                     service_agents[agent_name] = None
         except FileNotFoundError:
             print(f"  [SKIP] {env_path} not found")
+            service_agents[agent_name] = None
+        except UnicodeDecodeError as e:
+            print(f"  [SKIP] {agent_name} - encoding error: {e}")
             service_agents[agent_name] = None
 
     results = {}
