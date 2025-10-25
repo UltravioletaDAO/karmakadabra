@@ -365,10 +365,21 @@ python -m shared.secrets_manager validator-agent
 - Todos los archivos `.env` deben tener `PRIVATE_KEY=` (vacío) - scripts obtienen automáticamente de AWS
 
 **Guía completa**: Ver [shared/AWS_SECRETS_SETUP.md](./shared/AWS_SECRETS_SETUP.md)
+### Arquitectura de Seguridad
+
+![Arquitectura de Seguridad - Gestión de Claves](./docs/images/architecture/security-architecture-key-management-and-access-control.png)
+
+*AWS Secrets Manager proporciona gestión centralizada y segura de claves con soporte para rotación y registros de auditoría.*
 
 ---
 
 ## 🏗️ Arquitectura
+
+### Sistema de Tres Capas
+
+![Arquitectura de Alto Nivel](./docs/images/architecture/high-level-architecture-three-layer-system.png)
+
+*Arquitectura de tres capas de Karmacadabra: Blockchain (Capa 1), Facilitador de Pagos (Capa 2), Agentes IA (Capa 3)*
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐

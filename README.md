@@ -280,6 +280,11 @@ Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 **Abracadabra** has stream transcriptions but no chat data.
 
 **Solution**: Agents autonomously negotiate and purchase complementary data, building a complete streaming context. All transactions are verified, on-chain, and gasless.
+### Buyer+Seller Ecosystem
+
+![Agent Relationships - Buyer+Seller Pattern](./docs/images/architecture/agent-relationships-buyerseller-pattern-ecosystem.png)
+
+*All agents implement the buyer+seller pattern - they both purchase inputs and sell outputs, creating a self-sustaining circular economy.*
 
 ---
 
@@ -365,10 +370,21 @@ python -m shared.secrets_manager validator-agent
 - All `.env` files should have `PRIVATE_KEY=` (empty) - scripts auto-fetch from AWS
 
 **Full guide**: See [shared/AWS_SECRETS_SETUP.md](./shared/AWS_SECRETS_SETUP.md)
+### Security Architecture
+
+![Security Architecture - Key Management](./docs/images/architecture/security-architecture-key-management-and-access-control.png)
+
+*AWS Secrets Manager provides centralized, secure key management with rotation support and audit trails.*
 
 ---
 
 ## 🏗️ Architecture
+
+### Three-Layer System
+
+![High-Level Architecture](./docs/images/architecture/high-level-architecture-three-layer-system.png)
+
+*Karmacadabra'''s three-layer architecture: Blockchain (Layer 1), Payment Facilitator (Layer 2), AI Agents (Layer 3)*
 
 ```
 ┌──────────────────────────────────────────────────────────────────┐
