@@ -651,6 +651,86 @@ STEP 3: Deploying ERC-20 GLUE Token
 ... (continues through all 8 steps)
 ```
 
+### User Agent Marketplace Rebuild
+Idempotent pipeline to rebuild the entire 48-agent marketplace from chat logs:
+
+```bash
+# Full rebuild with all users (weekly update after new streams)
+python scripts/rebuild_user_agent_marketplace.py --force
+
+# Add 20 more users (expand from 48 to 68)
+python scripts/rebuild_user_agent_marketplace.py --users 68 --force
+
+# Just regenerate agent cards (after profile updates)
+python scripts/rebuild_user_agent_marketplace.py --skip-extract --force
+
+# Preview changes without executing
+python scripts/rebuild_user_agent_marketplace.py --dry-run
+
+# Process specific number of users
+python scripts/rebuild_user_agent_marketplace.py --users 30
+```
+
+**What it does**:
+1. 👤 **Profile Extraction** - Analyzes chat logs, extracts skills/interests/tools
+2. 🃏 **Agent Card Generation** - Converts profiles to A2A protocol cards with dynamic pricing
+3. 🚀 **Agent Deployment** - Creates 48 FastAPI agents with unique ports (9000-9047)
+
+**Features**:
+- ✅ **Idempotent** - Safe to run multiple times
+- ✅ **Incremental** - Add more users without rebuilding everything
+- ✅ **Safe** - Backs up existing data on `--force`
+- ✅ **Preserves wallets** - Restores .env files with PRIVATE_KEY after rebuild
+- ✅ **Flexible** - Skip individual steps with `--skip-*` flags
+
+**Use cases**:
+- 📺 **Weekly updates** - Re-extract with new chat logs from recent streams
+- 👥 **Add users** - Expand marketplace when new community members join
+- 📊 **Profile updates** - Regenerate cards after longer engagement histories
+- 🔄 **Complete rebuild** - Start fresh with all current data
+
+**Command-line options**:
+- `--users N` - Process N users (default: all available)
+- `--skip-extract` - Use existing profiles (skip Step 1)
+- `--skip-cards` - Use existing agent cards (skip Step 2)
+- `--skip-deploy` - Use existing deployments (skip Step 3)
+- `--force` - Rebuild all (creates backups first)
+- `--dry-run` - Preview without executing
+
+**Safety features**:
+- ⚠️ Non-destructive by default (won't overwrite existing files)
+- ⚠️ `--force` creates timestamped backups: `user-profiles.backup.YYYYMMDD_HHMMSS/`
+- ✅ Preserves agent .env files with wallet PRIVATE_KEY
+- ✅ Shows build summary with statistics
+
+**Example output**:
+```
+================================================================================
+User Agent Marketplace - Build Pipeline
+================================================================================
+
+Step 1/3: Profile Extraction
+  Found 97 users in chat logs
+  Processing 48 users...
+  ✅ Extracted 48 profiles
+
+Step 2/3: Agent Card Generation
+  Loading 48 profiles...
+  ✅ Generated 48 agent cards
+
+Step 3/3: Agent Deployment
+  Creating 48 agent directories...
+  ✅ Deployed 48 agents (ports 9000-9047)
+
+================================================================================
+Build Complete!
+  Profiles: 48 users
+  Agent Cards: 48 cards
+  Deployed Agents: 48 agents
+  Network Capacity: 2,256 potential trades
+================================================================================
+```
+
 ---
 
 ## 🔧 Requirements
