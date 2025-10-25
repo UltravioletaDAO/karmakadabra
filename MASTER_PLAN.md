@@ -84,6 +84,20 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 
 ## 📊 REVISED ROADMAP
 
+### ✅ Sprint 1 (Weeks 1-2): Foundation - COMPLETE
+
+### ✅ Sprint 2 (Weeks 3-4): System Agents - COMPLETE
+
+### ✅ Sprint 2.8: Testing & Validation - COMPLETE
+
+### ❌ Sprint 2.9 (Week 5): Coinbase Payments MCP - **DEFERRED** - Installation Blocker
+
+### 📋 Sprint 3 (Weeks 6-7): User Agent System - NEXT
+
+### 📋 Sprint 4 (Weeks 8-9): Visualization - FUTURE
+
+---
+
 ### Sprint 1 (Weeks 1-2): Foundation - START HERE 🔴 BLOCKER
 
 **Goal:** Build core infrastructure for all agents
@@ -359,7 +373,99 @@ Fixed critical Pydantic validation errors and port conflicts that prevented vali
 
 ---
 
-### Sprint 3 (Weeks 5-6): User Agent System
+### Sprint 2.9 (Week 5): Coinbase Payments MCP Integration ❌ **DEFERRED** - Installation Blocker
+
+**Goal:** Enable fiat payments via Coinbase MCP to massively expand user base before deploying 48 user agents
+
+**POC Result:** ❌ **NO-GO** - Installation blocker on Windows prevents testing
+
+**Timeline:**
+- **Day 1:** POC Testing ❌ **BLOCKED**
+  - [x] Install MCP: `npx @coinbase/payments-mcp` - **FAILED** (Windows Node.js detection bug)
+  - [ ] Test Avalanche Fuji testnet compatibility - **CANNOT TEST** (installation blocked)
+  - [ ] Test GLUE token support - **CANNOT TEST** (installation blocked)
+  - [ ] Measure transaction fees - **CANNOT TEST** (installation blocked)
+  - [ ] Test AI agent programmatic access - **CANNOT TEST** (installation blocked)
+  - [x] Document findings in `plans/COINBASE_MCP_POC_RESULTS.md` ✅ **COMPLETE**
+
+**Critical Blocker:**
+```
+Error: Node.js is not available. Please install Node.js version 16 or higher.
+Reality: Node.js v23.11.0 is installed and functional
+Root Cause: @coinbase/payments-mcp installer bug on Windows
+Impact: Cannot answer any of the 5 critical questions
+```
+
+**Critical Questions - Status:**
+1. ❌ Does it work with Fuji testnet? - **NOT TESTED** (installation blocked)
+2. ❌ Does it support GLUE token? - **NOT TESTED** (installation blocked)
+3. ❌ What are fees for 0.01 GLUE? - **NOT TESTED** (installation blocked)
+4. ❌ Can 48 agents use it programmatically? - **NOT TESTED** (installation blocked)
+5. ❌ Does it integrate with x402-rs? - **NOT TESTED** (installation blocked)
+
+**Decision:** ❌ **DEFER Sprint 2.9** indefinitely
+
+**Reasoning:**
+- 🔴 Installation blocker prevents POC completion
+- 🔴 Cannot validate critical assumptions (testnet, GLUE token, fees)
+- 🔴 Alternative (x402 MCP example) lacks fiat on-ramp feature (the core value)
+- 🟡 Risk too high to commit development effort without testing
+- 🟢 Existing x402scan embedded wallet works well for crypto users
+
+**Actions Taken:**
+- [x] POC attempted and documented
+- [x] Windows Node.js detection bug identified
+- [x] Alternative fiat on-ramps researched (Stripe, Moonpay, Transak, Ramp, OnRamper)
+- [x] GitHub issue prepared: `plans/GITHUB_ISSUE_PAYMENTS_MCP.md`
+- [x] Full findings documented: `plans/COINBASE_MCP_POC_RESULTS.md`
+- [x] Alternative research documented: `plans/ALTERNATIVE_FIAT_ONRAMPS_RESEARCH.md`
+
+**Alternative Fiat On-Ramps Research Result:** ❌ **NO VIABLE OPTIONS**
+- **Stripe**: ❌ No Avalanche Fuji testnet, no custom token support
+- **Moonpay**: ❌ Sandbox supports 8 testnets but NOT Avalanche Fuji
+- **Transak**: ❌ Staging supports 7 testnets but NOT Avalanche Fuji
+- **Ramp Network**: ⚠️ No testnet information found
+- **OnRamper**: ❌ Aggregator of above providers (no Fuji support)
+
+**Critical Finding:** ALL major fiat on-ramps support Avalanche **mainnet only**. Zero providers support Avalanche Fuji testnet in sandbox environments.
+
+**Implication:** Fiat on-ramp integration would require:
+- Migrating to Avalanche mainnet (high risk)
+- Security audit ($10K-$50K)
+- GLUE token compliance review (2-4 weeks)
+- Real AVAX for all 48+ agents
+- Testing with real money (expensive)
+
+**Alternative Paths Forward:**
+1. ❌ **Mainnet migration** - Premature, requires $10K-$50K audit before market validation
+2. ❌ **Manual fiat distribution** - Not scalable, violates trustless architecture
+3. ✅ **Crypto-only payments (status quo)** - Working, safe, proven ✅ **RECOMMENDED**
+
+**Impact on Roadmap:**
+- ❌ Fiat payments NOT available for Sprint 3 (User Agent System)
+- ❌ User onboarding remains crypto-native (15-20 min first-time setup)
+- ❌ Addressable market remains limited (crypto users only)
+- ✅ No wasted development effort on broken integration
+- ✅ Can revisit in Q1 2026 or when installer is fixed
+
+**Recommendation:** ✅ **Proceed to Sprint 3 (User Agent System) with existing payment infrastructure**
+
+**Full Analysis:**
+- POC Results: `plans/COINBASE_MCP_POC_RESULTS.md`
+- Alternative Fiat On-Ramps Research: `plans/ALTERNATIVE_FIAT_ONRAMPS_RESEARCH.md`
+- GitHub Issue Draft: `plans/GITHUB_ISSUE_PAYMENTS_MCP.md`
+- Original Integration Plan: `plans/COINBASE_PAYMENTS_MCP_INTEGRATION.md` (for future reference)
+
+**Revisit Criteria:** Reconsider fiat on-ramp integration when:
+- ✅ Coinbase Payments MCP Windows installer fixed
+- ✅ Any major provider adds Avalanche Fuji testnet support
+- ✅ Karmacadabra proves market demand (1,000+ transactions/month on testnet)
+- ✅ External funding secured ($50K+ for audit + mainnet migration)
+- ✅ Halliday adds Fuji testnet support (Intent Orchestration Protocol)
+
+---
+
+### Sprint 3 (Weeks 6-7): User Agent System
 
 **Milestones:**
 1. Automated profile extraction (using Skill-Extractor Agent for 48 users)
@@ -368,7 +474,7 @@ Fixed critical Pydantic validation errors and port conflicts that prevented vali
 4. Mass deployment (48 agents)
 5. Bootstrap marketplace test
 
-### Sprint 4 (Weeks 7-8): Visualization
+### Sprint 4 (Weeks 8-9): Visualization
 
 **Components:**
 1. Contract interaction viewer (real-time Fuji events)
