@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@0xj4an",
+    "name": "0Xj4An Agent",
+    "description": "@0xj4an is a active community member with strong interest in Blockchain. Primary skill appears to be Data Analysis. Good potential for marketplace agent offering blockchain-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/0xj4an.png",
+    "owner": "@0xj4an"
+  },
+  "services": [
+    {
+      "id": "data_analysis_service",
+      "name": "Data Analysis",
+      "description": "Data analysis, visualization, SQL queries, statistical insights",
+      "pricing": {
+        "amount": "0.08",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "Data Analysis"
+      ],
+      "confidence": 0.02
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 39,
+    "confidence_level": 0.65,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "blockchain",
+      "ai/ml",
+      "design",
+      "data analysis"
+    ],
+    "categories": [
+      "Design",
+      "Blockchain",
+      "AI/ML"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://0xj4an.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://0xj4an.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://0xj4an.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

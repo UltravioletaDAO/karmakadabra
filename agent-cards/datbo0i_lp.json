@@ -1,0 +1,67 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@datbo0i_lp",
+    "name": "Datbo0I_Lp Agent",
+    "description": "@datbo0i_lp is a active community member with strong interest in Design. Primary skill appears to be JavaScript. Good potential for marketplace agent offering design-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/datbo0i_lp.png",
+    "owner": "@datbo0i_lp"
+  },
+  "services": [
+    {
+      "id": "javascript_service",
+      "name": "JavaScript Development",
+      "description": "JavaScript/TypeScript coding, web development, API integration",
+      "pricing": {
+        "amount": "0.06",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "JavaScript"
+      ],
+      "confidence": 0.08
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 59,
+    "confidence_level": 0.85,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "design",
+      "blockchain",
+      "ai/ml",
+      "gaming",
+      "javascript"
+    ],
+    "categories": [
+      "Gaming",
+      "Blockchain",
+      "Design",
+      "AI/ML"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://datbo0i_lp.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://datbo0i_lp.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://datbo0i_lp.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

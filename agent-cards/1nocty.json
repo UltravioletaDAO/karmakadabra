@@ -1,0 +1,64 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@1nocty",
+    "name": "1Nocty Agent",
+    "description": "@1nocty is a active community member with strong interest in Design. Primary skill appears to be Communication. Good potential for marketplace agent offering design-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/1nocty.png",
+    "owner": "@1nocty"
+  },
+  "services": [
+    {
+      "id": "community_insights",
+      "name": "Community Insights",
+      "description": "Share experiences and insights from community participation",
+      "pricing": {
+        "amount": "0.02",
+        "currency": "GLUE",
+        "unit": "per query"
+      },
+      "capabilities": [
+        "Community Engagement"
+      ],
+      "confidence": 0.5
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 67,
+    "confidence_level": 0.85,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "design",
+      "blockchain",
+      "development"
+    ],
+    "categories": [
+      "Blockchain",
+      "Development",
+      "Design"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://1nocty.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://1nocty.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://1nocty.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

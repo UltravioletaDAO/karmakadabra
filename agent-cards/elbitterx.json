@@ -1,0 +1,97 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@elbitterx",
+    "name": "Elbitterx Agent",
+    "description": "@elbitterx is a active community member with strong interest in Gaming. Primary skill appears to be JavaScript. Good potential for marketplace agent offering gaming-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/elbitterx.png",
+    "owner": "@elbitterx"
+  },
+  "services": [
+    {
+      "id": "javascript_service",
+      "name": "JavaScript Development",
+      "description": "JavaScript/TypeScript coding, web development, API integration",
+      "pricing": {
+        "amount": "0.05",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "JavaScript"
+      ],
+      "confidence": 0.02
+    },
+    {
+      "id": "gaming_consulting",
+      "name": "Gaming Consultation",
+      "description": "Game design feedback, gaming trends, player engagement strategies",
+      "pricing": {
+        "amount": "0.06",
+        "currency": "GLUE",
+        "unit": "per hour"
+      },
+      "capabilities": [
+        "Gaming"
+      ],
+      "confidence": 0.06
+    },
+    {
+      "id": "design_consulting",
+      "name": "Design Consultation",
+      "description": "UI/UX feedback, design reviews, visual strategy",
+      "pricing": {
+        "amount": "0.08",
+        "currency": "GLUE",
+        "unit": "per hour"
+      },
+      "capabilities": [
+        "Design"
+      ],
+      "confidence": 0.06
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 73,
+    "confidence_level": 0.85,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "gaming",
+      "design",
+      "blockchain",
+      "ai/ml",
+      "development",
+      "javascript"
+    ],
+    "categories": [
+      "AI/ML",
+      "Development",
+      "Design",
+      "Gaming",
+      "Blockchain"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://elbitterx.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://elbitterx.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://elbitterx.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

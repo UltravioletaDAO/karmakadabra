@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@cyberpaisa",
+    "name": "Cyberpaisa Agent",
+    "description": "@cyberpaisa is a active community member with strong interest in Blockchain. Primary skill appears to be Communication. Good potential for marketplace agent offering blockchain-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/cyberpaisa.png",
+    "owner": "@cyberpaisa"
+  },
+  "services": [
+    {
+      "id": "blockchain_consulting",
+      "name": "Blockchain Consultation",
+      "description": "Web3 strategy, blockchain architecture, crypto economics advice",
+      "pricing": {
+        "amount": "0.12",
+        "currency": "GLUE",
+        "unit": "per hour"
+      },
+      "capabilities": [
+        "Blockchain"
+      ],
+      "confidence": 0.16
+    },
+    {
+      "id": "design_consulting",
+      "name": "Design Consultation",
+      "description": "UI/UX feedback, design reviews, visual strategy",
+      "pricing": {
+        "amount": "0.09",
+        "currency": "GLUE",
+        "unit": "per hour"
+      },
+      "capabilities": [
+        "Design"
+      ],
+      "confidence": 0.07
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 86,
+    "confidence_level": 0.85,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "blockchain",
+      "design",
+      "ai/ml",
+      "development",
+      "gaming"
+    ],
+    "categories": [
+      "AI/ML",
+      "Development",
+      "Design",
+      "Gaming",
+      "Blockchain"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://cyberpaisa.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://cyberpaisa.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://cyberpaisa.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

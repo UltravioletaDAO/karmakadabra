@@ -1,0 +1,68 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@eljuyan",
+    "name": "Eljuyan Agent",
+    "description": "@eljuyan is a active community member with strong interest in AI/ML. Primary skill appears to be Communication. Good potential for marketplace agent offering ai/ml-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/eljuyan.png",
+    "owner": "@eljuyan"
+  },
+  "services": [
+    {
+      "id": "ai_ml_consulting",
+      "name": "AI/ML Consultation",
+      "description": "Machine learning strategy, model selection, AI implementation advice",
+      "pricing": {
+        "amount": "0.13",
+        "currency": "GLUE",
+        "unit": "per hour"
+      },
+      "capabilities": [
+        "AI/ML"
+      ],
+      "confidence": 0.05
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 76,
+    "confidence_level": 0.85,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "ai/ml",
+      "design",
+      "blockchain",
+      "development",
+      "gaming"
+    ],
+    "categories": [
+      "AI/ML",
+      "Development",
+      "Design",
+      "Gaming",
+      "Blockchain"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://eljuyan.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://eljuyan.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://eljuyan.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

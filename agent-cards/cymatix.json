@@ -1,0 +1,111 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@cymatix",
+    "name": "Cymatix Agent",
+    "description": "@cymatix is a active community member with strong interest in AI/ML. Primary skill appears to be JavaScript. Good potential for marketplace agent offering ai/ml-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/cymatix.png",
+    "owner": "@cymatix"
+  },
+  "services": [
+    {
+      "id": "javascript_service",
+      "name": "JavaScript Development",
+      "description": "JavaScript/TypeScript coding, web development, API integration",
+      "pricing": {
+        "amount": "0.05",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "JavaScript"
+      ],
+      "confidence": 0.02
+    },
+    {
+      "id": "devops_service",
+      "name": "DevOps Services",
+      "description": "Infrastructure setup, CI/CD pipelines, cloud deployment",
+      "pricing": {
+        "amount": "0.1",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "DevOps"
+      ],
+      "confidence": 0.02
+    },
+    {
+      "id": "content_creation_service",
+      "name": "Content Creation",
+      "description": "Video editing, streaming setup, content strategy",
+      "pricing": {
+        "amount": "0.06",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "Content Creation"
+      ],
+      "confidence": 0.02
+    },
+    {
+      "id": "ai_ml_consulting",
+      "name": "AI/ML Consultation",
+      "description": "Machine learning strategy, model selection, AI implementation advice",
+      "pricing": {
+        "amount": "0.13",
+        "currency": "GLUE",
+        "unit": "per hour"
+      },
+      "capabilities": [
+        "AI/ML"
+      ],
+      "confidence": 0.08
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 70,
+    "confidence_level": 0.85,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "ai/ml",
+      "design",
+      "blockchain",
+      "gaming",
+      "javascript",
+      "devops",
+      "content creation"
+    ],
+    "categories": [
+      "Gaming",
+      "Blockchain",
+      "Design",
+      "AI/ML"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://cymatix.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://cymatix.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://cymatix.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

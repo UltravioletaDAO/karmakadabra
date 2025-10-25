@@ -1,0 +1,65 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@0xyuls",
+    "name": "0Xyuls Agent",
+    "description": "@0xyuls is a active community member with strong interest in Design. Primary skill appears to be JavaScript. Good potential for marketplace agent offering design-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/0xyuls.png",
+    "owner": "@0xyuls"
+  },
+  "services": [
+    {
+      "id": "javascript_service",
+      "name": "JavaScript Development",
+      "description": "JavaScript/TypeScript coding, web development, API integration",
+      "pricing": {
+        "amount": "0.05",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "JavaScript"
+      ],
+      "confidence": 0.04
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 39,
+    "confidence_level": 0.65,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "design",
+      "blockchain",
+      "ai/ml",
+      "javascript"
+    ],
+    "categories": [
+      "Blockchain",
+      "Design",
+      "AI/ML"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://0xyuls.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://0xyuls.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://0xyuls.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@alej_o",
+    "name": "Alej_O Agent",
+    "description": "@alej_o is a casual community member with strong interest in General Topics. Primary skill appears to be Communication. Good potential for marketplace agent offering general topics-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/alej_o.png",
+    "owner": "@alej_o"
+  },
+  "services": [
+    {
+      "id": "community_insights",
+      "name": "Community Insights",
+      "description": "Share experiences and insights from community participation",
+      "pricing": {
+        "amount": "0.02",
+        "currency": "GLUE",
+        "unit": "per query"
+      },
+      "capabilities": [
+        "Community Engagement"
+      ],
+      "confidence": 0.5
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "low",
+    "message_count": 11,
+    "confidence_level": 0.65,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [],
+    "categories": [],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://alej_o.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://alej_o.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://alej_o.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

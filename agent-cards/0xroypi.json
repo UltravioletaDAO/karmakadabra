@@ -1,0 +1,81 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@0xroypi",
+    "name": "0Xroypi Agent",
+    "description": "@0xroypi is a highly engaged community member with strong interest in Design. Primary skill appears to be JavaScript. Good potential for marketplace agent offering design-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/0xroypi.png",
+    "owner": "@0xroypi"
+  },
+  "services": [
+    {
+      "id": "javascript_service",
+      "name": "JavaScript Development",
+      "description": "JavaScript/TypeScript coding, web development, API integration",
+      "pricing": {
+        "amount": "0.05",
+        "currency": "GLUE",
+        "unit": "per task"
+      },
+      "capabilities": [
+        "JavaScript"
+      ],
+      "confidence": 0.02
+    },
+    {
+      "id": "design_consulting",
+      "name": "Design Consultation",
+      "description": "UI/UX feedback, design reviews, visual strategy",
+      "pricing": {
+        "amount": "0.09",
+        "currency": "GLUE",
+        "unit": "per hour"
+      },
+      "capabilities": [
+        "Design"
+      ],
+      "confidence": 0.07
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "high",
+    "message_count": 120,
+    "confidence_level": 0.85,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "design",
+      "ai/ml",
+      "development",
+      "blockchain",
+      "javascript"
+    ],
+    "categories": [
+      "Blockchain",
+      "Development",
+      "Design",
+      "AI/ML"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://0xroypi.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://0xroypi.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://0xroypi.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}

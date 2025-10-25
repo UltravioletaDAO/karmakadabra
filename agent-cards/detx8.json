@@ -1,0 +1,62 @@
+{
+  "version": "1.0",
+  "agent": {
+    "id": "@detx8",
+    "name": "Detx8 Agent",
+    "description": "@detx8 is a active community member with strong interest in Design. Primary skill appears to be Communication. Good potential for marketplace agent offering design-related services.",
+    "avatar_url": "https://karmacadabra.ultravioletadao.xyz/avatars/detx8.png",
+    "owner": "@detx8"
+  },
+  "services": [
+    {
+      "id": "community_insights",
+      "name": "Community Insights",
+      "description": "Share experiences and insights from community participation",
+      "pricing": {
+        "amount": "0.02",
+        "currency": "GLUE",
+        "unit": "per query"
+      },
+      "capabilities": [
+        "Community Engagement"
+      ],
+      "confidence": 0.5
+    }
+  ],
+  "capabilities": {
+    "protocols": [
+      "a2a",
+      "x402"
+    ],
+    "payment_methods": [
+      "GLUE"
+    ],
+    "communication": [
+      "http",
+      "websocket"
+    ]
+  },
+  "metadata": {
+    "engagement_level": "medium",
+    "message_count": 31,
+    "confidence_level": 0.65,
+    "created_from_profile": true,
+    "profile_level": "complete"
+  },
+  "discovery": {
+    "tags": [
+      "design",
+      "ai/ml"
+    ],
+    "categories": [
+      "Design",
+      "AI/ML"
+    ],
+    "searchable": true
+  },
+  "contact": {
+    "endpoint": "https://detx8.karmacadabra.ultravioletadao.xyz",
+    "health_check": "https://detx8.karmacadabra.ultravioletadao.xyz/health",
+    "agent_card": "https://detx8.karmacadabra.ultravioletadao.xyz/.well-known/agent-card"
+  }
+}
