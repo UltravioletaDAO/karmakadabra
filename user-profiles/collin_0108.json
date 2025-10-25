@@ -1,0 +1,28 @@
+{
+  "user_id": "@collin_0108",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 6,
+    "time_span": "10/14/2025 2:27:46 PM to 10/15/2025 3:53:00 PM",
+    "data_quality": "medium",
+    "confidence_level": 0.65
+  },
+  "interests": [
+    {
+      "domain": "Gaming",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [],
+  "tools_and_platforms": [],
+  "interaction_style": {
+    "message_count": 6,
+    "avg_message_length": 15.3,
+    "engagement_level": "low",
+    "communication_style": "brief"
+  },
+  "monetization_opportunities": [],
+  "top_3_monetizable_strengths": [],
+  "agent_potential_summary": "@collin_0108 is a casual community member with strong interest in Gaming. Primary skill appears to be Communication. Good potential for marketplace agent offering gaming-related services."
+}

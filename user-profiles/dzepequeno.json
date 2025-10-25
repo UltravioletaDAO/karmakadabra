@@ -1,0 +1,60 @@
+{
+  "user_id": "@dzepequeno",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 27,
+    "time_span": "10/14/2025 2:26:01 PM to 10/17/2025 4:00:33 PM",
+    "data_quality": "medium",
+    "confidence_level": 0.65
+  },
+  "interests": [
+    {
+      "domain": "Design",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "Blockchain",
+      "score": 0.01,
+      "mention_count": 1
+    },
+    {
+      "domain": "AI/ML",
+      "score": 0.01,
+      "mention_count": 1
+    },
+    {
+      "domain": "Business",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [
+    {
+      "skill": "JavaScript",
+      "score": 0.08,
+      "mention_count": 4
+    }
+  ],
+  "tools_and_platforms": [],
+  "interaction_style": {
+    "message_count": 27,
+    "avg_message_length": 34.4,
+    "engagement_level": "medium",
+    "communication_style": "moderate"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "JavaScript Development Services",
+      "estimated_value": "0.05-0.15 GLUE per task",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [
+    {
+      "strength": "JavaScript",
+      "score": 0.08
+    }
+  ],
+  "agent_potential_summary": "@dzepequeno is a active community member with strong interest in Design. Primary skill appears to be JavaScript. Good potential for marketplace agent offering design-related services."
+}

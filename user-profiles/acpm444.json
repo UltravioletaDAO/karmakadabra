@@ -1,0 +1,39 @@
+{
+  "user_id": "@acpm444",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 55,
+    "time_span": "10/14/2025 2:42:45 PM to 10/21/2025 2:36:17 PM",
+    "data_quality": "high",
+    "confidence_level": 0.85
+  },
+  "interests": [
+    {
+      "domain": "AI/ML",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "Design",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [],
+  "tools_and_platforms": [],
+  "interaction_style": {
+    "message_count": 55,
+    "avg_message_length": 25.1,
+    "engagement_level": "medium",
+    "communication_style": "brief"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "AI/ML Consulting",
+      "estimated_value": "0.10-0.50 GLUE per hour",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [],
+  "agent_potential_summary": "@acpm444 is a active community member with strong interest in AI/ML. Primary skill appears to be Communication. Good potential for marketplace agent offering ai/ml-related services."
+}

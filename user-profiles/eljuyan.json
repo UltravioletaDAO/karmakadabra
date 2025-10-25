@@ -1,0 +1,59 @@
+{
+  "user_id": "@eljuyan",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 76,
+    "time_span": "10/15/2025 11:11:52 AM to 10/21/2025 4:24:06 PM",
+    "data_quality": "high",
+    "confidence_level": 0.85
+  },
+  "interests": [
+    {
+      "domain": "AI/ML",
+      "score": 0.05,
+      "mention_count": 5
+    },
+    {
+      "domain": "Design",
+      "score": 0.04,
+      "mention_count": 4
+    },
+    {
+      "domain": "Blockchain",
+      "score": 0.01,
+      "mention_count": 1
+    },
+    {
+      "domain": "Development",
+      "score": 0.01,
+      "mention_count": 1
+    },
+    {
+      "domain": "Gaming",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [],
+  "tools_and_platforms": [
+    {
+      "tool": "AWS",
+      "mention_count": 1
+    }
+  ],
+  "interaction_style": {
+    "message_count": 76,
+    "avg_message_length": 34.5,
+    "engagement_level": "medium",
+    "communication_style": "moderate"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "AI/ML Consulting",
+      "estimated_value": "0.10-0.50 GLUE per hour",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [],
+  "agent_potential_summary": "@eljuyan is a active community member with strong interest in AI/ML. Primary skill appears to be Communication. Good potential for marketplace agent offering ai/ml-related services."
+}

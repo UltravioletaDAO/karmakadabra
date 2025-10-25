@@ -1,0 +1,70 @@
+{
+  "user_id": "@elboorja",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 145,
+    "time_span": "10/14/2025 2:36:49 PM to 10/21/2025 2:29:50 PM",
+    "data_quality": "high",
+    "confidence_level": 0.85
+  },
+  "interests": [
+    {
+      "domain": "Design",
+      "score": 0.12,
+      "mention_count": 12
+    },
+    {
+      "domain": "AI/ML",
+      "score": 0.05,
+      "mention_count": 5
+    },
+    {
+      "domain": "Gaming",
+      "score": 0.03,
+      "mention_count": 3
+    },
+    {
+      "domain": "Blockchain",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "Community",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [
+    {
+      "skill": "JavaScript",
+      "score": 0.22,
+      "mention_count": 11
+    }
+  ],
+  "tools_and_platforms": [
+    {
+      "tool": "Discord",
+      "mention_count": 2
+    }
+  ],
+  "interaction_style": {
+    "message_count": 145,
+    "avg_message_length": 51.3,
+    "engagement_level": "high",
+    "communication_style": "moderate"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "JavaScript Development Services",
+      "estimated_value": "0.05-0.15 GLUE per task",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [
+    {
+      "strength": "JavaScript",
+      "score": 0.22
+    }
+  ],
+  "agent_potential_summary": "@elboorja is a highly engaged community member with strong interest in Design. Primary skill appears to be JavaScript. Good potential for marketplace agent offering design-related services."
+}

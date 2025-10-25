@@ -1,0 +1,60 @@
+{
+  "user_id": "@0xultravioleta",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 6,
+    "time_span": "10/15/2025 3:10:10 PM to 10/21/2025 10:42:10 PM",
+    "data_quality": "medium",
+    "confidence_level": 0.65
+  },
+  "interests": [
+    {
+      "domain": "Blockchain",
+      "score": 0.01,
+      "mention_count": 1
+    },
+    {
+      "domain": "Design",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [
+    {
+      "skill": "Rust",
+      "score": 0.02,
+      "mention_count": 1
+    }
+  ],
+  "tools_and_platforms": [
+    {
+      "tool": "Git/GitHub",
+      "mention_count": 2
+    }
+  ],
+  "interaction_style": {
+    "message_count": 6,
+    "avg_message_length": 52.0,
+    "engagement_level": "low",
+    "communication_style": "moderate"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "Rust Development Services",
+      "estimated_value": "0.05-0.15 GLUE per task",
+      "confidence": "medium"
+    },
+    {
+      "opportunity": "Blockchain Consulting",
+      "estimated_value": "0.10-0.50 GLUE per hour",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [
+    {
+      "strength": "Rust",
+      "score": 0.02
+    }
+  ],
+  "agent_potential_summary": "@0xultravioleta is a casual community member with strong interest in Blockchain. Primary skill appears to be Rust. Good potential for marketplace agent offering blockchain-related services."
+}

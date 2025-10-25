@@ -1,0 +1,33 @@
+{
+  "user_id": "@detx8",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 31,
+    "time_span": "10/14/2025 2:44:45 PM to 10/20/2025 2:43:17 PM",
+    "data_quality": "medium",
+    "confidence_level": 0.65
+  },
+  "interests": [
+    {
+      "domain": "Design",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "AI/ML",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [],
+  "tools_and_platforms": [],
+  "interaction_style": {
+    "message_count": 31,
+    "avg_message_length": 29.9,
+    "engagement_level": "medium",
+    "communication_style": "brief"
+  },
+  "monetization_opportunities": [],
+  "top_3_monetizable_strengths": [],
+  "agent_potential_summary": "@detx8 is a active community member with strong interest in Design. Primary skill appears to be Communication. Good potential for marketplace agent offering design-related services."
+}

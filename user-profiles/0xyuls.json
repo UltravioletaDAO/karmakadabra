@@ -1,0 +1,55 @@
+{
+  "user_id": "@0xyuls",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 39,
+    "time_span": "10/14/2025 2:13:57 PM to 10/20/2025 4:06:26 PM",
+    "data_quality": "medium",
+    "confidence_level": 0.65
+  },
+  "interests": [
+    {
+      "domain": "Design",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "Blockchain",
+      "score": 0.01,
+      "mention_count": 1
+    },
+    {
+      "domain": "AI/ML",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [
+    {
+      "skill": "JavaScript",
+      "score": 0.04,
+      "mention_count": 2
+    }
+  ],
+  "tools_and_platforms": [],
+  "interaction_style": {
+    "message_count": 39,
+    "avg_message_length": 16.4,
+    "engagement_level": "medium",
+    "communication_style": "brief"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "JavaScript Development Services",
+      "estimated_value": "0.05-0.15 GLUE per task",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [
+    {
+      "strength": "JavaScript",
+      "score": 0.04
+    }
+  ],
+  "agent_potential_summary": "@0xyuls is a active community member with strong interest in Design. Primary skill appears to be JavaScript. Good potential for marketplace agent offering design-related services."
+}

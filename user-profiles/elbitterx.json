@@ -1,0 +1,70 @@
+{
+  "user_id": "@elbitterx",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 73,
+    "time_span": "10/14/2025 2:58:41 PM to 10/17/2025 5:05:01 PM",
+    "data_quality": "high",
+    "confidence_level": 0.85
+  },
+  "interests": [
+    {
+      "domain": "Gaming",
+      "score": 0.06,
+      "mention_count": 6
+    },
+    {
+      "domain": "Design",
+      "score": 0.06,
+      "mention_count": 6
+    },
+    {
+      "domain": "Blockchain",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "AI/ML",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "Development",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [
+    {
+      "skill": "JavaScript",
+      "score": 0.02,
+      "mention_count": 1
+    }
+  ],
+  "tools_and_platforms": [
+    {
+      "tool": "Discord",
+      "mention_count": 1
+    }
+  ],
+  "interaction_style": {
+    "message_count": 73,
+    "avg_message_length": 46.9,
+    "engagement_level": "medium",
+    "communication_style": "moderate"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "JavaScript Development Services",
+      "estimated_value": "0.05-0.15 GLUE per task",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [
+    {
+      "strength": "JavaScript",
+      "score": 0.02
+    }
+  ],
+  "agent_potential_summary": "@elbitterx is a active community member with strong interest in Gaming. Primary skill appears to be JavaScript. Good potential for marketplace agent offering gaming-related services."
+}

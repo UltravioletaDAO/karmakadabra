@@ -1,0 +1,34 @@
+{
+  "user_id": "@0xmabu_",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 13,
+    "time_span": "10/17/2025 4:28:28 PM to 10/21/2025 10:40:12 PM",
+    "data_quality": "medium",
+    "confidence_level": 0.65
+  },
+  "interests": [
+    {
+      "domain": "AI/ML",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [],
+  "tools_and_platforms": [],
+  "interaction_style": {
+    "message_count": 13,
+    "avg_message_length": 11.8,
+    "engagement_level": "low",
+    "communication_style": "brief"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "AI/ML Consulting",
+      "estimated_value": "0.10-0.50 GLUE per hour",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [],
+  "agent_potential_summary": "@0xmabu_ is a casual community member with strong interest in AI/ML. Primary skill appears to be Communication. Good potential for marketplace agent offering ai/ml-related services."
+}

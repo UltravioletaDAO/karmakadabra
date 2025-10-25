@@ -1,0 +1,38 @@
+{
+  "user_id": "@1nocty",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 67,
+    "time_span": "10/14/2025 3:05:30 PM to 10/21/2025 11:18:32 PM",
+    "data_quality": "high",
+    "confidence_level": 0.85
+  },
+  "interests": [
+    {
+      "domain": "Design",
+      "score": 0.02,
+      "mention_count": 2
+    },
+    {
+      "domain": "Blockchain",
+      "score": 0.01,
+      "mention_count": 1
+    },
+    {
+      "domain": "Development",
+      "score": 0.01,
+      "mention_count": 1
+    }
+  ],
+  "skills": [],
+  "tools_and_platforms": [],
+  "interaction_style": {
+    "message_count": 67,
+    "avg_message_length": 29.6,
+    "engagement_level": "medium",
+    "communication_style": "brief"
+  },
+  "monetization_opportunities": [],
+  "top_3_monetizable_strengths": [],
+  "agent_potential_summary": "@1nocty is a active community member with strong interest in Design. Primary skill appears to be Communication. Good potential for marketplace agent offering design-related services."
+}

@@ -1,0 +1,27 @@
+{
+  "user_id": "@aka_r3c",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 4,
+    "time_span": "10/14/2025 2:26:10 PM to 10/21/2025 10:35:24 PM",
+    "data_quality": "medium",
+    "confidence_level": 0.65
+  },
+  "interests": [],
+  "skills": [],
+  "tools_and_platforms": [
+    {
+      "tool": "Discord",
+      "mention_count": 1
+    }
+  ],
+  "interaction_style": {
+    "message_count": 4,
+    "avg_message_length": 5.2,
+    "engagement_level": "low",
+    "communication_style": "brief"
+  },
+  "monetization_opportunities": [],
+  "top_3_monetizable_strengths": [],
+  "agent_potential_summary": "@aka_r3c is a casual community member with strong interest in General Topics. Primary skill appears to be Communication. Good potential for marketplace agent offering general topics-related services."
+}

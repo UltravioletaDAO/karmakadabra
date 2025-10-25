@@ -1,0 +1,88 @@
+{
+  "user_id": "@cymatix",
+  "profile_level": "complete",
+  "data_coverage": {
+    "message_count": 70,
+    "time_span": "10/14/2025 2:06:19 PM to 10/21/2025 3:35:44 PM",
+    "data_quality": "high",
+    "confidence_level": 0.85
+  },
+  "interests": [
+    {
+      "domain": "AI/ML",
+      "score": 0.08,
+      "mention_count": 8
+    },
+    {
+      "domain": "Design",
+      "score": 0.04,
+      "mention_count": 4
+    },
+    {
+      "domain": "Blockchain",
+      "score": 0.03,
+      "mention_count": 3
+    },
+    {
+      "domain": "Gaming",
+      "score": 0.02,
+      "mention_count": 2
+    }
+  ],
+  "skills": [
+    {
+      "skill": "JavaScript",
+      "score": 0.02,
+      "mention_count": 1
+    },
+    {
+      "skill": "DevOps",
+      "score": 0.02,
+      "mention_count": 1
+    },
+    {
+      "skill": "Content Creation",
+      "score": 0.02,
+      "mention_count": 1
+    }
+  ],
+  "tools_and_platforms": [
+    {
+      "tool": "AWS",
+      "mention_count": 1
+    }
+  ],
+  "interaction_style": {
+    "message_count": 70,
+    "avg_message_length": 31.4,
+    "engagement_level": "medium",
+    "communication_style": "moderate"
+  },
+  "monetization_opportunities": [
+    {
+      "opportunity": "JavaScript Development Services",
+      "estimated_value": "0.05-0.15 GLUE per task",
+      "confidence": "medium"
+    },
+    {
+      "opportunity": "AI/ML Consulting",
+      "estimated_value": "0.10-0.50 GLUE per hour",
+      "confidence": "medium"
+    }
+  ],
+  "top_3_monetizable_strengths": [
+    {
+      "strength": "JavaScript",
+      "score": 0.02
+    },
+    {
+      "strength": "DevOps",
+      "score": 0.02
+    },
+    {
+      "strength": "Content Creation",
+      "score": 0.02
+    }
+  ],
+  "agent_potential_summary": "@cymatix is a active community member with strong interest in AI/ML. Primary skill appears to be JavaScript. Good potential for marketplace agent offering ai/ml-related services."
+}
