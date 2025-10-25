@@ -23,6 +23,18 @@ load_dotenv()
 RPC_URL = os.getenv("RPC_URL_FUJI", "https://avalanche-fuji-c-chain-rpc.publicnode.com")
 w3 = Web3(Web3.HTTPProvider(RPC_URL))
 
+# Agents to fund (0.10 AVAX each - gas is cheap on Fuji!)
+agents_to_fund = {
+    'voice-extractor': {
+        'address': '0xDd63D5840090B98D9EB86f2c31974f9d6c270b17',
+        'amount': 0.10
+    },
+    'skill-extractor': {
+        'address': '0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9',
+        'amount': 0.10
+    }
+}
+
 # Get ERC-20 deployer wallet from AWS
 print("[1/3] Fetching ERC-20 deployer wallet from AWS...")
 try:
@@ -40,9 +52,12 @@ try:
     print(f"[OK] ERC-20 Deployer: {deployer_address}")
     print(f"     Balance: {deployer_avax:.4f} AVAX")
 
-    if deployer_avax < 1.0:
-        print(f"[FAIL] Insufficient balance! Need at least 1.0 AVAX to fund both agents")
+    total_needed = sum(a['amount'] for a in agents_to_fund.values()) + 0.05  # +0.05 for gas
+    if deployer_avax < total_needed:
+        print(f"[FAIL] Insufficient balance! Need at least {total_needed:.2f} AVAX to fund both agents")
         print(f"       Current balance: {deployer_avax:.4f} AVAX")
+        print(f"       Total to send: {sum(a['amount'] for a in agents_to_fund.values()):.2f} AVAX")
+        print(f"       Gas buffer: 0.05 AVAX")
         print(f"       Get more AVAX from: https://faucet.avax.network/")
         sys.exit(1)
     print()
@@ -50,18 +65,6 @@ try:
 except Exception as e:
     print(f"[FAIL] AWS error: {e}")
     sys.exit(1)
-
-# Agents to fund
-agents_to_fund = {
-    'voice-extractor': {
-        'address': '0xDd63D5840090B98D9EB86f2c31974f9d6c270b17',
-        'amount': 0.5
-    },
-    'skill-extractor': {
-        'address': '0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9',
-        'amount': 0.5
-    }
-}
 
 print("[2/3] Checking agent balances...")
 for agent_name, info in agents_to_fund.items():

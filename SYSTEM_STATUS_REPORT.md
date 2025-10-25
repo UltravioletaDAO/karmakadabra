@@ -156,13 +156,13 @@ identity_registry.updateAgent(
 **Problem**: 2 agents need AVAX for gas fees
 
 **Agents**:
-- Voice-Extractor: 0.0000 AVAX (needs 0.5 AVAX)
-- Skill-Extractor: 0.0000 AVAX (needs 0.5 AVAX)
+- Voice-Extractor: 0.0000 AVAX (needs 0.10 AVAX)
+- Skill-Extractor: 0.0000 AVAX (needs 0.10 AVAX)
 
-**Solution**: Fund from ERC-20 deployer wallet
+**Solution**: Fund from ERC-20 deployer wallet (0.20 AVAX total + gas)
 
 ```bash
-python erc-20/distribute-token.py --fund-avax voice-extractor skill-extractor
+python scripts/fund_missing_agents.py --confirm
 ```
 
 ---

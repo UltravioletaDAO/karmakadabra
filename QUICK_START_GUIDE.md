@@ -23,8 +23,8 @@
 ### Step 1: Fund Missing Agents
 
 Two agents need AVAX for gas fees:
-- skill-extractor: 0 AVAX → needs 0.5 AVAX
-- voice-extractor: 0 AVAX → needs 0.5 AVAX
+- skill-extractor: 0 AVAX → needs 0.10 AVAX
+- voice-extractor: 0 AVAX → needs 0.10 AVAX
 
 ```powershell
 # Run from project root
@@ -33,8 +33,8 @@ python scripts/fund_missing_agents.py --confirm
 
 **What this does:**
 - Uses ERC-20 deployer wallet from AWS Secrets Manager
-- Sends 0.5 AVAX to each agent
-- Total cost: 1.0 AVAX + gas fees
+- Sends 0.10 AVAX to each agent (gas is cheap on Fuji!)
+- Total cost: 0.20 AVAX + gas fees (~0.25 AVAX total)
 
 ---
 

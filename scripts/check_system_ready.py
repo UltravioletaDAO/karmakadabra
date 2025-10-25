@@ -41,7 +41,7 @@ def check_agent_status(w3, agent_name, agent_address, identity_registry, glue_to
     print(f"\n{agent_name}:")
     print(f"  Address: {agent_address}")
 
-    # Check AVAX balance
+    # Check AVAX balance (minimum 0.01 AVAX for gas)
     avax_balance = w3.eth.get_balance(agent_address)
     avax_balance_ether = w3.from_wei(avax_balance, 'ether')
     status = "✅" if avax_balance_ether >= 0.01 else "❌"
