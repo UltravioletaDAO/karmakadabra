@@ -40,16 +40,24 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - ✅ **RPC URLs** - Public endpoints
 - ✅ **Domain names** - Public DNS records
 
-**NEVER store in .env files:**
-- ❌ **Private keys** (`PRIVATE_KEY=`) - ALWAYS leave empty
+**NEVER store in .env files (unless overriding for local testing):**
+- ❌ **Private keys** (`PRIVATE_KEY=`) - ALWAYS leave empty, fetched from AWS
+- ❌ **OpenAI API keys** (`OPENAI_API_KEY=`) - ALWAYS leave empty, fetched from AWS
 - ❌ **Mnemonics/seed phrases** - NEVER in any file
-- ❌ **API keys** (OpenAI, etc.) - Use environment variables or AWS Secrets Manager
 
 **Pattern used in this project:**
 ```bash
 # ✅ CORRECT .env pattern
 PRIVATE_KEY=  # Leave empty - fetched from AWS Secrets Manager
+OPENAI_API_KEY=  # Leave empty - fetched from AWS Secrets Manager
 AGENT_ADDRESS=0x2C3e071df446B25B821F59425152838ae4931E75  # Public address (safe to store)
+```
+
+**Override pattern (for local testing only):**
+```bash
+# If you set these in .env, they OVERRIDE AWS Secrets Manager
+PRIVATE_KEY=0x1234...  # Only for testing!
+OPENAI_API_KEY=sk-proj-...  # Only for testing!
 ```
 
 **Why public addresses in .env?**
@@ -404,6 +412,99 @@ skill-extractor.karmacadabra.ultravioletadao.xyz
 - ❌ `karma-hello-seller.ultravioletadao.xyz` (missing karmacadabra subdomain)
 - ❌ `karma-hello.karmacadabra.xyz` (wrong TLD)
 - ❌ `karma-hello-agent.local` (not under ultravioletadao.xyz)
+
+---
+
+## Agent Configuration and Secrets Management
+
+### Loading Agent Configuration
+
+All agents use the same pattern to load configuration from .env files and AWS Secrets Manager:
+
+```python
+from shared.agent_config import load_agent_config
+
+# Load complete configuration (fetches PRIVATE_KEY and OPENAI_API_KEY from AWS)
+config = load_agent_config("karma-hello-agent")
+
+# Access credentials (fetched from AWS Secrets Manager or .env override)
+print(config.private_key)  # Fetched from AWS or .env
+print(config.openai_api_key)  # Fetched from AWS or .env
+
+# Access public config (from .env)
+print(config.agent_address)  # From .env - safe to store
+print(config.agent_domain)  # From .env
+print(config.rpc_url)  # From .env
+print(config.identity_registry)  # From .env
+```
+
+### Secret Fetching Logic
+
+**Priority Order:**
+1. **Environment variable** (.env file) - if set and non-empty → use it
+2. **AWS Secrets Manager** - if env var is empty → fetch from AWS
+
+**Example with PRIVATE_KEY:**
+```python
+from shared.secrets_manager import get_private_key
+
+# If .env has PRIVATE_KEY=0x123... → uses that
+# If .env has PRIVATE_KEY= (empty) → fetches from AWS
+private_key = get_private_key("karma-hello-agent")
+```
+
+**Example with OPENAI_API_KEY:**
+```python
+from shared.secrets_manager import get_openai_api_key
+
+# If .env has OPENAI_API_KEY=sk-proj-... → uses that
+# If .env has OPENAI_API_KEY= (empty) → fetches from AWS
+openai_key = get_openai_api_key("karma-hello-agent")
+```
+
+### AWS Secrets Manager Structure
+
+The `karmacadabra` secret in AWS contains:
+
+```json
+{
+  "karma-hello-agent": {
+    "private_key": "0xf40...",
+    "openai_api_key": "sk-proj-Uwi...",
+    "address": "0x2C3e071df446B25B821F59425152838ae4931E75"
+  },
+  "skill-extractor-agent": {
+    "private_key": "0x8d1...",
+    "openai_api_key": "sk-proj-E_h...",
+    "address": "0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9"
+  },
+  "client-agent": {
+    "private_key": "0xa23...",
+    "openai_api_key": "sk-proj-Skk...",
+    "address": "0xCf30021812F27132d36dc791E0eC17f34B4eE8BA"
+  }
+}
+```
+
+### Adding OpenAI Keys to AWS
+
+To add or update OpenAI API keys:
+
+```bash
+python scripts/add_openai_keys_to_aws.py
+```
+
+This script updates the existing `karmacadabra` secret with `openai_api_key` for each agent.
+
+### Testing Secret Retrieval
+
+```bash
+# Test PRIVATE_KEY and OPENAI_API_KEY retrieval
+python shared/secrets_manager.py validator-agent
+
+# Test complete config loading
+python shared/agent_config.py validator-agent
+```
 
 ---
 
