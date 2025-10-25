@@ -12,6 +12,12 @@
 # Unused/scratch files
 .unused/
 
+# Empty old agent directories (pending Windows deletion)
+abracadabra-agent/
+karma-hello-agent/
+skill-extractor-agent/
+voice-extractor-agent/
+
 # Python
 __pycache__/
 *.py[cod]
