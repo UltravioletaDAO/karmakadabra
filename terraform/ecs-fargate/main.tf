@@ -178,6 +178,10 @@ resource "aws_ecs_task_definition" "agents" {
           value = "https://mainnet.base.org"
         },
         {
+          name  = "RPC_URL_AVALANCHE"
+          value = "https://avalanche-c-chain-rpc.publicnode.com"
+        },
+        {
           name  = "GLUE_TOKEN_ADDRESS"
           value = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
         },

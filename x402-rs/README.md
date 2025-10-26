@@ -3,8 +3,8 @@
 > HTTP 402 payment facilitator customized for Ultravioleta DAO's trustless agent economy
 
 **Version**: 1.0.0 (Karmacadabra Custom)
-**Networks**: Avalanche Fuji (testnet) + Base Sepolia (testnet) + Base Mainnet
-**Status**: 🔴 Ready to configure and deploy
+**Networks**: Avalanche Fuji + Avalanche Mainnet + Base Sepolia + Base Mainnet
+**Status**: ✅ Deployed and operational
 **Last Updated**: October 26, 2025
 
 ---
@@ -49,6 +49,64 @@ The **x402-rs facilitator** is the **payment engine** for Karmacadabra's trustle
 
 ---
 
+## 🌐 Supported Networks
+
+The facilitator supports **4 networks** across 2 blockchain ecosystems:
+
+### Avalanche Ecosystem
+
+**Avalanche Fuji (Testnet)**
+- **Chain ID**: 43113
+- **RPC URL**: `https://avalanche-fuji-c-chain-rpc.publicnode.com`
+- **Tokens**: GLUE, USDC, WAVAX
+- **Purpose**: Testing and development
+- **Explorer**: [Snowtrace Testnet](https://testnet.snowtrace.io)
+
+**Avalanche Mainnet (C-Chain)**
+- **Chain ID**: 43114
+- **RPC URL**: `https://avalanche-c-chain-rpc.publicnode.com`
+- **Tokens**: GLUE, USDC, WAVAX
+- **Purpose**: Production payments
+- **Explorer**: [Snowtrace](https://snowtrace.io)
+
+### Base Ecosystem (Optimistic Rollup)
+
+**Base Sepolia (Testnet)**
+- **Chain ID**: 84532
+- **RPC URL**: `https://sepolia.base.org`
+- **Tokens**: USDC
+- **Purpose**: Testing and development
+- **Explorer**: [Base Sepolia Explorer](https://sepolia.basescan.org)
+
+**Base Mainnet**
+- **Chain ID**: 8453
+- **RPC URL**: `https://mainnet.base.org`
+- **Tokens**: USDC
+- **Purpose**: Production payments
+- **Explorer**: [BaseScan](https://basescan.org)
+
+### Network Discovery
+
+Query the `/supported` endpoint to see all configured networks:
+
+```bash
+curl https://facilitator.ultravioletadao.xyz/supported
+```
+
+**Response:**
+```json
+{
+  "kinds": [
+    {"network":"avalanche-fuji","scheme":"exact","x402Version":1},
+    {"network":"avalanche","scheme":"exact","x402Version":1},
+    {"network":"base-sepolia","scheme":"exact","x402Version":1},
+    {"network":"base","scheme":"exact","x402Version":1}
+  ]
+}
+```
+
+---
+
 ## 🏗️ Architecture
 
 ```
@@ -70,9 +128,11 @@ The **x402-rs facilitator** is the **payment engine** for Karmacadabra's trustle
 │  • Return: {txHash: "0x..."}                │
 │                                             │
 │  GET /supported                             │
-│  • Avalanche Fuji: GLUE, USDC, WAVAX       │
-│  • Base Sepolia: USDC (testnet)             │
-│  • Base: USDC (mainnet)                     │
+│  • Avalanche Fuji (testnet): GLUE, USDC,   │
+│    WAVAX                                    │
+│  • Avalanche Mainnet: GLUE, USDC, WAVAX    │
+│  • Base Sepolia (testnet): USDC             │
+│  • Base Mainnet: USDC                       │
 │  • Format: {"kinds":[{network, scheme}]}   │
 │                                             │
 │  GET /health                                │
