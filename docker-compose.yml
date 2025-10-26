@@ -4,6 +4,7 @@ version: '3.8'
 # Complete agent-to-agent economy for buying/selling AI services
 #
 # Services:
+#   - facilitator: x402 payment facilitator (9000)
 #   - validator: Independent validation service (9001)
 #   - karma-hello: Chat logs seller (9002)
 #   - abracadabra: Transcription seller (9003)
@@ -11,10 +12,11 @@ version: '3.8'
 #   - voice-extractor: Personality profiling seller (9005)
 #
 # Usage:
-#   docker-compose up -d                    # Start all agents
+#   docker-compose up -d                    # Start all services
+#   docker-compose up facilitator           # Start facilitator only
 #   docker-compose up karma-hello           # Start single agent
-#   docker-compose logs -f karma-hello      # View logs
-#   docker-compose down                     # Stop all agents
+#   docker-compose logs -f facilitator      # View logs
+#   docker-compose down                     # Stop all services
 
 networks:
   karmacadabra:
@@ -27,8 +29,48 @@ volumes:
   skill-extractor-cache:
   voice-extractor-cache:
   validator-cache:
+  facilitator-data:
 
 services:
+  # ===========================================================================
+  # FACILITATOR (Port 9000)
+  # ===========================================================================
+  # x402 payment facilitator for gasless micropayments
+  # Verifies EIP-3009 signatures and settles transactions on-chain
+  facilitator:
+    image: ukstv/x402-facilitator:latest
+    container_name: karmacadabra-facilitator
+    ports:
+      - "9000:8080"  # Map internal 8080 to external 9000
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - RUST_LOG=info
+      - SIGNER_TYPE=private-key
+      - RPC_URL_AVALANCHE_FUJI=https://avalanche-fuji-c-chain-rpc.publicnode.com
+      - GLUE_TOKEN_ADDRESS=0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
+      - USDC_FUJI_ADDRESS=0x5425890298aed601595a70AB815c96711a31Bc65
+      - WAVAX_FUJI_ADDRESS=0xd00ae08403B9bbb9124bB305C09058E32C39A48c
+      # EVM_PRIVATE_KEY will be loaded from .env or AWS Secrets Manager
+    env_file:
+      - x402-rs/.env
+    volumes:
+      - facilitator-data:/app/data
+      - ~/.aws:/root/.aws:ro  # AWS credentials for secrets manager
+    networks:
+      - karmacadabra
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
   # ===========================================================================
   # VALIDATOR AGENT (Port 9001)
   # ===========================================================================

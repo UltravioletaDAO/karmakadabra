@@ -28,17 +28,20 @@ docker-compose up -d
 
 ## What Gets Started
 
-Running `docker-compose up` starts **5 agents**:
+Running `docker-compose up` starts **6 services**:
 
 | Service | Port | Description |
 |---------|------|-------------|
+| **facilitator** | 9000 | x402 payment facilitator (Rust) - Settles gasless transactions |
 | **validator** | 9001 | Independent validation service using CrewAI |
 | **karma-hello** | 9002 | Chat logs seller (0.01 GLUE base) |
 | **abracadabra** | 9003 | Transcription seller (0.02 GLUE base) |
 | **skill-extractor** | 9004 | Skill profiling (buys from karma-hello, sells profiles) |
 | **voice-extractor** | 9005 | Personality profiling (buys from karma-hello, sells profiles) |
 
-All agents communicate via internal Docker network: `karmacadabra`
+All services communicate via internal Docker network: `karmacadabra`
+
+**Note**: The facilitator uses a prebuilt image (`ukstv/x402-facilitator:latest`) and requires `EVM_PRIVATE_KEY` in `x402-rs/.env`
 
 ---
 
@@ -61,11 +64,13 @@ Copy from examples:
 ```bash
 # Windows
 for %a in (validator karma-hello abracadabra skill-extractor voice-extractor) do copy agents\%a\.env.example agents\%a\.env
+copy x402-rs\.env.example x402-rs\.env
 
 # Linux/Mac
 for agent in validator karma-hello abracadabra skill-extractor voice-extractor; do
   cp agents/$agent/.env.example agents/$agent/.env
 done
+cp x402-rs/.env.example x402-rs/.env
 ```
 
 **Required in each .env:**
@@ -119,9 +124,12 @@ bash scripts/docker-start.sh    # Linux/Mac
 bash scripts/docker-start.sh dev  # Development mode
 ```
 
-### Start Individual Agents
+### Start Individual Services
 
 ```bash
+# Start only facilitator
+docker-compose up -d facilitator
+
 # Start only karma-hello
 docker-compose up -d karma-hello
 
@@ -152,11 +160,15 @@ docker-compose logs karma-hello | grep ERROR
 docker-compose ps
 
 # Health checks
+curl http://localhost:9000/health  # facilitator
 curl http://localhost:9001/health  # validator
 curl http://localhost:9002/health  # karma-hello
 curl http://localhost:9003/health  # abracadabra
 curl http://localhost:9004/health  # skill-extractor
 curl http://localhost:9005/health  # voice-extractor
+
+# Facilitator endpoints
+curl http://localhost:9000/supported  # Payment methods
 
 # Validator metrics
 curl http://localhost:9090/metrics
