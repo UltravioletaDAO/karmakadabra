@@ -47,8 +47,13 @@ services:
       - HOST=0.0.0.0
       - RUST_LOG=info
       - SIGNER_TYPE=private-key
+      # Avalanche Fuji - Primary network for GLUE token
       - RPC_URL_AVALANCHE_FUJI=https://avalanche-fuji-c-chain-rpc.publicnode.com
       - GLUE_TOKEN_ADDRESS=0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
+      - GLUE_TOKEN_ADDRESS_AVALANCHE_FUJI=0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
+      # Base Sepolia - Optional network for USDC payments (no GLUE deployment)
+      - RPC_URL_BASE_SEPOLIA=https://sepolia.base.org
+      # Token addresses (auto-configured in code, but can override here)
       - USDC_FUJI_ADDRESS=0x5425890298aed601595a70AB815c96711a31Bc65
       - WAVAX_FUJI_ADDRESS=0xd00ae08403B9bbb9124bB305C09058E32C39A48c
       # EVM_PRIVATE_KEY will be loaded from .env or AWS Secrets Manager

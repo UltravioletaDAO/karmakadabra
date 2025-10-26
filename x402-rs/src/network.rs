@@ -280,9 +280,10 @@ static USDC_SEI_TESTNET: Lazy<USDCDeployment> = Lazy::new(|| {
 static UVD_AVALANCHE_FUJI: Lazy<UVDDeployment> = Lazy::new(|| {
     UVDDeployment(TokenDeployment {
         asset: TokenAsset {
-            // TODO: Update this address after deploying UVD V2 token
+            // Reads from GLUE_TOKEN_ADDRESS or GLUE_TOKEN_ADDRESS_AVALANCHE_FUJI environment variable
             // See: erc-20/deployment.json after running ./deploy-fuji.sh
-            address: std::env::var("UVD_TOKEN_ADDRESS")
+            address: std::env::var("GLUE_TOKEN_ADDRESS_AVALANCHE_FUJI")
+                .or_else(|_| std::env::var("GLUE_TOKEN_ADDRESS"))  // Fallback for backwards compatibility
                 .ok()
                 .and_then(|s| s.parse().ok())
                 .map(|addr| MixedAddress::Evm(addr))
@@ -397,11 +398,13 @@ impl From<&UVDDeployment> for Vec<TokenAsset> {
 }
 
 impl UVDDeployment {
-    /// Return the known UVD deployment for Avalanche Fuji.
+    /// Return the known UVD deployment for the given network.
+    ///
+    /// Currently only supports Avalanche Fuji testnet.
     pub fn by_network<N: Borrow<Network>>(network: N) -> &'static UVDDeployment {
         match network.borrow() {
             Network::AvalancheFuji => &UVD_AVALANCHE_FUJI,
-            _ => panic!("UVD token only deployed on Avalanche Fuji testnet"),
+            _ => panic!("UVD/GLUE token only deployed on Avalanche Fuji testnet"),
         }
     }
 }

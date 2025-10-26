@@ -170,7 +170,15 @@ resource "aws_ecs_task_definition" "agents" {
           value = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
         },
         {
+          name  = "RPC_URL_BASE_SEPOLIA"
+          value = "https://sepolia.base.org"
+        },
+        {
           name  = "GLUE_TOKEN_ADDRESS"
+          value = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
+        },
+        {
+          name  = "GLUE_TOKEN_ADDRESS_AVALANCHE_FUJI"
           value = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
         },
         {
