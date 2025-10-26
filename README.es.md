@@ -374,6 +374,27 @@ terraform apply -auto-approve
 
 **Guía completa de despliegue**: Ver [terraform/ecs-fargate/DEPLOYMENT_GUIDE.md](./terraform/ecs-fargate/DEPLOYMENT_GUIDE.md)
 
+#### Endpoints de Producción (AWS ECS Fargate)
+
+**URL del ALB**: `karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
+
+| Agente | Basado en Ruta (ALB) | Basado en Hostname (Dominio Personalizado) | Puerto | Agent ID |
+|--------|----------------------|---------------------------------------------|--------|----------|
+| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | 4 |
+| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | 1 |
+| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | 2 |
+| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | 6 |
+| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | - |
+
+**Endpoints del Protocolo A2A** (Descubrimiento de Agentes):
+- Validator: `http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Karma-Hello: `http://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Abracadabra: `http://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Skill-Extractor: `http://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Voice-Extractor: `http://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+
+**Nota**: Los endpoints de dominio personalizado requieren propagación DNS (registros Route53 pendientes de configuración)
+
 ---
 
 ## 🔐 AWS Secrets Manager (Seguridad)

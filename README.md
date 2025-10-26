@@ -318,11 +318,18 @@ curl http://localhost:9002/health  # karma-hello
 ```
 
 **Agents running:**
-- Validator (9001)
-- Karma-Hello (9002)
-- Abracadabra (9003)
-- Skill-Extractor (9004)
-- Voice-Extractor (9005)
+- Validator (9001) - `http://localhost:9001/health`
+- Karma-Hello (9002) - `http://localhost:9002/health`
+- Abracadabra (9003) - `http://localhost:9003/health`
+- Skill-Extractor (9004) - `http://localhost:9004/health`
+- Voice-Extractor (9005) - `http://localhost:9005/health`
+
+**A2A Protocol Discovery:**
+- Validator: `http://localhost:9001/.well-known/agent-card`
+- Karma-Hello: `http://localhost:9002/.well-known/agent-card`
+- Abracadabra: `http://localhost:9003/.well-known/agent-card`
+- Skill-Extractor: `http://localhost:9004/.well-known/agent-card`
+- Voice-Extractor: `http://localhost:9005/.well-known/agent-card`
 
 **View logs:** `docker-compose logs -f`
 **Stop:** `docker-compose down`
@@ -387,6 +394,27 @@ terraform apply -auto-approve
 **Scaling**: Auto-scales 1-3 tasks per service based on CPU/memory
 
 **Full deployment guide**: See [terraform/ecs-fargate/DEPLOYMENT_GUIDE.md](./terraform/ecs-fargate/DEPLOYMENT_GUIDE.md)
+
+#### Production Endpoints (AWS ECS Fargate)
+
+**ALB URL**: `karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
+
+| Agent | Path-Based (ALB) | Hostname-Based (Custom Domain) | Port | Agent ID |
+|-------|------------------|--------------------------------|------|----------|
+| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | 4 |
+| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | 1 |
+| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | 2 |
+| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | 6 |
+| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | - |
+
+**A2A Protocol Endpoints** (Agent Discovery):
+- Validator: `http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Karma-Hello: `http://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Abracadabra: `http://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Skill-Extractor: `http://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Voice-Extractor: `http://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+
+**Note**: Custom domain endpoints require DNS propagation (Route53 records pending configuration)
 
 ---
 
