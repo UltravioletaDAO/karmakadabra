@@ -59,9 +59,9 @@ Todos los contratos inteligentes están en vivo y verificados en Snowtrace. Las 
 - ✅ Token GLUE (EIP-3009) desplegado y verificado
 - ✅ Registros ERC-8004 Extendido (Identidad, Reputación, Validación) desplegados
 - ✅ Contrato TransactionLogger desplegado
-- ✅ 4 wallets de agentes creadas y fondeadas (Validator, Karma-Hello, Abracadabra, Client)
+- ✅ 6 wallets de agentes creadas y fondeadas (Client, Validator, Karma-Hello, Abracadabra, Voice-Extractor, Skill-Extractor)
 - ✅ AWS Secrets Manager configurado para gestión centralizada de claves
-- ⚠️ Facilitador x402 (usando instancia externa)
+- ✅ Facilitador x402 desplegado en AWS Fargate (https://facilitator.ultravioletadao.xyz)
 
 ### ✅ Sprint 1: Fundamentos (COMPLETO - Octubre 2025)
 
@@ -404,7 +404,7 @@ terraform apply -auto-approve
 ```
 
 **Costo**: ~$81-96/mes (Fargate Spot + ALB + NAT Gateway)
-**Servicios**: 5 agentes (validator, karma-hello, abracadabra, skill-extractor, voice-extractor)
+**Servicios**: 6 servicios (facilitator, validator, karma-hello, abracadabra, skill-extractor, voice-extractor)
 **Escalado**: Auto-escala 1-3 tareas por servicio basado en CPU/memoria
 
 **Guía completa de despliegue**: Ver [terraform/ecs-fargate/DEPLOYMENT_GUIDE.md](./terraform/ecs-fargate/DEPLOYMENT_GUIDE.md)
@@ -413,13 +413,14 @@ terraform apply -auto-approve
 
 **URL del ALB**: `karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
 
-| Agente | Basado en Ruta (ALB) | Basado en Hostname (Dominio Personalizado) | Puerto | Agent ID |
-|--------|----------------------|---------------------------------------------|--------|----------|
-| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | 4 |
-| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | 1 |
-| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | 2 |
-| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | 6 |
-| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | - |
+| Servicio | Basado en Ruta (ALB) | Basado en Hostname (Dominio Personalizado) | Puerto | Tipo |
+|----------|----------------------|---------------------------------------------|--------|------|
+| **Facilitator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/health` | `https://facilitator.ultravioletadao.xyz/health` | 9000 | Pagos |
+| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | Agente |
+| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | Agente |
+| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | Agente |
+| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | Agente |
+| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | Agente |
 
 **Endpoints del Protocolo A2A** (Descubrimiento de Agentes):
 - Validator: `http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
@@ -542,6 +543,142 @@ python -m shared.secrets_manager validator-agent
 
 ---
 
+## 💳 Facilitador de Pagos x402
+
+El **facilitador x402** es el motor de procesamiento de pagos que habilita micropagos sin gas entre agentes. Está escrito en Rust e implementa el protocolo HTTP 402 Payment Required.
+
+### Qué Hace
+
+El facilitador se sitúa entre los agentes compradores y vendedores, verificando firmas de pago y ejecutando transacciones en blockchain:
+
+1. **Verificación de Pago**: Recibe autorizaciones de pago firmadas con EIP-712 de compradores
+2. **Validación de Firma**: Verifica que la firma criptográfica coincida con los detalles del pago
+3. **Ejecución On-Chain**: Llama `transferWithAuthorization()` en el contrato del token GLUE
+4. **Liquidación**: Transfiere GLUE del comprador al vendedor (facilitador paga el gas, no los agentes)
+5. **Respuesta**: Retorna éxito/fallo para que el vendedor pueda entregar los datos
+
+**Innovación Clave**: Los agentes nunca necesitan AVAX/ETH para tarifas de gas. Solo firman autorizaciones de pago off-chain.
+
+### Endpoints
+
+**Producción**: `https://facilitator.ultravioletadao.xyz`
+**Local**: `http://localhost:9000`
+
+| Endpoint | Método | Descripción |
+|----------|--------|-------------|
+| `/health` | GET | Chequeo de salud (retorna estado del servicio) |
+| `/supported` | GET | Lista métodos de pago soportados (GLUE, USDC, WAVAX) |
+| `/verify` | POST | Verificar firma de pago sin ejecutar |
+| `/settle` | POST | Ejecutar pago on-chain (transfiere tokens) |
+
+### Arquitectura
+
+**Tecnología**: Rust + framework web Axum
+**Imagen**: `ukstv/x402-facilitator:latest` (preconstruida)
+**Red**: Avalanche Fuji testnet
+**Billetera**: 2.197 AVAX para tarifas de gas (financiado desde deployer ERC-20)
+
+**Variables de Entorno**:
+```bash
+PORT=8080
+HOST=0.0.0.0
+RUST_LOG=info
+SIGNER_TYPE=private-key
+RPC_URL_AVALANCHE_FUJI=https://avalanche-fuji-c-chain-rpc.publicnode.com
+GLUE_TOKEN_ADDRESS=0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
+EVM_PRIVATE_KEY=<desde AWS Secrets Manager>
+```
+
+### Modelo Económico
+
+El facilitador **no cobra tarifas** - es un servicio público para la economía de Karmacadabra:
+
+- ✅ Verificación de pagos gratuita
+- ✅ Liquidación de transacciones gratuita
+- ✅ Facilitador paga todas las tarifas de gas
+- ⚠️ Requiere financiamiento: ~1-2 AVAX por mes para gas
+
+**¿Por qué sin tarifas?** El facilitador es infraestructura para la economía de agentes. Las tarifas de servicios de agentes (0.001-200 GLUE) ya proporcionan captura de valor. El rol del facilitador es habilitar transacciones sin fricción.
+
+### Despliegue
+
+**Docker Compose (Pruebas Locales)**:
+```bash
+# Facilitador corre en puerto 9000
+docker-compose up -d facilitator
+curl http://localhost:9000/health
+curl http://localhost:9000/supported
+```
+
+**AWS ECS Fargate (Producción)**:
+```bash
+# Desplegar con scripts automatizados
+python scripts/deploy-all.py
+
+# O componentes individuales
+python scripts/fund-wallets.py --confirm        # Financiar billetera del facilitador
+python scripts/build-and-push.py facilitator    # Construir imagen Docker
+python scripts/deploy-to-fargate.py facilitator # Desplegar a Fargate
+```
+
+**Monitoreo**:
+```bash
+# Verificar salud del facilitador
+curl https://facilitator.ultravioletadao.xyz/health
+
+# Ver logs
+aws logs tail /ecs/karmacadabra-prod/facilitator --follow
+
+# Verificar balance de billetera
+cast balance 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8 --rpc-url https://avalanche-fuji-c-chain-rpc.publicnode.com
+```
+
+### Integración con Agentes
+
+Los agentes usan el facilitador a través de la biblioteca compartida `x402_client.py`:
+
+```python
+from shared.x402_client import X402Client
+
+# Agente comprador crea pago
+client = X402Client(
+    facilitator_url="https://facilitator.ultravioletadao.xyz",
+    private_key=os.getenv("PRIVATE_KEY")
+)
+
+# Firmar autorización de pago (off-chain)
+payment = client.create_payment(
+    to="0x2C3e071df446B25B821F59425152838ae4931E75",  # Vendedor
+    amount=Decimal("0.01"),  # 0.01 GLUE
+    token_address="0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
+)
+
+# Hacer solicitud HTTP con header X-Payment
+response = requests.get(
+    "https://karma-hello.karmacadabra.ultravioletadao.xyz/logs/20251022",
+    headers={"X-Payment": payment}
+)
+```
+
+**Agente vendedor verifica a través de middleware**:
+```python
+from shared.base_agent import ERC8004BaseAgent
+
+class KarmaHelloAgent(ERC8004BaseAgent):
+    def __init__(self):
+        super().__init__()
+        # middleware x402 verifica automáticamente pagos
+        self.app.add_middleware(X402Middleware, facilitator_url=self.facilitator_url)
+```
+
+### Código Fuente
+
+**Repositorio**: directorio `x402-rs/`
+**Documentación**: [x402-rs/README.md](./x402-rs/README.md)
+**Implementación Rust**: Basada en [especificación del protocolo x402](https://www.x402.org)
+
+---
+
 ## 💰 ¿Qué se Puede Monetizar?
 
 ### Servicios de Karma-Hello (20+ productos)
@@ -639,7 +776,7 @@ karmacadabra/
 | **Fase 1** | Token GLUE | ✅ **DESPLEGADO Y VERIFICADO** |
 | **Fase 1** | TransactionLogger | ✅ **DESPLEGADO Y VERIFICADO** |
 | **Fase 1** | Distribución de Tokens | ✅ **COMPLETO** (55,000 GLUE a cada agente) |
-| **Fase 1** | Facilitador x402 | ⏸️ Listo (requiere Rust nightly - usando facilitador externo) |
+| **Fase 1** | Facilitador x402 | ✅ **DESPLEGADO** (https://facilitator.ultravioletadao.xyz) |
 | **Fase 2** | Agente Validador | ✅ **COMPLETO** |
 | **Fase 3** | Agentes Karma-Hello | 🔴 Por implementar |
 | **Fase 4** | Agentes Abracadabra | 🔴 Por implementar |
