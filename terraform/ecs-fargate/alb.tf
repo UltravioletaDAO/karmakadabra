@@ -118,7 +118,7 @@ resource "aws_lb_listener" "http" {
 # Listener Rules (Path-based routing to agents)
 # ----------------------------------------------------------------------------
 
-resource "aws_lb_listener_rule" "agents" {
+resource "aws_lb_listener_rule" "agents_path" {
   for_each = var.agents
 
   listener_arn = aws_lb_listener.http.arn
@@ -136,7 +136,38 @@ resource "aws_lb_listener_rule" "agents" {
   }
 
   tags = merge(var.tags, {
-    Name  = "${var.project_name}-${var.environment}-${each.key}-rule"
+    Name  = "${var.project_name}-${var.environment}-${each.key}-path-rule"
+    Agent = each.key
+  })
+}
+
+# ----------------------------------------------------------------------------
+# Listener Rules (Hostname-based routing to agents)
+# ----------------------------------------------------------------------------
+# Routes requests based on Host header:
+# - validator.karmacadabra.ultravioletadao.xyz → validator
+# - karma-hello.karmacadabra.ultravioletadao.xyz → karma-hello
+# etc.
+
+resource "aws_lb_listener_rule" "agents_hostname" {
+  for_each = var.enable_hostname_routing ? var.agents : {}
+
+  listener_arn = aws_lb_listener.http.arn
+  priority     = each.value.priority + 1000 # Higher priority than path-based
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.agents[each.key].arn
+  }
+
+  condition {
+    host_header {
+      values = ["${each.key}.${var.base_domain}"]
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name  = "${var.project_name}-${var.environment}-${each.key}-hostname-rule"
     Agent = each.key
   })
 }
@@ -186,6 +217,8 @@ resource "aws_s3_bucket_lifecycle_configuration" "alb_logs" {
   rule {
     id     = "delete-old-logs"
     status = "Enabled"
+
+    filter {} # Apply to all objects
 
     expiration {
       days = 7 # Keep logs for 7 days only

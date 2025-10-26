@@ -26,14 +26,14 @@ terraform {
     }
   }
 
-  # Backend configuration (uncomment and configure for production)
-  # backend "s3" {
-  #   bucket         = "karmacadabra-terraform-state"
-  #   key            = "ecs-fargate/terraform.tfstate"
-  #   region         = "us-east-1"
-  #   encrypt        = true
-  #   dynamodb_table = "karmacadabra-terraform-locks"
-  # }
+  # Backend configuration for remote state in S3
+  backend "s3" {
+    bucket         = "karmacadabra-terraform-state"
+    key            = "ecs-fargate/terraform.tfstate"
+    region         = "us-east-1"
+    encrypt        = true
+    dynamodb_table = "karmacadabra-terraform-locks"
+  }
 }
 
 provider "aws" {
@@ -51,12 +51,10 @@ provider "aws" {
 data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
-data "aws_secretsmanager_secret" "karmacadabra" {
-  name = var.secrets_manager_secret_name
-}
-
-data "aws_secretsmanager_secret_version" "karmacadabra" {
-  secret_id = data.aws_secretsmanager_secret.karmacadabra.id
+# Data sources for individual agent secrets (flat JSON structure)
+data "aws_secretsmanager_secret" "agent_secrets" {
+  for_each = var.agents
+  name     = "karmacadabra-${each.key}"
 }
 
 # ----------------------------------------------------------------------------
@@ -177,14 +175,16 @@ resource "aws_ecs_task_definition" "agents" {
       ]
 
       # Secrets from AWS Secrets Manager
+      # Format: arn:...:secret-name:json-key::
+      # Uses separate secrets per agent with flat JSON structure
       secrets = [
         {
           name      = "PRIVATE_KEY"
-          valueFrom = "${data.aws_secretsmanager_secret.karmacadabra.arn}:${each.key}:private_key::"
+          valueFrom = "${data.aws_secretsmanager_secret.agent_secrets[each.key].arn}:private_key::"
         },
         {
           name      = "OPENAI_API_KEY"
-          valueFrom = "${data.aws_secretsmanager_secret.karmacadabra.arn}:${each.key}:openai_api_key::"
+          valueFrom = "${data.aws_secretsmanager_secret.agent_secrets[each.key].arn}:openai_api_key::"
         }
       ]
 
@@ -269,6 +269,14 @@ resource "aws_ecs_service" "agents" {
     }
   }
 
+  # Deployment configuration
+  # Note: deployment_configuration removed temporarily due to provider compatibility
+  # Will be added back once syntax is confirmed for AWS provider 5.x
+  # deployment_configuration {
+  #   maximum_percent         = 200
+  #   minimum_healthy_percent = 100
+  # }
+
   # Network configuration
   network_configuration {
     subnets          = aws_subnet.private[*].id
@@ -303,12 +311,6 @@ resource "aws_ecs_service" "agents" {
 
   # Enable ECS Exec for debugging
   enable_execute_command = var.enable_execute_command
-
-  # Deployment configuration
-  deployment_configuration {
-    maximum_percent         = 200
-    minimum_healthy_percent = 100
-  }
 
   # Health check grace period
   health_check_grace_period_seconds = 60

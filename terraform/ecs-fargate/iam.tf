@@ -48,7 +48,8 @@ resource "aws_iam_role_policy" "ecs_secrets_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "arn:aws:secretsmanager:${var.aws_region}:*:secret:${var.secrets_manager_secret_name}*"
+        # Allow access to all agent secrets (karmacadabra-validator, karmacadabra-karma-hello, etc.)
+        Resource = "arn:aws:secretsmanager:${var.aws_region}:*:secret:karmacadabra-*"
       },
       {
         Effect = "Allow"
@@ -129,7 +130,8 @@ resource "aws_iam_role_policy" "task_secrets_access" {
           "secretsmanager:GetSecretValue",
           "secretsmanager:DescribeSecret"
         ]
-        Resource = "arn:aws:secretsmanager:${var.aws_region}:*:secret:${var.secrets_manager_secret_name}*"
+        # Allow access to all agent secrets (karmacadabra-validator, karmacadabra-karma-hello, etc.)
+        Resource = "arn:aws:secretsmanager:${var.aws_region}:*:secret:karmacadabra-*"
       }
     ]
   })

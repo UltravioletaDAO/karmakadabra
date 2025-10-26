@@ -111,10 +111,40 @@ output "agent_endpoints" {
 }
 
 output "agent_health_check_urls" {
-  description = "Agent health check URLs"
+  description = "Agent health check URLs (path-based)"
   value = {
     for k, v in var.agents : k => "http://${aws_lb.main.dns_name}/${k}${v.health_check_path}"
   }
+}
+
+# ----------------------------------------------------------------------------
+# Route53 Domain Outputs
+# ----------------------------------------------------------------------------
+
+output "base_domain" {
+  description = "Base domain for karmacadabra"
+  value       = var.enable_route53 ? var.base_domain : "Route53 disabled"
+}
+
+output "agent_domains" {
+  description = "Agent domain names (hostname-based routing)"
+  value = var.enable_route53 ? {
+    for k, v in var.agents : k => "${k}.${var.base_domain}"
+  } : {}
+}
+
+output "agent_domain_endpoints" {
+  description = "Agent HTTP endpoints using custom domains"
+  value = var.enable_route53 ? {
+    for k, v in var.agents : k => "http://${k}.${var.base_domain}"
+  } : {}
+}
+
+output "agent_domain_health_check_urls" {
+  description = "Agent health check URLs using custom domains"
+  value = var.enable_route53 ? {
+    for k, v in var.agents : k => "http://${k}.${var.base_domain}${v.health_check_path}"
+  } : {}
 }
 
 # ----------------------------------------------------------------------------
@@ -154,15 +184,16 @@ output "cloudwatch_log_group_names" {
   value       = { for k, v in aws_cloudwatch_log_group.agents : k => v.name }
 }
 
-output "cloudwatch_dashboard_name" {
-  description = "CloudWatch Dashboard name"
-  value       = aws_cloudwatch_dashboard.main.dashboard_name
-}
+# Dashboard disabled - see cloudwatch.tf
+# output "cloudwatch_dashboard_name" {
+#   description = "CloudWatch Dashboard name"
+#   value       = aws_cloudwatch_dashboard.main.dashboard_name
+# }
 
-output "cloudwatch_dashboard_url" {
-  description = "CloudWatch Dashboard URL"
-  value       = "https://console.aws.amazon.com/cloudwatch/home?region=${var.aws_region}#dashboards:name=${aws_cloudwatch_dashboard.main.dashboard_name}"
-}
+# output "cloudwatch_dashboard_url" {
+#   description = "CloudWatch Dashboard URL"
+#   value       = "https://console.aws.amazon.com/cloudwatch/home?region=${var.aws_region}#dashboards:name=${aws_cloudwatch_dashboard.main.dashboard_name}"
+# }
 
 # ----------------------------------------------------------------------------
 # Security Group Outputs
@@ -201,12 +232,14 @@ output "service_connect_endpoints" {
 output "estimated_monthly_cost_usd" {
   description = "Estimated monthly cost in USD (approximate)"
   value = {
-    fargate_tasks = "~$${var.use_fargate_spot ? "25-40" : "80-120"} (5 agents, 24/7, ${var.use_fargate_spot ? "Spot" : "On-Demand"})"
+    fargate_tasks = format("~$%s (5 agents, 24/7, %s)",
+      var.use_fargate_spot ? "25-40" : "80-120",
+      var.use_fargate_spot ? "Spot" : "On-Demand")
     alb           = "~$16-18"
     nat_gateway   = var.enable_nat_gateway ? (var.single_nat_gateway ? "~$32" : "~$64") : "$0"
     cloudwatch    = "~$5-8 (logs + metrics)"
     ecr           = "~$1-2 (image storage)"
-    total         = "~$${var.use_fargate_spot ? "79-96" : "134-212"}"
+    total         = format("~$%s", var.use_fargate_spot ? "79-96" : "134-212")
     notes         = "Costs can be reduced by: 1) Scaling down to 0 tasks when not in use, 2) Using smaller task sizes, 3) Reducing log retention"
   }
 }
@@ -260,20 +293,27 @@ output "quick_start" {
        # Repeat for other agents: karma-hello, abracadabra, skill-extractor, voice-extractor
 
     2. ACCESS AGENTS:
-       ALB DNS: ${aws_lb.main.dns_name}
+       ${var.enable_route53 ? "CUSTOM DOMAINS (Recommended):" : "ALB DNS:"}
+       ${var.enable_route53 ? "" : aws_lb.main.dns_name}
 
-       Validator:       http://${aws_lb.main.dns_name}/validator/health
-       Karma-Hello:     http://${aws_lb.main.dns_name}/karma-hello/health
-       Abracadabra:     http://${aws_lb.main.dns_name}/abracadabra/health
-       Skill-Extractor: http://${aws_lb.main.dns_name}/skill-extractor/health
-       Voice-Extractor: http://${aws_lb.main.dns_name}/voice-extractor/health
+       ${var.enable_route53 ? "Validator:       http://validator.${var.base_domain}/health" : "Validator:       http://${aws_lb.main.dns_name}/validator/health"}
+       ${var.enable_route53 ? "Karma-Hello:     http://karma-hello.${var.base_domain}/health" : "Karma-Hello:     http://${aws_lb.main.dns_name}/karma-hello/health"}
+       ${var.enable_route53 ? "Abracadabra:     http://abracadabra.${var.base_domain}/health" : "Abracadabra:     http://${aws_lb.main.dns_name}/abracadabra/health"}
+       ${var.enable_route53 ? "Skill-Extractor: http://skill-extractor.${var.base_domain}/health" : "Skill-Extractor: http://${aws_lb.main.dns_name}/skill-extractor/health"}
+       ${var.enable_route53 ? "Voice-Extractor: http://voice-extractor.${var.base_domain}/health" : "Voice-Extractor: http://${aws_lb.main.dns_name}/voice-extractor/health"}
+
+       ${var.enable_route53 ? "PATH-BASED ROUTING (Also Available):" : ""}
+       ${var.enable_route53 ? "http://${aws_lb.main.dns_name}/validator/health" : ""}
+       ${var.enable_route53 ? "http://${aws_lb.main.dns_name}/karma-hello/health" : ""}
+       (etc.)
 
     3. VIEW LOGS:
        aws logs tail /ecs/${var.project_name}-${var.environment}/validator --follow
 
     4. MONITOR:
-       CloudWatch Dashboard: ${aws_cloudwatch_dashboard.main.dashboard_name}
-       https://console.aws.amazon.com/cloudwatch/home?region=${var.aws_region}#dashboards:name=${aws_cloudwatch_dashboard.main.dashboard_name}
+       CloudWatch Logs: View logs for each agent in CloudWatch console
+       CloudWatch Alarms: Monitor CPU/Memory/Task count alarms
+       (Dashboard disabled - see cloudwatch.tf for details)
 
     5. DEBUG (SSH into container):
        # Get task ID

@@ -298,19 +298,37 @@ variable "service_connect_namespace" {
 }
 
 # ----------------------------------------------------------------------------
-# Domain Configuration
+# Route53 Domain Configuration
 # ----------------------------------------------------------------------------
 
-variable "domain_name" {
-  description = "Domain name for ALB (optional - leave empty to skip Route53)"
-  type        = string
-  default     = "" # Empty = no Route53 configuration
+variable "enable_route53" {
+  description = "Enable Route53 DNS record creation"
+  type        = bool
+  default     = true
 }
 
-variable "create_route53_records" {
-  description = "Create Route53 DNS records (requires domain_name)"
+variable "hosted_zone_name" {
+  description = "Route53 hosted zone name (e.g., ultravioletadao.xyz)"
+  type        = string
+  default     = "ultravioletadao.xyz"
+}
+
+variable "base_domain" {
+  description = "Base domain for karmacadabra (under hosted zone)"
+  type        = string
+  default     = "karmacadabra.ultravioletadao.xyz"
+}
+
+variable "enable_wildcard_domain" {
+  description = "Create wildcard DNS record (*.karmacadabra.ultravioletadao.xyz)"
   type        = bool
-  default     = false # Disabled to save Route53 costs
+  default     = false
+}
+
+variable "enable_hostname_routing" {
+  description = "Enable hostname-based routing in ALB (in addition to path-based)"
+  type        = bool
+  default     = true
 }
 
 # ----------------------------------------------------------------------------

@@ -32,9 +32,14 @@ RUN pip install --no-cache-dir \
     crewai>=0.28.0 \
     openai>=1.3.0
 
-# Copy agent-specific code (overridden by volume mounts in dev)
-# This is a placeholder - actual code comes from volume mounts
-# Allows running without volume mounts in production
+# Accept agent name and path as build args
+ARG AGENT_NAME
+ARG AGENT_PATH=agents/${AGENT_NAME}
+
+# Copy agent-specific code
+# For validator: AGENT_PATH=validator
+# For others: AGENT_PATH=agents/{name}
+COPY ${AGENT_PATH}/ /app/
 
 # Health check (overridden per agent)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \

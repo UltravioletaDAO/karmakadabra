@@ -1,0 +1,97 @@
+graph TB
+    subgraph "AWS Cloud - us-east-1"
+        subgraph "VPC - karmacadabra-prod"
+            subgraph "Public Subnets (2 AZs)"
+                ALB[Application Load Balancer<br/>karmacadabra-prod-alb<br/>HTTP:80]
+                NAT1[NAT Gateway<br/>us-east-1a]
+                NAT2[NAT Gateway<br/>us-east-1b]
+            end
+            
+            subgraph "Private Subnets (2 AZs)"
+                subgraph "ECS Cluster - karmacadabra-prod"
+                    TASK1[Fargate Task<br/>Validator<br/>0.25 vCPU / 0.5GB]
+                    TASK2[Fargate Task<br/>Karma-Hello<br/>0.25 vCPU / 0.5GB]
+                    TASK3[Fargate Task<br/>Abracadabra<br/>0.25 vCPU / 0.5GB]
+                    TASK4[Fargate Task<br/>Skill-Extractor<br/>0.25 vCPU / 0.5GB]
+                    TASK5[Fargate Task<br/>Voice-Extractor<br/>0.25 vCPU / 0.5GB]
+                end
+            end
+            
+            subgraph "Security Groups"
+                SG_ALB[ALB Security Group<br/>Inbound: 80, 443<br/>Outbound: All]
+                SG_ECS[ECS Tasks SG<br/>Inbound: ALB only<br/>Outbound: All]
+            end
+        end
+        
+        subgraph "AWS Services"
+            ECR[Elastic Container Registry<br/>5 repositories<br/>karmacadabra/*]
+            SECRETS[Secrets Manager<br/>karmacadabra-validator<br/>karmacadabra-karma-hello<br/>etc.]
+            LOGS[CloudWatch Logs<br/>/ecs/karmacadabra-prod/*<br/>7 day retention]
+            METRICS[CloudWatch Metrics<br/>Container Insights<br/>CPU/Memory/Network]
+            R53[Route53<br/>ultravioletadao.xyz<br/>Zone]
+        end
+    end
+    
+    subgraph "Internet"
+        DNS[DNS Queries<br/>*.karmacadabra.ultravioletadao.xyz]
+        USERS[HTTP Clients<br/>Agent Buyers]
+    end
+    
+    DNS --> R53
+    R53 --> ALB
+    USERS --> ALB
+    
+    ALB --> TASK1
+    ALB --> TASK2
+    ALB --> TASK3
+    ALB --> TASK4
+    ALB --> TASK5
+    
+    TASK1 --> NAT1
+    TASK2 --> NAT1
+    TASK3 --> NAT2
+    TASK4 --> NAT2
+    TASK5 --> NAT1
+    
+    NAT1 --> Internet
+    NAT2 --> Internet
+    
+    TASK1 -.->|Pull Image| ECR
+    TASK2 -.->|Pull Image| ECR
+    TASK3 -.->|Pull Image| ECR
+    TASK4 -.->|Pull Image| ECR
+    TASK5 -.->|Pull Image| ECR
+    
+    TASK1 -.->|Fetch Secrets| SECRETS
+    TASK2 -.->|Fetch Secrets| SECRETS
+    TASK3 -.->|Fetch Secrets| SECRETS
+    TASK4 -.->|Fetch Secrets| SECRETS
+    TASK5 -.->|Fetch Secrets| SECRETS
+    
+    TASK1 -.->|Stream Logs| LOGS
+    TASK2 -.->|Stream Logs| LOGS
+    TASK3 -.->|Stream Logs| LOGS
+    TASK4 -.->|Stream Logs| LOGS
+    TASK5 -.->|Stream Logs| LOGS
+    
+    TASK1 -.->|Send Metrics| METRICS
+    TASK2 -.->|Send Metrics| METRICS
+    TASK3 -.->|Send Metrics| METRICS
+    TASK4 -.->|Send Metrics| METRICS
+    TASK5 -.->|Send Metrics| METRICS
+    
+    SG_ALB -.->|Controls| ALB
+    SG_ECS -.->|Controls| TASK1
+    SG_ECS -.->|Controls| TASK2
+    
+    style ALB fill:#ff9800
+    style ECR fill:#4caf50
+    style SECRETS fill:#e91e63
+    style LOGS fill:#2196f3
+    style R53 fill:#9c27b0
+    style TASK1 fill:#00bcd4
+    style TASK2 fill:#00bcd4
+    style TASK3 fill:#00bcd4
+    style TASK4 fill:#00bcd4
+    style TASK5 fill:#00bcd4
+

@@ -183,8 +183,13 @@ resource "aws_cloudwatch_metric_alarm" "unhealthy_targets" {
 # ----------------------------------------------------------------------------
 # CloudWatch Dashboard (Optional - for visual monitoring)
 # ----------------------------------------------------------------------------
+# NOTE: Temporarily disabled due to metric format issues.
+# Dashboard can be created manually in AWS Console or fixed later.
+# All CloudWatch alarms and metrics are still active.
 
-resource "aws_cloudwatch_dashboard" "main" {
+/* DISABLED - NEEDS METRIC FORMAT FIX
+resource "aws_cloudwatch_dashboard" "main_disabled" {
+  count = 0  # Disabled
   dashboard_name = "${var.project_name}-${var.environment}"
 
   dashboard_body = jsonencode({
@@ -277,6 +282,7 @@ resource "aws_cloudwatch_dashboard" "main" {
     )
   })
 }
+*/
 
 # ----------------------------------------------------------------------------
 # X-Ray Sampling Rule (for distributed tracing)

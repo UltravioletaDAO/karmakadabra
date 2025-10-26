@@ -1,0 +1,70 @@
+sequenceDiagram
+    participant Dev as Developer<br/>(Local Machine)
+    participant Docker as Docker Desktop
+    participant ECR as AWS ECR<br/>(Image Registry)
+    participant ECS as AWS ECS<br/>(Orchestrator)
+    participant Fargate as Fargate Tasks<br/>(Containers)
+    participant ALB as Application Load Balancer
+    participant R53 as Route53<br/>(DNS)
+    
+    Note over Dev,R53: Phase 1: Build and Push Images (10-30 min)
+    
+    Dev->>Docker: docker build -t validator<br/>--build-arg AGENT_NAME=validator
+    Docker-->>Dev: Image built successfully
+    
+    Dev->>ECR: aws ecr get-login-password
+    ECR-->>Dev: Authentication token
+    
+    Dev->>Docker: docker tag validator<br/>518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/validator:latest
+    
+    Dev->>ECR: docker push 518898403364.dkr...validator:latest
+    Note over ECR: Scan on push enabled<br/>Lifecycle: Keep 5 images
+    ECR-->>Dev: Push complete
+    
+    Note over Dev: Repeat for all 5 agents
+    
+    Note over Dev,R53: Phase 2: Deploy to ECS (5-10 min)
+    
+    Dev->>ECS: aws ecs update-service<br/>--force-new-deployment
+    Note over ECS: Deployment started<br/>Strategy: Rolling update
+    
+    ECS->>Fargate: Create new task
+    Note over Fargate: Pull image from ECR<br/>Fetch secrets from Secrets Manager
+    
+    Fargate->>ECR: Pull image<br/>karmacadabra/validator:latest
+    ECR-->>Fargate: Image layers
+    
+    Fargate->>Secrets: Get PRIVATE_KEY<br/>Get OPENAI_API_KEY
+    Secrets-->>Fargate: Injected as env vars
+    
+    Note over Fargate: Container starting<br/>Health check: /health
+    
+    Fargate->>Fargate: Wait 60s<br/>(health check grace period)
+    
+    Fargate->>ALB: Register with target group<br/>Port 9001 (validator)
+    
+    ALB->>Fargate: Health check:<br/>GET /health
+    Fargate-->>ALB: 200 OK
+    
+    Note over ALB: Target healthy
+    
+    ECS->>ECS: Drain old task<br/>Wait 30s
+    ECS->>ECS: Stop old task
+    
+    Note over ECS: Deployment complete
+    
+    Note over Dev,R53: Phase 3: DNS and Routing
+    
+    R53->>R53: Create A record<br/>validator.karmacadabra.ultravioletadao.xyz
+    Note over R53: ALIAS → ALB DNS
+    
+    Note over Dev,R53: Phase 4: Traffic Flow
+    
+    Dev->>R53: curl http://validator.karmacadabra.ultravioletadao.xyz/health
+    R53-->>Dev: Resolve to ALB DNS
+    Dev->>ALB: HTTP GET /health<br/>Host: validator.karmacadabra.ultravioletadao.xyz
+    ALB->>ALB: Match hostname rule<br/>Priority 1001
+    ALB->>Fargate: Forward to validator target group
+    Fargate-->>ALB: 200 OK {status: "healthy"}
+    ALB-->>Dev: 200 OK {status: "healthy"}
+
