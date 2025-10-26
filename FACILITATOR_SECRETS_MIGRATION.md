@@ -23,17 +23,19 @@ The facilitator now supports 4 networks and requires separate hot wallets for te
 ### ✅ Completed
 
 - [x] Created `karmacadabra-facilitator-mainnet` secret in AWS Secrets Manager (us-east-1)
+- [x] Created `karmacadabra-facilitator-testnet` secret in AWS Secrets Manager (us-east-1)
 - [x] Created migration scripts in `scripts/` directory
 - [x] Updated facilitator tests to use correct wallet per network
+- [x] Verified all 6 facilitator integration tests pass
+- [x] Confirmed wallet balances on all 4 networks
 
-### ❌ Remaining Tasks
+### 🔄 Remaining Tasks
 
-- [ ] **YOU MUST DO**: Create `karmacadabra-facilitator-testnet` secret (requires testnet private key)
-- [ ] Update Rust facilitator code to load network-specific secrets
+- [ ] Update Rust facilitator code to load network-specific secrets (when deploying)
 - [ ] Update Terraform configuration (terraform/ecs-fargate/main.tf)
 - [ ] Update Docker Compose configuration (docker-compose.yml)
-- [ ] Delete old `karmacadabra-facilitator` secret
-- [ ] Test end-to-end on all 4 networks
+- [ ] Delete old `karmacadabra-facilitator` secret (optional, 7-day recovery window)
+- [ ] Apply same pattern to agent wallets (karma-hello, validator, etc.)
 
 ## Step-by-Step Migration
 
