@@ -29,10 +29,19 @@ You are working with **Karmacadabra**, a trustless agent economy where AI agents
 - Two crates: `x402-axum` (server middleware) and `x402-reqwest` (client middleware)
 
 **Layer 3: AI Agents (Python + CrewAI)**
-- **System Agents**: Validator, Karma-Hello, Abracadabra, Voice-Extractor, Client-Agent
+- **System Agents**: Validator, Karma-Hello, Abracadabra, Skill-Extractor, Voice-Extractor
 - **User Agents** (Vision): 48+ agents, one per chat participant
 - All agents use A2A protocol (Pydantic AI) for discovery and communication
 - CrewAI for multi-agent orchestration and complex workflows
+
+**Layer 4: Cloud Infrastructure (AWS)**
+- **Compute**: ECS Fargate with Spot instances (70% cost savings)
+- **Networking**: VPC, ALB with HTTPS (ACM certificates), Route53 DNS
+- **Storage**: ECR for Docker images, S3 for logs (optional)
+- **Security**: AWS Secrets Manager, Security Groups, IAM roles
+- **Monitoring**: CloudWatch Logs, Metrics, Container Insights, Alarms
+- **Auto-scaling**: 1-3 tasks per service based on CPU/Memory
+- **Region**: us-east-1
 
 ### Tech Stack Map
 
@@ -45,6 +54,11 @@ You are working with **Karmacadabra**, a trustless agent economy where AI agents
 | **Agents** | Base Logic | Python 3.11+ | Agent implementation |
 | **Agents** | Orchestration | CrewAI + GPT-4o | Multi-agent workflows |
 | **Agents** | Protocol | A2A (Pydantic AI) | Agent discovery & communication |
+| **Infrastructure** | Compute | AWS ECS Fargate (Spot) | Containerized agent execution |
+| **Infrastructure** | Networking | AWS ALB + Route53 | HTTPS load balancing + DNS |
+| **Infrastructure** | Security | AWS Secrets Manager + IAM | Secret management + access control |
+| **Infrastructure** | Monitoring | CloudWatch | Logs, metrics, alarms |
+| **Infrastructure** | CI/CD | Docker + ECR | Container builds + registry |
 | **Data** | Karma-Hello Source | MongoDB @ z:\ultravioleta\ai\cursor\karma-hello | Chat logs (GOLDEN SOURCE) |
 | **Data** | Abracadabra Source | SQLite + Cognee @ z:\ultravioleta\ai\cursor\abracadabra | Transcripts & analysis |
 
@@ -56,19 +70,33 @@ You are working with **Karmacadabra**, a trustless agent economy where AI agents
 4. **A2A**: Agent-to-Agent protocol with AgentCard at `/.well-known/agent-card`
 5. **EIP-712**: Typed structured data hashing for signature verification
 
-### Current State (As of October 22, 2025)
+### Current State (As of October 26, 2025)
 
-✅ **Phase 1 Complete**: Smart Contracts Deployed
+✅ **Phase 1-5 Complete**: Full System Operational
 - All 5 contracts verified on Fuji testnet (GLUE, TransactionLogger, 3x ERC-8004 registries)
-- 4 agent wallets funded (Validator, Karma-Hello, Abracadabra, Client-Agent)
-- Total distributed: 220,000 GLUE across agents (55,000 each)
-- Registration fee: 0.005 AVAX
+- 6 agent wallets funded and registered on-chain
+- Total distributed: 330,000+ GLUE across agents
+- Registration fee: 0.005 AVAX per agent
 
-🚧 **Phase 2**: Agent Development (In Progress)
-- Base agent implementation with ERC-8004 integration
-- Validator agent (CrewAI-based quality verification)
-- Server agents (x402-axum middleware)
-- Client agents (x402-reqwest middleware)
+✅ **Phase 6 Complete**: AWS Production Infrastructure
+- **Infrastructure**: AWS ECS Fargate with auto-scaling (1-3 tasks per service)
+- **SSL/TLS**: ACM certificates with automatic DNS validation
+- **Domains**: All 5 agents accessible via HTTPS at `*.karmacadabra.ultravioletadao.xyz`
+- **Monitoring**: CloudWatch Logs, Metrics, Container Insights, and Alarms
+- **Security**: AWS Secrets Manager, VPC, Security Groups, IAM roles
+- **Cost**: Optimized at $81-96/month using Fargate Spot instances
+- **Agents Deployed**:
+  - Validator: https://validator.karmacadabra.ultravioletadao.xyz
+  - Karma-Hello: https://karma-hello.karmacadabra.ultravioletadao.xyz
+  - Abracadabra: https://abracadabra.karmacadabra.ultravioletadao.xyz
+  - Skill-Extractor: https://skill-extractor.karmacadabra.ultravioletadao.xyz
+  - Voice-Extractor: https://voice-extractor.karmacadabra.ultravioletadao.xyz
+
+🚧 **Current Focus**: End-to-End Testing & Integration
+- Testing agent-to-agent purchases in production
+- Validating x402 payment flows with live HTTPS endpoints
+- CrewAI crew optimization for production workloads
+- Client agent integration testing
 
 🔮 **Future Vision**: User Agent Microeconomy
 - 48+ user agents (one per chat participant)

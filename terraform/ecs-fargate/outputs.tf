@@ -143,8 +143,27 @@ output "agent_domain_endpoints" {
 output "agent_domain_health_check_urls" {
   description = "Agent health check URLs using custom domains"
   value = var.enable_route53 ? {
-    for k, v in var.agents : k => "http://${k}.${var.base_domain}${v.health_check_path}"
+    for k, v in var.agents : k => "${var.enable_https ? "https" : "http"}://${k}.${var.base_domain}${v.health_check_path}"
   } : {}
+}
+
+# ----------------------------------------------------------------------------
+# HTTPS/SSL Outputs
+# ----------------------------------------------------------------------------
+
+output "acm_certificate_arn" {
+  description = "ACM certificate ARN"
+  value       = var.enable_https ? aws_acm_certificate.main[0].arn : null
+}
+
+output "acm_certificate_status" {
+  description = "ACM certificate validation status"
+  value       = var.enable_https ? aws_acm_certificate.main[0].status : null
+}
+
+output "https_enabled" {
+  description = "Whether HTTPS is enabled"
+  value       = var.enable_https
 }
 
 # ----------------------------------------------------------------------------

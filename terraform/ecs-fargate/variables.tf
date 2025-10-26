@@ -332,6 +332,28 @@ variable "enable_hostname_routing" {
 }
 
 # ----------------------------------------------------------------------------
+# HTTPS/SSL Configuration
+# ----------------------------------------------------------------------------
+
+variable "enable_https" {
+  description = "Enable HTTPS with ACM certificate"
+  type        = bool
+  default     = true
+}
+
+variable "ssl_policy" {
+  description = "SSL policy for HTTPS listener"
+  type        = string
+  default     = "ELBSecurityPolicy-TLS-1-2-2017-01"
+}
+
+variable "redirect_http_to_https" {
+  description = "Redirect HTTP traffic to HTTPS"
+  type        = bool
+  default     = true
+}
+
+# ----------------------------------------------------------------------------
 # Monitoring & Alerting
 # ----------------------------------------------------------------------------
 

@@ -251,6 +251,41 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 
 **Progreso:** ✅ **7 de 7 hitos completados (100%)** - SPRINT 2 COMPLETO
 
+---
+
+### ✅ Fase 6: Despliegue en Producción (COMPLETA - 26 de Octubre 2025)
+
+**Infraestructura AWS ECS Fargate** - Los 5 agentes desplegados en producción con HTTPS
+
+**Endpoints de Producción en Vivo:**
+
+| Agente | Endpoint HTTPS | Descubrimiento AgentCard |
+|--------|---------------|--------------------------|
+| **Validator** | [https://validator.karmacadabra.ultravioletadao.xyz](https://validator.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Karma-Hello** | [https://karma-hello.karmacadabra.ultravioletadao.xyz](https://karma-hello.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Abracadabra** | [https://abracadabra.karmacadabra.ultravioletadao.xyz](https://abracadabra.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Skill-Extractor** | [https://skill-extractor.karmacadabra.ultravioletadao.xyz](https://skill-extractor.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Voice-Extractor** | [https://voice-extractor.karmacadabra.ultravioletadao.xyz](https://voice-extractor.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+
+**Componentes de Infraestructura:**
+- ✅ **Cómputo**: AWS ECS Fargate con instancias Spot (70% de ahorro en costos)
+- ✅ **SSL/TLS**: Certificado ACM wildcard con validación DNS automática
+- ✅ **Redes**: VPC, Application Load Balancer, Route53 DNS
+- ✅ **Seguridad**: AWS Secrets Manager, Security Groups, roles IAM
+- ✅ **Monitoreo**: CloudWatch Logs, Métricas, Container Insights, Alarmas
+- ✅ **Auto-escalado**: 1-3 tareas por servicio basado en CPU/Memoria
+- ✅ **Costo**: Optimizado a ~$81-96/mes
+
+**Probar el Stack de Producción:**
+```bash
+# Verificar que todos los agentes responden
+python scripts/test_production_stack.py
+
+# Probar compras entre agentes (requiere tokens GLUE)
+python scripts/demo_client_purchases.py --production
+```
+
+**Documentación**: Ver [`GUIA_PRUEBAS_PRODUCCION.md`](./GUIA_PRUEBAS_PRODUCCION.md) para guía completa de pruebas
 
 ---
 

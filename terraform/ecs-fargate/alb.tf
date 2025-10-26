@@ -88,24 +88,36 @@ resource "aws_lb_listener" "http" {
   port              = 80
   protocol          = "HTTP"
 
-  # Default action: return 404
+  # Default action: redirect to HTTPS or return 404
   default_action {
-    type = "fixed-response"
+    type = var.enable_https && var.redirect_http_to_https ? "redirect" : "fixed-response"
 
-    fixed_response {
-      content_type = "application/json"
-      message_body = jsonencode({
-        error   = "Not Found"
-        message = "No agent matched the request path"
-        agents = {
-          validator       = "/validator/*"
-          karma-hello     = "/karma-hello/*"
-          abracadabra     = "/abracadabra/*"
-          skill-extractor = "/skill-extractor/*"
-          voice-extractor = "/voice-extractor/*"
-        }
-      })
-      status_code = "404"
+    dynamic "redirect" {
+      for_each = var.enable_https && var.redirect_http_to_https ? [1] : []
+      content {
+        port        = "443"
+        protocol    = "HTTPS"
+        status_code = "HTTP_301"
+      }
+    }
+
+    dynamic "fixed_response" {
+      for_each = var.enable_https && var.redirect_http_to_https ? [] : [1]
+      content {
+        content_type = "application/json"
+        message_body = jsonencode({
+          error   = "Not Found"
+          message = "No agent matched the request path"
+          agents = {
+            validator       = "/validator/*"
+            karma-hello     = "/karma-hello/*"
+            abracadabra     = "/abracadabra/*"
+            skill-extractor = "/skill-extractor/*"
+            voice-extractor = "/voice-extractor/*"
+          }
+        })
+        status_code = "404"
+      }
     }
   }
 
@@ -173,27 +185,96 @@ resource "aws_lb_listener_rule" "agents_hostname" {
 }
 
 # ----------------------------------------------------------------------------
-# HTTPS Listener (Port 443) - Optional
+# HTTPS Listener (Port 443)
 # ----------------------------------------------------------------------------
-# Uncomment and configure if you have an SSL certificate
 
-# resource "aws_lb_listener" "https" {
-#   load_balancer_arn = aws_lb.main.arn
-#   port              = 443
-#   protocol          = "HTTPS"
-#   ssl_policy        = "ELBSecurityPolicy-TLS-1-2-2017-01"
-#   certificate_arn   = var.acm_certificate_arn
-#
-#   default_action {
-#     type = "fixed-response"
-#
-#     fixed_response {
-#       content_type = "text/plain"
-#       message_body = "Not Found"
-#       status_code  = "404"
-#     }
-#   }
-# }
+resource "aws_lb_listener" "https" {
+  count = var.enable_https ? 1 : 0
+
+  load_balancer_arn = aws_lb.main.arn
+  port              = 443
+  protocol          = "HTTPS"
+  ssl_policy        = var.ssl_policy
+  certificate_arn   = aws_acm_certificate_validation.main[0].certificate_arn
+
+  default_action {
+    type = "fixed-response"
+
+    fixed_response {
+      content_type = "application/json"
+      message_body = jsonencode({
+        error   = "Not Found"
+        message = "No agent matched the request path"
+        agents = {
+          validator       = "/validator/*"
+          karma-hello     = "/karma-hello/*"
+          abracadabra     = "/abracadabra/*"
+          skill-extractor = "/skill-extractor/*"
+          voice-extractor = "/voice-extractor/*"
+        }
+      })
+      status_code = "404"
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name = "${var.project_name}-${var.environment}-https-listener"
+  })
+}
+
+# ----------------------------------------------------------------------------
+# HTTPS Listener Rules (Path-based routing)
+# ----------------------------------------------------------------------------
+
+resource "aws_lb_listener_rule" "agents_path_https" {
+  for_each = var.enable_https ? var.agents : {}
+
+  listener_arn = aws_lb_listener.https[0].arn
+  priority     = each.value.priority
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.agents[each.key].arn
+  }
+
+  condition {
+    path_pattern {
+      values = ["/${each.key}/*"]
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name  = "${var.project_name}-${var.environment}-${each.key}-path-https-rule"
+    Agent = each.key
+  })
+}
+
+# ----------------------------------------------------------------------------
+# HTTPS Listener Rules (Hostname-based routing)
+# ----------------------------------------------------------------------------
+
+resource "aws_lb_listener_rule" "agents_hostname_https" {
+  for_each = var.enable_https && var.enable_hostname_routing ? var.agents : {}
+
+  listener_arn = aws_lb_listener.https[0].arn
+  priority     = each.value.priority + 1000
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.agents[each.key].arn
+  }
+
+  condition {
+    host_header {
+      values = ["${each.key}.${var.base_domain}"]
+    }
+  }
+
+  tags = merge(var.tags, {
+    Name  = "${var.project_name}-${var.environment}-${each.key}-hostname-https-rule"
+    Agent = each.key
+  })
+}
 
 # ----------------------------------------------------------------------------
 # S3 Bucket for ALB Access Logs (Optional)

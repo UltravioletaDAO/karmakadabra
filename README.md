@@ -251,6 +251,41 @@ python test_validator.py --live   # Test with running validator
 
 **Progress:** ✅ **7 of 7 milestones complete (100%)** - SPRINT 2 COMPLETE
 
+---
+
+### ✅ Phase 6: Production Deployment (COMPLETE - October 26, 2025)
+
+**AWS ECS Fargate Infrastructure** - All 5 agents deployed to production with HTTPS
+
+**Live Production Endpoints:**
+
+| Agent | HTTPS Endpoint | AgentCard Discovery |
+|-------|---------------|-------------------|
+| **Validator** | [https://validator.karmacadabra.ultravioletadao.xyz](https://validator.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Karma-Hello** | [https://karma-hello.karmacadabra.ultravioletadao.xyz](https://karma-hello.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Abracadabra** | [https://abracadabra.karmacadabra.ultravioletadao.xyz](https://abracadabra.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Skill-Extractor** | [https://skill-extractor.karmacadabra.ultravioletadao.xyz](https://skill-extractor.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+| **Voice-Extractor** | [https://voice-extractor.karmacadabra.ultravioletadao.xyz](https://voice-extractor.karmacadabra.ultravioletadao.xyz/health) | [/.well-known/agent-card](https://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
+
+**Infrastructure Components:**
+- ✅ **Compute**: AWS ECS Fargate with Spot instances (70% cost savings)
+- ✅ **SSL/TLS**: ACM wildcard certificate with automatic DNS validation
+- ✅ **Networking**: VPC, Application Load Balancer, Route53 DNS
+- ✅ **Security**: AWS Secrets Manager, Security Groups, IAM roles
+- ✅ **Monitoring**: CloudWatch Logs, Metrics, Container Insights, Alarms
+- ✅ **Auto-scaling**: 1-3 tasks per service based on CPU/Memory
+- ✅ **Cost**: Optimized at ~$81-96/month
+
+**Test the Production Stack:**
+```bash
+# Verify all agents are responding
+python scripts/test_production_stack.py
+
+# Test agent-to-agent purchases (requires GLUE tokens)
+python scripts/demo_client_purchases.py --production
+```
+
+**Documentation**: See [`GUIA_PRUEBAS_PRODUCCION.md`](./GUIA_PRUEBAS_PRODUCCION.md) for complete testing guide
 
 ---
 
