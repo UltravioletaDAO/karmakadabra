@@ -9,6 +9,10 @@
 !.env.example
 !.env.fuji.example
 
+# Temporary wallet files (used during rotation)
+.facilitator_wallet_temp.json
+*_wallet_temp.json
+
 # Unused/scratch files
 .unused/
 
