@@ -42,13 +42,13 @@ def get_owner_private_key():
 OWNER_PRIVATE_KEY = get_owner_private_key()
 
 # Amount to distribute per agent (with 6 decimals)
-# All agents get 55,000 GLUE each
+# Most agents get 55,000 GLUE, voice-extractor gets 110,000 GLUE
 AGENT_AMOUNTS = {
     "validator-agent": 55_000 * 10**6,      # 55,000.000000 GLUE
     "karma-hello-agent": 55_000 * 10**6,    # 55,000.000000 GLUE
     "abracadabra-agent": 55_000 * 10**6,    # 55,000.000000 GLUE
-    "client-agent": 55_000 * 10**6,         # 55,000.000000 GLUE
-    "voice-extractor-agent": 55_000 * 10**6, # 55,000.000000 GLUE
+    "client-agent": 220_000 * 10**6,        # 220,000.000000 GLUE (primary buyer)
+    "voice-extractor-agent": 110_000 * 10**6, # 110,000.000000 GLUE (high-volume agent)
     "skill-extractor-agent": 55_000 * 10**6, # 55,000.000000 GLUE
 }
 

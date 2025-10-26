@@ -2,8 +2,14 @@
 
 ## Estado Actual del Stack
 
-✅ **5 agentes de sistema desplegados y funcionando en AWS con HTTPS**
+✅ **6 componentes desplegados y funcionando en AWS con HTTPS**
 
+### Facilitador (x402 Payment Protocol)
+| Componente | Estado | Endpoint HTTPS | Documentación |
+|------------|--------|----------------|---------------|
+| **Facilitador** | 🟢 Running | https://facilitator.ultravioletadao.xyz | [/health](https://facilitator.ultravioletadao.xyz/health) · [/supported](https://facilitator.ultravioletadao.xyz/supported) |
+
+### Agentes de Sistema (5)
 | Agente | Estado | Endpoint HTTPS | AgentCard |
 |--------|--------|----------------|-----------|
 | **Validator** | 🟢 Running | https://validator.karmacadabra.ultravioletadao.xyz | [/.well-known/agent-card](https://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) |
@@ -16,29 +22,67 @@
 
 ## Opción 1: Prueba Rápida (Verificar que Todo Funcione)
 
-### Ejecuta el Script de Verificación
+### Ejecuta el Script de Verificación Completo
 
 ```bash
-python scripts/test_production_stack.py
+python scripts/test_all_endpoints.py
 ```
 
 **Esto verifica:**
-- ✅ Health checks de todos los agentes vía HTTPS
+- ✅ **Facilitador**: `/health`, `/supported`, `/verify` (3 endpoints)
+- ✅ **Todos los agentes**: `/health`, `/.well-known/agent-card` (10 endpoints)
+- ✅ **Total**: 13 endpoints verificados en ~5 segundos
 - ✅ Seguridad TLS/SSL
-- ✅ A2A Protocol (AgentCards)
 - ✅ Conectividad completa
 
 **Resultado esperado:**
 ```
-[SUCCESS] Production stack ready!
-Agents responding (HTTPS): 5/5
-Agents with secure config: 5/5
-Agents discoverable (A2A): 5/5
+[SUCCESS] All endpoints responding!
+Facilitator: 3/3 passing
+Agents: 10/10 passing
+Overall: 13/13 endpoints verified
+```
+
+**Alternativa (solo agentes, sin facilitador):**
+```bash
+python scripts/test_production_stack.py
 ```
 
 ---
 
 ## Opción 2: Prueba Manual con cURL
+
+### 0. Verificar Facilitador (x402 Payment Protocol)
+
+```bash
+# Health check del facilitador
+curl https://facilitator.ultravioletadao.xyz/health
+
+# Ver métodos de pago soportados
+curl https://facilitator.ultravioletadao.xyz/supported
+
+# Verificar endpoint de verificación (debe responder 400 sin payload)
+curl -X POST https://facilitator.ultravioletadao.xyz/verify -H "Content-Type: application/json" -d '{}'
+```
+
+**Respuesta esperada del `/health`:**
+```json
+{
+  "status": "healthy",
+  "version": "0.1.0",
+  "network": "fuji",
+  "facilitator_address": "0x..."
+}
+```
+
+**Respuesta esperada del `/supported`:**
+```json
+{
+  "payment_methods": ["eip3009", "glue"],
+  "network": "fuji",
+  "glue_token": "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
+}
+```
 
 ### 1. Verificar Health de Todos los Agentes
 

@@ -689,8 +689,28 @@ cd x402-rs && cargo run &
 ```
 
 ### Testing End-to-End
+
+**Test all production endpoints (after deploy):**
 ```bash
-python demo.py  # runs complete flow simulation
+# Comprehensive test: facilitator + all 5 agents (13 endpoints)
+python scripts/test_all_endpoints.py
+
+# Tests:
+#   - Facilitator: /health, /supported, /verify
+#   - All agents: /health, /.well-known/agent-card
+#   - Reports: Pass/fail status, JSON responses, troubleshooting tips
+```
+
+**Test agent-to-agent transactions:**
+```bash
+python scripts/demo_client_purchases.py --production
+
+# Simulates full purchase flows with real payments
+```
+
+**Legacy simulation (local):**
+```bash
+python demo.py  # runs complete flow simulation (if exists)
 ```
 
 ---

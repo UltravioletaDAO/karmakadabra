@@ -278,12 +278,20 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 
 **Probar el Stack de Producción:**
 ```bash
-# Verificar que todos los agentes responden
+# Verificar TODOS los endpoints (facilitador + todos los agentes)
+python scripts/test_all_endpoints.py
+
+# Alternativa: Probar solo agentes (sin facilitador)
 python scripts/test_production_stack.py
 
 # Probar compras entre agentes (requiere tokens GLUE)
 python scripts/demo_client_purchases.py --production
 ```
+
+**Endpoints probados por `test_all_endpoints.py`:**
+- **Facilitador**: `/health`, `/supported`, `/verify`
+- **Los 5 Agentes**: `/health`, `/.well-known/agent-card`
+- **Total**: 13 endpoints verificados en ~5 segundos
 
 **Documentación**: Ver [`docs/guides/GUIA_PRUEBAS_PRODUCCION.md`](./docs/guides/GUIA_PRUEBAS_PRODUCCION.md) para guía completa de pruebas
 
