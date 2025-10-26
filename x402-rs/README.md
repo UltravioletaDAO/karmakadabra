@@ -3,9 +3,9 @@
 > HTTP 402 payment facilitator customized for Ultravioleta DAO's trustless agent economy
 
 **Version**: 1.0.0 (Karmacadabra Custom)
-**Network**: Avalanche Fuji Testnet
+**Networks**: Avalanche Fuji (testnet) + Base Sepolia (testnet) + Base Mainnet
 **Status**: 🔴 Ready to configure and deploy
-**Last Updated**: October 22, 2025
+**Last Updated**: October 26, 2025
 
 ---
 
@@ -70,9 +70,10 @@ The **x402-rs facilitator** is the **payment engine** for Karmacadabra's trustle
 │  • Return: {txHash: "0x..."}                │
 │                                             │
 │  GET /supported                             │
-│  • List: ["evm-eip3009-USDC-fuji",          │
-│           "evm-eip3009-UVD-fuji",           │
-│           "evm-eip3009-WAVAX-fuji"]         │
+│  • Avalanche Fuji: GLUE, USDC, WAVAX       │
+│  • Base Sepolia: USDC (testnet)             │
+│  • Base: USDC (mainnet)                     │
+│  • Format: {"kinds":[{network, scheme}]}   │
 │                                             │
 │  GET /health                                │
 │  • Return service status                    │
