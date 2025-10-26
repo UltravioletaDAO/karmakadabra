@@ -155,13 +155,14 @@ abracadabra-agent/transcripts/20251021/*/*.wav
 *.avi
 *.mov
 
-# Allow architecture diagrams (documentation assets)
-!docs/images/architecture/*.png
-
+# Block most images, but allow architecture diagrams (order matters!)
 *.png
 *.jpg
 *.jpeg
 *.gif
+
+# Exception: Allow architecture diagrams (documentation assets)
+!docs/images/architecture/*.png
 
 # Secrets and credentials
 *secret*
