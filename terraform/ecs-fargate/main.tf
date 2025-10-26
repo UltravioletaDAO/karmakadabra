@@ -147,7 +147,41 @@ resource "aws_ecs_task_definition" "agents" {
       ]
 
       # Environment variables (non-secret)
-      environment = [
+      # Facilitator (Rust) vs Python agents have different requirements
+      environment = each.key == "facilitator" ? [
+        {
+          name  = "PORT"
+          value = tostring(each.value.port)
+        },
+        {
+          name  = "HOST"
+          value = "0.0.0.0"
+        },
+        {
+          name  = "RUST_LOG"
+          value = "info"
+        },
+        {
+          name  = "SIGNER_TYPE"
+          value = "private-key"
+        },
+        {
+          name  = "RPC_URL_AVALANCHE_FUJI"
+          value = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
+        },
+        {
+          name  = "GLUE_TOKEN_ADDRESS"
+          value = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
+        },
+        {
+          name  = "USDC_FUJI_ADDRESS"
+          value = "0x5425890298aed601595a70AB815c96711a31Bc65"
+        },
+        {
+          name  = "WAVAX_FUJI_ADDRESS"
+          value = "0xd00ae08403B9bbb9124bB305C09058E32C39A48c"
+        }
+      ] : [
         {
           name  = "PORT"
           value = tostring(each.value.port)
@@ -176,8 +210,13 @@ resource "aws_ecs_task_definition" "agents" {
 
       # Secrets from AWS Secrets Manager
       # Format: arn:...:secret-name:json-key::
-      # Uses separate secrets per agent with flat JSON structure
-      secrets = [
+      # Facilitator uses EVM_PRIVATE_KEY (no OpenAI), agents use PRIVATE_KEY + OPENAI_API_KEY
+      secrets = each.key == "facilitator" ? [
+        {
+          name      = "EVM_PRIVATE_KEY"
+          valueFrom = "${data.aws_secretsmanager_secret.agent_secrets[each.key].arn}:private_key::"
+        }
+      ] : [
         {
           name      = "PRIVATE_KEY"
           valueFrom = "${data.aws_secretsmanager_secret.agent_secrets[each.key].arn}:private_key::"

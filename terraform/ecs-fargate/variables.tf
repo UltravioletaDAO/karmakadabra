@@ -177,6 +177,11 @@ variable "agents" {
     priority          = number # ALB listener rule priority
   }))
   default = {
+    facilitator = {
+      port              = 8080
+      health_check_path = "/health"
+      priority          = 50
+    }
     validator = {
       port              = 9001
       health_check_path = "/health"
