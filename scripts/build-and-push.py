@@ -27,7 +27,7 @@ AGENTS = {
     'facilitator': {
         'context': 'x402-rs',
         'dockerfile': 'Dockerfile',
-        'use_prebuilt': True,  # Use ukstv/x402-facilitator:latest
+        'use_prebuilt': True,  # Use upstream image (local source requires Rust nightly - see MASTER_PLAN.md)
         'prebuilt_image': 'ukstv/x402-facilitator:latest',
         'platform': 'linux/amd64'
     },

@@ -1163,6 +1163,7 @@ This addresses the critical security requirement of never storing keys locally a
 - [x] **build-and-push.py** - Build Docker images and push to ECR (supports prebuilt images)
 - [x] **deploy-to-fargate.py** - Terraform apply + ECS force deployment
 - [x] **deploy-all.py** - Master orchestration (fund → build → deploy → verify)
+- [x] **test_all_endpoints.py** - Comprehensive endpoint testing (facilitator + all agents, 13 endpoints)
 - [x] All scripts fully idempotent - safe to run multiple times
 - [x] Comprehensive error handling and status reporting
 - [x] Documentation: `scripts/README.md`
@@ -1190,6 +1191,13 @@ This addresses the critical security requirement of never storing keys locally a
 - Wallet: 2.197 AVAX funded for gas fees
 - Tokens: GLUE, USDC (Fuji), WAVAX (Fuji)
 - Endpoints: `/health`, `/supported`, `/verify`, `/settle`
+
+⚠️ **Note on Local Builds:** Building x402-rs from local source requires Rust nightly toolchain (Rust 2024 edition features like "let chains"). Current deployment uses prebuilt image `ukstv/x402-facilitator:latest` for stability. Future local builds will require:
+```bash
+rustup toolchain install nightly
+rustup default nightly
+cargo build --release
+```
 
 **Status:** ✅ Production-ready with HTTPS, all 6 services operational
 **Cost:** ~$81-96/month (Fargate Spot + ALB + NAT Gateway)

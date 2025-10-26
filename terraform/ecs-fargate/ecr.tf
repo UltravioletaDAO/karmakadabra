@@ -13,6 +13,7 @@ resource "aws_ecr_repository" "agents" {
 
   name                 = "${var.project_name}/${each.key}"
   image_tag_mutability = "MUTABLE"
+  force_delete         = true # Allow deletion even with images present
 
   image_scanning_configuration {
     scan_on_push = true # Security best practice
