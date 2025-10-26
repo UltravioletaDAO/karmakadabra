@@ -1,7 +1,7 @@
 # 🎯 MASTER PLAN: Trustless Agent Economy
 ## AI Agent Microeconomy with ERC-8004 + A2A + x402
 
-> **Version:** 1.2.0 | **Updated:** October 26, 2025 | **Status:** ✅ Phase 6 Complete - Production Deployed with HTTPS
+> **Version:** 1.3.0 | **Updated:** October 26, 2025 | **Status:** 🔥 Phase 7 In Progress - Multi-Network Expansion & Security Hardening
 
 ---
 
@@ -1198,6 +1198,79 @@ This addresses the critical security requirement of never storing keys locally a
 
 ---
 
+### Phase 7: Infrastructure Hardening & Multi-Network Expansion 🔥 **IN PROGRESS**
+
+**Goal:** Enhance security, expand to mainnet networks, and improve operational resilience
+
+**Multi-Network Facilitator Support:** ✅ **COMPLETE**
+- [x] Base Sepolia network support added (USDC payments)
+- [x] Base Mainnet network support added (USDC payments)
+- [x] Avalanche Mainnet network support added (GLUE payments)
+- [x] Facilitator now supports **4 networks**:
+  - [x] Avalanche Fuji (testnet) - GLUE payments
+  - [x] Avalanche Mainnet - GLUE payments
+  - [x] Base Sepolia (testnet) - USDC payments
+  - [x] Base Mainnet - USDC payments
+- [x] Fixed x402 payment payload format (signature encoding + schema)
+- [x] All 6 facilitator integration tests passing
+- [x] Facilitator wallet separation (testnet vs mainnet)
+  - [x] `karmacadabra-facilitator-testnet` → 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
+  - [x] `karmacadabra-facilitator-mainnet` → 0x103040545AC5031A11E8C03dd11324C7333a13C7
+
+**Wallet Security & Separation:** 🔄 **IN PROGRESS**
+
+*Objective:* Separate testnet and mainnet wallets for all services to prevent accidental mainnet fund usage and improve key rotation security.
+
+**Facilitator Wallets:**
+- [x] Create `karmacadabra-facilitator-testnet` secret
+- [x] Create `karmacadabra-facilitator-mainnet` secret
+- [x] Migration scripts created (`scripts/split_facilitator_secrets.py`, etc.)
+- [x] Documentation: `FACILITATOR_SECRETS_MIGRATION.md`
+- [ ] Update Terraform to use network-specific secrets
+- [ ] Update Docker Compose to use network-specific secrets
+- [ ] Delete old `karmacadabra-facilitator` secret
+
+**Agent Wallets:** ⏳ **PENDING**
+- [ ] Create testnet/mainnet secret pairs for all agents:
+  - [ ] `karmacadabra-karma-hello-testnet` / `karmacadabra-karma-hello-mainnet`
+  - [ ] `karmacadabra-validator-testnet` / `karmacadabra-validator-mainnet`
+  - [ ] `karmacadabra-skill-extractor-testnet` / `karmacadabra-skill-extractor-mainnet`
+  - [ ] `karmacadabra-voice-extractor-testnet` / `karmacadabra-voice-extractor-mainnet`
+  - [ ] `karmacadabra-abracadabra-testnet` / `karmacadabra-abracadabra-mainnet`
+  - [ ] `karmacadabra-client-testnet` / `karmacadabra-client-mainnet`
+- [ ] Update agent code to load network-specific keys
+- [ ] Update Terraform to inject network-specific secrets
+- [ ] Migration guide for agent wallets (`AGENT_WALLET_MIGRATION.md`)
+
+**Security Hardening:**
+- [ ] Implement key rotation schedule (30-90 days)
+- [ ] Set up CloudWatch alarms for low wallet balances
+- [ ] Implement wallet balance monitoring dashboard
+- [ ] Add audit logging for all wallet operations
+- [ ] Document disaster recovery procedures
+
+**Infrastructure Improvements:**
+- [ ] CloudWatch Dashboard validation error fix
+- [ ] Disaster recovery plan documentation
+- [ ] Backup and restore procedures for secrets
+- [ ] Network failover testing (testnet ↔ mainnet)
+
+**Benefits:**
+- 🔒 Improved security: Mainnet keys isolated from testnet operations
+- 🔄 Easier key rotation: Rotate testnet keys without affecting mainnet
+- 💰 Cost savings: Prevent accidental mainnet transactions during testing
+- 🎯 Better compliance: Separate environments for audit purposes
+- 🚀 Mainnet readiness: Infrastructure prepared for production traffic
+
+**Status:** 25% Complete (facilitator wallets separated, agent wallets pending)
+
+**Documentation:**
+- `FACILITATOR_SECRETS_MIGRATION.md` - Complete facilitator wallet separation guide
+- `scripts/create_testnet_facilitator_secret.py` - Testnet secret creation
+- `scripts/split_facilitator_secrets.py` - Migration automation
+
+---
+
 **🎉 End of Master Plan**
 
-**Version:** 1.0.0 | **Author:** Ultravioleta DAO | **License:** MIT
+**Version:** 1.3.0 | **Author:** Ultravioleta DAO | **License:** MIT
