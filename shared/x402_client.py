@@ -159,23 +159,36 @@ class X402Client:
             private_key=private_key
         )
 
+        # Determine network identifier (no chain ID suffix)
+        # Map chain IDs to network names
+        network_map = {
+            43113: "avalanche-fuji",
+            43114: "avalanche",
+            84532: "base-sepolia",
+            8453: "base"
+        }
+        network = network_map.get(self.chain_id, f"unknown-{self.chain_id}")
+
         # Build x402 PaymentPayload
-        # Format: EIP-3009 transferWithAuthorization
+        # Format: Exact scheme with EVM (EIP-3009) payload
         payment_payload = {
-            "x402Version": "0.0.1",
-            "scheme": "eip3009",
-            "network": f"avalanche-fuji:{self.chain_id}",
+            "x402Version": 1,  # Protocol version 1 (integer, not string)
+            "scheme": "exact",  # Exact payment scheme
+            "network": network,  # Network name only (e.g., "avalanche-fuji", not "avalanche-fuji:43113")
             "payload": {
-                "tokenAddress": self.glue_token_address,
-                "from": signature['from'],
-                "to": signature['to'],
-                "value": str(signature['value']),
-                "validAfter": str(signature['validAfter']),
-                "validBefore": str(signature['validBefore']),
-                "nonce": signature['nonce'],
-                "v": signature['v'],
-                "r": signature['r'],
-                "s": signature['s']
+                "signature": {
+                    "v": signature['v'],
+                    "r": signature['r'],
+                    "s": signature['s']
+                },
+                "authorization": {
+                    "from": signature['from'],
+                    "to": signature['to'],
+                    "value": str(signature['value']),
+                    "validAfter": str(signature['validAfter']),
+                    "validBefore": str(signature['validBefore']),
+                    "nonce": signature['nonce']
+                }
             }
         }
 
@@ -236,7 +249,7 @@ class X402Client:
             dict: VerifyResponse (valid: bool, reason: Optional[str])
         """
         verify_request = {
-            "x402Version": "0.0.1",
+            "x402Version": 1,  # Protocol version 1 (integer, not string)
             "paymentPayload": payment_payload,
             "paymentRequirements": payment_requirements
         }
@@ -264,7 +277,7 @@ class X402Client:
             dict: SettleResponse (txHash, success)
         """
         settle_request = {
-            "x402Version": "0.0.1",
+            "x402Version": 1,  # Protocol version 1 (integer, not string)
             "paymentPayload": payment_payload,
             "paymentRequirements": payment_requirements
         }
