@@ -318,18 +318,107 @@ curl http://localhost:9002/health  # karma-hello
 ```
 
 **Agents running:**
-- Validator (9001)
-- Karma-Hello (9002)
-- Abracadabra (9003)
-- Skill-Extractor (9004)
-- Voice-Extractor (9005)
+- Validator (9001) - `http://localhost:9001/health`
+- Karma-Hello (9002) - `http://localhost:9002/health`
+- Abracadabra (9003) - `http://localhost:9003/health`
+- Skill-Extractor (9004) - `http://localhost:9004/health`
+- Voice-Extractor (9005) - `http://localhost:9005/health`
+
+**A2A Protocol Discovery:**
+- Validator: `http://localhost:9001/.well-known/agent-card`
+- Karma-Hello: `http://localhost:9002/.well-known/agent-card`
+- Abracadabra: `http://localhost:9003/.well-known/agent-card`
+- Skill-Extractor: `http://localhost:9004/.well-known/agent-card`
+- Voice-Extractor: `http://localhost:9005/.well-known/agent-card`
 
 **View logs:** `docker-compose logs -f`
 **Stop:** `docker-compose down`
 
 **Full Docker guide**: See [DOCKER_GUIDE.md](./DOCKER_GUIDE.md)
 
-### Option 2: Manual Setup
+### Option 2: Production Deployment (AWS ECS Fargate)
+
+**🌐 Deploy to AWS with Terraform** - Cost-optimized infrastructure using Fargate Spot
+
+#### Complete Infrastructure
+
+![ECS Fargate Infrastructure](./docs/images/architecture/terraform-ecs-fargate-complete-infrastructure.png)
+
+*Complete AWS infrastructure: VPC with public/private subnets, Application Load Balancer, ECS Fargate cluster with 5 services, ECR repositories, Route53 DNS, CloudWatch monitoring, and Secrets Manager integration.*
+
+#### Deployment Flow
+
+![Deployment Flow](./docs/images/architecture/terraform-deployment-flow-build-to-ecs.png)
+
+*End-to-end deployment process: Local Docker build → Push to ECR → Terraform apply → ECS pulls images → Tasks running*
+
+#### ALB Routing Strategy
+
+![ALB Routing](./docs/images/architecture/terraform-alb-routing-path-and-hostname.png)
+
+*Application Load Balancer routing with both path-based (`/validator/health`) and hostname-based (`validator.karmacadabra.ultravioletadao.xyz`) rules directing traffic to the correct ECS service.*
+
+#### Cost Optimization with Fargate Spot
+
+![Cost Optimization](./docs/images/architecture/terraform-fargate-spot-cost-optimization.png)
+
+*Monthly cost breakdown (~$81-96/month) using Fargate Spot (70% savings), with capacity providers, auto-scaling policies, and optimization strategies.*
+
+#### Secrets Management
+
+![Secrets Management](./docs/images/architecture/terraform-secrets-management-ecs.png)
+
+*Secure secret handling: ECS tasks fetch private keys and API keys from AWS Secrets Manager at runtime using IAM execution roles - no secrets in containers or environment variables.*
+
+#### Quick Deploy Commands
+
+```bash
+# 1. Build and push Docker images to ECR
+cd terraform/ecs-fargate
+./build-and-push.ps1  # or .sh on Linux/Mac
+
+# 2. Deploy infrastructure with Terraform
+terraform init
+terraform plan
+terraform apply -auto-approve
+
+# 3. Monitor deployment
+./deploy-and-monitor.ps1  # or .sh on Linux/Mac
+
+# 4. Force fresh image pull (when updating containers)
+./force-image-pull.ps1
+```
+
+**Cost**: ~$81-96/month (Fargate Spot + ALB + NAT Gateway)
+**Services**: 5 agents (validator, karma-hello, abracadabra, skill-extractor, voice-extractor)
+**Scaling**: Auto-scales 1-3 tasks per service based on CPU/memory
+
+**Full deployment guide**: See [terraform/ecs-fargate/DEPLOYMENT_GUIDE.md](./terraform/ecs-fargate/DEPLOYMENT_GUIDE.md)
+
+#### Production Endpoints (AWS ECS Fargate)
+
+**ALB URL**: `karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
+
+| Agent | Path-Based (ALB) | Hostname-Based (Custom Domain) | Port | Agent ID |
+|-------|------------------|--------------------------------|------|----------|
+| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | 4 |
+| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | 1 |
+| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | 2 |
+| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | 6 |
+| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | - |
+
+**A2A Protocol Endpoints** (Agent Discovery):
+- Validator: `http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Karma-Hello: `http://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Abracadabra: `http://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Skill-Extractor: `http://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Voice-Extractor: `http://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+
+**Note**: Custom domain endpoints require DNS propagation (Route53 records pending configuration)
+
+---
+
+### Option 3: Manual Setup
 
 ```bash
 # 1. Clone repository

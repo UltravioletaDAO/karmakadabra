@@ -1,0 +1,76 @@
+graph TB
+    subgraph "Cost Breakdown - Monthly Estimate"
+        TOTAL[Total: $79-96/month]
+        
+        FARGATE[Fargate Spot Tasks<br/>$25-40/month<br/>5 agents x 24/7<br/>0.25 vCPU / 0.5GB RAM]
+        ALB_COST[Application Load Balancer<br/>$16-18/month<br/>1 ALB + data transfer]
+        NAT[NAT Gateway<br/>$32/month<br/>2 AZs for HA]
+        LOGS_COST[CloudWatch<br/>$5-8/month<br/>Logs 7days and Metrics]
+        ECR_COST[ECR Storage<br/>$1-2/month<br/>$0.10/GB, 5 images]
+    end
+    
+    subgraph "Fargate Capacity Providers"
+        STRATEGY[Capacity Provider Strategy]
+        
+        SPOT[Fargate Spot<br/>Weight: 100<br/>Base: 1<br/>70% cheaper]
+        ONDEMAND[Fargate On-Demand<br/>Weight: 0<br/>Fallback only]
+    end
+    
+    subgraph "Auto-Scaling Configuration"
+        AUTOSCALE[Auto-Scaling Policy<br/>Target Tracking]
+        
+        CPU_SCALE[CPU Policy<br/>Target: 70%<br/>Scale out: 1 min<br/>Scale in: 5 min]
+        MEM_SCALE[Memory Policy<br/>Target: 80%<br/>Scale out: 1 min<br/>Scale in: 5 min]
+        
+        LIMITS[Scaling Limits<br/>Min: 1 task/service<br/>Max: 3 tasks/service]
+    end
+    
+    subgraph "Task Configuration"
+        TASK_SIZE[Task Size<br/>Smallest possible]
+        
+        CPU[CPU: 256<br/>0.25 vCPU]
+        MEMORY[Memory: 512<br/>0.5 GB RAM]
+    end
+    
+    subgraph "Cost Optimization Features"
+        LIFECYCLE[ECR Lifecycle<br/>Keep only 5 images<br/>Delete untagged after 7 days]
+        LOG_RETENTION[CloudWatch Logs<br/>7 day retention<br/>Auto-delete old logs]
+        SPOT_INTERRUPTION[Spot Interruption Handling<br/>Auto-restart on different host<br/>No downtime]
+    end
+    
+    TOTAL --> FARGATE
+    TOTAL --> ALB_COST
+    TOTAL --> NAT
+    TOTAL --> LOGS_COST
+    TOTAL --> ECR_COST
+    
+    STRATEGY --> SPOT
+    STRATEGY --> ONDEMAND
+    
+    AUTOSCALE --> CPU_SCALE
+    AUTOSCALE --> MEM_SCALE
+    AUTOSCALE --> LIMITS
+    
+    TASK_SIZE --> CPU
+    TASK_SIZE --> MEMORY
+    
+    SPOT -.->|Primary| FARGATE
+    ONDEMAND -.->|Fallback| FARGATE
+    
+    CPU_SCALE -.->|Triggers| LIMITS
+    MEM_SCALE -.->|Triggers| LIMITS
+    
+    CPU -.->|Smallest| FARGATE
+    MEMORY -.->|Smallest| FARGATE
+    
+    LIFECYCLE -.->|Saves| ECR_COST
+    LOG_RETENTION -.->|Saves| LOGS_COST
+    
+    style TOTAL fill:#4caf50
+    style FARGATE fill:#00bcd4
+    style SPOT fill:#ffc107
+    style ONDEMAND fill:#f44336
+    style CPU_SCALE fill:#2196f3
+    style MEM_SCALE fill:#2196f3
+    style LIMITS fill:#9c27b0
+

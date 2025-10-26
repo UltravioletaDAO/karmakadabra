@@ -40,6 +40,30 @@ This directory contains PNG exports of all architecture diagrams for Karmacadabr
 **File**: `system-status-deployment-status-diagram.png`  
 **Description**: Deployment status of contracts and agents
 
+---
+
+## Terraform/AWS Infrastructure Diagrams
+
+### 10. ECS Fargate Complete Infrastructure
+**File**: `terraform-ecs-fargate-complete-infrastructure.png`  
+**Description**: Complete AWS infrastructure showing VPC, subnets, ALB, ECS cluster, Fargate tasks, ECR, Route53, CloudWatch, and Secrets Manager
+
+### 11. Deployment Flow - Build to ECS
+**File**: `terraform-deployment-flow-build-to-ecs.png`  
+**Description**: Sequence diagram showing the complete deployment flow from local Docker build to running Fargate containers
+
+### 12. ALB Routing - Path and Hostname
+**File**: `terraform-alb-routing-path-and-hostname.png`  
+**Description**: Application Load Balancer routing logic with path-based and hostname-based rules, target groups, and Fargate tasks
+
+### 13. Fargate Spot Cost Optimization
+**File**: `terraform-fargate-spot-cost-optimization.png`  
+**Description**: Cost breakdown, Fargate Spot capacity providers, auto-scaling policies, and optimization strategies
+
+### 14. Secrets Management in ECS
+**File**: `terraform-secrets-management-ecs.png`  
+**Description**: Sequence diagram showing how ECS tasks fetch secrets from AWS Secrets Manager at runtime using IAM execution roles
+
 ## Image Specifications
 
 - **Format**: PNG

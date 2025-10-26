@@ -315,6 +315,88 @@ python main.py
 
 ---
 
+## 🌐 Despliegue en Producción (AWS ECS Fargate)
+
+**Despliega en AWS con Terraform** - Infraestructura optimizada en costos usando Fargate Spot
+
+### Infraestructura Completa
+
+![Infraestructura ECS Fargate](./docs/images/architecture/terraform-ecs-fargate-complete-infrastructure.png)
+
+*Infraestructura AWS completa: VPC con subredes públicas/privadas, Application Load Balancer, clúster ECS Fargate con 5 servicios, repositorios ECR, DNS Route53, monitoreo CloudWatch e integración con Secrets Manager.*
+
+### Flujo de Despliegue
+
+![Flujo de Despliegue](./docs/images/architecture/terraform-deployment-flow-build-to-ecs.png)
+
+*Proceso de despliegue end-to-end: Construcción Docker local → Push a ECR → Terraform apply → ECS descarga imágenes → Tareas ejecutándose*
+
+### Estrategia de Enrutamiento ALB
+
+![Enrutamiento ALB](./docs/images/architecture/terraform-alb-routing-path-and-hostname.png)
+
+*Enrutamiento del Application Load Balancer con reglas basadas en ruta (`/validator/health`) y hostname (`validator.karmacadabra.ultravioletadao.xyz`) dirigiendo tráfico al servicio ECS correcto.*
+
+### Optimización de Costos con Fargate Spot
+
+![Optimización de Costos](./docs/images/architecture/terraform-fargate-spot-cost-optimization.png)
+
+*Desglose de costos mensuales (~$81-96/mes) usando Fargate Spot (70% ahorro), con proveedores de capacidad, políticas de auto-escalado y estrategias de optimización.*
+
+### Gestión de Secretos
+
+![Gestión de Secretos](./docs/images/architecture/terraform-secrets-management-ecs.png)
+
+*Manejo seguro de secretos: las tareas ECS obtienen claves privadas y API keys desde AWS Secrets Manager en tiempo de ejecución usando roles IAM de ejecución - sin secretos en contenedores o variables de entorno.*
+
+### Comandos de Despliegue Rápido
+
+```bash
+# 1. Construir y publicar imágenes Docker a ECR
+cd terraform/ecs-fargate
+./build-and-push.ps1  # o .sh en Linux/Mac
+
+# 2. Desplegar infraestructura con Terraform
+terraform init
+terraform plan
+terraform apply -auto-approve
+
+# 3. Monitorear despliegue
+./deploy-and-monitor.ps1  # o .sh en Linux/Mac
+
+# 4. Forzar descarga de imágenes nuevas (al actualizar contenedores)
+./force-image-pull.ps1
+```
+
+**Costo**: ~$81-96/mes (Fargate Spot + ALB + NAT Gateway)
+**Servicios**: 5 agentes (validator, karma-hello, abracadabra, skill-extractor, voice-extractor)
+**Escalado**: Auto-escala 1-3 tareas por servicio basado en CPU/memoria
+
+**Guía completa de despliegue**: Ver [terraform/ecs-fargate/DEPLOYMENT_GUIDE.md](./terraform/ecs-fargate/DEPLOYMENT_GUIDE.md)
+
+#### Endpoints de Producción (AWS ECS Fargate)
+
+**URL del ALB**: `karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
+
+| Agente | Basado en Ruta (ALB) | Basado en Hostname (Dominio Personalizado) | Puerto | Agent ID |
+|--------|----------------------|---------------------------------------------|--------|----------|
+| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | 4 |
+| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | 1 |
+| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | 2 |
+| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | 6 |
+| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | - |
+
+**Endpoints del Protocolo A2A** (Descubrimiento de Agentes):
+- Validator: `http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Karma-Hello: `http://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Abracadabra: `http://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Skill-Extractor: `http://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Voice-Extractor: `http://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+
+**Nota**: Los endpoints de dominio personalizado requieren propagación DNS (registros Route53 pendientes de configuración)
+
+---
+
 ## 🔐 AWS Secrets Manager (Seguridad)
 
 ⚠️ **POLÍTICA DE SEGURIDAD CRÍTICA**: Las claves privadas **NUNCA se almacenan en archivos `.env`**. Todas las claves deben estar en AWS Secrets Manager.

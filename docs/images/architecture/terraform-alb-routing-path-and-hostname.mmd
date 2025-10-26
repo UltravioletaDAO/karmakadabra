@@ -1,0 +1,74 @@
+graph TB
+    subgraph "Internet"
+        CLIENT1[Client Request<br/>Host: validator.karmacadabra.ultravioletadao.xyz<br/>GET /health]
+        CLIENT2[Client Request<br/>Host: karmacadabra-prod-alb-xxx.elb.amazonaws.com<br/>GET /karma-hello/api/logs]
+    end
+    
+    subgraph "Application Load Balancer"
+        LISTENER[HTTP Listener<br/>Port 80]
+        
+        subgraph "Listener Rules (Priority Order)"
+            RULE_HOSTNAME1[Priority 1001<br/>Host: validator.karmacadabra...<br/>→ Validator TG]
+            RULE_HOSTNAME2[Priority 1002<br/>Host: karma-hello.karmacadabra...<br/>→ Karma-Hello TG]
+            RULE_PATH1[Priority 1<br/>Path: /validator/*<br/>→ Validator TG]
+            RULE_PATH2[Priority 2<br/>Path: /karma-hello/*<br/>→ Karma-Hello TG]
+            RULE_PATH3[Priority 3<br/>Path: /abracadabra/*<br/>→ Abracadabra TG]
+            RULE_PATH4[Priority 4<br/>Path: /skill-extractor/*<br/>→ Skill-Extractor TG]
+            RULE_PATH5[Priority 5<br/>Path: /voice-extractor/*<br/>→ Voice-Extractor TG]
+            DEFAULT[Default Action<br/>404 Not Found<br/>JSON error response]
+        end
+        
+        subgraph "Target Groups"
+            TG1[Validator TG<br/>Port 9001<br/>Health: /health]
+            TG2[Karma-Hello TG<br/>Port 9002<br/>Health: /health]
+            TG3[Abracadabra TG<br/>Port 9003<br/>Health: /health]
+            TG4[Skill-Extractor TG<br/>Port 9004<br/>Health: /health]
+            TG5[Voice-Extractor TG<br/>Port 9005<br/>Health: /health]
+        end
+    end
+    
+    subgraph "ECS Tasks (Private Subnets)"
+        TASK1[Validator Container<br/>IP: 10.0.10.5:9001]
+        TASK2[Karma-Hello Container<br/>IP: 10.0.10.6:9002]
+        TASK3[Abracadabra Container<br/>IP: 10.0.11.7:9003]
+        TASK4[Skill-Extractor Container<br/>IP: 10.0.11.8:9004]
+        TASK5[Voice-Extractor Container<br/>IP: 10.0.10.9:9005]
+    end
+    
+    CLIENT1 --> LISTENER
+    CLIENT2 --> LISTENER
+    
+    LISTENER --> RULE_HOSTNAME1
+    LISTENER --> RULE_HOSTNAME2
+    LISTENER --> RULE_PATH1
+    LISTENER --> RULE_PATH2
+    LISTENER --> RULE_PATH3
+    LISTENER --> RULE_PATH4
+    LISTENER --> RULE_PATH5
+    LISTENER -.->|No match| DEFAULT
+    
+    RULE_HOSTNAME1 --> TG1
+    RULE_HOSTNAME2 --> TG2
+    RULE_PATH1 --> TG1
+    RULE_PATH2 --> TG2
+    RULE_PATH3 --> TG3
+    RULE_PATH4 --> TG4
+    RULE_PATH5 --> TG5
+    
+    TG1 --> TASK1
+    TG2 --> TASK2
+    TG3 --> TASK3
+    TG4 --> TASK4
+    TG5 --> TASK5
+    
+    style LISTENER fill:#ff9800
+    style RULE_HOSTNAME1 fill:#4caf50
+    style RULE_HOSTNAME2 fill:#4caf50
+    style RULE_PATH1 fill:#2196f3
+    style RULE_PATH2 fill:#2196f3
+    style DEFAULT fill:#f44336
+    style TG1 fill:#9c27b0
+    style TG2 fill:#9c27b0
+    style TASK1 fill:#00bcd4
+    style TASK2 fill:#00bcd4
+
