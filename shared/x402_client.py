@@ -169,6 +169,11 @@ class X402Client:
         }
         network = network_map.get(self.chain_id, f"unknown-{self.chain_id}")
 
+        # Encode signature as single 65-byte hex string (0x-prefixed)
+        # This matches what the Rust facilitator expects (EvmSignature type)
+        # The payment_signer already provides the complete signature
+        signature_hex = '0x' + signature['signature']
+
         # Build x402 PaymentPayload
         # Format: Exact scheme with EVM (EIP-3009) payload
         payment_payload = {
@@ -176,11 +181,7 @@ class X402Client:
             "scheme": "exact",  # Exact payment scheme
             "network": network,  # Network name only (e.g., "avalanche-fuji", not "avalanche-fuji:43113")
             "payload": {
-                "signature": {
-                    "v": signature['v'],
-                    "r": signature['r'],
-                    "s": signature['s']
-                },
+                "signature": signature_hex,  # Single 65-byte hex string (0x-prefixed)
                 "authorization": {
                     "from": signature['from'],
                     "to": signature['to'],
@@ -326,14 +327,25 @@ class X402Client:
             amount_glue=amount_glue
         )
 
+        # Map chain IDs to network names
+        network_map = {
+            43113: "avalanche-fuji",
+            43114: "avalanche",
+            84532: "base-sepolia",
+            8453: "base"
+        }
+        network = network_map.get(self.chain_id, f"unknown-{self.chain_id}")
+
         payment_requirements = {
-            "scheme": "eip3009",
-            "network": f"avalanche-fuji:{self.chain_id}",
-            "receiver": seller_address,
-            "price": {
-                "tokenAddress": self.glue_token_address,
-                "amount": str(self.signer.glue_amount(amount_glue))
-            }
+            "scheme": "exact",
+            "network": network,
+            "maxAmountRequired": str(self.signer.glue_amount(amount_glue)),
+            "resource": seller_url,
+            "description": "Payment for service",
+            "mimeType": "application/json",
+            "payTo": seller_address,
+            "maxTimeoutSeconds": 3600,
+            "asset": self.glue_token_address
         }
 
         # Optional: Verify payment first

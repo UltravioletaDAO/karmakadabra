@@ -190,15 +190,23 @@ async def test_facilitator_wallet_balances():
     print("TEST 3: Facilitator Wallet Balance Check")
     print("="*80 + "\n")
 
-    # Get facilitator wallet address from AWS (or use known address)
-    facilitator_wallet = "0x103040545AC5031A11E8C03dd11324C7333a13C7"
+    # Facilitator wallet addresses (different for testnet vs mainnet)
+    FACILITATOR_WALLETS = {
+        "testnet": "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8",  # Fuji, Base Sepolia
+        "mainnet": "0x103040545AC5031A11E8C03dd11324C7333a13C7"   # Avalanche, Base
+    }
 
-    print(f"Facilitator Wallet: {facilitator_wallet}")
+    print("Facilitator Wallets:")
+    print(f"  Testnet (Fuji, Base Sepolia): {FACILITATOR_WALLETS['testnet']}")
+    print(f"  Mainnet (Avalanche, Base):    {FACILITATOR_WALLETS['mainnet']}")
     print()
 
     all_funded = True
 
     for network_key, config in NETWORKS.items():
+        # Select appropriate wallet for network
+        is_testnet = "fuji" in network_key or "sepolia" in network_key
+        facilitator_wallet = FACILITATOR_WALLETS["testnet"] if is_testnet else FACILITATOR_WALLETS["mainnet"]
         w3 = Web3(Web3.HTTPProvider(config["rpc"]))
 
         try:
@@ -278,13 +286,15 @@ async def test_payment_verification():
 
             # Prepare payment requirements
             payment_requirements = {
-                "scheme": "eip3009",
-                "network": f"avalanche-fuji:{chain_id}",
-                "receiver": TEST_SELLER_ADDRESS,
-                "price": {
-                    "tokenAddress": glue_token,
-                    "amount": str(client.glue_amount("0.01"))
-                }
+                "scheme": "exact",
+                "network": "avalanche-fuji",
+                "maxAmountRequired": str(client.glue_amount("0.01")),
+                "resource": "https://facilitator.ultravioletadao.xyz/test",
+                "description": "Test payment verification",
+                "mimeType": "application/json",
+                "payTo": TEST_SELLER_ADDRESS,
+                "maxTimeoutSeconds": 3600,
+                "asset": glue_token
             }
 
             # Verify payment with facilitator
@@ -379,7 +389,7 @@ async def test_x402_client_integration():
             )
             print(f"    Payload created: scheme={payload.get('scheme')}")
             sig = payload['payload']['signature']
-            print(f"    Signature valid: v={sig['v']}, r={sig['r'][:10]}..., s={sig['s'][:10]}...")
+            print(f"    Signature: {sig[:20]}...{sig[-20:]}")
             print()
 
             # Test payment header encoding
