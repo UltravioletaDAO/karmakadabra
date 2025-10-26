@@ -482,11 +482,14 @@ Impact: Cannot answer any of the 5 critical questions
 - GLUE Token: ERC-20 + EIP-3009 for gasless transfers
 - ERC-8004 Registries: Identity, Reputation, Validation
 
-**Layer 2: Payment Facilitator (Rust)**
+**Layer 2: Payment Facilitator (Rust)** ✅ DEPLOYED
 - x402-rs: HTTP 402 payment protocol
 - Verifies EIP-712 signatures, executes `transferWithAuthorization()`
 - Stateless (no DB, all state on-chain)
-- Public endpoint: `facilitator.ultravioletadao.xyz`
+- Production: `https://facilitator.ultravioletadao.xyz`
+- Local: `http://localhost:9000` (docker-compose)
+- Wallet: 2.197 AVAX for gas fees
+- Image: `ukstv/x402-facilitator:latest`
 
 **Layer 3: AI Agents (Python + CrewAI)**
 - Karma-Hello: Sells stream logs, buys transcripts
@@ -1138,38 +1141,60 @@ This addresses the critical security requirement of never storing keys locally a
 - [ ] Full documentation written
 
 ### Phase 6: Production Deployment (AWS ECS Fargate) ✅ **COMPLETE**
+
+**Infrastructure:**
 - [x] Terraform infrastructure created (VPC, ALB, ECS, ECR, Route53, CloudWatch)
 - [x] Cost-optimized configuration (~$81-96/month using Fargate Spot)
 - [x] Multi-agent Docker images built and pushed to ECR
-- [x] All 5 services deployed and running:
+- [x] All 6 services deployed and running:
+  - [x] **Facilitator** (Port 9000) - https://facilitator.ultravioletadao.xyz ⭐ NEW
   - [x] Validator (Agent ID: 4, Port 9001) - https://validator.karmacadabra.ultravioletadao.xyz
   - [x] Karma-Hello (Agent ID: 1, Port 9002) - https://karma-hello.karmacadabra.ultravioletadao.xyz
   - [x] Abracadabra (Agent ID: 2, Port 9003) - https://abracadabra.karmacadabra.ultravioletadao.xyz
   - [x] Skill-Extractor (Agent ID: 6, Port 9004) - https://skill-extractor.karmacadabra.ultravioletadao.xyz
   - [x] Voice-Extractor (Agent ID: 5, Port 9005) - https://voice-extractor.karmacadabra.ultravioletadao.xyz
-- [x] AWS Secrets Manager integration (flat JSON per-agent secrets)
+- [x] AWS Secrets Manager integration (separate secret per service)
 - [x] Health checks passing for all services (HTTP 200 responses)
-- [x] ALB routing configured (path-based + hostname-based)
+- [x] ALB routing configured (path-based + hostname-based + root domain for facilitator)
 - [x] Auto-scaling policies active (1-3 tasks per service)
-- [x] Deployment automation scripts created
-  - [x] build-and-push.ps1 - Build and push Docker images
-  - [x] deploy-and-monitor.ps1 - Deploy and monitor progress
-  - [x] force-image-pull.ps1 - Force fresh image pulls
-  - [x] diagnose-deployment.ps1 - Comprehensive diagnostics
+
+**Deployment Automation (Idempotent Scripts):** ⭐ NEW
+- [x] **fund-wallets.py** - Generic wallet funding from ERC-20 deployer (AWS Secrets Manager)
+- [x] **build-and-push.py** - Build Docker images and push to ECR (supports prebuilt images)
+- [x] **deploy-to-fargate.py** - Terraform apply + ECS force deployment
+- [x] **deploy-all.py** - Master orchestration (fund → build → deploy → verify)
+- [x] All scripts fully idempotent - safe to run multiple times
+- [x] Comprehensive error handling and status reporting
+- [x] Documentation: `scripts/README.md`
+
+**Local Development:** ⭐ NEW
+- [x] Docker-compose configuration updated with facilitator
+- [x] All 6 services can run locally on ports 9000-9005
+- [x] Facilitator uses prebuilt image (ukstv/x402-facilitator:latest)
+- [x] Local testing guide: `DOCKER_GUIDE.md`
+
+**Infrastructure as Code:**
 - [x] Architecture diagrams created (5 Terraform/AWS diagrams)
 - [x] Deployment documentation complete
 - [x] CloudWatch monitoring configured (Logs, Metrics, Container Insights, Alarms)
-- [x] DNS configured (Route53 A records for all 5 agents)
-- [x] HTTPS/SSL certificates (ACM wildcard cert with automatic DNS validation)
+- [x] DNS configured (Route53 A records + facilitator root domain)
+- [x] HTTPS/SSL certificates (ACM cert with facilitator.ultravioletadao.xyz SAN)
 - [x] Production testing scripts (test_production_stack.py)
 - [x] User testing guide (GUIA_PRUEBAS_PRODUCCION.md)
 - [ ] CloudWatch Dashboard fixed (validation error - non-critical)
 - [ ] Disaster recovery plan documented
 
-**Status:** ✅ Production-ready with HTTPS, all services operational
+**Facilitator Details:**
+- Image: `ukstv/x402-facilitator:latest` (prebuilt Rust x402-rs)
+- Network: Avalanche Fuji testnet
+- Wallet: 2.197 AVAX funded for gas fees
+- Tokens: GLUE, USDC (Fuji), WAVAX (Fuji)
+- Endpoints: `/health`, `/supported`, `/verify`, `/settle`
+
+**Status:** ✅ Production-ready with HTTPS, all 6 services operational
 **Cost:** ~$81-96/month (Fargate Spot + ALB + NAT Gateway)
-**Testing:** All agents passing health checks and AgentCard discovery
-**Documentation:** See `GUIA_PRUEBAS_PRODUCCION.md` and `terraform/ecs-fargate/DEPLOYMENT_GUIDE.md`
+**Testing:** All services passing health checks
+**Documentation:** See `scripts/README.md` and `terraform/ecs-fargate/`
 
 ---
 
