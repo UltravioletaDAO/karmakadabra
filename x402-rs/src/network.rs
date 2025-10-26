@@ -295,7 +295,7 @@ static UVD_AVALANCHE_FUJI: Lazy<UVDDeployment> = Lazy::new(|| {
         },
         decimals: 6,
         eip712: Some(TokenDeploymentEip712 {
-            name: "Ultravioleta DAO Token".into(),
+            name: "Gasless Ultravioleta DAO Extended Token".into(),
             version: "2".into(),
         }),
     })
@@ -367,7 +367,7 @@ impl USDCDeployment {
     }
 }
 
-/// A known UVD (Ultravioleta DAO Token) deployment as a wrapper around [`TokenDeployment`].
+/// A known UVD (Gasless Ultravioleta DAO Extended Token) deployment as a wrapper around [`TokenDeployment`].
 #[derive(Clone, Debug)]
 pub struct UVDDeployment(pub TokenDeployment);
 

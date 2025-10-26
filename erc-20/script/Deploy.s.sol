@@ -63,7 +63,7 @@ contract DeployUVD_V2 is Script {
                 '  "network": "avalanche-fuji",\n',
                 '  "chainId": 43113,\n',
                 '  "tokenAddress": "', vm.toString(address(token)), '",\n',
-                '  "tokenName": "Ultravioleta DAO Token",\n',
+                '  "tokenName": "Gasless Ultravioleta DAO Extended Token",\n',
                 '  "tokenSymbol": "UVD",\n',
                 '  "decimals": 6,\n',
                 '  "initialSupply": ', vm.toString(INITIAL_SUPPLY), ',\n',

@@ -63,7 +63,7 @@ contract DeployGLUE is Script {
                 '  "network": "avalanche-fuji",\n',
                 '  "chainId": 43113,\n',
                 '  "tokenAddress": "', vm.toString(address(token)), '",\n',
-                '  "tokenName": "GLUE Token",\n',
+                '  "tokenName": "Gasless Ultravioleta DAO Extended Token",\n',
                 '  "tokenSymbol": "GLUE",\n',
                 '  "decimals": 6,\n',
                 '  "initialSupply": ', vm.toString(INITIAL_SUPPLY), ',\n',

@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @title GLUE Token (Gasless Lightweight Ultraviolet Economy)
+ * @title GLUE Token (Gasless Ultravioleta DAO Extended Token)
  * @author Ultravioleta DAO
  * @notice ERC-20 token with EIP-3009 (transferWithAuthorization) support for gasless payments
  * @dev This token enables AI agents to make micropayments without holding AVAX for gas fees
@@ -77,8 +77,8 @@ contract GLUE is ERC20, ERC20Permit, Ownable {
      * @dev Uses EIP-2612 Permit for gasless approvals
      */
     constructor()
-        ERC20("GLUE Token", "GLUE")
-        ERC20Permit("GLUE Token")
+        ERC20("Gasless Ultravioleta DAO Extended Token", "GLUE")
+        ERC20Permit("Gasless Ultravioleta DAO Extended Token")
         Ownable(OWNER_WALLET)
     {
         // Mint initial supply to owner wallet

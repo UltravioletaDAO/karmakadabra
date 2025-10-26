@@ -118,7 +118,7 @@ function permit(
 **Uso**: Approvals sin gas (útil para DEXs, contratos)
 
 ### Token Parameters
-- **Name**: GLUE Token
+- **Name**: Gasless Ultravioleta DAO Extended Token
 - **Symbol**: GLUE
 - **Decimals**: 6 (matching USDC for lower gas costs)
 - **Initial Supply**: 24,157,817 GLUE
@@ -245,7 +245,7 @@ Network: Avalanche Fuji Testnet
 Chain ID: 43113
 
 Contract Address: 0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743
-Token Name: GLUE Token
+Token Name: Gasless Ultravioleta DAO Extended Token
 Token Symbol: GLUE
 Decimals: 6
 Initial Supply: 24,157,817 GLUE
@@ -299,7 +299,7 @@ cat deployment.json
 #   "network": "avalanche-fuji",
 #   "chainId": 43113,
 #   "tokenAddress": "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743",
-#   "tokenName": "GLUE Token",
+#   "tokenName": "Gasless Ultravioleta DAO Extended Token",
 #   "tokenSymbol": "GLUE",
 #   "decimals": 6,
 #   "initialSupply": 24157817,
@@ -353,7 +353,7 @@ const nonce = ethers.hexlify(ethers.randomBytes(32));
 
 // 2. Domain separator (EIP-712)
 const domain = {
-  name: "GLUE Token",
+  name: "Gasless Ultravioleta DAO Extended Token",
   version: "1",
   chainId: 43113,
   verifyingContract: GLUE_ADDRESS
@@ -411,7 +411,7 @@ nonce = "0x" + secrets.token_hex(32)
 
 # 2. EIP-712 domain
 domain = {
-    "name": "GLUE Token",
+    "name": "Gasless Ultravioleta DAO Extended Token",
     "version": "1",
     "chainId": 43113,
     "verifyingContract": GLUE_ADDRESS
@@ -498,7 +498,7 @@ impl GLUEDeployment {
                 },
                 decimals: 6,
                 eip712: TokenAssetEip712 {
-                    name: "GLUE Token".into(),
+                    name: "Gasless Ultravioleta DAO Extended Token".into(),
                     version: "1".into(),
                 },
             },

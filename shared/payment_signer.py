@@ -29,7 +29,7 @@ import time
 
 
 # GLUE Token constants
-GLUE_TOKEN_NAME = "GLUE Token"
+GLUE_TOKEN_NAME = "Gasless Ultravioleta DAO Extended Token"
 GLUE_TOKEN_VERSION = "1"  # From EIP-2612 Permit
 GLUE_DECIMALS = 6
 

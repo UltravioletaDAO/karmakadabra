@@ -146,7 +146,7 @@ cast call 0xYourDeployedUVDAddress \
   "name()(string)" \
   --rpc-url https://avalanche-fuji-c-chain-rpc.publicnode.com
 
-# Should return: "Ultravioleta DAO Token"
+# Should return: "Gasless Ultravioleta DAO Extended Token"
 
 cast call 0xYourDeployedUVDAddress \
   "decimals()(uint8)" \

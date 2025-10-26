@@ -6,7 +6,7 @@ import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Permit.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 
 /**
- * @title UVD V2 Token (Ultravioleta DAO Token)
+ * @title UVD V2 Token (Gasless Ultravioleta DAO Extended Token)
  * @author Ultravioleta DAO
  * @notice ERC-20 token with EIP-3009 (transferWithAuthorization) support for gasless payments
  * @dev This token enables AI agents to make micropayments without holding AVAX for gas fees
@@ -79,8 +79,8 @@ contract UVD_V2 is ERC20, ERC20Permit, Ownable {
      * @dev Uses EIP-2612 Permit for gasless approvals
      */
     constructor()
-        ERC20("Ultravioleta DAO Token", "UVD")
-        ERC20Permit("Ultravioleta DAO Token")
+        ERC20("Gasless Ultravioleta DAO Extended Token", "UVD")
+        ERC20Permit("Gasless Ultravioleta DAO Extended Token")
         Ownable(OWNER_WALLET)
     {
         // Mint initial supply to owner wallet (same as UVT V1)
