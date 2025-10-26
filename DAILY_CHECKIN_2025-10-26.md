@@ -46,10 +46,22 @@ Deployed production-grade infrastructure using Terraform Infrastructure-as-Code:
 | **Skill-Extractor** | 🟢 Running | 6 | 9004 | User skill profiling from chat data |
 | **Voice-Extractor** | 🟢 Running | 5 | 9005 | Personality analysis from messages |
 
-**Access URLs:**
-- ALB Base: `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
-- Example Endpoint: `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health`
-- Custom Domains: `http://validator.karmacadabra.ultravioletadao.xyz` *(pending DNS)*
+**Complete Endpoint Reference:**
+
+ALB Base URL: `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
+
+| Agent | Health Check (ALB) | Health Check (Custom Domain) | AgentCard Discovery (ALB) | AgentCard Discovery (Custom Domain) |
+|-------|-------------------|------------------------------|---------------------------|-------------------------------------|
+| **Validator** | [/validator/health](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health) | [validator.../health](http://validator.karmacadabra.ultravioletadao.xyz/health) *(pending DNS)* | [/validator/.well-known/agent-card](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/.well-known/agent-card) | [validator.../.well-known/agent-card](http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) *(pending DNS)* |
+| **Karma-Hello** | [/karma-hello/health](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health) | [karma-hello.../health](http://karma-hello.karmacadabra.ultravioletadao.xyz/health) *(pending DNS)* | [/karma-hello/.well-known/agent-card](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/.well-known/agent-card) | [karma-hello.../.well-known/agent-card](http://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) *(pending DNS)* |
+| **Abracadabra** | [/abracadabra/health](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health) | [abracadabra.../health](http://abracadabra.karmacadabra.ultravioletadao.xyz/health) *(pending DNS)* | [/abracadabra/.well-known/agent-card](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/.well-known/agent-card) | [abracadabra.../.well-known/agent-card](http://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) *(pending DNS)* |
+| **Skill-Extractor** | [/skill-extractor/health](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health) | [skill-extractor.../health](http://skill-extractor.karmacadabra.ultravioletadao.xyz/health) *(pending DNS)* | [/skill-extractor/.well-known/agent-card](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/.well-known/agent-card) | [skill-extractor.../.well-known/agent-card](http://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) *(pending DNS)* |
+| **Voice-Extractor** | [/voice-extractor/health](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health) | [voice-extractor.../health](http://voice-extractor.karmacadabra.ultravioletadao.xyz/health) *(pending DNS)* | [/voice-extractor/.well-known/agent-card](http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/.well-known/agent-card) | [voice-extractor.../.well-known/agent-card](http://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card) *(pending DNS)* |
+
+**A2A Protocol Integration:**
+- All agents expose AgentCard at `/.well-known/agent-card` for service discovery
+- AgentCards declare capabilities, pricing, and payment methods
+- Enables autonomous agent-to-agent service marketplace
 
 **Deployment Flow:**
 
