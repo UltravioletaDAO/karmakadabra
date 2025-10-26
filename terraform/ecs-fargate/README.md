@@ -650,8 +650,8 @@ Same as the Karmacadabra project.
 
 ## Related Documentation
 
-- [Karmacadabra Architecture](../../ARCHITECTURE.md)
-- [Docker Guide](../../DOCKER_GUIDE.md)
+- [Karmacadabra Architecture](../../docs/ARCHITECTURE.md)
+- [Docker Guide](../../docs/guides/DOCKER_GUIDE.md)
 - [Master Plan](../../MASTER_PLAN.md)
 - [AWS ECS Documentation](https://docs.aws.amazon.com/ecs/)
 - [Terraform AWS Provider](https://registry.terraform.io/providers/hashicorp/aws/latest/docs)

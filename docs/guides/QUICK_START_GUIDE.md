@@ -238,16 +238,16 @@ When running real agents, they listen on these ports:
 
 - `scripts/check_system_ready.py` - Check if system is ready
 - `scripts/demo_client_purchases.py` - Run simulated demo
-- `SYSTEM_STATUS_REPORT.md` - Detailed system status
-- `AGENT_BUYER_SELLER_PATTERN.md` - Architecture explanation
-- `ARCHITECTURE_GUIDE.md` - New folder structure guide
+- `../plans/SYSTEM_STATUS_REPORT.md` - Detailed system status
+- `../AGENT_BUYER_SELLER_PATTERN.md` - Architecture explanation
+- `../ARCHITECTURE_GUIDE.md` - New folder structure guide
 
 ---
 
 ## Support
 
 If you encounter issues:
-1. Check `SYSTEM_STATUS_REPORT.md` for known issues
+1. Check `../plans/SYSTEM_STATUS_REPORT.md` for known issues
 2. Run `python scripts/check_system_ready.py` to diagnose
 3. Review agent logs in `logs/` directory
 4. Check CLAUDE.md for troubleshooting section

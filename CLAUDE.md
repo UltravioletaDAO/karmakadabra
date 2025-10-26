@@ -216,7 +216,7 @@ test_results.log                       ❌ (put in logs/)
 
 **⚠️ CRITICAL**: All agents implement the **Buyer+Seller pattern** - they both buy inputs and sell outputs.
 
-**Reference Documentation**: See `AGENT_BUYER_SELLER_PATTERN.md` for complete implementation guide.
+**Reference Documentation**: See `docs/AGENT_BUYER_SELLER_PATTERN.md` for complete implementation guide.
 
 ### Pattern Overview
 
@@ -301,7 +301,7 @@ docker-compose logs -f karma-hello  # single agent
 docker-compose down
 ```
 
-**For complete Docker documentation, see DOCKER_GUIDE.md**
+**For complete Docker documentation, see docs/guides/DOCKER_GUIDE.md**
 
 ---
 
@@ -588,7 +588,7 @@ class KarmaHelloSeller(ERC8004BaseAgent, A2AServer):
 
 ## Monetization: 50+ Services
 
-Full catalog in `MONETIZATION_OPPORTUNITIES.md`. Quick reference:
+Full catalog in `docs/MONETIZATION_OPPORTUNITIES.md`. Quick reference:
 
 **Karma-Hello (6 tiers):**
 - Tier 1 (0.01-0.05 GLUE): Chat logs, user activity, token economics
@@ -762,12 +762,12 @@ Trustless verification - buyers don't trust sellers' data quality. Independent v
 ## Documentation Map
 
 - **MASTER_PLAN.md**: Complete vision, roadmap, all components explained
-- **ARCHITECTURE.md**: Technical decisions, stack, data flows
-- **MONETIZATION_OPPORTUNITIES.md**: All 50+ services with pricing
-- **QUICKSTART.md**: 30-minute setup guide
+- **docs/ARCHITECTURE.md**: Technical decisions, stack, data flows
+- **docs/MONETIZATION_OPPORTUNITIES.md**: All 50+ services with pricing
+- **docs/guides/QUICKSTART.md**: 30-minute setup guide
 - **Component READMEs**: Each folder has detailed README with code examples
 
-**Start here**: Read `QUICKSTART.md` (30 min) → `MASTER_PLAN.md` (60 min) → component READMEs
+**Start here**: Read `docs/guides/QUICKSTART.md` (30 min) → `MASTER_PLAN.md` (60 min) → component READMEs
 
 ---
 

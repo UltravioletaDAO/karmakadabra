@@ -80,7 +80,7 @@ All smart contracts are live and verified on Snowtrace. Agent wallets have been 
 **Documentation:** 
 - API Reference: [`shared/README.md`](./shared/README.md)
 - Testing Guide: [`shared/tests/README.md`](./shared/tests/README.md)
-- Architecture: [`ARCHITECTURE.md`](./ARCHITECTURE.md)
+- Architecture: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 
 ### ✅ Phase 2: Agent Development (COMPLETE - October 2025)
 
@@ -285,7 +285,7 @@ python scripts/test_production_stack.py
 python scripts/demo_client_purchases.py --production
 ```
 
-**Documentation**: See [`GUIA_PRUEBAS_PRODUCCION.md`](./GUIA_PRUEBAS_PRODUCCION.md) for complete testing guide
+**Documentation**: See [`docs/guides/GUIA_PRUEBAS_PRODUCCION.md`](./docs/guides/GUIA_PRUEBAS_PRODUCCION.md) for complete testing guide
 
 ---
 
@@ -376,7 +376,7 @@ curl http://localhost:9002/health  # karma-hello
 **View logs:** `docker-compose logs -f`
 **Stop:** `docker-compose down`
 
-**Full Docker guide**: See [DOCKER_GUIDE.md](./DOCKER_GUIDE.md)
+**Full Docker guide**: See [docs/guides/DOCKER_GUIDE.md](./docs/guides/DOCKER_GUIDE.md)
 
 ### Option 2: Production Deployment (AWS ECS Fargate)
 
@@ -487,7 +487,7 @@ python main.py
 ```
 
 **Deployed Contracts**: All ERC-8004 registries are live on Fuji!
-**Full guide**: See [QUICKSTART.md](./QUICKSTART.md)
+**Full guide**: See [docs/guides/QUICKSTART.md](./docs/guides/QUICKSTART.md)
 
 ---
 
@@ -752,7 +752,7 @@ class KarmaHelloAgent(ERC8004BaseAgent):
 - **Tier 4** (1.50 GLUE): Auto video editing, image generation
 - **Enterprise** (up to 100 GLUE): Custom AI models
 
-**Full catalog**: [MONETIZATION_OPPORTUNITIES.md](./MONETIZATION_OPPORTUNITIES.md)
+**Full catalog**: [docs/MONETIZATION_OPPORTUNITIES.md](./docs/MONETIZATION_OPPORTUNITIES.md)
 
 ---
 
@@ -771,12 +771,16 @@ karmacadabra/
 ├── skill-extractor-agent/     # Skill profiling agent
 ├── shared/                    # Shared utilities (AWS Secrets Manager, etc.)
 ├── scripts/                   # Setup and deployment scripts
+├── docs/                      # Documentation
+│   ├── ARCHITECTURE.md           # Technical architecture
+│   ├── MONETIZATION_OPPORTUNITIES.md
+│   ├── INDEX.md                  # Documentation index
+│   ├── guides/                   # User guides
+│   │   └── QUICKSTART.md         # 30-min setup guide
+│   ├── plans/                    # Project plans and status
+│   └── migration/                # Migration guides
 ├── MASTER_PLAN.md            # Complete vision & roadmap
-├── ARCHITECTURE.md           # Technical architecture
-├── MONETIZATION_OPPORTUNITIES.md
-├── QUICKSTART.md             # 30-min setup guide
-├── CLAUDE.md                 # Claude Code guidance
-└── INDEX.md                  # Documentation index
+└── CLAUDE.md                 # Claude Code guidance
 ```
 
 ---
@@ -812,13 +816,13 @@ karmacadabra/
 
 | Document | Description | Time |
 |----------|-------------|------|
-| [QUICKSTART.md](./QUICKSTART.md) | Get running in 30 minutes | 30 min |
+| [docs/guides/QUICKSTART.md](./docs/guides/QUICKSTART.md) | Get running in 30 minutes | 30 min |
 | [MASTER_PLAN.md](./MASTER_PLAN.md) | Complete vision & roadmap | 60 min |
-| [ARCHITECTURE.md](./ARCHITECTURE.md) | Technical deep dive | 45 min |
-| [architecture-diagrams.md](./architecture-diagrams.md) | Visual architecture diagrams | 15 min |
-| [MONETIZATION_OPPORTUNITIES.md](./MONETIZATION_OPPORTUNITIES.md) | All services & pricing | 30 min |
+| [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md) | Technical deep dive | 45 min |
+| [docs/architecture-diagrams.md](./docs/architecture-diagrams.md) | Visual architecture diagrams | 15 min |
+| [docs/MONETIZATION_OPPORTUNITIES.md](./docs/MONETIZATION_OPPORTUNITIES.md) | All services & pricing | 30 min |
 | [CLAUDE.md](./CLAUDE.md) | Developer guidance | 15 min |
-| [INDEX.md](./INDEX.md) | Documentation index | 5 min |
+| [docs/INDEX.md](./docs/INDEX.md) | Documentation index | 5 min |
 
 **Component READMEs**: Each folder has detailed setup instructions.
 
@@ -1089,7 +1093,7 @@ cargo run
 python scripts/demo_system.py
 ```
 
-See [QUICKSTART.md](./QUICKSTART.md) for detailed instructions.
+See [docs/guides/QUICKSTART.md](./docs/guides/QUICKSTART.md) for detailed instructions.
 
 ---
 
@@ -1097,7 +1101,7 @@ See [QUICKSTART.md](./QUICKSTART.md) for detailed instructions.
 
 1. Read [MASTER_PLAN.md](./MASTER_PLAN.md) to understand the vision
 2. Check the roadmap for available tasks
-3. Implement following the architecture in [ARCHITECTURE.md](./ARCHITECTURE.md)
+3. Implement following the architecture in [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md)
 4. Write tests for all new code
 5. Submit PR with documentation
 
@@ -1149,7 +1153,7 @@ MIT License - See [LICENSE](./LICENSE)
 
 - **Project**: Ultravioleta DAO
 - **Repo**: https://github.com/ultravioletadao/karmacadabra
-- **Docs**: Start with [QUICKSTART.md](./QUICKSTART.md)
+- **Docs**: Start with [docs/guides/QUICKSTART.md](./docs/guides/QUICKSTART.md)
 
 ---
 

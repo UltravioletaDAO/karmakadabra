@@ -219,10 +219,10 @@ All components operational! 🎉
 
 ## References
 
-- **SYSTEM_STATUS_REPORT.md** - Original status from 2025-10-24
-- **QUICK_START_GUIDE.md** - Setup and demo instructions
-- **AGENT_BUYER_SELLER_PATTERN.md** - Architecture explanation
-- **ARCHITECTURE_GUIDE.md** - Folder structure
+- **SYSTEM_STATUS_REPORT.md** - Original status from 2025-10-24 (same folder)
+- **../guides/QUICK_START_GUIDE.md** - Setup and demo instructions
+- **../AGENT_BUYER_SELLER_PATTERN.md** - Architecture explanation
+- **../ARCHITECTURE_GUIDE.md** - Folder structure
 
 ---
 

@@ -434,8 +434,8 @@ class MyCustomAgent(ERC8004BaseAgent):
 ## 📚 Documentation
 
 - **AWS Secrets Manager**: `AWS_SECRETS_SETUP.md`
-- **Transaction Logging**: `../TRANSACTION_LOGGING.md`
-- **Full Architecture**: `../ARCHITECTURE.md`
+- **Transaction Logging**: `../docs/TRANSACTION_LOGGING.md`
+- **Full Architecture**: `../docs/ARCHITECTURE.md`
 - **Master Plan**: `../MASTER_PLAN.md`
 
 ---

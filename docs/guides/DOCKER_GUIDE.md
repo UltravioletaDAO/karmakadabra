@@ -473,4 +473,4 @@ services:
 4. **Test purchases**: Use client agent to buy services
 5. **Monitor metrics**: `curl http://localhost:9090/metrics`
 
-**For more details**: See MASTER_PLAN.md and ARCHITECTURE.md
+**For more details**: See ../../MASTER_PLAN.md and ../ARCHITECTURE.md

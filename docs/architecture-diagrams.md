@@ -496,6 +496,6 @@ graph TB
 
 **See Also**:
 - [ARCHITECTURE.md](./ARCHITECTURE.md) - Detailed technical documentation
-- [README.md](./README.md) - Project overview and quick start
-- [MASTER_PLAN.md](./MASTER_PLAN.md) - Complete vision and roadmap
+- [README.md](../README.md) - Project overview and quick start
+- [MASTER_PLAN.md](../MASTER_PLAN.md) - Complete vision and roadmap
 

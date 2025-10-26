@@ -189,8 +189,8 @@ cast call $UVD_TOKEN \
 
 Una vez que todo funciona:
 
-1. **Leer [MASTER_PLAN.md](./MASTER_PLAN.md)** para entender el sistema completo
-2. **Explorar [ARCHITECTURE.md](./ARCHITECTURE.md)** para detalles técnicos
+1. **Leer [MASTER_PLAN.md](../../MASTER_PLAN.md)** para entender el sistema completo
+2. **Explorar [ARCHITECTURE.md](../ARCHITECTURE.md)** para detalles técnicos
 3. **Revisar READMEs** de cada componente para customización
 
 ---

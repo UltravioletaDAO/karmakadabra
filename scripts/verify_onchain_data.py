@@ -6,7 +6,7 @@ Hardcodes addresses to verify blockchain state
 
 from web3 import Web3
 
-# Hardcoded from SYSTEM_STATUS_REPORT.md
+# Hardcoded from docs/plans/SYSTEM_STATUS_REPORT.md
 RPC_URL = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
 IDENTITY_REGISTRY = "0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618"
 GLUE_TOKEN = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
@@ -102,7 +102,7 @@ except Exception as e:
     print(f"ERROR getting GLUE supply: {e}")
 print()
 
-# Agent addresses from SYSTEM_STATUS_REPORT.md
+# Agent addresses from docs/plans/SYSTEM_STATUS_REPORT.md
 agents = {
     'client': '0xCf30021812F27132d36dc791E0eC17f34B4eE8BA',
     'karma-hello': '0x2C3e071df446B25B821F59425152838ae4931E75',

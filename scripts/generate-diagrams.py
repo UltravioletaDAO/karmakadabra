@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Extract Mermaid diagrams from architecture-diagrams.md and create individual .mmd files."""
+"""Extract Mermaid diagrams from docs/architecture-diagrams.md and create individual .mmd files."""
 
 import re
 from pathlib import Path
 
 # Read the markdown file (from project root)
 project_root = Path(__file__).parent.parent
-with open(project_root / 'architecture-diagrams.md', 'r', encoding='utf-8') as f:
+with open(project_root / 'docs' / 'architecture-diagrams.md', 'r', encoding='utf-8') as f:
     content = f.read()
 
 # Extract all mermaid code blocks with their section titles

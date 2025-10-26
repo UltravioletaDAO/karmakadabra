@@ -591,7 +591,7 @@ cp .env.example .env && nano .env  # Configure
 
 **Data Source:** MongoDB at `z:\ultravioleta\ai\cursor\karma-hello`
 
-**Services (see MONETIZATION_OPPORTUNITIES.md):**
+**Services (see docs/MONETIZATION_OPPORTUNITIES.md):**
 - Tier 1 (0.01-0.05 GLUE): Chat logs, user activity, token economics
 - Tier 2 (0.05-0.15 GLUE): ML predictions, sentiment analysis
 - Tier 3-6: Advanced analytics, custom models (up to 200 GLUE)
@@ -617,7 +617,7 @@ class KarmaHelloSeller(ERC8004BaseAgent, A2AServer):
 
 **Data Source:** SQLite (`analytics.db`) + Cognee knowledge graph at `z:\ultravioleta\ai\cursor\abracadabra`
 
-**Services (see MONETIZATION_OPPORTUNITIES.md):**
+**Services (see docs/MONETIZATION_OPPORTUNITIES.md):**
 - Tier 1 (0.02-0.08 GLUE): Raw/enhanced transcripts, multi-language
 - Tier 2 (0.10-0.25 GLUE): Clip generation, blog posts, social media
 - Tier 3-6: Video editing, image generation, custom AI (up to 100 GLUE)
@@ -919,7 +919,7 @@ python scripts/demo_system.py --network local
 
 ## 💰 Monetization
 
-**Full catalog:** See `MONETIZATION_OPPORTUNITIES.md` for 50+ services
+**Full catalog:** See `docs/MONETIZATION_OPPORTUNITIES.md` for 50+ services
 
 ### Service Tiers
 
@@ -1171,7 +1171,7 @@ This addresses the critical security requirement of never storing keys locally a
 - [x] Docker-compose configuration updated with facilitator
 - [x] All 6 services can run locally on ports 9000-9005
 - [x] Facilitator uses prebuilt image (ukstv/x402-facilitator:latest)
-- [x] Local testing guide: `DOCKER_GUIDE.md`
+- [x] Local testing guide: `docs/guides/DOCKER_GUIDE.md`
 
 **Infrastructure as Code:**
 - [x] Architecture diagrams created (5 Terraform/AWS diagrams)
@@ -1180,7 +1180,7 @@ This addresses the critical security requirement of never storing keys locally a
 - [x] DNS configured (Route53 A records + facilitator root domain)
 - [x] HTTPS/SSL certificates (ACM cert with facilitator.ultravioletadao.xyz SAN)
 - [x] Production testing scripts (test_production_stack.py)
-- [x] User testing guide (GUIA_PRUEBAS_PRODUCCION.md)
+- [x] User testing guide (docs/guides/GUIA_PRUEBAS_PRODUCCION.md)
 - [ ] CloudWatch Dashboard fixed (validation error - non-critical)
 - [ ] Disaster recovery plan documented
 
@@ -1225,7 +1225,7 @@ This addresses the critical security requirement of never storing keys locally a
 - [x] Create `karmacadabra-facilitator-testnet` secret
 - [x] Create `karmacadabra-facilitator-mainnet` secret
 - [x] Migration scripts created (`scripts/split_facilitator_secrets.py`, etc.)
-- [x] Documentation: `FACILITATOR_SECRETS_MIGRATION.md`
+- [x] Documentation: `docs/migration/FACILITATOR_SECRETS_MIGRATION.md`
 - [ ] Update Terraform to use network-specific secrets
 - [ ] Update Docker Compose to use network-specific secrets
 - [ ] Delete old `karmacadabra-facilitator` secret
@@ -1265,7 +1265,7 @@ This addresses the critical security requirement of never storing keys locally a
 **Status:** 25% Complete (facilitator wallets separated, agent wallets pending)
 
 **Documentation:**
-- `FACILITATOR_SECRETS_MIGRATION.md` - Complete facilitator wallet separation guide
+- `docs/migration/FACILITATOR_SECRETS_MIGRATION.md` - Complete facilitator wallet separation guide
 - `scripts/create_testnet_facilitator_secret.py` - Testnet secret creation
 - `scripts/split_facilitator_secrets.py` - Migration automation
 

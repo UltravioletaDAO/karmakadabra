@@ -131,10 +131,10 @@ agents/voice-extractor/.env.example - PORT=9005, KARMA_HELLO_URL updated
 
 ### Documentation
 ```
-DOCKER_GUIDE.md                     - NEW: Complete Docker documentation
-PORT_MIGRATION_9000.md              - Updated with Docker info
-DOCKER_AND_PORT_UPDATE_SUMMARY.md   - NEW: This file
-CLAUDE.md                           - Added Docker Compose section, updated port numbers
+docs/guides/DOCKER_GUIDE.md                     - NEW: Complete Docker documentation
+docs/migration/PORT_MIGRATION_9000.md           - Updated with Docker info
+docs/migration/DOCKER_AND_PORT_UPDATE_SUMMARY.md - NEW: This file
+CLAUDE.md                                        - Added Docker Compose section, updated port numbers
 .gitignore                          - Added Docker entries
 ```
 
@@ -258,16 +258,16 @@ docker-compose up -d --build
 ## 📚 Documentation
 
 **Quick References:**
-- **DOCKER_GUIDE.md** - Complete Docker documentation
-- **PORT_MIGRATION_9000.md** - Port changes details
-- **CLAUDE.md** - Project guidelines (updated with Docker info)
-- **MASTER_PLAN.md** - Overall architecture
-- **QUICKSTART.md** - 30-minute setup guide
+- **../guides/DOCKER_GUIDE.md** - Complete Docker documentation
+- **PORT_MIGRATION_9000.md** - Port changes details (same folder)
+- **../../CLAUDE.md** - Project guidelines (updated with Docker info)
+- **../../MASTER_PLAN.md** - Overall architecture
+- **../guides/QUICKSTART.md** - 30-minute setup guide
 
 **For help:**
-- Docker issues → DOCKER_GUIDE.md "Troubleshooting"
+- Docker issues → ../guides/DOCKER_GUIDE.md "Troubleshooting"
 - Port conflicts → PORT_MIGRATION_9000.md
-- General setup → QUICKSTART.md
+- General setup → ../guides/QUICKSTART.md
 
 ---
 

@@ -198,7 +198,7 @@ When deploying to production servers:
 ---
 
 **Status**: ✅ All .env and .env.example files updated
-**Docker**: ✅ Docker Compose setup available - see DOCKER_GUIDE.md
+**Docker**: ✅ Docker Compose setup available - see ../guides/DOCKER_GUIDE.md
 
 ---
 
@@ -215,4 +215,4 @@ scripts\docker-start.bat        # Windows
 bash scripts/docker-start.sh    # Linux/Mac
 ```
 
-**See DOCKER_GUIDE.md for complete documentation.**
+**See ../guides/DOCKER_GUIDE.md for complete documentation.**

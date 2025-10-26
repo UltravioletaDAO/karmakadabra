@@ -59,7 +59,7 @@ IDENTITY_REGISTRY_ABI = [
     }
 ]
 
-# Agents to update (from SYSTEM_STATUS_REPORT.md)
+# Agents to update (from docs/plans/SYSTEM_STATUS_REPORT.md)
 AGENTS_TO_UPDATE = {
     'client': {
         'agent_id': 3,

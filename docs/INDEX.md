@@ -8,8 +8,8 @@
 
 | Documento | Descripción | Tiempo |
 |-----------|-------------|--------|
-| **[QUICKSTART.md](./QUICKSTART.md)** | Setup rápido en 30 minutos | 30 min |
-| **[MASTER_PLAN.md](./MASTER_PLAN.md)** | Plan maestro completo | 60 min |
+| **[QUICKSTART.md](./guides/QUICKSTART.md)** | Setup rápido en 30 minutos | 30 min |
+| **[MASTER_PLAN.md](../MASTER_PLAN.md)** | Plan maestro completo | 60 min |
 | **[ARCHITECTURE.md](./ARCHITECTURE.md)** | Arquitectura técnica detallada | 45 min |
 | **[VALIDATOR_BLOCKCHAIN_INTERACTION.md](./VALIDATOR_BLOCKCHAIN_INTERACTION.md)** | 🔴 **Aclaración**: Validator SÍ escribe on-chain | 15 min |
 
@@ -112,21 +112,21 @@ x402-rs/
 
 ### Para Principiantes
 
-1. **[QUICKSTART.md](./QUICKSTART.md)** - Setup en 30 minutos
-2. **[erc-20/README.md](./erc-20/README.md)** - Entender UVD Token
-3. **[erc-8004/README.md](./erc-8004/README.md)** - Entender ERC-8004
+1. **[QUICKSTART.md](./guides/QUICKSTART.md)** - Setup en 30 minutos
+2. **[erc-20/README.md](../erc-20/README.md)** - Entender UVD Token
+3. **[erc-8004/README.md](../erc-8004/README.md)** - Entender ERC-8004
 
 ### Para Desarrolladores
 
-1. **[MASTER_PLAN.md](./MASTER_PLAN.md)** - Visión completa
+1. **[MASTER_PLAN.md](../MASTER_PLAN.md)** - Visión completa
 2. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Decisiones técnicas
-3. **[karma-hello-agent/README.md](./karma-hello-agent/README.md)** - Implementar agentes
-4. **[x402-rs/CLAUDE.md](./x402-rs/CLAUDE.md)** - Protocolo x402
+3. **[karma-hello-agent/README.md](../karma-hello-agent/README.md)** - Implementar agentes
+4. **[x402-rs/CLAUDE.md](../x402-rs/CLAUDE.md)** - Protocolo x402
 
 ### Para Arquitectos
 
 1. **[ARCHITECTURE.md](./ARCHITECTURE.md)** - Arquitectura completa
-2. **[MASTER_PLAN.md](./MASTER_PLAN.md)** - Decisiones de diseño
+2. **[MASTER_PLAN.md](../MASTER_PLAN.md)** - Decisiones de diseño
 3. Código fuente de cada componente
 
 ---

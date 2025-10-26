@@ -176,23 +176,23 @@ python main.py --buy-voice --user 0xultravioleta
 ## 📚 Documentation
 
 ### Quick Start
-- **README.md** - Project overview + Docker quick start
-- **DOCKER_GUIDE.md** - Complete Docker documentation
-- **TEST_CLIENT_AGENT.md** - Testing guide
+- **../../README.md** - Project overview + Docker quick start
+- **../guides/DOCKER_GUIDE.md** - Complete Docker documentation
+- **../guides/TEST_CLIENT_AGENT.md** - Testing guide
 
 ### Configuration
-- **PORT_MIGRATION_9000.md** - Port changes (8000→9000)
-- **DOCKER_AND_PORT_UPDATE_SUMMARY.md** - What changed
-- **DOTENV_INLINE_COMMENT_BUG.md** - python-dotenv gotcha
+- **../migration/PORT_MIGRATION_9000.md** - Port changes (8000→9000)
+- **../migration/DOCKER_AND_PORT_UPDATE_SUMMARY.md** - What changed
+- **../migration/DOTENV_INLINE_COMMENT_BUG.md** - python-dotenv gotcha
 
 ### Architecture
-- **MASTER_PLAN.md** - Complete vision and roadmap
-- **ARCHITECTURE.md** - Technical architecture
-- **ARCHITECTURE_GUIDE.md** - Folder structure
+- **../../MASTER_PLAN.md** - Complete vision and roadmap
+- **../ARCHITECTURE.md** - Technical architecture
+- **../ARCHITECTURE_GUIDE.md** - Folder structure
 
 ### Development
-- **CLAUDE.md** - Development guidelines
-- **AGENT_BUYER_SELLER_PATTERN.md** - Agent pattern docs
+- **../../CLAUDE.md** - Development guidelines
+- **../AGENT_BUYER_SELLER_PATTERN.md** - Agent pattern docs
 
 ---
 
