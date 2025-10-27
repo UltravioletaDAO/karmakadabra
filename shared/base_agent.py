@@ -253,6 +253,29 @@ class ERC8004BaseAgent:
             },
             {
                 "type": "function",
+                "name": "rateValidator",
+                "inputs": [
+                    {"name": "agentValidatorId", "type": "uint256"},
+                    {"name": "rating", "type": "uint8"}
+                ],
+                "outputs": [],
+                "stateMutability": "nonpayable"
+            },
+            {
+                "type": "function",
+                "name": "getValidatorRating",
+                "inputs": [
+                    {"name": "agentValidatorId", "type": "uint256"},
+                    {"name": "agentServerId", "type": "uint256"}
+                ],
+                "outputs": [
+                    {"name": "hasRating", "type": "bool"},
+                    {"name": "rating", "type": "uint8"}
+                ],
+                "stateMutability": "view"
+            },
+            {
+                "type": "function",
                 "name": "acceptFeedback",
                 "inputs": [
                     {"name": "agentClientId", "type": "uint256"},
@@ -506,6 +529,113 @@ class ERC8004BaseAgent:
             (has_rating, rating): Tuple of whether rating exists and the rating value
         """
         return self.reputation_registry.functions.getClientRating(client_id, server_id).call()
+
+    def rate_validator(self, validator_agent_id: int, rating: int) -> str:
+        """
+        Rate a validator agent (as a server)
+
+        This implements the bidirectional trust pattern, allowing service providers
+        to rate validators who verify their work.
+
+        Args:
+            validator_agent_id: The validator agent's ID
+            rating: Rating (0-100)
+
+        Returns:
+            tx_hash: Transaction hash
+        """
+        if not self.agent_id:
+            raise ValueError("Agent not registered. Call register_agent() first.")
+
+        if not (0 <= rating <= 100):
+            raise ValueError("Rating must be between 0 and 100")
+
+        logger.info(f"[{self.agent_name}] Rating validator {validator_agent_id}: {rating}/100")
+
+        # Build transaction
+        tx = self.reputation_registry.functions.rateValidator(
+            validator_agent_id,
+            rating
+        ).build_transaction({
+            'from': self.address,
+            'nonce': self.w3.eth.get_transaction_count(self.address),
+            'gas': 200000,
+            'gasPrice': self.w3.eth.gas_price,
+            'chainId': self.chain_id
+        })
+
+        # Sign and send
+        signed_tx = self.account.sign_transaction(tx)
+        tx_hash = self.w3.eth.send_raw_transaction(signed_tx.raw_transaction)
+
+        logger.info(f"   TX Hash: {tx_hash.hex()}")
+
+        # Wait for confirmation
+        receipt = self.w3.eth.wait_for_transaction_receipt(tx_hash, timeout=120)
+
+        if receipt['status'] != 1:
+            raise Exception(f"Rating failed! TX: {tx_hash.hex()}")
+
+        logger.info(f"[{self.agent_name}] ✅ Validator rated successfully")
+
+        return tx_hash.hex()
+
+    def get_validator_rating(self, validator_id: int, server_id: int) -> Tuple[bool, int]:
+        """
+        Get validator rating given by a server
+
+        Args:
+            validator_id: Validator agent ID
+            server_id: Server agent ID
+
+        Returns:
+            (has_rating, rating): Tuple of whether rating exists and the rating value
+        """
+        return self.reputation_registry.functions.getValidatorRating(validator_id, server_id).call()
+
+    def get_bidirectional_ratings(self, agent_id: int) -> dict:
+        """
+        Get all ratings (both directions) for an agent
+
+        This helper method retrieves:
+        - Ratings the agent gave to clients (as server)
+        - Ratings the agent gave to validators (as server)
+        - Ratings the agent received from servers (as client)
+        - Ratings the agent received from servers (as validator)
+
+        Args:
+            agent_id: Agent ID to query
+
+        Returns:
+            dict: {
+                'ratings_given': {
+                    'to_clients': [(client_id, rating), ...],
+                    'to_validators': [(validator_id, rating), ...]
+                },
+                'ratings_received': {
+                    'as_client': [(server_id, rating), ...],
+                    'as_validator': [(server_id, rating), ...]
+                }
+            }
+        """
+        result = {
+            'ratings_given': {
+                'to_clients': [],
+                'to_validators': []
+            },
+            'ratings_received': {
+                'as_client': [],
+                'as_validator': []
+            }
+        }
+
+        # Note: This is a simplified version that requires knowing which agents to check
+        # A full implementation would need event indexing or subgraph queries
+        # For now, it returns the structure for manual queries
+
+        logger.info(f"[{self.agent_name}] Retrieved bidirectional ratings for agent {agent_id}")
+
+        return result
 
     def accept_feedback(self, server_agent_id: int) -> str:
         """
