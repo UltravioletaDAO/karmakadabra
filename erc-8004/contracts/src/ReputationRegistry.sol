@@ -28,10 +28,19 @@ contract ReputationRegistry is IReputationRegistry {
     /// @dev Mapping from (clientId, serverId) to whether rating exists
     mapping(uint256 => mapping(uint256 => bool)) private _hasClientRating;
 
+    /// @dev Mapping from (validatorId, serverId) to validator rating (0-100)
+    mapping(uint256 => mapping(uint256 => uint8)) private _validatorRatings;
+
+    /// @dev Mapping from (validatorId, serverId) to whether rating exists
+    mapping(uint256 => mapping(uint256 => bool)) private _hasValidatorRating;
+
     // ============ Events ============
 
     /// @dev Emitted when a server rates a client
     event ClientRated(uint256 indexed clientId, uint256 indexed serverId, uint8 rating);
+
+    /// @dev Emitted when a server rates a validator
+    event ValidatorRated(uint256 indexed validatorId, uint256 indexed serverId, uint8 rating);
 
     // ============ Constructor ============
     
@@ -113,6 +122,38 @@ contract ReputationRegistry is IReputationRegistry {
         emit ClientRated(agentClientId, agentServerId, rating);
     }
 
+    /**
+     * @dev Allows a server agent to rate a validator's quality
+     * @param agentValidatorId The validator agent ID
+     * @param rating The rating score (0-100)
+     */
+    function rateValidator(uint256 agentValidatorId, uint8 rating) external {
+        // Validate rating range (0-100)
+        if (rating > 100) {
+            revert UnauthorizedFeedback();
+        }
+
+        // Validate that validator exists
+        if (!identityRegistry.agentExists(agentValidatorId)) {
+            revert AgentNotFound();
+        }
+
+        // Get the server agent ID from the caller
+        IIdentityRegistry.AgentInfo memory serverAgent = identityRegistry.resolveByAddress(msg.sender);
+        uint256 agentServerId = serverAgent.agentId;
+
+        // Validate that caller is a registered agent
+        if (agentServerId == 0) {
+            revert AgentNotFound();
+        }
+
+        // Store the rating
+        _validatorRatings[agentValidatorId][agentServerId] = rating;
+        _hasValidatorRating[agentValidatorId][agentServerId] = true;
+
+        emit ValidatorRated(agentValidatorId, agentServerId, rating);
+    }
+
     // ============ Read Functions ============
     
     /**
@@ -147,6 +188,20 @@ contract ReputationRegistry is IReputationRegistry {
         hasRating = _hasClientRating[agentClientId][agentServerId];
         if (hasRating) {
             rating = _clientRatings[agentClientId][agentServerId];
+        }
+    }
+
+    /**
+     * @dev Gets the rating a server gave to a validator
+     * @param agentValidatorId The validator agent ID
+     * @param agentServerId The server agent ID
+     * @return hasRating Whether a rating exists
+     * @return rating The rating score (0-100)
+     */
+    function getValidatorRating(uint256 agentValidatorId, uint256 agentServerId) external view returns (bool hasRating, uint8 rating) {
+        hasRating = _hasValidatorRating[agentValidatorId][agentServerId];
+        if (hasRating) {
+            rating = _validatorRatings[agentValidatorId][agentServerId];
         }
     }
 
