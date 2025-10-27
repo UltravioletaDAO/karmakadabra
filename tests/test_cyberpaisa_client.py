@@ -118,7 +118,7 @@ async def test_cyberpaisa_purchases():
             expected_price_glue="0.01"
         )
 
-        if result.get("success"):
+        if result and result.get("success"):
             print("[OK] Purchase successful!")
             data = result.get('data', {})
             print(f"   [DATA] Data received: {len(str(data))} bytes")
@@ -130,8 +130,10 @@ async def test_cyberpaisa_purchases():
             if tx_hash:
                 print(f"   [TX] Transaction: {tx_hash}")
                 print(f"   [LINK] View on Snowtrace: https://testnet.snowtrace.io/tx/{tx_hash}")
-        else:
+        elif result:
             print(f"[ERROR] Purchase failed: {result.get('error', 'Unknown error')}")
+        else:
+            print(f"[WARN]  Purchase returned no result (agent may not have data available)")
 
     except Exception as e:
         print(f"[ERROR] Purchase failed with exception: {e}")
