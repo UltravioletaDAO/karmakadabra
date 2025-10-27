@@ -17,18 +17,33 @@ Run: pytest tests/test_bidirectional_transactions.py -v -s
 import asyncio
 import pytest
 import httpx
+import os
 from decimal import Decimal
 from typing import Dict, List
 
-# Test configuration
-TEST_CONFIG = {
-    "karma_hello_url": "http://localhost:8002",
-    "abracadabra_url": "http://localhost:8003",
-    "skill_extractor_url": "http://localhost:8004",
-    "voice_extractor_url": "http://localhost:8005",
-    "validator_url": "http://localhost:8001",
-    "timeout": 60.0  # Doubled from 30.0 for CrewAI validation processing
-}
+# Test configuration - support production endpoints via environment variable
+USE_PRODUCTION = os.getenv("USE_PRODUCTION", "false").lower() == "true"
+
+if USE_PRODUCTION:
+    print("\n[INFO] Using PRODUCTION endpoints (AWS ECS)")
+    TEST_CONFIG = {
+        "karma_hello_url": "https://karma-hello.karmacadabra.ultravioletadao.xyz",
+        "abracadabra_url": "https://abracadabra.karmacadabra.ultravioletadao.xyz",
+        "skill_extractor_url": "https://skill-extractor.karmacadabra.ultravioletadao.xyz",
+        "voice_extractor_url": "https://voice-extractor.karmacadabra.ultravioletadao.xyz",
+        "validator_url": "https://validator.karmacadabra.ultravioletadao.xyz",
+        "timeout": 60.0
+    }
+else:
+    print("\n[INFO] Using LOCAL endpoints (localhost)")
+    TEST_CONFIG = {
+        "karma_hello_url": "http://localhost:8002",
+        "abracadabra_url": "http://localhost:8003",
+        "skill_extractor_url": "http://localhost:8004",
+        "voice_extractor_url": "http://localhost:8005",
+        "validator_url": "http://localhost:8001",
+        "timeout": 60.0  # Doubled from 30.0 for CrewAI validation processing
+    }
 
 
 class AgentBalanceTracker:

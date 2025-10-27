@@ -13,20 +13,35 @@ All tests use HTTP requests to running agent servers.
 
 import asyncio
 import httpx
+import sys
 from typing import Dict, Any
 
 # ============================================================================
 # Test Configuration
 # ============================================================================
 
-AGENTS = {
-    "karma-hello": "http://localhost:8002",
-    "abracadabra": "http://localhost:8003",
-    "validator": "http://localhost:8011",
-    "client": "http://localhost:8000",
-    "voice-extractor": "http://localhost:8005",
-    "skill-extractor": "http://localhost:8006"
-}
+# Check if --production flag is provided
+USE_PRODUCTION = "--production" in sys.argv
+
+if USE_PRODUCTION:
+    print("\n[INFO] Using PRODUCTION endpoints (AWS ECS)")
+    AGENTS = {
+        "karma-hello": "https://karma-hello.karmacadabra.ultravioletadao.xyz",
+        "abracadabra": "https://abracadabra.karmacadabra.ultravioletadao.xyz",
+        "validator": "https://validator.karmacadabra.ultravioletadao.xyz",
+        "voice-extractor": "https://voice-extractor.karmacadabra.ultravioletadao.xyz",
+        "skill-extractor": "https://skill-extractor.karmacadabra.ultravioletadao.xyz"
+    }
+else:
+    print("\n[INFO] Using LOCAL endpoints (localhost)")
+    AGENTS = {
+        "karma-hello": "http://localhost:8002",
+        "abracadabra": "http://localhost:8003",
+        "validator": "http://localhost:8011",
+        "client": "http://localhost:8000",
+        "voice-extractor": "http://localhost:8005",
+        "skill-extractor": "http://localhost:8006"
+    }
 
 # ============================================================================
 # Test 1: Discovery Flow
@@ -74,7 +89,7 @@ async def test_discovery_flow():
             print(f"   [FAIL] Error: {e}")
             return False
 
-        # Test 1c: Parse AgentCard
+        # Test 1c: Parse AgentCard structure
         print("\n1c. Parsing AgentCard structure...")
         required_fields = ["agentId", "name", "domain", "skills"]  # A2A protocol uses camelCase
         missing = [f for f in required_fields if f not in card]
@@ -83,6 +98,19 @@ async def test_discovery_flow():
             return False
         else:
             print(f"   [OK] AgentCard valid (all required fields present)")
+
+        # Test 1d: Verify EIP-8004 endpoints field
+        print("\n1d. Verifying EIP-8004 endpoints...")
+        if "endpoints" in card:
+            endpoints = card["endpoints"]
+            if isinstance(endpoints, list) and len(endpoints) > 0:
+                print(f"   [OK] Endpoints field present ({len(endpoints)} endpoints)")
+                for ep in endpoints:
+                    print(f"      - {ep.get('name')}: {ep.get('endpoint')}")
+            else:
+                print(f"   [WARN] Endpoints field exists but is empty")
+        else:
+            print(f"   [WARN] Endpoints field missing (not EIP-8004 compliant)")
 
     print(f"\n{'='*70}")
     print("[OK] TEST 1 PASSED: Discovery Flow")

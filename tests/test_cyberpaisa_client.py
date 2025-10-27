@@ -27,11 +27,11 @@ async def test_cyberpaisa_purchases():
     """Test cyberpaisa purchasing from multiple agents"""
 
     print("=" * 80)
-    print("🧪 TESTING CYBERPAISA USER AGENT AS CLIENT")
+    print("TESTING CYBERPAISA USER AGENT AS CLIENT")
     print("=" * 80)
 
     # Initialize cyberpaisa agent
-    print("\n📋 Step 1: Initialize cyberpaisa agent")
+    print("\n[INFO] Step 1: Initialize cyberpaisa agent")
     print("-" * 80)
 
     config = {
@@ -46,7 +46,7 @@ async def test_cyberpaisa_purchases():
     }
 
     if not config["private_key"]:
-        print("❌ ERROR: No PRIVATE_KEY found in client-agents/cyberpaisa/.env")
+        print("[ERROR] ERROR: No PRIVATE_KEY found in client-agents/cyberpaisa/.env")
         print("   Please follow Step 1-2 in docs/guides/TEST_USER_AGENT_CYBERPAISA.md")
         return
 
@@ -62,22 +62,22 @@ async def test_cyberpaisa_purchases():
             private_key=config["private_key"]
         )
 
-        print(f"✅ Agent initialized: {agent.agent_name}")
+        print(f"[OK] Agent initialized: {agent.agent_name}")
         print(f"   Wallet: {agent.wallet_address}")
 
         initial_balance = agent.get_balance()
-        print(f"   💎 Initial GLUE Balance: {initial_balance}")
+        print(f"   [GLUE] Initial GLUE Balance: {initial_balance}")
 
         if initial_balance < Decimal("1.0"):
-            print(f"⚠️  WARNING: Low GLUE balance. Recommended: 1000+ GLUE")
+            print(f"[WARN]  WARNING: Low GLUE balance. Recommended: 1000+ GLUE")
             print(f"   Run: python erc-20/distribute-token.py")
 
     except Exception as e:
-        print(f"❌ Failed to initialize agent: {e}")
+        print(f"[ERROR] Failed to initialize agent: {e}")
         return
 
     # Test 1: Discover and buy from karma-hello
-    print("\n🔍 Step 2: Discover karma-hello agent")
+    print("\n[DISCOVER] Step 2: Discover karma-hello agent")
     print("-" * 80)
 
     karma_hello_url = "https://karma-hello.karmacadabra.ultravioletadao.xyz"
@@ -86,7 +86,7 @@ async def test_cyberpaisa_purchases():
         agent_card = await agent.discover_agent(karma_hello_url)
 
         if agent_card:
-            print(f"✅ Discovered karma-hello agent!")
+            print(f"[OK] Discovered karma-hello agent!")
             print(f"   Agent ID: {agent_card.get('agentId', 'N/A')}")
             print(f"   Skills: {len(agent_card.get('skills', []))}")
 
@@ -94,15 +94,15 @@ async def test_cyberpaisa_purchases():
             for skill in agent_card.get('skills', [])[:3]:  # Show first 3
                 print(f"      - {skill.get('skillId')}: {skill.get('price', {}).get('amount')} GLUE")
         else:
-            print("❌ Could not discover karma-hello agent")
+            print("[ERROR] Could not discover karma-hello agent")
             return
 
     except Exception as e:
-        print(f"❌ Discovery failed: {e}")
+        print(f"[ERROR] Discovery failed: {e}")
         return
 
     # Test 2: Purchase chat logs
-    print("\n💸 Step 3: Purchase chat logs from karma-hello")
+    print("\n[PURCHASE] Step 3: Purchase chat logs from karma-hello")
     print("-" * 80)
 
     try:
@@ -117,25 +117,25 @@ async def test_cyberpaisa_purchases():
         )
 
         if result.get("success"):
-            print("✅ Purchase successful!")
+            print("[OK] Purchase successful!")
             data = result.get('data', {})
-            print(f"   📦 Data received: {len(str(data))} bytes")
+            print(f"   [DATA] Data received: {len(str(data))} bytes")
 
             if isinstance(data, dict):
-                print(f"   📊 Keys in response: {list(data.keys())[:5]}")
+                print(f"   [STATS] Keys in response: {list(data.keys())[:5]}")
 
             tx_hash = result.get('tx_hash')
             if tx_hash:
-                print(f"   🔗 Transaction: {tx_hash}")
-                print(f"   🌐 View on Snowtrace: https://testnet.snowtrace.io/tx/{tx_hash}")
+                print(f"   [TX] Transaction: {tx_hash}")
+                print(f"   [LINK] View on Snowtrace: https://testnet.snowtrace.io/tx/{tx_hash}")
         else:
-            print(f"❌ Purchase failed: {result.get('error', 'Unknown error')}")
+            print(f"[ERROR] Purchase failed: {result.get('error', 'Unknown error')}")
 
     except Exception as e:
-        print(f"❌ Purchase failed with exception: {e}")
+        print(f"[ERROR] Purchase failed with exception: {e}")
 
     # Test 3: Discover and buy from abracadabra
-    print("\n🔍 Step 4: Discover abracadabra agent")
+    print("\n[DISCOVER] Step 4: Discover abracadabra agent")
     print("-" * 80)
 
     abracadabra_url = "https://abracadabra.karmacadabra.ultravioletadao.xyz"
@@ -144,19 +144,19 @@ async def test_cyberpaisa_purchases():
         agent_card = await agent.discover_agent(abracadabra_url)
 
         if agent_card:
-            print(f"✅ Discovered abracadabra agent!")
+            print(f"[OK] Discovered abracadabra agent!")
             print(f"   Agent ID: {agent_card.get('agentId', 'N/A')}")
             print(f"   Skills: {len(agent_card.get('skills', []))}")
         else:
-            print("⚠️  Could not discover abracadabra agent (may be offline)")
+            print("[WARN]  Could not discover abracadabra agent (may be offline)")
 
     except Exception as e:
-        print(f"⚠️  Discovery failed: {e}")
+        print(f"[WARN]  Discovery failed: {e}")
 
     # Test 4: Purchase transcript (optional - costs more)
-    print("\n💸 Step 5: Purchase transcript from abracadabra (optional)")
+    print("\n[PURCHASE] Step 5: Purchase transcript from abracadabra (optional)")
     print("-" * 80)
-    print("⏭️  Skipped (costs 0.02 GLUE) - uncomment to test")
+    print("[SKIP]  Skipped (costs 0.02 GLUE) - uncomment to test")
 
     # Uncomment to test:
     # try:
@@ -167,28 +167,28 @@ async def test_cyberpaisa_purchases():
     #         params={"stream_id": "20241021"}
     #     )
     #     if result.get("success"):
-    #         print("✅ Transcript purchase successful!")
+    #         print("[OK] Transcript purchase successful!")
     #     else:
-    #         print(f"❌ Purchase failed: {result.get('error')}")
+    #         print(f"[ERROR] Purchase failed: {result.get('error')}")
     # except Exception as e:
-    #     print(f"⚠️  Purchase failed: {e}")
+    #     print(f"[WARN]  Purchase failed: {e}")
 
     # Final balance
-    print("\n📊 Step 6: Final Summary")
+    print("\n[STATS] Step 6: Final Summary")
     print("-" * 80)
 
     final_balance = agent.get_balance()
     spent = initial_balance - final_balance
 
-    print(f"💎 Initial Balance: {initial_balance} GLUE")
-    print(f"💎 Final Balance:   {final_balance} GLUE")
-    print(f"💸 Total Spent:     {spent} GLUE")
+    print(f"[GLUE] Initial Balance: {initial_balance} GLUE")
+    print(f"[GLUE] Final Balance:   {final_balance} GLUE")
+    print(f"[PURCHASE] Total Spent:     {spent} GLUE")
 
     print("\n" + "=" * 80)
-    print("✅ TEST COMPLETE!")
+    print("[OK] TEST COMPLETE!")
     print("=" * 80)
 
-    print("\n📝 Next steps:")
+    print("\n[NEXT] Next steps:")
     print("   1. View transactions on Snowtrace:")
     print(f"      https://testnet.snowtrace.io/address/{agent.wallet_address}")
     print("   2. Test other agents (skill-extractor, voice-extractor)")
