@@ -1,0 +1,91 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+*.egg-info/
+dist/
+build/
+venv/
+env/
+.venv/
+
+# Logs
+*.log
+logs/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Git
+.git/
+.gitignore
+
+# Documentation
+docs/
+*.md
+!README.md
+
+# Tests
+tests/
+*.test.py
+test_*.py
+
+# Terraform
+terraform/
+*.tf
+*.tfstate
+*.tfstate.backup
+
+# Data files (exclude old data but include mock data in data/*/logs/ and data/*/transcripts/)
+# data/  # COMMENTED OUT - we need mock data for production
+data/README.md
+data/karma-hello/chat_logs_*.json
+data/abracadabra/transcription_*.json
+# Allow: data/karma-hello/logs/
+# Allow: data/abracadabra/transcripts/
+*.csv
+*.db
+*.sqlite
+
+# Agent-specific (exclude other agents when building)
+# Note: Uncomment the agent you're NOT building
+# agents/karma-hello/
+# agents/abracadabra/
+# agents/validator/
+# agents/voice-extractor/
+# agents/skill-extractor/
+
+# Client agents
+client-agents/
+
+# ERC contracts
+erc-20/
+erc-8004/
+erc-8004-example/
+
+# Rust
+x402-rs/
+target/
+Cargo.lock
+
+# Scripts
+scripts/
+
+# Credentials
+.env
+.env.*
+!.env.example
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Temporary
+*.tmp
+*.temp
+*.bak
