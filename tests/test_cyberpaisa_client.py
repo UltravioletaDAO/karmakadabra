@@ -16,11 +16,12 @@ from decimal import Decimal
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from shared.base_agent import ERC8004BaseAgent
+from shared.agent_config import load_agent_config
 from dotenv import load_dotenv
 import os
 
-# Load cyberpaisa config
-load_dotenv("client-agents/cyberpaisa/.env")
+# Don't load .env - use AWS Secrets Manager directly via load_agent_config()
+# (client-agent credentials are in AWS, no local .env needed)
 
 
 async def test_cyberpaisa_purchases():
@@ -34,36 +35,37 @@ async def test_cyberpaisa_purchases():
     print("\n[INFO] Step 1: Initialize cyberpaisa agent")
     print("-" * 80)
 
-    config = {
-        "agent_name": os.getenv("AGENT_NAME"),
-        "agent_domain": os.getenv("AGENT_DOMAIN"),
-        "rpc_url_fuji": os.getenv("RPC_URL_FUJI"),
-        "chain_id": int(os.getenv("CHAIN_ID")),
-        "identity_registry": os.getenv("IDENTITY_REGISTRY"),
-        "reputation_registry": os.getenv("REPUTATION_REGISTRY"),
-        "validation_registry": os.getenv("VALIDATION_REGISTRY"),
-        "private_key": os.getenv("PRIVATE_KEY")
-    }
+    try:
+        # Load config using AWS Secrets Manager (fetches PRIVATE_KEY automatically)
+        # Using client-agent as cyberpaisa (generic user agent)
+        config = load_agent_config("client-agent")
 
-    if not config["private_key"]:
-        print("[ERROR] ERROR: No PRIVATE_KEY found in client-agents/cyberpaisa/.env")
-        print("   Please follow Step 1-2 in docs/guides/TEST_USER_AGENT_CYBERPAISA.md")
+        print(f"[OK] Config loaded from AWS Secrets Manager (using client-agent)")
+        print(f"   Agent: {config.agent_name}")
+        print(f"   Domain: {config.agent_domain}")
+
+        agent = ERC8004BaseAgent(
+            agent_name=config.agent_name,
+            agent_domain=config.agent_domain,
+            rpc_url=config.rpc_url,
+            chain_id=config.chain_id,
+            identity_registry_address=config.identity_registry,
+            reputation_registry_address=config.reputation_registry,
+            validation_registry_address=config.validation_registry,
+            private_key=config.private_key
+        )
+    except Exception as e:
+        print(f"[ERROR] Failed to load config or initialize agent: {e}")
+        print(f"   Make sure client-agent exists in AWS Secrets Manager")
+        print(f"   Available agents: validator-agent, karma-hello-agent, client-agent, etc.")
+        import traceback
+        traceback.print_exc()
         return
 
     try:
-        agent = ERC8004BaseAgent(
-            agent_name=config["agent_name"],
-            agent_domain=config["agent_domain"],
-            rpc_url=config["rpc_url_fuji"],
-            chain_id=config["chain_id"],
-            identity_registry_address=config["identity_registry"],
-            reputation_registry_address=config["reputation_registry"],
-            validation_registry_address=config["validation_registry"],
-            private_key=config["private_key"]
-        )
 
         print(f"[OK] Agent initialized: {agent.agent_name}")
-        print(f"   Wallet: {agent.wallet_address}")
+        print(f"   Wallet: {agent.address}")
 
         initial_balance = agent.get_balance()
         print(f"   [GLUE] Initial GLUE Balance: {initial_balance}")
@@ -107,13 +109,13 @@ async def test_cyberpaisa_purchases():
 
     try:
         result = await agent.buy_from_agent(
-            seller_url=karma_hello_url,
-            skill_id="get_logs",
-            price_glue="0.01",
-            params={
+            agent_url=karma_hello_url,
+            endpoint="/get_chat_logs",
+            request_data={
                 "date": "20241021",
                 "format": "json"
-            }
+            },
+            expected_price_glue="0.01"
         )
 
         if result.get("success"):
@@ -161,10 +163,10 @@ async def test_cyberpaisa_purchases():
     # Uncomment to test:
     # try:
     #     result = await agent.buy_from_agent(
-    #         seller_url=abracadabra_url,
-    #         skill_id="get_transcript",
-    #         price_glue="0.02",
-    #         params={"stream_id": "20241021"}
+    #         agent_url=abracadabra_url,
+    #         endpoint="/get_transcription",
+    #         request_data={"stream_id": "20241021"},
+    #         expected_price_glue="0.02"
     #     )
     #     if result.get("success"):
     #         print("[OK] Transcript purchase successful!")
@@ -190,7 +192,7 @@ async def test_cyberpaisa_purchases():
 
     print("\n[NEXT] Next steps:")
     print("   1. View transactions on Snowtrace:")
-    print(f"      https://testnet.snowtrace.io/address/{agent.wallet_address}")
+    print(f"      https://testnet.snowtrace.io/address/{agent.address}")
     print("   2. Test other agents (skill-extractor, voice-extractor)")
     print("   3. Register cyberpaisa on-chain: python scripts/register_missing_agents.py")
     print("   4. Run full marketplace test: python tests/test_marketplace_bootstrap.py")
