@@ -7,6 +7,12 @@
 >
 > **⚠️ CRITICAL BLOCKER:** 48 user agents have NO WALLETS. Cannot test marketplace without wallet infrastructure.
 > **Current Priority:** Sprint 3.5 - Generate wallets, distribute AVAX/GLUE, register on-chain
+>
+> **📦 Latest Deployment (October 27, 2025):**
+> - ✅ Skill-Extractor Agent upgraded to bidirectional AI agent profiler (963 lines, +283 LOC)
+> - ✅ New features: User needs analysis, market opportunities, revenue projections, agent identity design
+> - ✅ Deployed to ECS Fargate: `skill-extractor.karmacadabra.ultravioletadao.xyz`
+> - ✅ System now produces 20-field comprehensive profiles (6→20 fields)
 
 ---
 
@@ -80,12 +86,12 @@ All contracts deployed and verified on Fuji. All system agent wallets funded. To
 | Validator Agent | ✅ COMPLETE | Independent quality validation (443 lines) | validator/main.py |
 | Karma-Hello Agent | ✅ COMPLETE | Dual buyer/seller (571 lines) | agents/karma-hello/main.py |
 | Abracadabra Agent | ✅ COMPLETE | Dual buyer/seller (565 lines) | agents/abracadabra/main.py |
-| Skill-Extractor Agent | ✅ COMPLETE | Competency analyzer (680 lines) | agents/skill-extractor/main.py |
+| Skill-Extractor Agent | ✅ COMPLETE | Bidirectional AI agent profiler (963 lines) | agents/skill-extractor/main.py |
 | Voice-Extractor Agent | ✅ COMPLETE | Personality profiler (524 lines) | agents/voice-extractor/main.py |
 | Buyer+Seller Pattern | ✅ BUILT-IN | All agents inherit discover/buy/sell methods from base | shared/base_agent.py |
 
 **Total System Agents:** 5 (Validator, Karma-Hello, Abracadabra, Skill-Extractor, Voice-Extractor)
-**Total Code Lines (shared + agents):** 4,124 (shared) + 2,783 (agents) = **6,907 lines**
+**Total Code Lines (shared + agents):** 4,124 (shared) + 3,110 (agents) = **7,234 lines**
 
 ### 🚧 PHASE 3 BLOCKED: User Agent Microeconomy
 
@@ -100,7 +106,7 @@ User agent **code** is complete, but **wallet infrastructure is NOT ready**:
 
 **Code Status (Complete):**
 - ✅ Voice Extractor Agent (linguistic personality profiler) - COMPLETE
-- ✅ Skill-Extractor Agent (skill/competency profiler) - COMPLETE
+- ✅ Skill-Extractor Agent (bidirectional AI agent profiler: skills + needs + opportunities) - COMPLETE
 - ✅ User Agent Template (486 lines with full buyer+seller) - COMPLETE (client-agents/template/)
 - ✅ User Agent Factory (mass deployment) - COMPLETE (48 agents generated)
 - ✅ 48 User Agents (one per chat participant) - CODE DEPLOYED (client-agents/)
@@ -192,10 +198,13 @@ Net profit: 0.04 GLUE per extraction (400% margin)
 - Enterprise Analysis (0.50 GLUE): Deep-dive competitive analysis
 
 **Implementation:**
-- ✅ `skill-extractor-agent/main.py` - 790+ lines, full buyer+seller implementation
-- ✅ FastAPI server (port 8085)
-- ✅ 5-category analysis framework (interests, skills, tools, interaction_style, monetization)
-- ✅ CrewAI-based multi-agent analysis (simplified for MVP)
+- ✅ `skill-extractor-agent/main.py` - 963 lines, bidirectional AI agent profiler
+- ✅ FastAPI server (port 9004)
+- ✅ **Bidirectional Analysis:** User sells (skills) + User needs to buy (gaps, shopping list)
+- ✅ **Market Opportunities:** UNMET_NEED, UPSELL, COMPLEMENTARY signals for other agents
+- ✅ **Revenue Projections:** Monthly income, break-even, passive income potential
+- ✅ **Agent Identity Design:** Autonomous agent personality + implementation roadmap
+- ✅ 20-field comprehensive output (skills, needs, opportunities, revenue, identity, etc.)
 - ✅ A2A protocol discovery via `/.well-known/agent-card`
 - ✅ x402 payment protocol integration
 - ✅ Dual data source support (local files + Karma-Hello purchases)
@@ -640,6 +649,430 @@ Impact: Cannot answer any of the 5 critical questions
 
 ---
 
+## 📊 Production Data Migration (MongoDB & SQLite)
+
+### Current Status: Mock Data Approach
+
+**October 27, 2025 - Status:**
+- ✅ Mock data files created for testing (karma-hello logs + abracadabra transcripts)
+- ✅ Agents configured to read from `/app/data/` directory
+- ✅ Dockerfile configured to copy mock data into containers
+- ❌ Docker builds blocked on Windows (fsutil walker panic - see `data/README.md`)
+- 📋 MongoDB production data migration documented below (PENDING IMPLEMENTATION)
+
+**Why Mock Data First:**
+- Fast testing without database setup
+- No external dependencies
+- Consistent test data across environments
+- Easier Docker image building (when working)
+- Good for development and CI/CD
+
+**Why Migrate to Production Databases:**
+- Real data from actual Twitch streams (not static)
+- Continuous updates as new streams happen
+- Larger dataset (months of chat logs and transcripts)
+- Better testing of query performance and edge cases
+- Realistic production environment
+
+### MongoDB Migration Guide (Karma-Hello Agent)
+
+**Current Data Location:** `z:\ultravioleta\ai\cursor\karma-hello`
+
+**Step 1: Set Up MongoDB Atlas (Free Tier)**
+
+1. **Create MongoDB Atlas Account:**
+   ```bash
+   # Visit: https://www.mongodb.com/cloud/atlas/register
+   # Create free tier cluster (M0 - 512MB storage)
+   # Region: AWS us-east-1 (same as ECS for low latency)
+   ```
+
+2. **Configure Network Access:**
+   ```bash
+   # MongoDB Atlas → Network Access → Add IP Address
+   # Option 1: Allow access from anywhere (0.0.0.0/0) - easiest for testing
+   # Option 2: Add ECS NAT Gateway IPs (more secure)
+   # Get NAT IPs from: terraform/ecs-fargate/outputs.tf
+   ```
+
+3. **Create Database User:**
+   ```bash
+   # MongoDB Atlas → Database Access → Add New Database User
+   # Username: karmacadabra-agent
+   # Password: Generate secure password (save to AWS Secrets Manager)
+   # Role: Read and Write to any database
+   ```
+
+4. **Get Connection String:**
+   ```
+   mongodb+srv://<username>:<password>@cluster0.xxxxx.mongodb.net/?retryWrites=true&w=majority
+   ```
+
+**Step 2: Load Production Data**
+
+1. **Export Data from Local MongoDB:**
+   ```bash
+   # If data is in local MongoDB
+   mongodump --uri="mongodb://localhost:27017/karma_hello" --out=./backup
+
+   # If data is in files, use migration script
+   python scripts/migrate_karma_hello_to_atlas.py \
+     --source-dir="z:\ultravioleta\ai\cursor\karma-hello" \
+     --atlas-uri="mongodb+srv://..." \
+     --database="karma_hello"
+   ```
+
+2. **Restore to Atlas:**
+   ```bash
+   mongorestore --uri="mongodb+srv://..." ./backup
+   ```
+
+**Migration Script Template** (`scripts/migrate_karma_hello_to_atlas.py`):
+```python
+"""
+Migrate karma-hello data from local files/MongoDB to MongoDB Atlas.
+"""
+import os
+import json
+from pymongo import MongoClient
+from datetime import datetime
+
+def migrate_karma_hello_data(source_dir: str, atlas_uri: str, database: str):
+    """
+    Migrate karma-hello chat logs from local files to MongoDB Atlas.
+
+    Args:
+        source_dir: Path to karma-hello data (z:\ultravioleta\ai\cursor\karma-hello)
+        atlas_uri: MongoDB Atlas connection string
+        database: Database name (e.g., 'karma_hello')
+    """
+    client = MongoClient(atlas_uri)
+    db = client[database]
+
+    # Create collections
+    messages_collection = db['messages']
+    streams_collection = db['streams']
+    users_collection = db['users']
+
+    # Create indexes for performance
+    messages_collection.create_index([('timestamp', 1), ('user', 1)])
+    messages_collection.create_index([('stream_id', 1)])
+    users_collection.create_index([('username', 1)], unique=True)
+
+    # Parse local files and insert
+    logs_dir = os.path.join(source_dir, 'logs')
+    for date_folder in os.listdir(logs_dir):
+        date_path = os.path.join(logs_dir, date_folder)
+        if not os.path.isdir(date_path):
+            continue
+
+        # Process full.txt for each date
+        full_txt = os.path.join(date_path, 'full.txt')
+        if os.path.exists(full_txt):
+            stream_id = f"stream_{date_folder}"
+            messages = parse_chat_log(full_txt, stream_id)
+
+            if messages:
+                messages_collection.insert_many(messages)
+                print(f"[INFO] Loaded {len(messages)} messages for {date_folder}")
+
+    print(f"[SUCCESS] Migration complete")
+    print(f"  Messages: {messages_collection.count_documents({})}")
+    print(f"  Streams: {streams_collection.count_documents({})}")
+    print(f"  Users: {users_collection.count_documents({})}")
+
+def parse_chat_log(file_path: str, stream_id: str) -> list:
+    """Parse karma-hello chat log format."""
+    messages = []
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            # Format: [MM/DD/YYYY HH:MM:SS AM/PM] username: message
+            if line.strip().startswith('['):
+                try:
+                    timestamp_str = line[1:line.index(']')]
+                    rest = line[line.index(']')+2:]
+                    username = rest[:rest.index(':')]
+                    message = rest[rest.index(':')+2:].strip()
+
+                    messages.append({
+                        'timestamp': datetime.strptime(timestamp_str, '%m/%d/%Y %I:%M:%S %p'),
+                        'user': username,
+                        'message': message,
+                        'stream_id': stream_id
+                    })
+                except Exception as e:
+                    print(f"[WARN] Failed to parse line: {line[:50]}... - {e}")
+    return messages
+
+if __name__ == "__main__":
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--source-dir', required=True)
+    parser.add_argument('--atlas-uri', required=True)
+    parser.add_argument('--database', default='karma_hello')
+    args = parser.parse_args()
+
+    migrate_karma_hello_data(args.source_dir, args.atlas_uri, args.database)
+```
+
+**Step 3: Update Agent Configuration**
+
+1. **Store MongoDB URI in AWS Secrets Manager:**
+   ```bash
+   # Update karma-hello-agent secret
+   python scripts/update_agent_secret.py \
+     --agent karma-hello-agent \
+     --key MONGO_URI \
+     --value "mongodb+srv://..."
+   ```
+
+2. **Update Agent Code** (`agents/karma-hello/main.py`):
+   ```python
+   # Change from:
+   config = {
+       "use_local_files": True,
+       "local_data_path": "/app/data/karma-hello"
+   }
+
+   # To:
+   config = {
+       "use_local_files": os.getenv("USE_LOCAL_FILES", "false").lower() == "true",
+       "local_data_path": "/app/data/karma-hello",
+       "mongo_uri": config.mongo_uri  # From AWS Secrets Manager
+   }
+   ```
+
+3. **Update ECS Task Definition** (Terraform):
+   ```hcl
+   # terraform/ecs-fargate/ecs.tf
+
+   resource "aws_ecs_task_definition" "karma_hello" {
+     # ... existing config ...
+
+     container_definitions = jsonencode([{
+       name  = "karma-hello"
+       image = "${aws_ecr_repository.agent_repos["karma-hello"].repository_url}:latest"
+
+       environment = [
+         { name = "USE_LOCAL_FILES", value = "false" },  # Switch to MongoDB
+         { name = "PORT", value = "9002" },
+         { name = "AGENT_NAME", value = "karma-hello-agent" },
+       ]
+
+       secrets = [
+         {
+           name      = "PRIVATE_KEY"
+           valueFrom = "${aws_secretsmanager_secret.agent_secrets["karma-hello"].arn}:private_key::"
+         },
+         {
+           name      = "OPENAI_API_KEY"
+           valueFrom = "${aws_secretsmanager_secret.agent_secrets["karma-hello"].arn}:openai_api_key::"
+         },
+         {
+           name      = "MONGO_URI"  # NEW: MongoDB connection
+           valueFrom = "${aws_secretsmanager_secret.agent_secrets["karma-hello"].arn}:mongo_uri::"
+         }
+       ]
+     }])
+   }
+   ```
+
+4. **Deploy Updated Configuration:**
+   ```bash
+   cd terraform/ecs-fargate
+   terraform plan -out=tfplan
+   terraform apply tfplan
+
+   # Force new deployment to pick up environment changes
+   aws ecs update-service \
+     --cluster karmacadabra-cluster \
+     --service karma-hello \
+     --force-new-deployment
+   ```
+
+**Step 4: Verify MongoDB Connection**
+
+```bash
+# Test MongoDB connection from ECS
+aws ecs execute-command \
+  --cluster karmacadabra-cluster \
+  --task <task-id> \
+  --container karma-hello \
+  --command "python -c 'from pymongo import MongoClient; client = MongoClient(\"mongodb+srv://...\"); print(client.server_info())'" \
+  --interactive
+```
+
+### SQLite + Cognee Migration Guide (Abracadabra Agent)
+
+**Current Data Location:** `z:\ultravioleta\ai\cursor\abracadabra`
+
+**Step 1: Upload SQLite Database to S3**
+
+1. **Create S3 Bucket:**
+   ```bash
+   aws s3 mb s3://karmacadabra-abracadabra-data --region us-east-1
+   ```
+
+2. **Upload Database:**
+   ```bash
+   aws s3 cp "z:\ultravioleta\ai\cursor\abracadabra\analytics.db" \
+     s3://karmacadabra-abracadabra-data/analytics.db
+   ```
+
+3. **Download in Container** (add to Dockerfile or startup script):
+   ```dockerfile
+   # agents/abracadabra/entrypoint.sh
+   #!/bin/bash
+
+   # Download SQLite database from S3
+   if [ "$USE_LOCAL_FILES" = "false" ]; then
+     echo "[INFO] Downloading production database from S3..."
+     aws s3 cp s3://karmacadabra-abracadabra-data/analytics.db /app/data/analytics.db
+     echo "[INFO] Database downloaded"
+   fi
+
+   # Start agent
+   python main.py
+   ```
+
+**Alternative: Migrate to PostgreSQL (Recommended for Production)**
+
+**Why PostgreSQL over SQLite:**
+- Concurrent access (SQLite locks entire database)
+- Better performance for large datasets
+- Native JSON support for transcripts
+- Integration with AWS RDS (managed, backups, replication)
+- Easier scaling
+
+**Step 2: Set Up PostgreSQL (AWS RDS)**
+
+1. **Create RDS Instance:**
+   ```bash
+   # Via Terraform (recommended)
+   cd terraform/ecs-fargate
+
+   # Add to ecs.tf:
+   resource "aws_db_instance" "abracadabra_postgres" {
+     identifier           = "karmacadabra-abracadabra"
+     engine              = "postgres"
+     engine_version      = "15.4"
+     instance_class      = "db.t4g.micro"  # Free tier eligible
+     allocated_storage   = 20
+     storage_encrypted   = true
+
+     db_name  = "abracadabra"
+     username = "abracadabra_agent"
+     password = random_password.db_password.result
+
+     vpc_security_group_ids = [aws_security_group.rds.id]
+     db_subnet_group_name   = aws_db_subnet_group.rds.name
+
+     backup_retention_period = 7
+     skip_final_snapshot     = false
+     final_snapshot_identifier = "abracadabra-final-snapshot"
+   }
+   ```
+
+2. **Migrate Data from SQLite to PostgreSQL:**
+   ```bash
+   # Use pgloader for migration
+   apt-get install pgloader
+
+   pgloader \
+     "z:\ultravioleta\ai\cursor\abracadabra\analytics.db" \
+     "postgresql://username:password@rds-endpoint:5432/abracadabra"
+   ```
+
+3. **Update Abracadabra Agent:**
+   ```python
+   # Change from:
+   import sqlite3
+   db = sqlite3.connect('/app/data/analytics.db')
+
+   # To:
+   import psycopg2
+   db = psycopg2.connect(
+       host=config.postgres_host,
+       database='abracadabra',
+       user=config.postgres_user,
+       password=config.postgres_password
+   )
+   ```
+
+### Cognee Knowledge Graph Integration
+
+**Current Data:** Cognee graph at `z:\ultravioleta\ai\cursor\abracadabra`
+
+**Options:**
+
+1. **Option A: S3 Backup/Restore (Simple)**
+   ```bash
+   # Backup Cognee data
+   aws s3 sync "z:\ultravioleta\ai\cursor\abracadabra\.cognee" \
+     s3://karmacadabra-abracadabra-data/cognee-graph/
+
+   # Restore on container startup
+   aws s3 sync s3://karmacadabra-abracadabra-data/cognee-graph/ \
+     /app/data/.cognee
+   ```
+
+2. **Option B: Migrate to Neo4j (Production-Grade)**
+   - Use AWS Neptune or self-hosted Neo4j
+   - Better graph query performance
+   - Native graph database features
+
+### Benefits: Mock Data vs. Production Databases
+
+| Feature | Mock Data | MongoDB/PostgreSQL |
+|---------|-----------|-------------------|
+| **Setup Time** | Minutes | Hours (first time) |
+| **Data Freshness** | Static (Oct 21, 2024) | Real-time updates |
+| **Data Volume** | 48 messages, 1 transcript | Months of history |
+| **Testing** | Consistent, reproducible | Realistic edge cases |
+| **Cost** | $0 | MongoDB Free Tier: $0<br>RDS t4g.micro: ~$15/month |
+| **Performance** | Fast (local files) | Depends on query optimization |
+| **Scaling** | No scaling needed | Handles thousands of streams |
+| **Maintenance** | Zero | Database backups, updates |
+
+**Recommendation:**
+- **Phase 3-4 (Testing):** Use mock data for rapid iteration
+- **Phase 5 (Production):** Migrate to MongoDB/PostgreSQL for real workloads
+- **Phase 6 (Scale):** Add read replicas, caching (Redis), CDN for static assets
+
+### Migration Checklist
+
+**Karma-Hello MongoDB Migration:**
+- [ ] Create MongoDB Atlas free tier cluster
+- [ ] Configure network access (ECS NAT IPs)
+- [ ] Create database user and store credentials in AWS Secrets Manager
+- [ ] Run migration script to load data
+- [ ] Update `agents/karma-hello/main.py` to support MongoDB
+- [ ] Update Terraform to inject MONGO_URI from Secrets Manager
+- [ ] Deploy updated task definition
+- [ ] Verify agent can query MongoDB
+- [ ] Test purchase flows with production data
+
+**Abracadabra PostgreSQL Migration:**
+- [ ] Create AWS RDS PostgreSQL instance (or use Atlas)
+- [ ] Migrate SQLite data using pgloader
+- [ ] Upload Cognee graph to S3
+- [ ] Update `agents/abracadabra/main.py` to support PostgreSQL
+- [ ] Add S3 sync to container startup script
+- [ ] Update Terraform to inject database credentials
+- [ ] Deploy updated task definition
+- [ ] Verify agent can query PostgreSQL and Cognee
+- [ ] Test transcript generation with production data
+
+**Future Enhancements:**
+- [ ] Implement database connection pooling
+- [ ] Add read replicas for high availability
+- [ ] Set up automated backups
+- [ ] Monitor query performance (CloudWatch RDS metrics)
+- [ ] Add Redis caching layer for frequently accessed data
+- [ ] Implement data retention policies (archive old streams)
+
+---
+
 ## 🧩 Components
 
 ### 1. GLUE Token (`erc-20/`)
@@ -1074,12 +1507,24 @@ python scripts/demo_system.py --network local
 
 ---
 
-## ❓ Critical Decisions Needed
+## ❓ Critical Decisions
 
-### Q1: Data Source Strategy
+### Q1: Data Source Strategy ✅ **DECIDED**
+
 - **Option A:** Static demo files (48 user logs from Oct 21, one-time extraction) - FASTER
 - **Option B:** Connect to production MongoDB/SQLite - SCALABLE
-- **Decision:** ___________________
+- **Decision:** **OPTION A (Mock Data) - October 27, 2025**
+
+**Rationale:**
+- Fast iteration during testing phase
+- No external database dependencies
+- Docker images easier to build (when working on Linux/WSL2)
+- Consistent test data across all environments
+
+**Next Steps:**
+- Continue using mock data for Phase 3-4 (testing)
+- Migrate to MongoDB/PostgreSQL for Phase 5 (production workloads)
+- See **"Production Data Migration (MongoDB & SQLite)"** section above for complete migration guide
 
 ### Q2: Message Quality Integration
 How should Karma-Hello's quality service use main app's evaluation logic?
@@ -1250,7 +1695,7 @@ This addresses the critical security requirement of never storing keys locally a
 - [x] Validator agent working (443 lines, AgentCard + CrewAI validation)
 - [x] Karma-Hello agent operational (571 lines)
 - [x] Abracadabra agent operational (565 lines)
-- [x] Skill-Extractor agent operational (680 lines)
+- [x] Skill-Extractor agent operational (963 lines - bidirectional AI agent profiler)
 - [x] Voice-Extractor agent operational (524 lines)
 - [x] ERC-8004 integration complete
 - [x] A2A protocol working
