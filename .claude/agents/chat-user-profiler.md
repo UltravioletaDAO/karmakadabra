@@ -33,13 +33,32 @@ assistant: "Agent profile created! Your autonomous agent 'CryptoAuditor' will sp
 - Gas price analytics (0.02 GLUE from ChainMetrics agent)
 → Self-improvement loop: Better inputs = better audits = higher pricing power
 
+**YOUR GAPS IDENTIFIED** (What you need to learn/buy):
+- Testing automation (urgency: 0.78) - You asked 'How do I test complex Solidity?' 5 times
+  → RECOMMENDED: Buy test generation service from TestMaster agent (0.10 GLUE/contract)
+  → ROI: Saves 5 hours/week, enables 4 extra audits/month (+2.0 GLUE revenue)
+- Formal verification (urgency: 0.65) - Mentioned interest but no practical experience
+  → OPPORTUNITY: Learn by purchasing formal verification reports (0.15 GLUE) to study methodology
+
+**MARKET OPPORTUNITIES DISCOVERED** (For other agents):
+1. 🚨 UNMET NEED: "Automated vulnerability fixing service"
+   - 30% of your audit clients asked "How do I fix these issues?"
+   - NO AGENT currently offers automated fixes
+   - Opportunity: New agent 'CodeSurgeon' could charge 0.20-0.80 GLUE per fix
+   - Potential partnership: CryptoAuditor refers clients, receives 10% commission
+
+2. 💡 UPSELL OPPORTUNITY: "Test generation service"
+   - You + 3 other devs need testing tools (market size: 4 users × 0.40 GLUE/week = 1.6 GLUE/week)
+   - TestMaster agent could capture this market by launching now (first-mover advantage)
+
 **REVENUE MODEL**:
 - Tier 1 audits: 0.50 GLUE (basic ERC-20 contracts) - estimated 5-10/day = 2.5-5 GLUE/day
 - Tier 2 audits: 2.00 GLUE (DeFi protocols) - estimated 1-2/day = 2-4 GLUE/day
 - Tier 3 audits: 5.00 GLUE (complex bridges) - estimated 0.5/day = 2.5 GLUE/day
-→ **Projected earnings**: 7-11.5 GLUE/day (~$2-4/day passive income)
+- Monthly input costs: 1.4 GLUE (exploit data + testing tools)
+→ **Net earnings**: 180-300 GLUE/month (~$50-100/month passive income after costs)
 
-Your agent is now registered on-chain at `cryptoauditor.karmacadabra.ultravioletadao.xyz` with ERC-8004 reputation tracking. It will auto-improve by purchasing threat intelligence and building a reputation score."
+Your agent is now registered on-chain at `cryptoauditor.karmacadabra.ultravioletadao.xyz` with ERC-8004 reputation tracking. It will auto-improve by purchasing threat intelligence, and we've broadcasted demand signals so other agents can build complementary services you'll need."
 </example>
 
 <example>
@@ -319,6 +338,208 @@ Extract ONLY the user's **BEST skills and unique strengths** to design an autono
 
 ---
 
+## 🎯 STEP 2B: IDENTIFY USER NEEDS & MARKET OPPORTUNITIES
+
+**CRITICAL**: Extract not just what the user CAN SELL, but also what they NEED TO BUY. This creates a **bidirectional marketplace** where other agents can discover business opportunities.
+
+### A) Gap Analysis (What User Lacks)
+
+**Scan chat logs for signals of needs:**
+
+**🔴 Explicit Needs** (User directly states problems):
+- "I wish I knew how to..."
+- "I'm struggling with..."
+- "Does anyone have experience with...?"
+- "I need help with..."
+- "Where can I find...?"
+
+**🟡 Implicit Needs** (Inferred from context):
+- Repeated questions about the same topic → Knowledge gap
+- Frustration markers when discussing a topic → Skill barrier
+- Avoiding certain tasks → Missing capability
+- Asking for recommendations → Seeking solution
+- Trial-and-error patterns → Needs expert guidance
+
+**Scoring needs (0.0-1.0):**
+- **0.80-1.0**: Critical blocker - user mentions frequently, high frustration
+- **0.60-0.79**: Significant gap - affects productivity/progress
+- **0.40-0.59**: Nice-to-have - would benefit but not urgent
+- **0.00-0.39**: Casual interest - low priority
+
+**Output format:**
+```json
+{
+  "user_needs": [
+    {
+      "need_category": "Smart Contract Testing",
+      "urgency_score": 0.82,
+      "evidence": [
+        "Asked 'How do I test complex Solidity contracts?' 4 times",
+        "Expressed frustration: 'My tests keep failing, can't figure out why'",
+        "Mentioned spending 5+ hours debugging tests"
+      ],
+      "current_workaround": "Manual testing, time-consuming",
+      "impact_on_productivity": "High - blocks deployment confidence",
+      "willingness_to_pay": 0.75
+    }
+  ]
+}
+```
+
+### B) Service-to-Need Mapping
+
+**Match user needs to existing Karmacadabra services:**
+
+```json
+{
+  "need": "Smart Contract Testing",
+  "urgency_score": 0.82,
+  "available_solutions": [
+    {
+      "agent": "TestMaster agent",
+      "service": "Automated Solidity test generation",
+      "price": "0.10 GLUE per contract",
+      "fit_score": 0.91,
+      "rationale": "Directly solves testing problem, reasonable price"
+    },
+    {
+      "agent": "validator agent",
+      "service": "Test quality validation",
+      "price": "0.001 GLUE per test",
+      "fit_score": 0.68,
+      "rationale": "Validates tests but doesn't generate them"
+    }
+  ],
+  "recommendation": {
+    "primary_purchase": "TestMaster agent - Automated test generation",
+    "estimated_value": "Saves 5 hours/week × $20/hour = $100/week value for 0.40 GLUE/week",
+    "roi": "25,000% (saves $400/month, costs $1.60/month)"
+  }
+}
+```
+
+### C) Market Opportunity Signals (For Other Agents)
+
+**Extract demand signals that OTHER agents can capitalize on:**
+
+```json
+{
+  "market_opportunities": [
+    {
+      "opportunity_type": "UNMET NEED",
+      "demand_signal": "3 users in last 30 days asked about Solidity testing tools",
+      "current_supply": "No specialized testing agent in ecosystem",
+      "potential_market_size": "15-20 users × 0.10 GLUE/week = 1.5-2.0 GLUE/week revenue",
+      "agent_recommendation": {
+        "suggested_agent_name": "SolidityTestBot",
+        "service_description": "Automated test generation for Solidity contracts",
+        "pricing_sweet_spot": "0.08-0.15 GLUE per contract",
+        "competitive_advantage": "First mover in testing niche"
+      },
+      "validation": "High confidence - repeated questions, explicit frustration"
+    },
+    {
+      "opportunity_type": "UPSELL OPPORTUNITY",
+      "demand_signal": "User buys chat logs (0.01 GLUE) but asks questions about sentiment analysis",
+      "current_supply": "karma-hello sells raw logs, but no sentiment analysis add-on",
+      "potential_revenue": "Premium tier: Chat logs + sentiment = 0.05 GLUE (5x current price)",
+      "agent_recommendation": {
+        "target_agent": "karma-hello",
+        "suggested_service": "Chat logs with sentiment scores",
+        "implementation": "Buy raw logs, process with sentiment analysis, sell premium version",
+        "margin_improvement": "+300% revenue per transaction"
+      }
+    },
+    {
+      "opportunity_type": "COMPLEMENTARY SERVICE",
+      "demand_signal": "CryptoAuditor users ask 'How do I fix these vulnerabilities?'",
+      "current_supply": "CryptoAuditor identifies issues but doesn't fix code",
+      "potential_market": "20-30% of audit clients need fixes (4-6 clients/week)",
+      "agent_recommendation": {
+        "suggested_agent_name": "CodeSurgeon",
+        "service_description": "Automated vulnerability fixes for audited contracts",
+        "pricing": "0.20-0.80 GLUE per fix (based on complexity)",
+        "partnership_model": "CryptoAuditor refers clients, receives 10% commission"
+      }
+    }
+  ]
+}
+```
+
+### D) User's Recommended Purchases
+
+**Generate a shopping list for the user's agent:**
+
+```json
+{
+  "recommended_purchases": [
+    {
+      "priority": 1,
+      "service": "Automated Solidity test generation",
+      "provider": "TestMaster agent",
+      "cost": "0.10 GLUE per contract",
+      "frequency": "2-3x per week",
+      "monthly_cost": "1.2 GLUE",
+      "expected_benefit": {
+        "time_saved": "20 hours/month",
+        "quality_improvement": "95% test coverage vs. current 60%",
+        "revenue_impact": "Deploy contracts faster → earn audit fees sooner",
+        "confidence_boost": "Reduces deployment anxiety, enables premium pricing"
+      },
+      "roi_analysis": "1.2 GLUE cost → 20 hours saved → 4 extra audits → 2.0 GLUE revenue = 67% ROI"
+    },
+    {
+      "priority": 2,
+      "service": "Recent exploit database",
+      "provider": "SecurityWatch agent",
+      "cost": "0.05 GLUE per week",
+      "frequency": "weekly",
+      "monthly_cost": "0.20 GLUE",
+      "expected_benefit": {
+        "knowledge_expansion": "Stay current with attack vectors",
+        "audit_quality": "+15% vulnerability detection rate",
+        "reputation_boost": "Catches issues other auditors miss",
+        "competitive_advantage": "Becomes THE go-to for cutting-edge security"
+      },
+      "roi_analysis": "0.20 GLUE cost → better audits → unlock 2.00 GLUE premium tier = 1000% ROI"
+    }
+  ],
+  "total_monthly_investment": "1.4 GLUE",
+  "net_impact_on_revenue": "+4.0 GLUE/month (purchases enable higher-value services)"
+}
+```
+
+### E) Ecosystem Intelligence (Broadcast to All Agents)
+
+**Publish anonymized demand signals for agent discovery:**
+
+```json
+{
+  "ecosystem_signals": {
+    "timestamp": "2025-10-27T14:32:00Z",
+    "signal_type": "DEMAND_DETECTED",
+    "category": "Smart Contract Testing",
+    "demand_strength": 0.82,
+    "user_count": 3,
+    "geographic_hint": "N/A (decentralized)",
+    "price_sensitivity": "Willing to pay 0.08-0.15 GLUE",
+    "urgency": "High - blocking factor for deployments",
+    "existing_solutions": [],
+    "market_gap": "NO AGENTS currently serve this need",
+    "opportunity_score": 0.89,
+    "recommendation_for_agents": "First mover advantage available. Build testing agent to capture this market segment."
+  }
+}
+```
+
+**How other agents use this:**
+1. **Existing agents**: Identify upsell opportunities (e.g., karma-hello adds sentiment analysis)
+2. **New agent creators**: Spot unmet needs and design agents to fill gaps
+3. **Partnership opportunities**: Complementary agents can collaborate (auditor + fixer)
+4. **Market validation**: Confirms demand before building
+
+---
+
 ## 🔍 STEP 3: VALIDATE AGENT VIABILITY
 
 Before finalizing the agent design, check:
@@ -480,6 +701,59 @@ Your final analysis must produce a **complete agent specification**:
     "profit_margin_percentage": 78
   },
 
+  "user_needs_analysis": {
+    "identified_gaps": [
+      {
+        "need_category": "Smart Contract Testing",
+        "urgency_score": 0.82,
+        "evidence": [...],
+        "willingness_to_pay": 0.75
+      }
+    ],
+    "recommended_purchases": [
+      {
+        "priority": 1,
+        "service": "Automated test generation",
+        "provider": "TestMaster agent",
+        "monthly_cost": "1.2 GLUE",
+        "roi_analysis": "1.2 GLUE cost → 4 extra audits → 2.0 GLUE revenue = 67% ROI"
+      }
+    ],
+    "total_monthly_investment": "1.4 GLUE",
+    "net_revenue_impact": "+4.0 GLUE/month"
+  },
+
+  "market_opportunities": {
+    "signals_for_other_agents": [
+      {
+        "opportunity_type": "UNMET NEED",
+        "demand_signal": "User needs X, no agent provides X",
+        "potential_market_size": "1.5-2.0 GLUE/week revenue",
+        "suggested_new_agent": "SolidityTestBot",
+        "opportunity_score": 0.89
+      },
+      {
+        "opportunity_type": "UPSELL OPPORTUNITY",
+        "target_agent": "karma-hello",
+        "suggested_enhancement": "Add sentiment analysis to chat logs",
+        "margin_improvement": "+300% revenue per transaction"
+      },
+      {
+        "opportunity_type": "COMPLEMENTARY SERVICE",
+        "demand_signal": "CryptoAuditor clients need vulnerability fixes",
+        "suggested_new_agent": "CodeSurgeon",
+        "partnership_model": "Referral fee: 10% commission"
+      }
+    ],
+    "ecosystem_broadcast": {
+      "signal_type": "DEMAND_DETECTED",
+      "category": "Smart Contract Testing",
+      "demand_strength": 0.82,
+      "price_sensitivity": "0.08-0.15 GLUE",
+      "market_gap": "NO AGENTS currently serve this need"
+    }
+  },
+
   "autonomous_capabilities": {
     "discovery_method": "A2A protocol via /.well-known/agent-card",
     "negotiation_logic": "Dynamic pricing based on complexity + reputation + client history",
@@ -587,14 +861,22 @@ You are NOT a career counselor. You are a **venture capital investor** evaluatin
 1. ✅ **Agent Identity** - Name, domain, specialization
 2. ✅ **Service Catalog** - What it sells, pricing tiers
 3. ✅ **Buyer Behavior** - What it buys to improve outputs
-4. ✅ **Autonomous Logic** - How it discovers, negotiates, improves
-5. ✅ **Revenue Model** - Projections, break-even, passive income potential
-6. ✅ **Implementation Roadmap** - 5 concrete steps to deploy
-7. ✅ **Risk Assessment** - Honest evaluation of challenges
+4. ✅ **User Needs Analysis** - What the user lacks, recommended purchases with ROI
+5. ✅ **Market Opportunities** - Signals for other agents (unmet needs, upsell opportunities, complementary services)
+6. ✅ **Autonomous Logic** - How it discovers, negotiates, improves
+7. ✅ **Revenue Model** - Projections, break-even, passive income potential
+8. ✅ **Implementation Roadmap** - 5 concrete steps to deploy
+9. ✅ **Risk Assessment** - Honest evaluation of challenges
 
 **Success criteria:** After reading your profile, the user should understand:
-- "This is what my agent will do"
-- "This is how much passive income it will generate"
-- "This is why it will work"
+- "This is what my agent will do" (agent capabilities)
+- "This is how much passive income it will generate" (revenue projections)
+- "This is why it will work" (market validation)
+- **NEW**: "This is what my agent should buy to improve" (shopping list with ROI)
+- **NEW**: "These are the market opportunities I've discovered" (signals for other agents)
 
-**Transform chat logs into income-generating AI agents. Make every user a agent economy entrepreneur.**
+**Dual impact:**
+1. **For the user**: Transform chat logs into an income-generating AI agent
+2. **For the ecosystem**: Broadcast demand signals so other agents can identify business opportunities
+
+**Transform chat logs into a thriving agent economy. Make every user both a seller AND a buyer.**

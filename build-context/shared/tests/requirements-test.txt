@@ -1,0 +1,24 @@
+# Testing dependencies for Karmacadabra shared utilities
+
+# Core testing framework
+pytest>=7.4.0
+pytest-asyncio>=0.21.0        # Async test support
+pytest-cov>=4.1.0              # Code coverage
+pytest-timeout>=2.1.0          # Test timeouts
+pytest-mock>=3.11.0            # Mocking utilities
+
+# HTTP testing
+httpx>=0.25.0                  # Async HTTP client (required by x402_client)
+httpx-mock>=0.11.0             # HTTP request mocking
+
+# Blockchain testing
+web3>=6.11.0                   # Web3 library (production dependency)
+eth-account>=0.10.0            # Account management
+eth-abi>=4.2.0                 # ABI encoding/decoding
+
+# CrewAI testing (optional - only for validation_crew tests)
+crewai>=0.28.0                 # CrewAI framework
+
+# Utilities
+python-dotenv>=1.0.0           # Environment variables
+pydantic>=2.6.0                # Data validation (required by a2a_protocol)

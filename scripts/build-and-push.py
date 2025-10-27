@@ -33,27 +33,32 @@ AGENTS = {
     },
     'validator': {
         'context': '.',
-        'dockerfile': 'validator/Dockerfile',
+        'dockerfile': 'Dockerfile.agent',
+        'agent_path': 'validator',
         'platform': 'linux/amd64'
     },
     'karma-hello': {
         'context': '.',
-        'dockerfile': 'karma-hello-agent/Dockerfile',
+        'dockerfile': 'Dockerfile.agent',
+        'agent_path': 'agents/karma-hello',
         'platform': 'linux/amd64'
     },
     'abracadabra': {
         'context': '.',
-        'dockerfile': 'abracadabra-agent/Dockerfile',
+        'dockerfile': 'Dockerfile.agent',
+        'agent_path': 'agents/abracadabra',
         'platform': 'linux/amd64'
     },
     'skill-extractor': {
         'context': '.',
-        'dockerfile': 'skill-extractor-agent/Dockerfile',
+        'dockerfile': 'Dockerfile.agent',
+        'agent_path': 'agents/skill-extractor',
         'platform': 'linux/amd64'
     },
     'voice-extractor': {
         'context': '.',
-        'dockerfile': 'voice-extractor-agent/Dockerfile',
+        'dockerfile': 'Dockerfile.agent',
+        'agent_path': 'agents/voice-extractor',
         'platform': 'linux/amd64'
     }
 }
@@ -80,24 +85,24 @@ def ecr_login():
     """Login to ECR"""
     print("[1/5] Logging into ECR...")
     try:
-        # Get ECR login password
-        ecr_client = boto3.client('ecr', region_name=AWS_REGION)
-        response = ecr_client.get_authorization_token()
-        token = response['authorizationData'][0]['authorizationToken']
+        # Use AWS CLI to login (cross-platform compatible)
+        # This command works on both Windows and Linux
+        cmd = f'aws ecr get-login-password --region {AWS_REGION} | docker login --username AWS --password-stdin {ECR_REGISTRY}'
 
-        # Decode token (format: AWS:password)
-        import base64
-        username, password = base64.b64decode(token).decode('utf-8').split(':')
-
-        # Docker login
-        cmd = f'echo {password} | docker login --username {username} --password-stdin {ECR_REGISTRY}'
-        result = run_command(cmd, check=False)
+        # On Windows, we need to use shell=True for pipe to work
+        result = subprocess.run(
+            cmd,
+            shell=True,
+            capture_output=True,
+            text=True
+        )
 
         if result.returncode == 0:
             print(f"  [OK] Logged into ECR: {ECR_REGISTRY}")
             return True
         else:
             print(f"  [FAIL] ECR login failed")
+            print(f"  STDERR: {result.stderr}")
             return False
 
     except Exception as e:
@@ -165,8 +170,14 @@ def build_image(agent_name, config, force=False):
         '--platform', config.get('platform', 'linux/amd64'),
         '-f', str(dockerfile_path),
         '-t', image_tag,
-        str(context_path)
     ]
+
+    # Add build args if agent_path is specified (for shared Dockerfile.agent)
+    if 'agent_path' in config:
+        cmd.extend(['--build-arg', f"AGENT_PATH={config['agent_path']}"])
+
+    # Add context path
+    cmd.append(str(context_path))
 
     if force:
         cmd.insert(2, '--no-cache')

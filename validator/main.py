@@ -27,7 +27,7 @@ import logging
 
 from dotenv import load_dotenv
 from shared.base_agent import ERC8004BaseAgent
-from shared.a2a_protocol import AgentCard, Skill, Price
+from shared.a2a_protocol import AgentCard, Skill, Price, Endpoint
 from crews.quality_crew import QualityValidationCrew
 from crews.fraud_crew import FraudDetectionCrew
 from crews.price_crew import PriceReviewCrew
@@ -154,6 +154,17 @@ class ValidatorAgent(ERC8004BaseAgent):
             description="Independent data quality verification service using CrewAI multi-agent validation",
             domain=self.config['agent_domain'],  # Add required domain field
             url=f"https://{self.config['agent_domain']}",
+            endpoints=[  # ✅ EIP-8004 compliant endpoints
+                Endpoint(
+                    name="A2A",
+                    endpoint=f"https://{self.config['agent_domain']}",
+                    version="1.0"
+                ),
+                Endpoint(
+                    name="agentWallet",
+                    endpoint=self.address  # Use self.address from base class
+                )
+            ],
             skills=[
                 Skill(
                     skillId="validate_data",

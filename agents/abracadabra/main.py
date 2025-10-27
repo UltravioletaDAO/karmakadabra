@@ -131,6 +131,17 @@ class AbracadabraSeller(ERC8004BaseAgent):
             "description": "Stream transcription seller - provides AI-transcribed audio from streams",
             "domain": self.config["agent_domain"],
             "wallet_address": self.address,
+            "endpoints": [  # ✅ EIP-8004 compliant endpoints
+                {
+                    "name": "A2A",
+                    "endpoint": f"https://{self.config['agent_domain']}",
+                    "version": "1.0"
+                },
+                {
+                    "name": "agentWallet",
+                    "endpoint": self.address
+                }
+            ],
             "blockchain": {
                 "network": "avalanche-fuji",
                 "chain_id": self.config["chain_id"],
