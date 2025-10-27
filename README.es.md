@@ -15,15 +15,63 @@
 
 ---
 
+## 🎯 ¿Qué es Karmacadabra?
+
+**Karmacadabra** es un ecosistema de agentes de IA autónomos que **compran y venden datos** sin intervención humana utilizando:
+
+- **ERC-8004 Extendido** - **¡NO la implementación base!** Esta es una extensión personalizada que habilita **reputación bidireccional** (tanto compradores como vendedores se califican entre sí)
+- **Protocolo A2A** (Pydantic AI) para comunicación entre agentes
+- **x402 + EIP-3009** para micropagos HTTP (¡sin gas!)
+- **CrewAI** para orquestación de múltiples agentes
+- **Blockchain Avalanche** - nuestra cadena de origen y la fundación de Ultravioleta DAO
+
+### 🏔️ Desplegado en Avalanche - Nuestro Hogar
+
+**Karmacadabra vive en Avalanche**, el hogar nativo de blockchain de **Ultravioleta DAO**. Elegimos Avalanche por:
+
+- **Finalidad rápida**: Tiempos de bloque de 2 segundos para transacciones instantáneas de agentes
+- **Costos bajos**: Tarifas de gas mínimas hacen que los micropagos sean económicamente viables
+- **Compatibilidad EVM**: Soporte completo de Solidity con herramientas de Ethereum
+- **Alineación con DAO**: Avalanche es donde Ultravioleta DAO nació y prospera
+
+Actualmente en **testnet Fuji**, con despliegue en mainnet planificado después de auditorías.
+
+### El Problema que Resolvemos
+
+**Karma-Hello** tiene registros ricos de chat de Twitch pero sin contexto de audio.
+**Abracadabra** tiene transcripciones de streams pero sin datos de chat.
+
+**Solución**: Los agentes negocian y compran de forma autónoma datos complementarios, construyendo un contexto completo de streaming. Todas las transacciones son verificadas, on-chain, y sin gas.
+
+### Ecosistema Comprador+Vendedor
+
+![Relaciones de Agentes - Patrón Comprador+Vendedor](./docs/images/architecture/agent-relationships-buyerseller-pattern-ecosystem.png)
+
+*Todos los agentes implementan el patrón comprador+vendedor - tanto compran entradas como venden salidas, creando una economía circular autosostenible.*
+
+---
+
+## 🎯 Características Clave
+
+✅ **Micropagos sin Gas**: Los agentes no necesitan ETH/AVAX para gas
+✅ **Reputación Bidireccional**: Extensión personalizada de ERC-8004 - compradores Y vendedores se califican entre sí (¡no está en la especificación base!)
+✅ **Nativo de Avalanche**: Desplegado en nuestra cadena de origen para rendimiento óptimo
+✅ **Validación sin Confianza**: Validadores independientes verifican la calidad de los datos
+✅ **Descubrimiento de Agentes**: AgentCards del protocolo A2A en `/.well-known/agent-card`
+✅ **Flujos Multi-Agente**: Crews de CrewAI para tareas complejas
+✅ **50+ Servicios Monetizables**: Desde $0.01 hasta $200 GLUE por servicio
+
+---
+
 ## 🚀 **EN VIVO EN FUJI TESTNET** - Desplegado 22 de Octubre 2025
 
 | Contrato | Dirección | Estado |
 |----------|-----------|--------|
 | **Token GLUE (EIP-3009)** | [`0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743`](https://testnet.snowtrace.io/address/0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743) | ✅ Verificado |
+| **Registro de Identidad** | [`0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618`](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) | ✅ Verificado |
+| **Registro de Reputación** | [`0x932d32194C7A47c0fe246C1d61caF244A4804C6a`](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) | ✅ Verificado |
+| **Registro de Validación** | [`0x9aF4590035C109859B4163fd8f2224b820d11bc2`](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) | ✅ Verificado |
 | **TransactionLogger** | [`0x85ea82dDc0d3dDC4473AAAcc7E7514f4807fF654`](https://testnet.snowtrace.io/address/0x85ea82dDc0d3dDC4473AAAcc7E7514f4807fF654) | ✅ Verificado |
-| **Registro de Identidad (ERC-8004)** | [`0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618`](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) | ✅ Verificado |
-| **Registro de Reputación (ERC-8004)** | [`0x932d32194C7A47c0fe246C1d61caF244A4804C6a`](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) | ✅ Verificado |
-| **Registro de Validación (ERC-8004)** | [`0x9aF4590035C109859B4163fd8f2224b820d11bc2`](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) | ✅ Verificado |
 
 **Red**: Avalanche Fuji Testnet (Chain ID: 43113)
 **Tarifa de Registro**: 0.005 AVAX
@@ -44,7 +92,6 @@
 
 **Ver Todos los Contratos**: [Explorador Snowtrace](https://testnet.snowtrace.io/)
 
-
 ---
 
 ## 📦 Qué Está Implementado
@@ -63,7 +110,7 @@ Todos los contratos inteligentes están en vivo y verificados en Snowtrace. Las 
 - ✅ AWS Secrets Manager configurado para gestión centralizada de claves
 - ✅ Facilitador x402 desplegado en AWS Fargate (https://facilitator.ultravioletadao.xyz)
 
-### ✅ Sprint 1: Fundamentos (COMPLETO - Octubre 2025)
+### ✅ Componentes Fundamentales (COMPLETO - Octubre 2025)
 
 **Utilidades Compartidas en Python** (`shared/`) - **3,300+ líneas** de código listo para producción:
 
@@ -77,16 +124,16 @@ Todos los contratos inteligentes están en vivo y verificados en Snowtrace. Las 
 
 **Pruebas:** ✅ Todas las pruebas pasando - Unitarias (30/30), Integración (4/4 agentes iniciando), E2E (4/4 flujo completo)
 
-**Documentación:** 
+**Documentación:**
 - Referencia API: [`shared/README.md`](./shared/README.md)
 - Guía de Testing: [`shared/tests/README.md`](./shared/tests/README.md)
 - Arquitectura: [`docs/ARCHITECTURE.md`](./docs/ARCHITECTURE.md)
 
 ### ✅ Fase 2: Desarrollo de Agentes (COMPLETA - Octubre 2025)
 
-**Sprint 2: Agentes del Sistema** - Infraestructura del mercado completa (7/7 hitos)
+**Agentes del Sistema** - Infraestructura del mercado completa (7/7 componentes)
 
-#### ✅ Sprint 2.1: Agente Validador (COMPLETO)
+#### ✅ Agente Validador (COMPLETO)
 **Servicio independiente de verificación de calidad de datos** - `validator/` - **1,545+ líneas**
 
 **Qué hace:**
@@ -117,7 +164,7 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Tarifa de validación: 0.001 GLUE por validación
 - Puerto: 8001
 
-#### ✅ Sprint 2.2: Agente Cliente (COMPLETO)
+#### ✅ Agente Cliente (COMPLETO)
 **Orquestador comprador+vendedor - mercado de insights comprehensivos de usuarios** - `client-agent/` - **485 líneas**
 
 **Qué hace:**
@@ -147,7 +194,7 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Vende a: 1.00 GLUE por reporte comprehensivo
 - Gasta: 0.211 GLUE por generación de reporte
 
-#### ✅ Sprint 2.3: Integración de Datos (COMPLETO)
+#### ✅ Integración de Datos (COMPLETO)
 **Archivos de datos de muestra para pruebas** - `data/` - **495+ líneas**
 
 **Qué proporciona:**
@@ -165,7 +212,7 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Transcripción: 15 segmentos, 7200 segundos (2 horas)
 - Ambos comparten `stream_id: stream_20251023_001` para pruebas de datos complementarios
 
-#### ✅ Sprint 2.4: Agente Karma-Hello (COMPLETO)
+#### ✅ Agente Karma-Hello (COMPLETO)
 **Vendedor + comprador de logs de chat de Twitch** - `karma-hello-agent/` - **720+ líneas**
 
 **Qué hace:**
@@ -185,7 +232,7 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Billetera: `0x2C3e071df446B25B821F59425152838ae4931E75`
 - Saldo: 55,000 GLUE
 
-#### ✅ Sprint 2.5: Agente Abracadabra (COMPLETO)
+#### ✅ Agente Abracadabra (COMPLETO)
 **Vendedor + comprador de transcripciones de streams** - `abracadabra-agent/` - **720+ líneas**
 
 **Qué hace:**
@@ -204,7 +251,7 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Billetera: `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`
 - Saldo: 55,000 GLUE
 
-#### ✅ Sprint 2.6: Agente Voice-Extractor (COMPLETO)
+#### ✅ Agente Voice-Extractor (COMPLETO)
 **Perfilador de personalidad lingüística** - `voice-extractor-agent/` - **523+ líneas**
 
 **Qué hace:**
@@ -223,7 +270,7 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 - Beneficio neto: 0.03 GLUE por extracción (margen del 300%)
 - Saldo inicial: 55,000 GLUE (presupuestado)
 
-#### ✅ Sprint 2.7: Agente Skill-Extractor (COMPLETO)
+#### ✅ Agente Skill-Extractor (COMPLETO)
 **Perfilador de habilidades y competencias** - `skill-extractor-agent/` - **790+ líneas**
 
 **Qué hace:**
@@ -248,8 +295,6 @@ python test_validator.py --live   # Prueba con validador ejecutándose
 **Modelo Económico:**
 - Beneficio neto: 0.04 GLUE por extracción (margen del 400%)
 - Saldo inicial: 55,000 GLUE (presupuestado)
-
-**Progreso:** ✅ **7 de 7 hitos completados (100%)** - SPRINT 2 COMPLETO
 
 ---
 
@@ -297,205 +342,13 @@ python scripts/demo_client_purchases.py --production
 
 ---
 
-## 🎯 ¿Qué es Karmacadabra?
-
-**Karmacadabra** es un ecosistema de agentes de IA autónomos que **compran y venden datos** sin intervención humana utilizando:
-
-- **ERC-8004 Extendido** - **¡NO la implementación base!** Esta es una extensión personalizada que habilita **reputación bidireccional** (tanto compradores como vendedores se califican entre sí)
-- **Protocolo A2A** (Pydantic AI) para comunicación entre agentes
-- **x402 + EIP-3009** para micropagos HTTP (¡sin gas!)
-- **CrewAI** para orquestación de múltiples agentes
-
-### 🏔️ Desplegado en Avalanche - Nuestro Hogar
-
-**Karmacadabra vive en Avalanche**, el hogar nativo de blockchain de **Ultravioleta DAO**. Elegimos Avalanche por:
-
-- **Finalidad rápida**: Tiempos de bloque de 2 segundos para transacciones instantáneas de agentes
-- **Costos bajos**: Tarifas de gas mínimas hacen que los micropagos sean económicamente viables
-- **Compatibilidad EVM**: Soporte completo de Solidity con herramientas de Ethereum
-- **Alineación con DAO**: Avalanche es donde Ultravioleta DAO nació y prospera
-
-Actualmente en **testnet Fuji**, con despliegue en mainnet planificado después de auditorías.
-
-### El Problema que Resolvemos
-
-**Karma-Hello** tiene registros ricos de chat de Twitch pero sin contexto de audio.
-**Abracadabra** tiene transcripciones de streams pero sin datos de chat.
-
-**Solución**: Los agentes negocian y compran de forma autónoma datos complementarios, construyendo un contexto completo de streaming. Todas las transacciones son verificadas, on-chain, y sin gas.
-
----
-
-## 🚀 Inicio Rápido (30 minutos)
-
-**✨ ¡Contratos ya desplegados!** Puedes empezar a construir agentes de inmediato.
-
-```bash
-# 1. Clonar repositorio
-git clone https://github.com/ultravioletadao/karmacadabra.git
-cd karmacadabra
-
-# 2. Obtener AVAX de testnet
-# Visitar: https://faucet.avax.network/
-
-# 3. Configurar entorno
-cd validator
-cp .env.example .env
-# Agregar tus claves:
-# - PRIVATE_KEY (para tu wallet de prueba)
-# - OPENAI_API_KEY (para CrewAI)
-# - ¡Las direcciones de contratos ya están configuradas!
-
-# 4. Instalar dependencias
-pip install -r requirements.txt
-
-# 5. Ejecutar agente validador
-python main.py
-```
-
-**Contratos Desplegados**: ¡Todos los registros ERC-8004 están en vivo en Fuji!
-**Guía completa**: Ver [docs/guides/QUICKSTART.md](./docs/guides/QUICKSTART.md)
-
----
-
-## 🌐 Despliegue en Producción (AWS ECS Fargate)
-
-**Despliega en AWS con Terraform** - Infraestructura optimizada en costos usando Fargate Spot
-
-### Infraestructura Completa
-
-![Infraestructura ECS Fargate](./docs/images/architecture/terraform-ecs-fargate-complete-infrastructure.png)
-
-*Infraestructura AWS completa: VPC con subredes públicas/privadas, Application Load Balancer, clúster ECS Fargate con 5 servicios, repositorios ECR, DNS Route53, monitoreo CloudWatch e integración con Secrets Manager.*
-
-### Flujo de Despliegue
-
-![Flujo de Despliegue](./docs/images/architecture/terraform-deployment-flow-build-to-ecs.png)
-
-*Proceso de despliegue end-to-end: Construcción Docker local → Push a ECR → Terraform apply → ECS descarga imágenes → Tareas ejecutándose*
-
-### Estrategia de Enrutamiento ALB
-
-![Enrutamiento ALB](./docs/images/architecture/terraform-alb-routing-path-and-hostname.png)
-
-*Enrutamiento del Application Load Balancer con reglas basadas en ruta (`/validator/health`) y hostname (`validator.karmacadabra.ultravioletadao.xyz`) dirigiendo tráfico al servicio ECS correcto.*
-
-### Optimización de Costos con Fargate Spot
-
-![Optimización de Costos](./docs/images/architecture/terraform-fargate-spot-cost-optimization.png)
-
-*Desglose de costos mensuales (~$81-96/mes) usando Fargate Spot (70% ahorro), con proveedores de capacidad, políticas de auto-escalado y estrategias de optimización.*
-
-### Gestión de Secretos
-
-![Gestión de Secretos](./docs/images/architecture/terraform-secrets-management-ecs.png)
-
-*Manejo seguro de secretos: las tareas ECS obtienen claves privadas y API keys desde AWS Secrets Manager en tiempo de ejecución usando roles IAM de ejecución - sin secretos en contenedores o variables de entorno.*
-
-### Comandos de Despliegue Rápido
-
-```bash
-# 1. Construir y publicar imágenes Docker a ECR
-cd terraform/ecs-fargate
-./build-and-push.ps1  # o .sh en Linux/Mac
-
-# 2. Desplegar infraestructura con Terraform
-terraform init
-terraform plan
-terraform apply -auto-approve
-
-# 3. Monitorear despliegue
-./deploy-and-monitor.ps1  # o .sh en Linux/Mac
-
-# 4. Forzar descarga de imágenes nuevas (al actualizar contenedores)
-./force-image-pull.ps1
-```
-
-**Costo**: ~$81-96/mes (Fargate Spot + ALB + NAT Gateway)
-**Servicios**: 6 servicios (facilitator, validator, karma-hello, abracadabra, skill-extractor, voice-extractor)
-**Escalado**: Auto-escala 1-3 tareas por servicio basado en CPU/memoria
-
-**Guía completa de despliegue**: Ver [terraform/ecs-fargate/DEPLOYMENT_GUIDE.md](./terraform/ecs-fargate/DEPLOYMENT_GUIDE.md)
-
-#### Endpoints de Producción (AWS ECS Fargate)
-
-**URL del ALB**: `karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
-
-| Servicio | Basado en Ruta (ALB) | Basado en Hostname (Dominio Personalizado) | Puerto | Tipo |
-|----------|----------------------|---------------------------------------------|--------|------|
-| **Facilitator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/health` | `https://facilitator.ultravioletadao.xyz/health` | 9000 | Pagos |
-| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | Agente |
-| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | Agente |
-| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | Agente |
-| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | Agente |
-| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | Agente |
-
-**Endpoints del Protocolo A2A** (Descubrimiento de Agentes):
-- Validator: `http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
-- Karma-Hello: `http://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
-- Abracadabra: `http://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
-- Skill-Extractor: `http://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
-- Voice-Extractor: `http://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
-
-**Nota**: Los endpoints de dominio personalizado requieren propagación DNS (registros Route53 pendientes de configuración)
-
----
-
-## 🔐 AWS Secrets Manager (Seguridad)
-
-⚠️ **POLÍTICA DE SEGURIDAD CRÍTICA**: Las claves privadas **NUNCA se almacenan en archivos `.env`**. Todas las claves deben estar en AWS Secrets Manager.
-
-**Por qué AWS Secrets Manager:**
-- ✅ Almacenamiento seguro centralizado para todas las claves privadas de agentes
-- ✅ Sin claves en repositorios git (incluso archivos de ejemplo tienen `PRIVATE_KEY=` vacío)
-- ✅ Soporte de rotación automática vía `rotate-system.py`
-- ✅ Registro de auditoría de quién accedió a las claves y cuándo
-- ✅ Seguro para transmisiones públicas en vivo (sin exposición accidental de claves)
-
-### Configuración Rápida
-
-```bash
-# 1. Configurar AWS CLI (una sola vez)
-aws configure
-# Ingresar AWS Access Key ID, Secret Access Key, región (us-east-1)
-
-# 2. Almacenar todas las claves en AWS Secrets Manager
-python scripts/setup-secrets.py
-# Crea el secreto 'karmacadabra' con todas las claves privadas
-
-# 3. Limpiar archivos .env locales (REQUERIDO)
-python scripts/clear-env-keys.py
-# Establece PRIVATE_KEY= (vacío) en todos los archivos .env
-
-# 4. Probar recuperación
-python -m shared.secrets_manager validator-agent
-# [AWS Secrets] Retrieved key for 'validator-agent' from AWS
-```
-
-**Estructura de Almacenamiento de Claves:**
-```json
-{
-  "erc-20": {"private_key": "0x..."},
-  "client-agent": {"private_key": "0x..."},
-  "karma-hello-agent": {"private_key": "0x..."},
-  "abracadabra-agent": {"private_key": "0x..."},
-  "validator-agent": {"private_key": "0x..."},
-  "voice-extractor-agent": {"private_key": "0x..."},
-  "skill-extractor-agent": {"private_key": "0x..."}
-}
-```
-
-**Notas Importantes:**
-- Clave del deployer ERC-20 almacenada por separado (posee el contrato del token GLUE)
-- Rotar clave ERC-20 solo cuando sea necesario: `python scripts/rotate-system.py --rotate-erc20`
-- Todos los archivos `.env` deben tener `PRIVATE_KEY=` (vacío) - scripts obtienen automáticamente de AWS
-
-**Guía completa**: Ver [shared/AWS_SECRETS_SETUP.md](./shared/AWS_SECRETS_SETUP.md)
-### Arquitectura de Seguridad
+## 🔐 Arquitectura de Seguridad
 
 ![Arquitectura de Seguridad - Gestión de Claves](./docs/images/architecture/security-architecture-key-management-and-access-control.png)
 
 *AWS Secrets Manager proporciona gestión centralizada y segura de claves con soporte para rotación y registros de auditoría.*
+
+⚠️ **POLÍTICA DE SEGURIDAD CRÍTICA**: Las claves privadas **NUNCA se almacenan en archivos `.env`**. Todas las claves se obtienen desde AWS Secrets Manager en tiempo de ejecución. Para instrucciones detalladas de configuración, ver [shared/AWS_SECRETS_SETUP.md](./shared/AWS_SECRETS_SETUP.md).
 
 ---
 
@@ -679,11 +532,7 @@ class KarmaHelloAgent(ERC8004BaseAgent):
         self.app.add_middleware(X402Middleware, facilitator_url=self.facilitator_url)
 ```
 
-### Código Fuente
-
-**Repositorio**: directorio `x402-rs/`
-**Documentación**: [x402-rs/README.md](./x402-rs/README.md)
-**Implementación Rust**: Basada en [especificación del protocolo x402](https://www.x402.org)
+**Código Fuente**: directorio `x402-rs/` | [x402-rs/README.md](./x402-rs/README.md)
 
 ---
 
@@ -706,36 +555,6 @@ class KarmaHelloAgent(ERC8004BaseAgent):
 
 ---
 
-## 📂 Estructura del Repositorio
-
-```
-karmacadabra/
-├── erc-20/                    # Token GLUE (EIP-3009)
-├── erc-8004/                  # ERC-8004 Extendido - Registros de reputación bidireccional
-├── x402-rs/                   # Facilitador de pagos (Rust)
-├── validator/                 # Agente validador (Python + CrewAI)
-├── karma-hello-agent/         # Agentes vendedor/comprador de logs de chat
-├── abracadabra-agent/         # Agentes vendedor/comprador de transcripciones
-├── client-agent/              # Agente comprador genérico
-├── voice-extractor-agent/     # Agente de análisis lingüístico
-├── skill-extractor-agent/     # Agente de perfilado de habilidades
-├── shared/                    # Utilidades compartidas (AWS Secrets Manager, etc.)
-├── scripts/                   # Scripts de configuración y despliegue
-├── docs/                      # Documentación
-│   ├── ARCHITECTURE.md           # Arquitectura técnica
-│   ├── TRANSACTION_LOGGING.md    # Sistema de logging en blockchain
-│   ├── MONETIZATION_OPPORTUNITIES.md
-│   ├── INDEX.md                  # Índice de documentación
-│   ├── guides/                   # Guías de usuario
-│   │   └── QUICKSTART.md         # Guía de configuración de 30 min
-│   ├── plans/                    # Planes y reportes de estado
-│   └── migration/                # Guías de migración
-├── MASTER_PLAN.md            # Visión completa y hoja de ruta
-└── CLAUDE.md                 # Guía para Claude Code
-```
-
----
-
 ## 🛠️ Stack Tecnológico
 
 | Capa | Tecnología | Propósito |
@@ -748,19 +567,9 @@ karmacadabra/
 | **LLM** | GPT-4o | Análisis y validación |
 | **Web3** | web3.py + ethers-rs | Interacción con blockchain |
 | **Datos** | MongoDB + SQLite + Cognee | Fuentes de datos de agentes |
-
----
-
-## 🎯 Características Clave
-
-✅ **Micropagos sin Gas**: Los agentes no necesitan ETH/AVAX para gas
-✅ **Reputación Bidireccional**: Extensión personalizada de ERC-8004 - compradores Y vendedores se califican entre sí (¡no está en la especificación base!)
-✅ **Nativo de Avalanche**: Desplegado en nuestra cadena de origen para rendimiento óptimo
-✅ **Validación sin Confianza**: Validadores independientes verifican la calidad de los datos
-✅ **Descubrimiento de Agentes**: AgentCards del protocolo A2A en `/.well-known/agent-card`
-✅ **Flujos Multi-Agente**: Crews de CrewAI para tareas complejas
-✅ **Logging en Blockchain**: Todas las transacciones logueadas con mensajes UTF-8 permanentes en Snowtrace
-✅ **50+ Servicios Monetizables**: Desde $0.01 hasta $200 GLUE por servicio
+| **Nube** | AWS ECS Fargate, ALB, Route53 | Hosting de producción |
+| **Seguridad** | AWS Secrets Manager, IAM | Gestión de claves y control de acceso |
+| **Monitoreo** | CloudWatch Logs, Métricas | Observabilidad |
 
 ---
 
@@ -780,22 +589,186 @@ karmacadabra/
 
 ---
 
-## 🧪 Estado del Desarrollo
+## 🚀 Inicio Rápido
 
-| Fase | Componente | Estado |
-|-------|-----------|--------|
-| **Fase 1** | Registros ERC-8004 Extendidos | ✅ **DESPLEGADO Y VERIFICADO** |
-| **Fase 1** | Token GLUE | ✅ **DESPLEGADO Y VERIFICADO** |
-| **Fase 1** | TransactionLogger | ✅ **DESPLEGADO Y VERIFICADO** |
-| **Fase 1** | Distribución de Tokens | ✅ **COMPLETO** (55,000 GLUE a cada agente) |
-| **Fase 1** | Facilitador x402 | ✅ **DESPLEGADO** (https://facilitator.ultravioletadao.xyz) |
-| **Fase 2** | Agente Validador | ✅ **COMPLETO** |
-| **Fase 3** | Agentes Karma-Hello | 🔴 Por implementar |
-| **Fase 4** | Agentes Abracadabra | 🔴 Por implementar |
-| **Fase 5** | Pruebas de Extremo a Extremo | ✅ **COMPLETO** (4/4 pruebas E2E pasando) |
+**✨ ¡Contratos ya desplegados!** Puedes empezar a construir agentes de inmediato.
 
-**Fase Actual**: Fase 2 Completa - Todas las pruebas pasando (Unitarias, Integración, E2E)
-**Última Actualización**: 24 de Octubre 2025
+### Opción 1: Docker Compose (Más Rápido - Recomendado)
+
+Ejecutar todos los 6 servicios con un comando:
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/ultravioletadao/karmacadabra.git
+cd karmacadabra
+
+# 2. Crear archivos .env desde ejemplos
+for agent in validator karma-hello abracadabra skill-extractor voice-extractor; do
+  cp agents/$agent/.env.example agents/$agent/.env
+done
+cp x402-rs/.env.example x402-rs/.env
+
+# 3. Configurar credenciales AWS (para claves privadas y claves OpenAI)
+aws configure
+
+# 4. Iniciar todos los servicios
+docker-compose up -d
+
+# 5. Verificar estado
+docker-compose ps
+curl http://localhost:9000/health  # facilitador
+curl http://localhost:9002/health  # karma-hello
+```
+
+**Servicios ejecutándose:**
+- Facilitador (9000) - `http://localhost:9000/health`
+- Validator (9001) - `http://localhost:9001/health`
+- Karma-Hello (9002) - `http://localhost:9002/health`
+- Abracadabra (9003) - `http://localhost:9003/health`
+- Skill-Extractor (9004) - `http://localhost:9004/health`
+- Voice-Extractor (9005) - `http://localhost:9005/health`
+
+**Descubrimiento por Protocolo A2A:**
+- Validator: `http://localhost:9001/.well-known/agent-card`
+- Karma-Hello: `http://localhost:9002/.well-known/agent-card`
+- Abracadabra: `http://localhost:9003/.well-known/agent-card`
+- Skill-Extractor: `http://localhost:9004/.well-known/agent-card`
+- Voice-Extractor: `http://localhost:9005/.well-known/agent-card`
+
+**Endpoints del Facilitador:**
+- Salud: `http://localhost:9000/health`
+- Métodos soportados: `http://localhost:9000/supported`
+
+**Ver logs:** `docker-compose logs -f`
+**Detener:** `docker-compose down`
+
+**Guía completa de Docker**: Ver [docs/guides/DOCKER_GUIDE.md](./docs/guides/DOCKER_GUIDE.md)
+
+---
+
+### Opción 2: Despliegue en Producción (AWS ECS Fargate)
+
+**🌐 Despliega en AWS con Terraform** - Infraestructura optimizada en costos usando Fargate Spot
+
+#### Infraestructura Completa
+
+![Infraestructura ECS Fargate](./docs/images/architecture/terraform-ecs-fargate-complete-infrastructure.png)
+
+*Infraestructura AWS completa: VPC con subredes públicas/privadas, Application Load Balancer, clúster ECS Fargate con 5 servicios, repositorios ECR, DNS Route53, monitoreo CloudWatch e integración con Secrets Manager.*
+
+#### Flujo de Despliegue
+
+![Flujo de Despliegue](./docs/images/architecture/terraform-deployment-flow-build-to-ecs.png)
+
+*Proceso de despliegue end-to-end: Construcción Docker local → Push a ECR → Terraform apply → ECS descarga imágenes → Tareas ejecutándose*
+
+#### Estrategia de Enrutamiento ALB
+
+![Enrutamiento ALB](./docs/images/architecture/terraform-alb-routing-path-and-hostname.png)
+
+*Enrutamiento del Application Load Balancer con reglas basadas en ruta (`/validator/health`) y hostname (`validator.karmacadabra.ultravioletadao.xyz`) dirigiendo tráfico al servicio ECS correcto.*
+
+#### Optimización de Costos con Fargate Spot
+
+![Optimización de Costos](./docs/images/architecture/terraform-fargate-spot-cost-optimization.png)
+
+*Desglose de costos mensuales (~$81-96/mes) usando Fargate Spot (70% ahorro), con proveedores de capacidad, políticas de auto-escalado y estrategias de optimización.*
+
+#### Gestión de Secretos
+
+![Gestión de Secretos](./docs/images/architecture/terraform-secrets-management-ecs.png)
+
+*Manejo seguro de secretos: las tareas ECS obtienen claves privadas y API keys desde AWS Secrets Manager en tiempo de ejecución usando roles IAM de ejecución - sin secretos en contenedores o variables de entorno.*
+
+#### Comandos de Despliegue Rápido
+
+```bash
+# 1. Construir y publicar imágenes Docker a ECR
+cd terraform/ecs-fargate
+./build-and-push.ps1  # o .sh en Linux/Mac
+
+# 2. Desplegar infraestructura con Terraform
+terraform init
+terraform plan
+terraform apply -auto-approve
+
+# 3. Monitorear despliegue
+./deploy-and-monitor.ps1  # o .sh en Linux/Mac
+
+# 4. Forzar descarga de imágenes nuevas (al actualizar contenedores)
+./force-image-pull.ps1
+```
+
+**Costo**: ~$81-96/mes (Fargate Spot + ALB + NAT Gateway)
+**Servicios**: 6 servicios (facilitator, validator, karma-hello, abracadabra, skill-extractor, voice-extractor)
+**Escalado**: Auto-escala 1-3 tareas por servicio basado en CPU/memoria
+
+**Guía completa de despliegue**: Ver [terraform/ecs-fargate/DEPLOYMENT_GUIDE.md](./terraform/ecs-fargate/DEPLOYMENT_GUIDE.md)
+
+#### Endpoints de Producción (AWS ECS Fargate)
+
+**URL del ALB**: `karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com`
+
+| Servicio | Basado en Ruta (ALB) | Basado en Hostname (Dominio Personalizado) | Puerto | Tipo |
+|----------|----------------------|---------------------------------------------|--------|------|
+| **Facilitator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/health` | `https://facilitator.ultravioletadao.xyz/health` | 9000 | Pagos |
+| **Validator** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/validator/health` | `http://validator.karmacadabra.ultravioletadao.xyz/health` | 9001 | Agente |
+| **Karma-Hello** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/karma-hello/health` | `http://karma-hello.karmacadabra.ultravioletadao.xyz/health` | 9002 | Agente |
+| **Abracadabra** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/abracadabra/health` | `http://abracadabra.karmacadabra.ultravioletadao.xyz/health` | 9003 | Agente |
+| **Skill-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/skill-extractor/health` | `http://skill-extractor.karmacadabra.ultravioletadao.xyz/health` | 9004 | Agente |
+| **Voice-Extractor** | `http://karmacadabra-prod-alb-1072717858.us-east-1.elb.amazonaws.com/voice-extractor/health` | `http://voice-extractor.karmacadabra.ultravioletadao.xyz/health` | 9005 | Agente |
+
+**Endpoints del Protocolo A2A** (Descubrimiento de Agentes):
+- Validator: `http://validator.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Karma-Hello: `http://karma-hello.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Abracadabra: `http://abracadabra.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Skill-Extractor: `http://skill-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+- Voice-Extractor: `http://voice-extractor.karmacadabra.ultravioletadao.xyz/.well-known/agent-card`
+
+**Nota**: Los endpoints de dominio personalizado requieren propagación DNS (registros Route53 pendientes de configuración)
+
+---
+
+### Opción 3: Configuración Manual
+
+```bash
+# 1. Clonar repositorio
+git clone https://github.com/ultravioletadao/karmacadabra.git
+cd karmacadabra
+
+# 2. Obtener AVAX de testnet
+# Visitar: https://faucet.avax.network/
+
+# 3. Configurar entorno
+cd validator
+cp .env.example .env
+# Agregar tus claves:
+# - PRIVATE_KEY (para tu wallet de prueba)
+# - OPENAI_API_KEY (para CrewAI)
+# - ¡Las direcciones de contratos ya están configuradas!
+
+# 4. Instalar dependencias
+pip install -r requirements.txt
+
+# 5. Ejecutar agente validador
+python main.py
+```
+
+**Contratos Desplegados**: ¡Todos los registros ERC-8004 están en vivo en Fuji!
+**Guía completa**: Ver [docs/guides/QUICKSTART.md](./docs/guides/QUICKSTART.md)
+
+---
+
+## 🔧 Requisitos
+
+- **Python** 3.11+
+- **Rust** última versión estable
+- **Foundry** (forge, anvil, cast)
+- **Node.js** 18+ (opcional, para frontend)
+- **AVAX** en testnet Fuji (gratis desde faucet)
+- **Clave API de OpenAI** (para agentes CrewAI)
+- **Cuenta AWS** (para despliegue en producción)
+- **Docker** (para despliegue en contenedores)
 
 ---
 
@@ -884,6 +857,7 @@ python scripts/rotate-system.py --rotate-erc20 --confirm
 - 🔄 **Reinicio limpio**: Comenzar de cero con nueva infraestructura
 - 🧪 **Pruebas**: Validar automatización de despliegue
 - 🎥 **Post-stream**: Rotar claves después de demostraciones públicas
+- 💰 **Rellenar wallets**: Agregar tokens GLUE a las wallets de agentes (usar flag `--refill`)
 
 **Seguridad**:
 - ⚠️ Requiere flag `--confirm` para ejecutar (por defecto modo dry-run)
@@ -893,25 +867,9 @@ python scripts/rotate-system.py --rotate-erc20 --confirm
 
 **Fondeo de Gas**:
 - 💰 **¿Necesitas AVAX para gas?** Usa la wallet del deployer ERC-20 (almacenada en AWS Secrets Manager)
-- 🔑 Acceso vía `distribute-token.py` (obtiene automáticamente desde AWS)
+- 🔑 Acceso vía: `distribute-token.py` (obtiene automáticamente desde AWS)
 - ⚠️ **El deployer ERC-20 NO se rota por defecto** (es dueño del contrato GLUE)
 - 🔄 Rotar separadamente: `python scripts/rotate-system.py --rotate-erc20 --confirm`
-
-**Ejemplo de salida**:
-```
-STEP 1: Generating New Wallets
-✓ validator-agent          -> 0x742d35Cc6634C0532925a3b844Bc9e7595f0bEb9
-✓ karma-hello-agent        -> 0x95cED938F7991cd0dFcb48F0a06a40FA1aF46EBC
-...
-
-STEP 2: Updating AWS Secrets Manager
-✓ Successfully updated AWS Secrets Manager
-
-STEP 3: Deploying ERC-20 GLUE Token
-✓ GLUE Token deployed: 0x1234...
-
-... (continúa por los 8 pasos)
-```
 
 ### Reconstrucción del Marketplace de Agentes de Usuario
 Pipeline idempotente para reconstruir el marketplace completo de 48 agentes desde logs de chat:
@@ -944,107 +902,6 @@ python scripts/rebuild_user_agent_marketplace.py --users 30
 - ✅ **Seguro** - Respalda datos existentes con `--force`
 - ✅ **Preserva wallets** - Restaura archivos .env con PRIVATE_KEY después de reconstruir
 - ✅ **Flexible** - Omitir pasos individuales con flags `--skip-*`
-
-**Casos de uso**:
-- 📺 **Actualizaciones semanales** - Re-extraer con nuevos logs de chat de streams recientes
-- 👥 **Agregar usuarios** - Expandir marketplace cuando se unen nuevos miembros de la comunidad
-- 📊 **Actualizar perfiles** - Regenerar tarjetas después de historiales de engagement más largos
-- 🔄 **Reconstrucción completa** - Comenzar de cero con todos los datos actuales
-
-**Opciones de línea de comandos**:
-- `--users N` - Procesar N usuarios (por defecto: todos los disponibles)
-- `--skip-extract` - Usar perfiles existentes (omitir Paso 1)
-- `--skip-cards` - Usar tarjetas de agente existentes (omitir Paso 2)
-- `--skip-deploy` - Usar despliegues existentes (omitir Paso 3)
-- `--force` - Reconstruir todo (crea respaldos primero)
-- `--dry-run` - Previsualizar sin ejecutar
-
-**Características de seguridad**:
-- ⚠️ No destructivo por defecto (no sobrescribirá archivos existentes)
-- ⚠️ `--force` crea respaldos con fecha/hora: `user-profiles.backup.YYYYMMDD_HHMMSS/`
-- ✅ Preserva archivos .env de agentes con wallet PRIVATE_KEY
-- ✅ Muestra resumen de compilación con estadísticas
-
-**Ejemplo de salida**:
-```
-================================================================================
-User Agent Marketplace - Build Pipeline
-================================================================================
-
-Step 1/3: Profile Extraction
-  Found 97 users in chat logs
-  Processing 48 users...
-  ✅ Extracted 48 profiles
-
-Step 2/3: Agent Card Generation
-  Loading 48 profiles...
-  ✅ Generated 48 agent cards
-
-Step 3/3: Agent Deployment
-  Creating 48 agent directories...
-  ✅ Deployed 48 agents (ports 9000-9047)
-
-================================================================================
-Build Complete!
-  Profiles: 48 users
-  Agent Cards: 48 cards
-  Deployed Agents: 48 agents
-  Network Capacity: 2,256 potential trades
-================================================================================
-```
-
----
-
-## 🔧 Requisitos
-
-- **Python** 3.11+
-- **Rust** última versión estable
-- **Foundry** (forge, anvil, cast)
-- **Node.js** 18+ (opcional, para frontend)
-- **AVAX** en testnet Fuji (gratis desde faucet)
-- **Clave API de OpenAI** (para agentes CrewAI)
-
----
-
-## 🚦 Comenzando
-
-### 1. Prerequisitos
-```bash
-# Instalar Foundry
-curl -L https://foundry.paradigm.xyz | bash
-foundryup
-
-# Instalar Rust
-curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
-
-# Python 3.11+
-python --version  # Debe ser 3.11 o superior
-```
-
-### 2. Obtener AVAX de Testnet
-Visita https://faucet.avax.network/ y solicita AVAX para tu wallet.
-
-### 3. Desplegar Infraestructura
-```bash
-cd erc-20
-cp .env.example .env
-# Editar .env con tu PRIVATE_KEY
-./deploy-fuji.sh
-
-cd ../erc-8004
-./deploy-fuji.sh
-
-cd ../x402-rs
-cargo build --release
-cargo run
-```
-
-### 4. Ejecutar Demo
-```bash
-python scripts/demo_system.py
-```
-
-Ver [docs/guides/QUICKSTART.md](./docs/guides/QUICKSTART.md) para instrucciones detalladas.
 
 ---
 
