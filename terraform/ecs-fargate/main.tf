@@ -3,18 +3,21 @@
 # ============================================================================
 # COST-OPTIMIZED CONFIGURATION:
 # - Fargate Spot (70% cheaper than on-demand)
-# - Smallest task sizes (0.25 vCPU / 0.5GB RAM)
+# - Mixed task sizes:
+#   * Facilitator: 1 vCPU / 2GB RAM (handles blockchain transactions)
+#   * Other agents: 0.25 vCPU / 0.5GB RAM (lightweight services)
 # - Conservative auto-scaling (max 3 tasks per service)
 # - Container Insights enabled (essential observability)
 # - Service Connect for inter-agent communication (no ALB needed)
 #
 # MONTHLY COST ESTIMATE:
-# - 5 agents x $5-8/month (Spot) = $25-40
+# - Facilitator (1 vCPU / 2GB): ~$12-15/month (Spot)
+# - 5 agents x $1.50/month (Spot) = ~$7.50/month
 # - ALB: ~$16/month
 # - NAT Gateway: ~$32/month
 # - CloudWatch Logs (7 days): ~$5/month
 # - Container Insights: ~$3/month
-# TOTAL: ~$81-96/month (can be reduced further by scaling down)
+# TOTAL: ~$75-92/month (can be reduced further by scaling down)
 
 terraform {
   required_version = ">= 1.0"
@@ -126,8 +129,8 @@ resource "aws_ecs_task_definition" "agents" {
   family                   = "${var.project_name}-${var.environment}-${each.key}"
   network_mode             = "awsvpc"
   requires_compatibilities = ["FARGATE"]
-  cpu                      = var.task_cpu
-  memory                   = var.task_memory
+  cpu                      = each.key == "facilitator" ? var.facilitator_task_cpu : var.task_cpu
+  memory                   = each.key == "facilitator" ? var.facilitator_task_memory : var.task_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution.arn
   task_role_arn            = aws_iam_role.ecs_task.arn
 

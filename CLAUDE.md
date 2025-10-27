@@ -31,6 +31,108 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Why separate rotation**: ERC-20 deployer owns the GLUE token contract. Rotating it requires redeploying the entire token, so it's only rotated when specifically needed.
 
+### SMART CONTRACT SAFETY - EXTREMELY CRITICAL
+**⚠️ SMART CONTRACTS ARE IMMUTABLE - ERRORS CANNOT BE UNDONE**
+
+**MANDATORY RULES when working with smart contracts:**
+
+1. **✅ ALWAYS read the actual Solidity source code FIRST**
+   - Located in `erc-8004/contracts/src/` or `erc-20/contracts/`
+   - **NEVER guess** function signatures or return types
+   - **NEVER work from memory** - verify against actual contract code
+   - Example: `resolveByAddress()` returns `AgentInfo` struct, NOT `uint256`
+
+2. **✅ ALWAYS use correct ABIs from contract source**
+   - Solidity structs return tuples in web3.py
+   - Check function return types in the `.sol` file
+   - Test with small queries before making state changes
+   - Example of WRONG ABI (caused major bug):
+     ```python
+     # ❌ WRONG - assumed returns uint256
+     abi = [{"outputs": [{"type": "uint256"}]}]
+     ```
+   - Example of CORRECT ABI:
+     ```python
+     # ✅ CORRECT - actually returns struct (tuple)
+     abi = [{
+         "outputs": [{
+             "components": [
+                 {"name": "agentId", "type": "uint256"},
+                 {"name": "agentDomain", "type": "string"},
+                 {"name": "agentAddress", "type": "address"}
+             ],
+             "type": "tuple"
+         }]
+     }]
+     ```
+
+3. **✅ ALWAYS test read operations before write operations**
+   - Call view/pure functions first to verify contract state
+   - Test with known data to verify ABI is correct
+   - Example: Query existing agent before registering new ones
+   ```python
+   # Test the ABI works correctly first
+   result = contract.functions.resolveByAddress(KNOWN_ADDRESS).call()
+   print(f"Test result type: {type(result)}, value: {result}")
+   # Only proceed if result matches expected format
+   ```
+
+4. **✅ UNDERSTAND the cost of mistakes**
+   - Registration fees are burned (0.005 AVAX = ~$0.20 each)
+   - Gas fees cannot be recovered
+   - Incorrect registrations cannot be deleted, only updated
+   - Testing costs real money on testnets too
+   - **48 agents × 0.005 AVAX = 0.24 AVAX** - not trivial
+
+5. **✅ CHECK contract addresses match deployment**
+   - Verify `IDENTITY_REGISTRY` matches `erc-8004/.env.deployed`
+   - Verify `GLUE_TOKEN_ADDRESS` matches `erc-20/.env.deployed`
+   - Wrong contract = lost funds or failed transactions
+
+6. **✅ VERIFY function effects before calling**
+   - Read function documentation in Solidity comments
+   - Check for `require()` statements that could revert
+   - Understand state changes: `newAgent()` increments counter, `updateAgent()` modifies existing
+   - Example: `newAgent()` reverts if address already registered - must use `updateAgent()` instead
+
+7. **✅ TEST with block explorers**
+   - Verify transactions on Snowtrace: https://testnet.snowtrace.io/
+   - Check contract state after test transactions
+   - Confirm gas usage is reasonable before batch operations
+
+**Real Bug Example from this project:**
+```python
+# ❌ WRONG: Used wrong ABI, showed all 48 agents as "Agent ID 32"
+abi = [{"outputs": [{"type": "uint256"}]}]  # Assumed returns just uint256
+agent_id = contract.functions.resolveByAddress(address).call()
+# Result: Decoded tuple as single uint256, always returned 32
+
+# ✅ CORRECT: Used proper struct ABI
+abi = [{"outputs": [{"components": [...], "type": "tuple"}]}]
+agent_info = contract.functions.resolveByAddress(address).call()
+agent_id = agent_info[0]  # Extract agentId from tuple
+# Result: Shows correct unique IDs: 7, 8, 9, ..., 54
+```
+
+**How this bug could have been catastrophic:**
+- If we used this to decide "already registered" → would have tried to register duplicates
+- `newAgent()` would revert with `AddressAlreadyRegistered`
+- Would waste 0.24 AVAX in failed transactions
+- Could corrupt our internal database thinking agents weren't registered
+
+**Prevention checklist:**
+- [ ] Read Solidity source code for function signature
+- [ ] Build correct ABI from source
+- [ ] Test with known data first
+- [ ] Verify output format matches expectations
+- [ ] Only then use in batch operations
+
+**When in doubt:**
+1. Check the Solidity file FIRST
+2. Use cast/foundry to test the function: `cast call <address> "functionName(type)" <args>`
+3. Verify output with block explorer
+4. Only then write Python code
+
 ### .env Files: Public Addresses vs Private Keys
 **IMPORTANT DISTINCTION: Public addresses are NOT secret**
 
@@ -157,6 +259,160 @@ test_results.log                       ❌ (put in logs/)
 6. Shared library? → `shared/`
 
 **Why this matters**: Clean root directory improves navigation, prevents clutter, and makes the project structure immediately clear to contributors.
+
+---
+
+## 🧠 System Thinking & Code Quality Rules
+
+### Before Modifying Complex Scripts
+
+**CRITICAL: Always follow this checklist when modifying multi-step scripts:**
+
+1. ✅ **Read the ENTIRE script first**
+   - Understand the complete data flow from start to finish
+   - Identify what data is produced/consumed in each step
+   - Map dependencies between steps (Step 2 output → Step 3 input)
+
+2. ✅ **Check existing working code FIRST**
+   - Look in `scripts/` folder for similar patterns
+   - Copy attribute names, function signatures, patterns from working code
+   - **DON'T work from memory** - verify the actual code
+   - Example: Use grep to find `rawTransaction` vs `raw_transaction` in working scripts
+
+3. ✅ **Trace execution mentally**
+   - Walk through the script step-by-step in your mind
+   - Ask: "If I change Step 2, what breaks in Steps 3-5?"
+   - Verify data availability: "Does Step 3 have the data it expects?"
+
+4. ✅ **State your plan EXPLICITLY**
+   - Before coding, explain: "I will change X, which affects Y and Z, so I'll update those too"
+   - Let the user verify your approach before implementation
+   - Communicate your mental model clearly
+
+5. ✅ **Test incrementally**
+   - Don't change everything at once
+   - Make one architectural change and verify all affected code
+   - Grep for patterns to find all usages: `grep -r "pattern" scripts/`
+
+6. ✅ **ALWAYS test dry-runs before giving code to user**
+   - **MANDATORY**: Run dry-run mode FIRST before presenting modified scripts
+   - If script has `--execute` flag, test WITHOUT it first
+   - If script has dry-run mode, verify it works end-to-end
+   - Catch errors like undefined variables, import issues, syntax errors
+   - **NEVER give untested code** - the user should not be your QA tester
+   - Example: `python scripts/setup_user_agents.py` (without --execute)
+
+### When Refactoring Architecture
+
+**CRITICAL: Architectural changes ripple through the entire system:**
+
+1. ✅ **Map ALL affected code paths**
+   - If you change how data is stored (Step 2), you MUST update how it's read (Steps 3-5)
+   - Use grep to find all places that access the old structure
+   - Example: `grep -r "PRIVATE_KEY" scripts/` to find all consumers
+
+2. ✅ **Update all consumers atomically**
+   - Change storage AND retrieval in the same commit
+   - Don't leave half-refactored code
+   - Test the complete flow, not just one step
+
+3. ✅ **Verify consistency across the codebase**
+   - Use the same attribute names as existing code (`raw_transaction`, not `rawTransaction`)
+   - Follow the same patterns as working scripts
+   - Check: "How do other scripts do this?"
+
+4. ✅ **Document the change clearly**
+   - Explain the OLD architecture vs NEW architecture
+   - List ALL affected files
+   - Provide migration instructions
+
+### Learning from Working Code
+
+**CRITICAL: Working code is your best teacher:**
+
+1. ✅ **Always check `scripts/` folder first**
+   - Before writing new code, find similar existing scripts
+   - Copy patterns, not reinvent from memory
+   - Example: `grep -r "send_raw_transaction" scripts/` shows you the correct attribute name
+
+2. ✅ **Use grep to find patterns**
+   ```bash
+   # How do other scripts do X?
+   grep -r "pattern" scripts/
+
+   # What attribute name is used?
+   grep -r "rawTransaction\|raw_transaction" scripts/
+
+   # How do they handle errors?
+   grep -r "try.*except" scripts/
+   ```
+
+3. ✅ **Verify details matter**
+   - `rawTransaction` vs `raw_transaction` - one works, one fails
+   - `resolveByAddress` vs `resolve_by_address` - case matters
+   - `uint256` vs `tuple` - wrong type = wrong data
+   - **Smart contracts**: Always check `.sol` file for exact return types
+   - Don't assume - verify against working code or source files
+
+4. ✅ **Copy working patterns wholesale**
+   - If a pattern works in one script, use it in yours
+   - Don't "improve" working code without testing
+   - Consistency > cleverness
+
+### Common Failure Patterns to Avoid
+
+**❌ DON'T:**
+- Give untested code to the user - ALWAYS run dry-runs first
+- Change one part of a system without checking downstream effects
+- Write code from memory instead of checking working examples
+- Assume attribute names or APIs without verification
+- Make multiple architectural changes simultaneously
+- Remove variables/constants without checking all references
+- Skip mental execution testing
+- **Guess smart contract ABIs** - ALWAYS read the Solidity source
+- **Assume return types** - Structs return tuples, not primitives
+- **Skip testing with known data** - Verify ABI correctness first
+
+**✅ DO:**
+- Trace complete data flows through the system
+- Check working code first, code second
+- Verify every attribute name against actual usage
+- Make one change at a time and verify
+- Walk through execution mentally before coding
+- **Read .sol files** before writing contract interaction code
+- **Test ABIs with known addresses** before batch operations
+- **Verify on block explorer** when uncertain about contract state
+
+### Why This Matters
+
+**Real example from this project:**
+- Changed Step 2 to store data in AWS with empty `.env` PRIVATE_KEY
+- Forgot to update Steps 3-5 to read from AWS instead of `.env`
+- Result: Script silently skipped all funding/registration
+- **Could have been prevented by**: Tracing data flow through all steps before coding
+
+**Another example:**
+- Used `rawTransaction` from memory
+- Working scripts use `raw_transaction`
+- Result: Runtime error on first execution
+- **Could have been prevented by**: Grepping for the pattern in existing code first
+
+**Third example:**
+- Removed `TOTAL_AVAX_NEEDED` and `TOTAL_GLUE_NEEDED` calculations
+- Didn't check all references to these variables
+- Result: `NameError: name 'TOTAL_AVAX_NEEDED' is not defined` on first run
+- **Could have been prevented by**: Testing dry-run mode before presenting code
+
+**Fourth example (CRITICAL - Smart Contracts):**
+- Used wrong ABI for `resolveByAddress()` - assumed returns `uint256`
+- Didn't read IdentityRegistry.sol to verify actual return type
+- Result: All 48 agents showed as "Agent ID 32" (decoded tuple as uint256)
+- Contract actually returns `AgentInfo` struct (tuple with 3 fields)
+- **Could have caused**: Failed registrations, wasted gas fees (0.24 AVAX), data corruption
+- **Could have been prevented by**: Reading the Solidity source FIRST, testing with known address
+- **Real fix required**: Updated ABI to match struct, showed correct IDs: 7, 8, 9...54
+
+**Key lesson**: System thinking prevents silent failures. Check working code prevents runtime errors. Always test dry-runs. **ALWAYS read Solidity source before writing contract interaction code**. Do all four.
 
 ---
 

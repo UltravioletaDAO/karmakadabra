@@ -58,9 +58,11 @@ def get_private_key(agent_name: str, env_var: str = "PRIVATE_KEY") -> str:
     Logic:
     1. Check if environment variable is set and non-empty → use it
     2. Otherwise, fetch from AWS Secrets Manager
+       - System agents: karmacadabra[agent_name]
+       - User agents: karmacadabra['user-agents'][agent_name]
 
     Args:
-        agent_name: Name of the agent (e.g., "validator-agent", "karma-hello-agent")
+        agent_name: Name of the agent (e.g., "validator-agent", "karma-hello-agent", "cyberpaisa")
         env_var: Name of environment variable to check (default: "PRIVATE_KEY")
 
     Returns:
@@ -70,7 +72,8 @@ def get_private_key(agent_name: str, env_var: str = "PRIVATE_KEY") -> str:
         RuntimeError: If key not found in either source
 
     Example:
-        >>> pk = get_private_key("validator-agent")
+        >>> pk = get_private_key("validator-agent")  # System agent
+        >>> pk = get_private_key("cyberpaisa")  # User agent
         >>> print(pk[:10])  # 0x1234567...
     """
     # 1. Try environment variable first
@@ -90,31 +93,44 @@ def get_private_key(agent_name: str, env_var: str = "PRIVATE_KEY") -> str:
     try:
         secrets = _get_aws_secret()
 
-        if agent_name not in secrets:
-            available = ", ".join(secrets.keys())
-            raise RuntimeError(
-                f"Agent '{agent_name}' not found in AWS secret '{AWS_SECRET_NAME}'. "
-                f"Available agents: {available}"
-            )
+        # Check if it's a system agent (top-level key)
+        if agent_name in secrets and isinstance(secrets[agent_name], dict):
+            agent_data = secrets[agent_name]
+            private_key = agent_data.get("private_key")
 
-        agent_data = secrets[agent_name]
-        private_key = agent_data.get("private_key")
+            if private_key:
+                print(f"[AWS Secrets] Retrieved key for system agent '{agent_name}' from AWS")
+                return private_key
 
-        if not private_key:
-            raise RuntimeError(
-                f"No private_key found for '{agent_name}' in AWS secret"
-            )
+        # Check if it's a user agent (under 'user-agents' key)
+        if 'user-agents' in secrets and agent_name in secrets['user-agents']:
+            agent_data = secrets['user-agents'][agent_name]
+            private_key = agent_data.get("private_key")
 
-        print(f"[AWS Secrets] Retrieved key for '{agent_name}' from AWS")
-        return private_key
+            if private_key:
+                print(f"[AWS Secrets] Retrieved key for user agent '{agent_name}' from AWS")
+                return private_key
+
+        # Agent not found
+        system_agents = [k for k, v in secrets.items() if isinstance(v, dict) and 'private_key' in v]
+        user_agents = list(secrets.get('user-agents', {}).keys()) if 'user-agents' in secrets else []
+        available = f"System agents: {', '.join(system_agents) or 'none'}, User agents: {', '.join(user_agents[:5]) or 'none'}"
+        if len(user_agents) > 5:
+            available += f" (and {len(user_agents) - 5} more)"
+
+        raise RuntimeError(
+            f"Agent '{agent_name}' not found in AWS secret '{AWS_SECRET_NAME}'. "
+            f"{available}"
+        )
 
     except Exception as e:
         raise RuntimeError(
             f"Failed to get private key for '{agent_name}': {e}\n"
             f"Ensure either:\n"
             f"  1. Set {env_var} in .env file, OR\n"
-            f"  2. Run 'python scripts/setup-secrets.py' to create AWS secret, OR\n"
-            f"  3. Configure ~/.aws credentials"
+            f"  2. Run 'python scripts/setup_48_user_agents.py --execute' for user agents, OR\n"
+            f"  3. Run 'python scripts/setup-secrets.py' for system agents, OR\n"
+            f"  4. Configure ~/.aws credentials"
         )
 
 
@@ -125,9 +141,11 @@ def get_openai_api_key(agent_name: str, env_var: str = "OPENAI_API_KEY") -> str:
     Logic:
     1. Check if environment variable is set and non-empty → use it
     2. Otherwise, fetch from AWS Secrets Manager
+       - System agents: karmacadabra[agent_name]
+       - User agents: karmacadabra['user-agents'][agent_name]
 
     Args:
-        agent_name: Name of the agent (e.g., "validator-agent", "karma-hello-agent")
+        agent_name: Name of the agent (e.g., "validator-agent", "karma-hello-agent", "cyberpaisa")
         env_var: Name of environment variable to check (default: "OPENAI_API_KEY")
 
     Returns:
@@ -153,23 +171,28 @@ def get_openai_api_key(agent_name: str, env_var: str = "OPENAI_API_KEY") -> str:
     try:
         secrets = _get_aws_secret()
 
-        if agent_name not in secrets:
-            available = ", ".join(secrets.keys())
-            raise RuntimeError(
-                f"Agent '{agent_name}' not found in AWS secret '{AWS_SECRET_NAME}'. "
-                f"Available agents: {available}"
-            )
+        # Check if it's a system agent (top-level key)
+        if agent_name in secrets and isinstance(secrets[agent_name], dict):
+            agent_data = secrets[agent_name]
+            openai_key = agent_data.get("openai_api_key")
 
-        agent_data = secrets[agent_name]
-        openai_key = agent_data.get("openai_api_key")
+            if openai_key:
+                print(f"[AWS Secrets] Retrieved OpenAI API key for system agent '{agent_name}' from AWS")
+                return openai_key
 
-        if not openai_key:
-            raise RuntimeError(
-                f"No openai_api_key found for '{agent_name}' in AWS secret"
-            )
+        # Check if it's a user agent (under 'user-agents' key)
+        if 'user-agents' in secrets and agent_name in secrets['user-agents']:
+            agent_data = secrets['user-agents'][agent_name]
+            openai_key = agent_data.get("openai_api_key")
 
-        print(f"[AWS Secrets] Retrieved OpenAI API key for '{agent_name}' from AWS")
-        return openai_key
+            if openai_key:
+                print(f"[AWS Secrets] Retrieved OpenAI API key for user agent '{agent_name}' from AWS")
+                return openai_key
+
+        # Not found - this is OK for user agents (they may not need OpenAI keys)
+        raise RuntimeError(
+            f"No openai_api_key found for '{agent_name}' in AWS secret"
+        )
 
     except Exception as e:
         raise RuntimeError(
@@ -185,6 +208,8 @@ def get_agent_address(agent_name: str) -> Optional[str]:
     """
     Get wallet address for an agent from AWS Secrets Manager
 
+    Supports both system agents (top-level) and user agents (under 'user-agents')
+
     Args:
         agent_name: Name of the agent
 
@@ -193,8 +218,16 @@ def get_agent_address(agent_name: str) -> Optional[str]:
     """
     try:
         secrets = _get_aws_secret()
-        agent_data = secrets.get(agent_name, {})
-        return agent_data.get("address")
+
+        # Check system agents (top-level)
+        if agent_name in secrets and isinstance(secrets[agent_name], dict):
+            return secrets[agent_name].get("address")
+
+        # Check user agents (under 'user-agents')
+        if 'user-agents' in secrets and agent_name in secrets['user-agents']:
+            return secrets['user-agents'][agent_name].get("address")
+
+        return None
     except Exception:
         return None
 

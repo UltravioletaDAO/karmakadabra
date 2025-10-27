@@ -1,7 +1,12 @@
 # 🎯 MASTER PLAN: Trustless Agent Economy
 ## AI Agent Microeconomy with ERC-8004 + A2A + x402
 
-> **Version:** 1.3.0 | **Updated:** October 26, 2025 | **Status:** 🔥 Phase 7 In Progress - Multi-Network Expansion & Security Hardening
+> **Version:** 1.5.0 | **Updated:** October 27, 2025 | **Status:** 🚧 BLOCKED - Sprint 3.5 Wallet Infrastructure Required
+>
+> **Last Audit:** October 27, 2025 - Code audit completed, **CRITICAL BLOCKER IDENTIFIED**
+>
+> **⚠️ CRITICAL BLOCKER:** 48 user agents have NO WALLETS. Cannot test marketplace without wallet infrastructure.
+> **Current Priority:** Sprint 3.5 - Generate wallets, distribute AVAX/GLUE, register on-chain
 
 ---
 
@@ -23,18 +28,31 @@
 - **ONLY send funds to EOAs** (externally owned addresses - wallet addresses with private keys)
 - See `CLAUDE.md` for detailed safety guidelines
 
-### Agent Wallets
+### System Agent Wallets (Production Infrastructure)
 
 | Agent | Address | GLUE Balance | Domain | Status |
 |-------|---------|--------------|--------|--------|
-| **Client Agent** | `0xCf30021812F27132d36dc791E0eC17f34B4eE8BA` | 55,000 | `client.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
+| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 55,000 | `validator.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
 | **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 55,000 | `karma-hello.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
 | **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 55,000 | `abracadabra.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
-| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 55,000 | `validator.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
-| **Voice Extractor** | `0xYOUR_ADDRESS_HERE` | 55,000 | `voice-extractor.karmacadabra.ultravioletadao.xyz` | ⏳ Pending |
-| **Skill Extractor** | `0xYOUR_ADDRESS_HERE` | 55,000 | `skill-extractor.karmacadabra.ultravioletadao.xyz` | ⏳ Pending |
+| **Skill Extractor** | `0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9` | 55,000 | `skill-extractor.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
+| **Voice Extractor** | `0x8e0Db88181668cdE24660D7Ee8dA18A77DDbbF96` | 55,000 | `voice-extractor.karmacadabra.ultravioletadao.xyz` | ✅ Funded |
 
-**Total Distributed:** 220,000 GLUE (4 agents funded) | **Budgeted:** 110,000 GLUE (2 agents pending) | **Owner Remaining:** 23,937,817 GLUE
+**Total System Agents:** 5 | **Total Distributed:** 275,000 GLUE | **Owner Remaining:** 23,882,817 GLUE
+
+**Note:** Client Agent (0xCf30021812F27132d36dc791E0eC17f34B4eE8BA) is a testing/orchestrator agent, not part of production system agents.
+
+### User Agent Ecosystem (48 Agents)
+
+**Status:** ✅ **DEPLOYED** - 48 user agents generated and ready for marketplace
+- Location: `client-agents/` (49 folders: 48 users + 1 template)
+- Template: 486 lines with full buyer+seller capabilities
+- Each user agent: ~310 lines (simplified from template)
+- All inherit from ERC8004BaseAgent with discover/buy/sell methods
+
+**User agents:** 0xultravioleta, fredinoo, f3l1p3_bx, eljuyan, elboorja, elbitterx, efeksellindo, dzepequeno, dogonpayy, djhohn, detx8, derek_farming, davidzoh_, davidtherich, datbo0i_lp, darelou, daniel_02s, cymatix, cyberpaisa, craami, collin_0108, coleguin_, celacaftt, calde333, cabomarzo, byparcero, aricreando, andres92____, allan__lp, alej0lr420, alej_o, akawolfcito, aka_r3c, acpm444, abu_ela, 1nocty, 0xyuls, 0xsoulavax, 0xroypi, 0xpineda, 0xmabu_, 0xkysaug, 0xjuanwx_, 0xjuandi, 0xjokker, 0xj4an, 0xh1p0tenusa, 0xdream_sgo
+
+**Total Agents in Ecosystem:** 5 system agents + 48 user agents = **53 agents**
 
 **Domain Convention:** All agents use `<agent-name>.karmacadabra.ultravioletadao.xyz` format (required for on-chain registration)
 
@@ -42,43 +60,66 @@
 
 ## ⚠️ IMPLEMENTATION STATUS
 
-**Last Updated:** October 24, 2025
+**Last Updated:** October 27, 2025
+**Last Audit:** October 27, 2025 - Full codebase audit completed (see AUDIT_FINDINGS_2025-10-27.md)
 
 ### ✅ PHASE 1 COMPLETE: Blockchain Infrastructure
 
-All contracts deployed and verified on Fuji. All agent wallets funded. Token distribution scripts functional.
+All contracts deployed and verified on Fuji. All system agent wallets funded. Token distribution scripts functional.
 
 ### ✅ PHASE 2 COMPLETE: Agent Development
 
-**COMPLETE:** All foundation components and agents implemented. Full buyer+seller pattern operational.
+**COMPLETE:** All foundation components and 5 system agents implemented. Full buyer+seller pattern operational.
 
-| Component | Status | Details |
-|-----------|--------|---------|
-| ERC8004BaseAgent Class | ✅ COMPLETE | 857 lines with buyer+seller capabilities built-in |
-| x402 Payment Integration | ✅ COMPLETE | payment_signer.py (470+ lines) |
-| A2A Protocol | ✅ COMPLETE | a2a_protocol.py (650+ lines) with AgentCard |
-| CrewAI Integration | ✅ COMPLETE | validation_crew.py (550+ lines) |
-| Validator Agent | ✅ COMPLETE | Independent quality validation (1,545+ lines) |
-| Client Agent | ✅ COMPLETE | Buyer+Seller orchestrator (485+ lines) |
-| Karma-Hello Agent | ✅ COMPLETE | Dual buyer/seller (720+ lines) |
-| Abracadabra Agent | ✅ COMPLETE | Dual buyer/seller (720+ lines) |
-| Voice-Extractor Agent | ✅ COMPLETE | Skill profiler (523+ lines) |
-| Skill-Extractor Agent | ✅ COMPLETE | Competency analyzer (790+ lines) |
-| Buyer+Seller Pattern | ✅ BUILT-IN | All agents inherit discover/buy/sell methods from base |
+| Component | Status | Details | Location |
+|-----------|--------|---------|----------|
+| ERC8004BaseAgent Class | ✅ COMPLETE | 857 lines with buyer+seller capabilities built-in | shared/base_agent.py |
+| x402 Payment Integration | ✅ COMPLETE | payment_signer.py (470 lines) | shared/payment_signer.py |
+| A2A Protocol | ✅ COMPLETE | a2a_protocol.py (599 lines) with AgentCard | shared/a2a_protocol.py |
+| CrewAI Integration | ✅ COMPLETE | validation_crew.py (558 lines) | shared/validation_crew.py |
+| Validator Agent | ✅ COMPLETE | Independent quality validation (443 lines) | validator/main.py |
+| Karma-Hello Agent | ✅ COMPLETE | Dual buyer/seller (571 lines) | agents/karma-hello/main.py |
+| Abracadabra Agent | ✅ COMPLETE | Dual buyer/seller (565 lines) | agents/abracadabra/main.py |
+| Skill-Extractor Agent | ✅ COMPLETE | Competency analyzer (680 lines) | agents/skill-extractor/main.py |
+| Voice-Extractor Agent | ✅ COMPLETE | Personality profiler (524 lines) | agents/voice-extractor/main.py |
+| Buyer+Seller Pattern | ✅ BUILT-IN | All agents inherit discover/buy/sell methods from base | shared/base_agent.py |
 
-### 🔮 NEW VISION: User Agent Microeconomy
+**Total System Agents:** 5 (Validator, Karma-Hello, Abracadabra, Skill-Extractor, Voice-Extractor)
+**Total Code Lines (shared + agents):** 4,124 (shared) + 2,783 (agents) = **6,907 lines**
 
-**Evolution:** From 4 system agents → 48+ user agents creating self-organizing microeconomy
+### 🚧 PHASE 3 BLOCKED: User Agent Microeconomy
 
-**Key New Components:**
+**Evolution:** From 5 system agents → 48 user agents creating self-organizing microeconomy
+
+**⚠️ CRITICAL BLOCKER IDENTIFIED (2025-10-27):**
+User agent **code** is complete, but **wallet infrastructure is NOT ready**:
+- ❌ **No wallets generated** for 48 user agents
+- ❌ **No GLUE distributed** to user agents
+- ❌ **No on-chain registration** completed
+- ❌ **Cannot test marketplace** without funded wallets
+
+**Code Status (Complete):**
 - ✅ Voice Extractor Agent (linguistic personality profiler) - COMPLETE
 - ✅ Skill-Extractor Agent (skill/competency profiler) - COMPLETE
-- 📋 Agent Card Generator (auto-gen from profiles) 🔥 **NEXT TASK**
-- 📋 User Agent Factory (mass deployment)
-- 📋 48 User Agents (one per chat participant)
-- 📋 Bootstrap Marketplace (self-discovery flow)
+- ✅ User Agent Template (486 lines with full buyer+seller) - COMPLETE (client-agents/template/)
+- ✅ User Agent Factory (mass deployment) - COMPLETE (48 agents generated)
+- ✅ 48 User Agents (one per chat participant) - CODE DEPLOYED (client-agents/)
 
-**Network Math:** 48 agents × 47 connections = **2,256 potential trades** (quadratic growth)
+**Infrastructure Status (BLOCKED):**
+- ❌ Wallet Generation (48 wallets) - **BLOCKING**
+- ❌ AVAX Distribution (48 × 0.5 AVAX = 24 AVAX) - **BLOCKING**
+- ❌ GLUE Distribution (48 × 1000 GLUE = 48,000 GLUE) - **BLOCKING**
+- ❌ On-chain Registration (48 agents) - **BLOCKED BY WALLETS**
+- 📋 Agent Card Generator (auto-gen from profiles) - PENDING
+- 📋 Bootstrap Marketplace (self-discovery flow) - **BLOCKED BY WALLETS**
+
+**Network Math:** 53 agents total (5 system + 48 user) × 52 connections = **2,756 potential trades** (quadratic growth)
+
+**User Agent Status:**
+- Location: `client-agents/` directory
+- Each agent: ~310 lines (simplified from 486-line template)
+- All inherit ERC8004BaseAgent with discover/buy/sell methods
+- Ready for on-chain registration and marketplace activation
 
 ---
 
@@ -90,9 +131,11 @@ All contracts deployed and verified on Fuji. All agent wallets funded. Token dis
 
 ### ✅ Sprint 2.8: Testing & Validation - COMPLETE
 
-### 🔥 Sprint 3 (Weeks 5-6): User Agent System - **CURRENT SPRINT**
+### 🚧 Sprint 3 (Weeks 5-6): User Agent System - BLOCKED
 
-### 📋 Sprint 4 (Weeks 7-8): Visualization - NEXT
+### 🔥 Sprint 3.5 (Unblock): Wallet Infrastructure - **CURRENT PRIORITY**
+
+### 📋 Sprint 4 (Weeks 7-8): Visualization & Marketplace Bootstrap - BLOCKED
 
 ### ⏸️ Sprint 5 (Future): Coinbase Payments MCP - **DEFERRED** - Awaiting Testnet Support
 
@@ -373,23 +416,106 @@ Fixed critical Pydantic validation errors and port conflicts that prevented vali
 
 ---
 
-### Sprint 3 (Weeks 5-6): User Agent System 🔥 **CURRENT SPRINT**
+### Sprint 3 (Weeks 5-6): User Agent System 🚧 **BLOCKED**
+
+**⚠️ CRITICAL BLOCKER: Wallet Infrastructure Missing**
 
 **Milestones:**
-1. Automated profile extraction (using Skill-Extractor Agent for 48 users)
-2. Agent Card auto-generator
-3. User agent template + factory
-4. Mass deployment (48 agents)
-5. Bootstrap marketplace test
+1. ⏳ Automated profile extraction (using Skill-Extractor Agent for 48 users) - PARTIAL
+2. 📋 Agent Card auto-generator - PENDING (moved to Sprint 4)
+3. ✅ User agent template + factory - **COMPLETE** (client-agents/template/ - 486 lines)
+4. ✅ Mass deployment (48 agents) - **CODE COMPLETE** (client-agents/ with 48 user agents)
+5. ❌ Wallet infrastructure - **MISSING** → **BLOCKING ALL TESTING**
 
-### Sprint 4 (Weeks 7-8): Visualization
+**Completed Deliverables (Code Only):**
+- ✅ User Agent Template: 486 lines with full buyer+seller capabilities
+- ✅ 48 User Agents Generated: Each ~310 lines, inherit from ERC8004BaseAgent
+- ✅ Agent Factory Automation: Scripts to generate agents from template
+- ✅ Directory Structure: `client-agents/` with 49 folders (48 users + template)
 
-**Components:**
-1. Contract interaction viewer (real-time Fuji events)
-2. Agent network graph (D3.js)
-3. Transaction flow tracer
-4. Agent directory (search/filter)
-5. Dashboard overview (metrics)
+**BLOCKED Deliverables (Infrastructure Missing):**
+- ❌ **48 Wallets Generated** - NONE EXIST
+- ❌ **AVAX Distribution** - No testnet AVAX in user wallets
+- ❌ **GLUE Distribution** - No GLUE tokens in user wallets
+- ❌ **On-chain Registration** - Cannot register without funded wallets
+- ❌ **Bootstrap marketplace test** - Cannot test without wallets
+
+**Deferred to Sprint 4:**
+- Agent Card auto-generator (milestone 2)
+- Bootstrap marketplace test (milestone 5) - **NOW BLOCKED**
+- Profile extraction automation (milestone 1 completion)
+
+### Sprint 3.5 (URGENT): Wallet Infrastructure Setup 🔥 **CURRENT PRIORITY**
+
+**Goal:** Unblock Sprint 3 by creating wallet infrastructure for 48 user agents
+
+**Scripts Created:** ✅ **READY TO EXECUTE**
+
+1. ✅ **Unified Setup Script** - `scripts/setup_48_user_agents.py`
+   - Generates 48 wallets
+   - Stores keys in AWS Secrets Manager
+   - Updates all `.env` files
+   - Distributes AVAX (0.05 per agent)
+   - Distributes GLUE (1,000 per agent)
+   - Registers agents on-chain
+   - Idempotent (safe to run multiple times)
+
+2. ✅ **Verification Script** - `scripts/verify_user_agents.py`
+   - Checks all 48 agents
+   - Verifies AVAX balance (≥0.05)
+   - Verifies GLUE balance (≥1,000)
+   - Verifies on-chain registration
+   - Provides detailed summary
+
+**Resource Requirements (Final):**
+- AVAX: **2.4 AVAX** (48 × 0.05) ✅ Available in 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
+- GLUE: **48,000 GLUE** (48 × 1,000) ✅ Available in ERC-20 deployer wallet
+- Time: **30-60 minutes** (transaction confirmations)
+
+**Execution Command:**
+```bash
+# Dry-run (shows what will happen)
+python scripts/setup_48_user_agents.py
+
+# Execute (actually does it)
+python scripts/setup_48_user_agents.py --execute
+
+# Verify completion
+python scripts/verify_user_agents.py
+```
+
+**Success Criteria:**
+- [ ] All 48 wallets generated and stored securely
+- [ ] All 48 wallets have ≥0.05 AVAX
+- [ ] All 48 wallets have ≥1,000 GLUE
+- [ ] All 48 agents registered on-chain
+- [ ] All 48 `.env` files configured correctly
+- [ ] `verify_user_agents.py` shows 100% on all checks
+
+---
+
+### Sprint 4 (Weeks 7-8): Marketplace Activation & Visualization 📋 **BLOCKED**
+
+**⚠️ BLOCKED BY:** Sprint 3.5 wallet infrastructure
+
+**Priority 1: Marketplace Bootstrap (from Sprint 3):**
+1. 📋 Agent Card auto-generator for 48 user agents - **BLOCKED**
+2. 📋 Complete profile extraction automation (Skill + Voice extractors)
+3. 📋 Bootstrap marketplace test (agent discovery and first transactions) - **BLOCKED**
+4. 📋 User agent on-chain registration (53 agents total) - **BLOCKED**
+
+**Priority 2: Visualization & Monitoring:**
+1. 📋 Contract interaction viewer (real-time Fuji events)
+2. 📋 Agent network graph (D3.js - 53 nodes, 2,756 potential edges)
+3. 📋 Transaction flow tracer
+4. 📋 Agent directory (search/filter 53 agents)
+5. 📋 Dashboard overview (metrics: agents, transactions, GLUE flow)
+
+**Success Criteria:**
+- All 53 agents registered on-chain
+- Agent cards published for all user agents
+- First inter-agent transactions executed
+- Real-time monitoring dashboard operational
 
 ---
 
@@ -1121,24 +1247,46 @@ This addresses the critical security requirement of never storing keys locally a
 
 ### Phase 2: Base Agents ✅ **COMPLETE**
 - [x] base_agent.py implemented (857 lines with buyer+seller built-in)
-- [x] Validator agent working (AgentCard + CrewAI validation)
-- [x] Client agent operational (buyer+seller orchestrator, 485 lines)
+- [x] Validator agent working (443 lines, AgentCard + CrewAI validation)
+- [x] Karma-Hello agent operational (571 lines)
+- [x] Abracadabra agent operational (565 lines)
+- [x] Skill-Extractor agent operational (680 lines)
+- [x] Voice-Extractor agent operational (524 lines)
 - [x] ERC-8004 integration complete
 - [x] A2A protocol working
 - [x] CrewAI crews functional
 - [x] Buyer+Seller pattern - ALL agents inherit discover/buy/sell methods
 
-### Phase 3-4: Service Agents 🔴
-- [ ] Karma-Hello seller/buyer deployed
-- [ ] Abracadabra seller/buyer deployed
-- [ ] APIs with x402 working
-- [ ] Data integration complete
+### Phase 3: User Agent System 🚧 **BLOCKED** - Wallet Infrastructure Missing
+- [x] User agent template created (486 lines)
+- [x] 48 User agents generated (~310 lines each) - CODE ONLY
+- [x] Agent factory automation
+- [x] client-agents/ directory structure (49 folders)
+- [ ] **48 Wallets generated** - **BLOCKING** ⚠️
+- [ ] **AVAX distributed (24 AVAX)** - **BLOCKING** ⚠️
+- [ ] **GLUE distributed (48,000 GLUE)** - **BLOCKING** ⚠️
+- [ ] **On-chain registration (48 agents)** - **BLOCKED** ⚠️
+- [ ] Agent Card auto-generator (deferred to Phase 4)
+- [ ] Bootstrap marketplace test - **BLOCKED BY WALLETS** ⚠️
 
-### Phase 5: Testing & Demo 🔵 IN PROGRESS
-- [x] End-to-end flow working (4/4 tests passing)
-- [ ] Demo script complete
-- [ ] Video tutorial recorded
-- [ ] Full documentation written
+### Phase 4: Service Agents in Production 🔵 IN PROGRESS
+- [x] Karma-Hello seller/buyer deployed (production)
+- [x] Abracadabra seller/buyer deployed (production)
+- [x] Skill-Extractor deployed (production)
+- [x] Voice-Extractor deployed (production)
+- [x] APIs with x402 working
+- [ ] User agents on-chain registration (48 agents)
+- [ ] Marketplace bootstrap testing
+
+### Phase 5: Testing & Demo ✅ **COMPLETE**
+- [x] End-to-end flow working (4/4 Level 3 tests passing)
+- [x] Facilitator testing (6/6 tests passing)
+- [x] System state verification scripts
+- [x] Bidirectional transaction tests
+- [x] Integration tests (Level 2)
+- [ ] Demo script for 48-agent marketplace (pending)
+- [ ] Video tutorial recorded (pending)
+- [ ] Full documentation written (in progress)
 
 ### Phase 6: Production Deployment (AWS ECS Fargate) ✅ **COMPLETE**
 
@@ -1256,6 +1404,28 @@ cargo build --release
 - [ ] Implement wallet balance monitoring dashboard
 - [ ] Add audit logging for all wallet operations
 - [ ] Document disaster recovery procedures
+- [ ] **Migrate from AWS Secrets Manager to HashiCorp Vault**
+  - **Why:** Better secrets rotation, dynamic credentials, fine-grained access control, comprehensive audit logging
+  - **Current:** All agent keys stored in AWS Secrets Manager (system agents: top-level, user agents: under `user-agents` key)
+  - **Target:** HashiCorp Vault with dynamic secrets, automatic rotation, and enhanced security
+  - **Benefits:**
+    - Dynamic database credentials (rotate automatically)
+    - Time-limited tokens for agent authentication
+    - Detailed audit trail of all secret access
+    - Policy-based access control (agents can only read own secrets)
+    - Secrets versioning and rollback
+    - Better integration with Kubernetes/ECS
+  - **Tasks:**
+    - [ ] Set up HashiCorp Vault cluster (Cloud or self-hosted)
+    - [ ] Design secret hierarchy and access policies
+    - [ ] Migrate system agent secrets (5 agents)
+    - [ ] Migrate user agent secrets (48 agents)
+    - [ ] Update `shared/secrets_manager.py` to support Vault
+    - [ ] Implement Vault token refresh mechanism
+    - [ ] Test failover and backup procedures
+    - [ ] Document Vault operations and disaster recovery
+  - **Priority:** Medium (current AWS setup works, but Vault provides production-grade features)
+  - **Estimated effort:** 2-3 weeks
 
 **Infrastructure Improvements:**
 - [ ] CloudWatch Dashboard validation error fix

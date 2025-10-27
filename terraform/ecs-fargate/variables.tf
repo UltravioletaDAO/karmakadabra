@@ -101,6 +101,19 @@ variable "task_memory" {
   default     = 512 # 0.5 GB - smallest for 256 CPU
 }
 
+# Facilitator-specific configuration (higher specs needed)
+variable "facilitator_task_cpu" {
+  description = "Fargate task CPU units for facilitator (1024 = 1 vCPU)"
+  type        = number
+  default     = 1024 # 1 vCPU for facilitator
+}
+
+variable "facilitator_task_memory" {
+  description = "Fargate task memory in MB for facilitator"
+  type        = number
+  default     = 2048 # 2 GB for facilitator
+}
+
 variable "desired_count_per_service" {
   description = "Number of tasks to run per service - COST: Start with 1"
   type        = number

@@ -89,6 +89,23 @@ class Skill(BaseModel):
         return self.endpoint or f"/api/{self.skillId}"
 
 
+class Endpoint(BaseModel):
+    """
+    Agent endpoint definition (EIP-8004 compliant)
+
+    Defines how to communicate with the agent. Multiple endpoint types
+    can be registered (A2A, MCP, wallet addresses, etc.)
+
+    Attributes:
+        name: Endpoint type (e.g., "A2A", "MCP", "agentWallet", "ENS", "DID")
+        endpoint: Endpoint value (URL for protocols, address for wallets)
+        version: Optional version identifier
+    """
+    name: str = Field(..., description="Endpoint type (A2A, MCP, agentWallet, etc.)")
+    endpoint: str = Field(..., description="Endpoint URL or address")
+    version: Optional[str] = Field(default=None, description="Protocol version")
+
+
 class Registration(BaseModel):
     """
     On-chain registration information
@@ -110,7 +127,7 @@ class Registration(BaseModel):
 
 class AgentCard(BaseModel):
     """
-    Agent discovery card (A2A protocol)
+    Agent discovery card (A2A protocol + EIP-8004 compliant)
 
     Published at /.well-known/agent-card for agent discovery.
     Contains all metadata needed for other agents to interact.
@@ -121,6 +138,7 @@ class AgentCard(BaseModel):
         description: What this agent does
         version: Agent version (e.g., "1.0.0")
         domain: Agent domain (e.g., "karma-hello.ultravioletadao.xyz")
+        endpoints: List of communication endpoints (A2A, wallet, etc.) - EIP-8004
         skills: List of available skills
         trustModels: Supported trust mechanisms (e.g., ["erc-8004"])
         paymentMethods: Supported payment protocols (e.g., ["x402-eip3009-GLUE"])
@@ -131,6 +149,10 @@ class AgentCard(BaseModel):
     description: str = Field(..., description="Agent description")
     version: str = Field(default="1.0.0", description="Agent version")
     domain: str = Field(..., description="Agent domain")
+    endpoints: List[Endpoint] = Field(
+        default_factory=list,
+        description="Communication endpoints (EIP-8004)"
+    )
     skills: List[Skill] = Field(default_factory=list, description="Available skills")
     trustModels: List[str] = Field(
         default_factory=lambda: ["erc-8004"],
@@ -237,7 +259,11 @@ class A2AServer:
         registrations: Optional[List[Registration]] = None
     ) -> AgentCard:
         """
-        Create and store AgentCard
+        Create and store AgentCard (EIP-8004 compliant)
+
+        Automatically adds:
+        - A2A endpoint (HTTPS URL based on domain)
+        - agentWallet endpoint (agent's wallet address)
 
         Args:
             agent_id: On-chain agent ID
@@ -248,14 +274,32 @@ class A2AServer:
             registrations: On-chain registrations
 
         Returns:
-            AgentCard: Created agent card
+            AgentCard: Created agent card with endpoints
         """
+        # Build endpoints array (EIP-8004 compliant)
+        endpoints = []
+
+        # Add A2A endpoint
+        endpoints.append(Endpoint(
+            name="A2A",
+            endpoint=f"https://{domain}",
+            version="1.0"
+        ))
+
+        # Add agentWallet endpoint if available
+        if hasattr(self, 'agent_address') and self.agent_address:
+            endpoints.append(Endpoint(
+                name="agentWallet",
+                endpoint=self.agent_address
+            ))
+
         self._agent_card = AgentCard(
             agentId=agent_id,
             name=name,
             description=description,
             version=version,
             domain=domain,
+            endpoints=endpoints,
             skills=self._skills,
             registrations=registrations or []
         )

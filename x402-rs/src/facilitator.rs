@@ -4,6 +4,7 @@
 //! against specified requirements [`Facilitator::verify`] and executing on-chain transfers [`Facilitator::settle`].
 
 use std::fmt::{Debug, Display};
+use std::future::Future;
 
 use crate::types::{
     SettleRequest, SettleResponse, SupportedPaymentKindsResponse, VerifyRequest, VerifyResponse,
