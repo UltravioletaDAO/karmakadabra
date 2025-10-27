@@ -1,0 +1,148 @@
+{
+  "stream_id": "20241021",
+  "stream_date": "2024-10-21",
+  "duration_seconds": 14400,
+  "total_segments": 48,
+  "language": "es",
+  "transcript": [
+    {
+      "timestamp": "00:00:15",
+      "speaker": "ultravioleta",
+      "text": "Buenos días! Starting the development stream today. We're implementing EIP-8004 agent registries."
+    },
+    {
+      "timestamp": "00:01:23",
+      "speaker": "j4an",
+      "text": "Hola! What are we building today?"
+    },
+    {
+      "timestamp": "00:05:12",
+      "speaker": "ultravioleta",
+      "text": "We're implementing EIP-8004 agent registries today. These store on-chain identity, reputation, and validation data for AI agents."
+    },
+    {
+      "timestamp": "00:10:00",
+      "speaker": "j4an",
+      "text": "Can you explain what agent registries do?"
+    },
+    {
+      "timestamp": "00:12:45",
+      "speaker": "ultravioleta",
+      "text": "Agent registries store on-chain identity, reputation, and validation data for AI agents. Think of it like a decentralized LinkedIn for agents, plus trust scores and payment history."
+    },
+    {
+      "timestamp": "00:18:00",
+      "speaker": "ultravioleta",
+      "text": "Agents register themselves by calling newAgent() with their domain and metadata. The contract validates everything on-chain and builds reputation through transactions."
+    },
+    {
+      "timestamp": "00:25:15",
+      "speaker": "j4an",
+      "text": "How do agents register themselves?"
+    },
+    {
+      "timestamp": "00:28:45",
+      "speaker": "ultravioleta",
+      "text": "They call newAgent() with their domain and metadata. The smart contract validates the data and creates their on-chain identity."
+    },
+    {
+      "timestamp": "00:40:22",
+      "speaker": "cyberpaisa",
+      "text": "Can malicious agents game the reputation system?"
+    },
+    {
+      "timestamp": "00:43:50",
+      "speaker": "ultravioleta",
+      "text": "Good question! That's what the validation registry prevents. Independent validators verify data quality before transactions and stake their own reputation."
+    },
+    {
+      "timestamp": "00:50:30",
+      "speaker": "ultravioleta",
+      "text": "Correct! Independent validators stake their own reputation. This creates a trustless marketplace where quality is verified on-chain."
+    },
+    {
+      "timestamp": "01:05:20",
+      "speaker": "ultravioleta",
+      "text": "We're deploying to Fuji testnet right now. Once it's up, everyone can test the system."
+    },
+    {
+      "timestamp": "01:20:15",
+      "speaker": "ultravioleta",
+      "text": "Perfect! That's what Karmacadabra is for. It's the agent marketplace we're building."
+    },
+    {
+      "timestamp": "01:30:00",
+      "speaker": "ultravioleta",
+      "text": "Karmacadabra is the agent marketplace we're building. Agents can buy and sell from each other autonomously - chat logs, transcripts, AI analysis, everything."
+    },
+    {
+      "timestamp": "01:50:30",
+      "speaker": "j4an",
+      "text": "How do payments work without gas fees?"
+    },
+    {
+      "timestamp": "01:55:15",
+      "speaker": "ultravioleta",
+      "text": "We use EIP-3009 meta-transactions via x402 protocol. The facilitator pays gas on behalf of the agents, so they don't need ETH in their wallets."
+    },
+    {
+      "timestamp": "02:05:45",
+      "speaker": "ultravioleta",
+      "text": "Exactly! The facilitator pays gas on their behalf. This removes a huge barrier for autonomous agent commerce."
+    },
+    {
+      "timestamp": "02:30:00",
+      "speaker": "ultravioleta",
+      "text": "Alright, deployment complete! Let's test the first transaction."
+    },
+    {
+      "timestamp": "02:40:20",
+      "speaker": "ultravioleta",
+      "text": "Running test now... buyer discovering seller via A2A protocol."
+    },
+    {
+      "timestamp": "02:55:15",
+      "speaker": "ultravioleta",
+      "text": "YES! First gasless purchase complete. The transaction went through without the buyer needing any AVAX for gas."
+    },
+    {
+      "timestamp": "03:15:00",
+      "speaker": "ultravioleta",
+      "text": "Yes! I'll generate wallets for everyone so you can all test the marketplace."
+    },
+    {
+      "timestamp": "03:30:00",
+      "speaker": "ultravioleta",
+      "text": "Thanks everyone! Same time tomorrow. We'll continue building the agent economy."
+    }
+  ],
+  "metadata": {
+    "title": "Building EIP-8004 Agent Registries - Karmacadabra Development",
+    "description": "Live coding session implementing on-chain agent registries with gasless payments",
+    "platform": "Twitch",
+    "channel": "ultravioleta",
+    "topics": ["blockchain", "AI agents", "EIP-8004", "web3", "smart contracts"],
+    "key_moments": [
+      {
+        "timestamp": "00:12:45",
+        "title": "Agent Registry Explanation",
+        "description": "Detailed explanation of on-chain identity and reputation"
+      },
+      {
+        "timestamp": "00:43:50",
+        "title": "Validation System",
+        "description": "How independent validators prevent gaming the system"
+      },
+      {
+        "timestamp": "01:55:15",
+        "title": "Gasless Payments",
+        "description": "EIP-3009 meta-transactions via x402 protocol"
+      },
+      {
+        "timestamp": "02:55:15",
+        "title": "First Transaction",
+        "description": "Successful gasless purchase on testnet"
+      }
+    ]
+  }
+}

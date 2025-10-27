@@ -442,7 +442,7 @@ config = {
     "agent_domain": os.getenv("AGENT_DOMAIN", "abracadabra.ultravioletadao.xyz"),
     "sqlite_db_path": os.getenv("SQLITE_DB_PATH"),
     "use_local_files": os.getenv("USE_LOCAL_FILES", "true").lower() == "true",
-    "local_data_path": os.getenv("LOCAL_DATA_PATH", "../data/abracadabra"),
+    "local_data_path": os.getenv("LOCAL_DATA_PATH", "/app/data/abracadabra"),
     "base_price": float(os.getenv("BASE_PRICE", "0.02")),
     "price_per_segment": float(os.getenv("PRICE_PER_SEGMENT", "0.001")),
     "max_price": float(os.getenv("MAX_PRICE", "300.0"))

@@ -452,7 +452,7 @@ config = {
     "mongo_db": os.getenv("MONGO_DB", "karma_hello"),
     "mongo_collection": os.getenv("MONGO_COLLECTION", "chat_logs"),
     "use_local_files": os.getenv("USE_LOCAL_FILES", "true").lower() == "true",
-    "local_data_path": os.getenv("LOCAL_DATA_PATH", "../data/karma-hello"),
+    "local_data_path": os.getenv("LOCAL_DATA_PATH", "/app/data/karma-hello"),
     "base_price": float(os.getenv("BASE_PRICE", "0.01")),
     "price_per_message": float(os.getenv("PRICE_PER_MESSAGE", "0.0001")),
     "max_price": float(os.getenv("MAX_PRICE", "200.0"))

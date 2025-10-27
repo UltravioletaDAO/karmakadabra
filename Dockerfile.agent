@@ -37,9 +37,12 @@ ARG AGENT_NAME
 ARG AGENT_PATH=agents/${AGENT_NAME}
 
 # Copy agent-specific code
-# For validator: AGENT_PATH=validator
-# For others: AGENT_PATH=agents/{name}
+# AGENT_PATH defaults to agents/${AGENT_NAME}
+# Works for all agents: validator, karma-hello, abracadabra, skill-extractor, voice-extractor
 COPY ${AGENT_PATH}/ /app/
+
+# Copy mock data for testing (karma-hello and abracadabra need data to serve)
+COPY data/ /app/data/
 
 # Health check (overridden per agent)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
