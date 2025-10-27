@@ -96,7 +96,7 @@ def load_agent_wallets():
     import re
 
     agent_dirs = {
-        "validator-agent": "../validator/.env",
+        "validator-agent": "../agents/validator/.env",
         "karma-hello-agent": "../karma-hello-agent/.env",
         "abracadabra-agent": "../abracadabra-agent/.env",
         "client-agent": "../client-agent/.env",

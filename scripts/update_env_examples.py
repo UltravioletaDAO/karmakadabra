@@ -21,7 +21,6 @@ project_root = Path(__file__).parent.parent
 # Find all .env.example files in agent directories
 env_example_files = []
 env_example_files.extend(project_root.glob("agents/*/.env.example"))
-env_example_files.extend(project_root.glob("validator/.env.example"))
 
 print(f"Found {len(env_example_files)} .env.example files")
 print()

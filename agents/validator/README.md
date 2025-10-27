@@ -1,462 +1,331 @@
-# 🔍 Validator Agent (Bob)
+# Validator Agent
 
-> Agente validador independiente que verifica la calidad de datos antes de cada transacción
+Independent data quality verification service using CrewAI multi-agent validation.
 
-**Versión**: 1.0.0
-**Network**: Avalanche Fuji Testnet
-**Basado en**: Bob del ejemplo ERC-8004
-**Estado**: 🔴 Por implementar
-**Última actualización**: Octubre 21, 2025
+## Overview
 
----
+The Validator Agent provides trustless validation for data transactions in the Karmacadabra ecosystem. It analyzes data quality, detects fraud, and reviews pricing fairness using three specialized CrewAI crews.
 
-## 🗂️ Ubicación en el Proyecto
+**Key Features:**
+- ✅ Quality validation using AI multi-agent crews
+- ✅ Fraud detection and authenticity verification
+- ✅ Price fairness review
+- ✅ On-chain validation score submission (validator pays gas)
+- ✅ FastAPI REST API
+- ✅ A2A protocol compatible
 
-```
-z:\ultravioleta\dao\karmacadabra\
-├── erc-20/                    (GLUE Token - recibe 0.001 GLUE por validación)
-├── erc-8004/                  (REGISTRA identidad aquí, SUBE validaciones)
-├── x402-rs/                   (x402 Facilitator)
-├── validator/                 ← ESTÁS AQUÍ
-├── karma-hello-agent/         (VALIDA sus logs antes de venta)
-├── abracadabra-agent/         (VALIDA sus transcripts antes de venta)
-├── MASTER_PLAN.md            (Plan completo del proyecto)
-└── MONETIZATION_OPPORTUNITIES.md
-```
-
-**Parte del Master Plan**: Phase 2 - Base Agents (Semana 3)
-
----
-
-## 🎯 Descripción
-
-El **Validator Agent** es un agente neutral que valida la calidad de datos en transacciones entre Karma-Hello y Abracadabra.
-
-### ¿Por qué un Validator?
-
-**Problema**: Buyers pagan por datos que podrían ser de baja calidad.
-
-**Solución**: Validator independiente verifica calidad ANTES del pago, proporcionando un score de 0-100. Los buyers pueden rechazar si el score es bajo.
-
-### Rol en el Ecosistema
-
-**El Validator NO vende datos**, solo proporciona un servicio:
-
-**Servicio**:
-- ✅ **Validación de calidad de datos** (0.001 UVD por validación)
-- ✅ **Fraud detection** como servicio premium (ver MONETIZATION Tier 3)
-- ✅ **Compliance audit trail** para DAOs/protocolos
-
-**Clientes del Validator**:
-- **Karma-Hello Seller**: Valida sus logs antes de venderlos (aumenta confianza)
-- **Abracadabra Seller**: Valida sus transcripts antes de venderlos
-- **Buyers**: Consultan validaciones on-chain antes de pagar
-- **DAOs/Protocolos**: Contratan validaciones para compliance (ver MONETIZATION)
-
-**Ingresos proyectados**:
-- Si valida 100 transacciones/día: 0.1 UVD/día = 36.5 UVD/año
-- Si ofrece Fraud Detection premium (0.20 UVD): +revenue adicional
-- Ver `MONETIZATION_OPPORTUNITIES.md` § Tier 3 "Fraud Detection Service"
-
-### Fees y Costos
-
-**Ingresos (UVD recibido)**:
-- **0.001 UVD** por validación básica (pagado por el buyer)
-- **0.20 UVD** por Fraud Detection Service (servicio premium)
-
-**Gastos (AVAX pagado)**:
-- **~0.01 AVAX** por cada transacción `validationResponse()` on-chain
-- ⚠️ **IMPORTANTE**: Validator es el ÚNICO agente que paga gas (los demás usan EIP-3009 gasless)
-
-**Economía del Validator**:
-```
-Fee actual:     0.001 UVD por validación
-Gas cost:       ~0.01 AVAX por validación
-Rentabilidad:   ❌ NO rentable en testnet (gas > fee)
-
-Soluciones:
-1. Aumentar VALIDATION_FEE_UVD a 0.01+ UVD
-2. Usar Layer 2 para reducir gas
-3. Batch validations (validar múltiples en una tx)
-```
-
-**Reputación on-chain** basada en accuracy (cuántas validaciones fueron correctas)
-
----
-
-## 🏗️ Arquitectura
-
-### Interacción con Blockchain
+## Architecture
 
 ```
-┌────────────────────────────────────────────────────┐
-│         AVALANCHE FUJI TESTNET                     │
-│                                                    │
-│  ┌──────────────────────────────────────────┐     │
-│  │   ValidationRegistry (Smart Contract)    │     │
-│  │                                          │     │
-│  │   validationRequest(validator, seller,   │     │
-│  │                     dataHash)            │ ◄── Buyer llama
-│  │   ✓ Registra request on-chain           │     │
-│  │                                          │     │
-│  │   validationResponse(dataHash, score)    │ ◄── ❗VALIDATOR ESCRIBE❗
-│  │   ✓ Requiere AVAX para gas (~0.01)       │     │
-│  │   ✓ Guarda score 0-100 on-chain          │     │
-│  │   ✓ Emite event ValidationResponseEvent  │     │
-│  │                                          │     │
-│  │   getValidationResponse(dataHash)        │     │
-│  │   ✓ Lectura gratis (no gas)              │     │
-│  └──────────────────────────────────────────┘     │
-└────────────────────────────────────────────────────┘
-                      ▲
-                      │ web3.py
-                      │ Validator.send_transaction()
-                      │ PAGA GAS AQUÍ
-                      │
-┌─────────────────────┴──────────────────────────────┐
-
-```
-┌─────────────────────────────────────────────┐
-│          Validator Agent (Bob)              │
-├─────────────────────────────────────────────┤
-│                                             │
-│  • ERC-8004 Agent ID: 3                     │
-│  • Domain: validator.ultravioletadao.xyz    │
-│  • Role: Independent validator              │
-│                                             │
-│  ┌─────────────────────────────────────┐   │
-│  │   CrewAI Validation Crew            │   │
-│  ├─────────────────────────────────────┤   │
-│  │                                     │   │
-│  │  Agent 1: Quality Analyst           │   │
-│  │  • Verifica completeness            │   │
-│  │  • Valida schemas                   │   │
-│  │  • Chequea timestamps               │   │
-│  │                                     │   │
-│  │  Agent 2: Fraud Detector            │   │
-│  │  • Detecta duplicados               │   │
-│  │  • Verifica autenticidad            │   │
-│  │  • Similarity checks                │   │
-│  │                                     │   │
-│  │  Agent 3: Price Reviewer            │   │
-│  │  • Verifica que precio es justo     │   │
-│  │  • Market comparison                │   │
-│  │  • Historical data                  │   │
-│  │                                     │   │
-│  └─────────────────────────────────────┘   │
-│                                             │
-│  Output: Validation Score (0-100)           │
-│          + Detailed Report                  │
-└─────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────┐
+│  Validator Agent (FastAPI Server)                           │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐            │
+│  │  Quality   │  │   Fraud    │  │   Price    │            │
+│  │   Crew     │  │   Crew     │  │   Crew     │            │
+│  │            │  │            │  │            │            │
+│  │ • Analyst  │  │ • Detector │  │ • Analyst  │            │
+│  │ • Checker  │  │ • Pattern  │  │ • Assessor │            │
+│  │ • Validator│  │ • Verifier │  │ • Comparar │            │
+│  └────────────┘  └────────────┘  └────────────┘            │
+└──────────────────────┬──────────────────────────────────────┘
+                       │ Submit validation score
+                       ▼
+          ┌────────────────────────┐
+          │  ValidationRegistry    │
+          │  (Avalanche Fuji)      │
+          │  Validator pays gas!   │
+          └────────────────────────┘
 ```
 
----
+## Quick Start
 
-## 🤖 Implementación
+### 1. Installation
 
-### Basado en Bob
-
-```python
-# Extraído de z:\erc8004\erc-8004-example\agents\validator_agent.py
-
-from agents.base_agent import ERC8004BaseAgent
-from crewai import Agent, Task, Crew
-
-class ValidatorAgent(ERC8004BaseAgent):
-    def __init__(self, config):
-        super().__init__(
-            agent_domain="validator.ultravioletadao.xyz",
-            private_key=config.VALIDATOR_PRIVATE_KEY
-        )
-
-        self.agent_id = self.register_agent()
-        self.setup_validation_crew()
-
-    def setup_validation_crew(self):
-        self.quality_analyst = Agent(
-            role="Data Quality Analyst",
-            goal="Verify data completeness and format",
-            backstory="Expert in data validation with 15+ years experience",
-            tools=[CheckSchema(), VerifyTimestamps(), ValidateJSON()]
-        )
-
-        self.fraud_detector = Agent(
-            role="Fraud Detection Specialist",
-            goal="Detect fake or duplicate data",
-            backstory="Forensic data analyst specialized in fraud detection",
-            tools=[SimilarityCheck(), BlockchainVerify(), DuplicateDetector()]
-        )
-
-        self.price_reviewer = Agent(
-            role="Price Fairness Reviewer",
-            goal="Ensure pricing is fair and competitive",
-            backstory="Market analyst with knowledge of data pricing",
-            tools=[MarketCheck(), HistoricalPrices(), FairnessCalculator()]
-        )
-
-    async def validate_transaction(self,
-                                   data_hash: str,
-                                   seller_id: int,
-                                   buyer_id: int,
-                                   data_type: str) -> ValidationResult:
-        """
-        Valida una transacción de datos.
-
-        Args:
-            data_hash: Hash de los datos a validar
-            seller_id: ID del agente vendedor
-            buyer_id: ID del agente comprador
-            data_type: 'logs' o 'transcript'
-        """
-        # 1. Cargar datos
-        data = await self.load_data(data_hash)
-
-        # 2. Ejecutar crew de validación
-        crew = Crew(
-            agents=[
-                self.quality_analyst,
-                self.fraud_detector,
-                self.price_reviewer
-            ],
-            tasks=[
-                Task(
-                    description=f"Analyze data quality for {data_type}",
-                    agent=self.quality_analyst
-                ),
-                Task(
-                    description="Check for fraud indicators",
-                    agent=self.fraud_detector
-                ),
-                Task(
-                    description="Review price fairness",
-                    agent=self.price_reviewer
-                )
-            ]
-        )
-
-        validation_report = crew.kickoff(inputs={
-            "data": data,
-            "data_type": data_type,
-            "seller_id": seller_id,
-            "buyer_id": buyer_id
-        })
-
-        # 3. Extraer score (0-100)
-        score = self.extract_score(validation_report)
-
-        # 4. Submit on-chain
-        tx_hash = await self.submit_validation_response(
-            data_hash=bytes.fromhex(data_hash),
-            response=score
-        )
-
-        return ValidationResult(
-            score=score,
-            report=validation_report,
-            tx_hash=tx_hash,
-            validator_id=self.agent_id
-        )
+```bash
+cd validator
+pip install -r requirements.txt
 ```
 
----
+### 2. Configuration
 
-## ✅ Criterios de Validación
-
-### Para Logs (Karma-Hello)
-
-```python
-def validate_logs(self, logs_data):
-    checks = {
-        "timestamps_valid": all(
-            0 < log["timestamp"] < time.time()
-            for log in logs_data
-        ),
-        "users_exist": all(
-            self.verify_twitch_user(log["user"])
-            for log in logs_data
-        ),
-        "no_duplicates": len(logs_data) == len(set(
-            log["timestamp"] + log["user"] + log["message"]
-            for log in logs_data
-        )),
-        "valid_json": self.validate_schema(logs_data, LOGS_SCHEMA),
-        "messages_not_empty": all(
-            len(log["message"]) > 0
-            for log in logs_data
-        )
-    }
-
-    score = sum(checks.values()) / len(checks) * 100
-    return score, checks
+```bash
+cp .env.example .env
+# Edit .env with your configuration:
+# - PRIVATE_KEY (validator wallet) or leave empty for AWS Secrets
+# - OPENAI_API_KEY (for CrewAI)
+# - Contract addresses (already configured for Fuji)
 ```
 
-### Para Transcripts (Abracadabra)
+### 3. Run Validator
 
-```python
-def validate_transcript(self, transcript_data):
-    checks = {
-        "audio_exists": self.verify_stream_exists(
-            transcript_data["stream_id"]
-        ),
-        "coherence": self.check_text_coherence(
-            transcript_data["text"]
-        ),
-        "timestamps_match": self.verify_duration(
-            transcript_data["segments"]
-        ),
-        "not_random": self.detect_gibberish(
-            transcript_data["text"]
-        ),
-        "topics_relevant": self.verify_topics(
-            transcript_data["topics"],
-            transcript_data["text"]
-        )
-    }
-
-    score = sum(checks.values()) / len(checks) * 100
-    return score, checks
+```bash
+python main.py
 ```
 
----
+The validator will start on `http://0.0.0.0:8001`
 
-## 📡 API
+## API Endpoints
 
-### Request Validation (From Seller)
+### Health Check
 
-```python
-# Seller solicita validación antes de vender
-validator = ValidatorAgent.get_by_id(VALIDATOR_ID)
+```bash
+GET /
+GET /health
+```
 
-validation = await validator.validate_transaction(
-    data_hash="0xabc123...",
-    seller_id=1,  # KarmaHelloSeller
-    buyer_id=4,   # KarmaHelloBuyer
-    data_type="logs"
-)
+Returns validator status and configuration.
 
-# Validation result
+### Agent Card (A2A Protocol)
+
+```bash
+GET /.well-known/agent-card
+```
+
+Returns A2A AgentCard with validator capabilities.
+
+### Validate Data
+
+```bash
+POST /validate
+Content-Type: application/json
+
 {
-  "score": 95,
-  "report": "Data quality: EXCELLENT. All checks passed...",
-  "tx_hash": "0xdef456...",
-  "validator_id": 3
+  "data_type": "chat_logs",
+  "data_content": {
+    "messages": [...],
+    "metadata": {...}
+  },
+  "seller_address": "0x...",
+  "buyer_address": "0x...",
+  "price_glue": "0.01",
+  "metadata": {}
 }
 ```
 
-### Query Validation (From Buyer)
+**Response:**
+
+```json
+{
+  "validation_id": "val_1698765432_0x1219eF",
+  "quality_score": 0.85,
+  "fraud_score": 0.1,
+  "price_score": 0.8,
+  "overall_score": 0.78,
+  "recommendation": "approve",
+  "reasoning": "Quality: High-quality data with complete records | Fraud Check: No suspicious patterns | Price Review: Fair pricing | Overall Score: 0.78/1.0",
+  "timestamp": "2025-10-23T10:30:00Z",
+  "tx_hash": "0xabc123..."
+}
+```
+
+## Validation Process
+
+### 1. Quality Analysis
+
+Three agents analyze data quality:
+- **Quality Analyst**: Evaluates accuracy, consistency, format
+- **Completeness Checker**: Identifies missing fields and gaps
+- **Format Validator**: Checks schema compliance and structure
+
+**Score**: 0.0 (poor) to 1.0 (excellent)
+
+### 2. Fraud Detection
+
+Three agents detect potential fraud:
+- **Fraud Analyst**: Identifies scams, fake data, malicious content
+- **Pattern Analyzer**: Detects statistical anomalies
+- **Authenticity Checker**: Verifies genuine vs. AI-generated content
+
+**Score**: 0.0 (no fraud) to 1.0 (definite fraud)
+
+### 3. Price Review
+
+Three agents review pricing fairness:
+- **Price Analyst**: Evaluates pricing reasonableness
+- **Value Assessor**: Assesses true data value
+- **Market Comparator**: Compares against market benchmarks
+
+**Score**: 0.0 (unfair) to 1.0 (very fair)
+
+### 4. Overall Recommendation
+
+Weighted average of all scores:
+- Quality: 50% weight (most important)
+- Fraud: 30% weight (inverse - lower is better)
+- Price: 20% weight
+
+**Recommendations:**
+- `approve`: Overall score ≥ 0.8 AND fraud < 0.2
+- `reject`: Overall score < 0.5 OR fraud > 0.7
+- `review`: Everything in between
+
+### 5. On-Chain Submission
+
+The validator submits the validation score to `ValidationRegistry` on Avalanche Fuji. **The validator pays gas for this transaction** (~0.01 AVAX per validation).
+
+## Pricing
+
+**Validation Fee**: 0.001 GLUE per validation
+
+## Wallet Information
+
+**Validator Wallet**: `0x1219eF9484BF7E40E6479141B32634623d37d507`
+- **Balance**: 55,000 GLUE
+- **Purpose**: Pay gas for on-chain validation submissions
+
+## Configuration
+
+### Environment Variables
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `PRIVATE_KEY` | Validator wallet private key (or use AWS Secrets) | Yes |
+| `OPENAI_API_KEY` | OpenAI API key for CrewAI | Yes |
+| `OPENAI_MODEL` | Model to use (default: gpt-4o) | No |
+| `RPC_URL_FUJI` | Avalanche Fuji RPC endpoint | Yes |
+| `CHAIN_ID` | Chain ID (43113 for Fuji) | Yes |
+| `IDENTITY_REGISTRY` | Identity Registry address | Yes |
+| `REPUTATION_REGISTRY` | Reputation Registry address | Yes |
+| `VALIDATION_REGISTRY` | Validation Registry address | Yes |
+| `GLUE_TOKEN_ADDRESS` | GLUE Token address | Yes |
+| `HOST` | Server host (default: 0.0.0.0) | No |
+| `PORT` | Server port (default: 8001) | No |
+| `VALIDATION_FEE_GLUE` | Validation fee (default: 0.001) | No |
+
+## Example Usage
+
+### Python Client
 
 ```python
-# Buyer consulta validación antes de pagar
-validation_score = await identity_registry.get_validation_score(
-    data_hash="0xabc123..."
-)
+import httpx
 
-if validation_score >= 80:
-    # Proceder con compra
-    await buyer.purchase(data_hash)
-else:
-    # Rechazar
-    logger.warning(f"Low quality: {validation_score}/100")
+async def validate_data(data):
+    async with httpx.AsyncClient() as client:
+        response = await client.post(
+            "http://localhost:8001/validate",
+            json={
+                "data_type": "chat_logs",
+                "data_content": data,
+                "seller_address": "0xSeller...",
+                "buyer_address": "0xBuyer...",
+                "price_glue": "0.01"
+            }
+        )
+        return response.json()
+
+# Usage
+result = await validate_data({"messages": [...]})
+print(f"Recommendation: {result['recommendation']}")
+print(f"Overall Score: {result['overall_score']}")
 ```
 
----
+### cURL
 
-## ⚙️ Configuración
-
-**.env**:
 ```bash
-# Validator
-VALIDATOR_PRIVATE_KEY=0x...
-VALIDATOR_DOMAIN=validator.ultravioletadao.xyz
-VALIDATOR_WALLET=0x...
-
-# Validation fee
-VALIDATION_FEE_UVD=0.001
-
-# CrewAI
-OPENAI_API_KEY=sk-...
-CREW_MODEL=gpt-4o
-
-# ERC-8004
-VALIDATION_REGISTRY=0x...
+curl -X POST http://localhost:8001/validate \
+  -H "Content-Type: application/json" \
+  -d '{
+    "data_type": "chat_logs",
+    "data_content": {"messages": []},
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_address": "0xCf30021812F27132d36dc791E0eC17f34B4eE8BA",
+    "price_glue": "0.01"
+  }'
 ```
 
----
+## Development
 
-## 🚀 Uso
+### Run in Development Mode
 
 ```bash
-# Install
-pip install -r requirements.txt
-
-# Register
-python scripts/register_validator.py
-
-# Run
+# With auto-reload
 python main.py
 
-# Output:
-# ✅ Validator Agent listening...
-# 🔍 Waiting for validation requests...
+# Or with uvicorn directly
+uvicorn main:app --reload --host 0.0.0.0 --port 8001
 ```
+
+### Testing
+
+```bash
+# Unit tests for crews
+pytest tests/
+
+# Integration test with sample data
+python test_validator.py
+```
+
+## Architecture Details
+
+### CrewAI Integration
+
+Each validation crew uses the CrewAI framework with:
+- **Multiple specialized agents** with distinct roles
+- **Sequential process** for coordinated analysis
+- **GPT-4o** for advanced reasoning
+- **Structured output** parsing for scores and reasoning
+
+### On-Chain Integration
+
+The validator uses `ERC8004BaseAgent` from `shared/` to:
+- Register on-chain with a unique agent ID
+- Submit validation scores to `ValidationRegistry`
+- Pay gas fees from the validator wallet
+- Maintain reputation through successful validations
+
+### A2A Protocol Compliance
+
+Exposes an AgentCard at `/.well-known/agent-card` with:
+- Agent identity and description
+- Available skills (validate_data)
+- Pricing information
+- Input/output schemas
+
+## Security Considerations
+
+1. **Private Key Management**: Use AWS Secrets Manager or secure environment variables
+2. **Rate Limiting**: Implement rate limiting to prevent abuse
+3. **API Authentication**: Consider adding API key auth for production
+4. **Gas Management**: Monitor AVAX balance to ensure validator can submit validations
+5. **OpenAI API**: Secure your OpenAI key and monitor usage
+
+## Troubleshooting
+
+### Validator Not Starting
+
+- Check OPENAI_API_KEY is valid
+- Verify private key is correct
+- Ensure all contract addresses are set
+- Check RPC endpoint is accessible
+
+### Validation Failing
+
+- Verify validator has AVAX for gas
+- Check ValidationRegistry contract is deployed
+- Ensure validator is registered on-chain
+- Review logs for CrewAI errors
+
+### Low Validation Scores
+
+- Review crew prompts in `crews/` directory
+- Adjust scoring weights in `main.py`
+- Consider fine-tuning GPT model
+- Add more sophisticated parsing logic
+
+## Roadmap
+
+- [ ] Add validation caching for repeated data
+- [ ] Implement rate limiting
+- [ ] Add API key authentication
+- [ ] Support batch validations
+- [ ] Add validation history tracking
+- [ ] Implement dynamic pricing based on data size
+- [ ] Add webhook notifications for validation results
+
+## License
+
+MIT
 
 ---
 
-## 📊 Reputación On-Chain
-
-El Validator construye reputación basado en:
-- **Accuracy**: ¿Sus validaciones fueron correctas?
-- **Response time**: ¿Qué tan rápido responde?
-- **Ratings**: Buyers y sellers pueden calificarlo
-
-```solidity
-// ValidationRegistry.sol
-
-function rateValidator(uint256 validatorId, uint256 rating) external {
-    require(rating <= 100, "Max rating is 100");
-    // Store rating on-chain
-}
-
-function getValidatorReputation(uint256 validatorId)
-    external view returns (uint256) {
-    // Return average rating
-}
-```
-
----
-
-## 📚 Estructura
-
-```
-validator/
-├── README.md                   # ← Este archivo
-├── agents/
-│   ├── base_agent.py          # Hereda de ERC8004BaseAgent
-│   ├── validator_agent.py     # Main logic (basado en Bob)
-│   └── validation_tools.py    # CrewAI tools
-├── scripts/
-│   └── register_validator.py  # Registra en ERC-8004
-├── requirements.txt
-├── .env.example
-└── main.py                     # Entry point
-```
-
-**Productos que Valida**:
-- Karma-Hello logs (ver `karma-hello-agent/` para formato de datos)
-- Abracadabra transcripts (ver `abracadabra-agent/` para formato)
-
-**Fuentes de datos para validación**:
-- MongoDB: `z:\ultravioleta\ai\cursor\karma-hello` (para verificar logs)
-- SQLite: `z:\ultravioleta\ai\cursor\abracadabra\analytics.db` (para verificar transcripts)
-
----
-
-## 🔗 Referencias
-
-- **Ejemplo Original (Bob)**: `z:\erc8004\erc-8004-example\agents\validator_agent.py`
-- **MASTER_PLAN.md**: Flujo completo de validación
-- **MONETIZATION_OPPORTUNITIES.md**: Servicios premium (Fraud Detection, Compliance)
-
----
-
-**Ver [MASTER_PLAN.md](../MASTER_PLAN.md) para el flujo completo.**
+**Built with ❤️ by Ultravioleta DAO**
