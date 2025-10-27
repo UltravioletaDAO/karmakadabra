@@ -229,6 +229,75 @@ These files were manually created to represent realistic data for testing. For p
 - **Karma-Hello**: Real data from `z:\ultravioleta\ai\cursor\karma-hello` MongoDB
 - **Abracadabra**: Real data from `z:\ultravioleta\ai\cursor\abracadabra` SQLite + Cognee
 
+## Docker Build Issues (Windows)
+
+### Known Issue: fsutil Walker Panic
+
+**Problem**: Docker builds fail on Windows with `panic: runtime error: invalid memory address or nil pointer dereference` in `github.com/tonistiigi/fsutil` walker.
+
+**Error**:
+```
+panic: runtime error: invalid memory address or nil pointer dereference
+[signal 0xc0000005 code=0x0 addr=0x10 pc=0x375d33]
+
+goroutine 150 [running]:
+os.(*fileStat).Mode(...)
+  os/types_windows.go:116
+os.(*fileStat).IsDir(0xc000276180?)
+  os/types.go:59 +0x13
+github.com/tonistiigi/fsutil.Walk.func1(...)
+```
+
+**Root Cause**: Docker BuildKit on Windows has a bug when walking certain file structures during build context creation. This happens even before reaching the COPY commands.
+
+**Solutions**:
+
+#### Solution 1: Build in WSL2 (Recommended)
+```bash
+# From WSL2 terminal
+cd /mnt/z/ultravioleta/dao/karmacadabra
+python scripts/build-and-push.py --agents karma-hello abracadabra --force
+```
+
+#### Solution 2: Use GitHub Actions
+Create `.github/workflows/build-docker.yml`:
+```yaml
+name: Build Docker Images
+on:
+  push:
+    paths:
+      - 'agents/**'
+      - 'data/**'
+      - 'Dockerfile.agent'
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: docker/setup-buildx-action@v2
+      - uses: aws-actions/configure-aws-credentials@v2
+      - run: python scripts/build-and-push.py --force
+```
+
+#### Solution 3: Manual Docker Commands (Linux/Mac only)
+```bash
+# Build karma-hello
+docker build --platform linux/amd64 \
+  -f Dockerfile.agent \
+  -t karmacadabra/karma-hello:latest \
+  --build-arg AGENT_PATH=agents/karma-hello \
+  .
+
+# Build abracadabra
+docker build --platform linux/amd64 \
+  -f Dockerfile.agent \
+  -t karmacadabra/karma-hello:latest \
+  --build-arg AGENT_PATH=agents/abracadabra \
+  .
+```
+
+**Status**: Mock data files are ready and committed. Dockerfile is configured correctly. Only the build step is blocked on Windows native Docker.
+
 ## License
 
 Sample data for testing purposes. Not for production use.

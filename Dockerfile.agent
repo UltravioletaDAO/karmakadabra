@@ -41,8 +41,15 @@ ARG AGENT_PATH=agents/${AGENT_NAME}
 # Works for all agents: validator, karma-hello, abracadabra, skill-extractor, voice-extractor
 COPY ${AGENT_PATH}/ /app/
 
-# Copy mock data for testing (karma-hello and abracadabra need data to serve)
-COPY data/ /app/data/
+# Copy mock data for testing (copy specific files to avoid Windows Docker bug)
+# karma-hello logs
+RUN mkdir -p /app/data/karma-hello/logs/20241021
+COPY data/karma-hello/logs/20241021/full.txt /app/data/karma-hello/logs/20241021/
+COPY data/karma-hello/logs/20241021/0xultravioleta.txt /app/data/karma-hello/logs/20241021/
+
+# abracadabra transcripts
+RUN mkdir -p /app/data/abracadabra/transcripts/20241021
+COPY data/abracadabra/transcripts/20241021/transcripcion.json /app/data/abracadabra/transcripts/20241021/
 
 # Health check (overridden per agent)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
