@@ -1,20 +1,27 @@
 # 🎯 MASTER PLAN: Trustless Agent Economy
 ## AI Agent Microeconomy with ERC-8004 + A2A + x402
 
-> **Version:** 1.6.0 | **Updated:** October 27, 2025 | **Status:** ✅ READY - Sprint 4 Marketplace Activation
+> **Version:** 1.6.1 | **Updated:** October 28, 2025 | **Status:** ✅ READY - Sprint 4 Marketplace Active
 >
 > **Last Audit:** October 27, 2025 - Code audit completed, **WALLET INFRASTRUCTURE COMPLETE**
 >
-> **✅ MILESTONE ACHIEVED:** 48 user agents fully operational with wallets, funds, and on-chain registration
-> **Current Priority:** Sprint 4 - Marketplace Bootstrap & Visualization
+> **✅ MILESTONE ACHIEVED:** Central Marketplace API operational, serving 48 user agent cards
+> **Current Priority:** Sprint 4 - Visualization & Agent Activation
 >
-> **📦 Latest Deployment (October 27, 2025 - Evening):**
+> **📦 Latest Deployment (October 28, 2025):**
+> - ✅ **Central Marketplace API:** Option C implementation complete (agents/marketplace/main.py)
+> - ✅ **Agent Discovery:** Serves 48 static agent cards via A2A protocol
+> - ✅ **Search & Stats:** Full-text search, engagement filtering, marketplace statistics
+> - ✅ **Cost-effective:** One API instead of deploying 48 agents (~$100+/month saved)
+> - ✅ **Endpoints:** /agents, /search, /stats, /agents/{username}/card all operational
+> - ✅ **Tested locally:** All endpoints verified, loads 48 cards + 48 profiles
+>
+> **Previous Deployment (October 27, 2025):**
 > - ✅ **Production Data Integration:** karma-hello and abracadabra now serve real production data
 > - ✅ Created TXT→JSON conversion script for karma-hello logs (6 dates: 20251014-20251021, 2,685 messages)
 > - ✅ Fixed Docker path mounting: `/data/karma-hello` for logs, `/transcripts` for abracadabra
 > - ✅ Rebuilt and redeployed both agents to ECS Fargate with production data
 > - ✅ **All E2E tests passing:** Health (5/5), Discovery, Validation, Purchase flows operational
-> - ✅ System ready for real marketplace testing with production chat logs and transcriptions
 
 ---
 
@@ -497,6 +504,60 @@ python scripts/verify_user_agents.py
 - [x] All 48 `.env` files configured correctly
 - [x] `verify_user_agents.py` shows 100% on all checks
 
+### Sprint 3.9: Marketplace Strategy Decision ✅ **COMPLETE**
+
+**Context:** Sprint 3 created 48 user agents (code + wallets + on-chain registration), but they weren't deployed as HTTP services. This blocked agent discovery via A2A protocol.
+
+**Three Options Considered:**
+
+**Option A: Deploy All to ECS**
+- Pro: Always online, scalable, production-ready
+- Con: ~$100+/month for 48 agents (2 vCPU + 4GB RAM each)
+- Con: Complex Terraform setup for 48 services
+
+**Option B: On-Demand Local Execution**
+- Pro: Free, flexible
+- Con: Not truly autonomous (requires manual startup)
+- Con: Not accessible via domain names
+
+**Option C: Central Marketplace + Static Cards** ✅ **CHOSEN**
+- Pro: Cheap (one API server instead of 48)
+- Pro: Simple implementation (FastAPI + JSON files)
+- Pro: Provides full A2A discovery
+- Pro: Can spin up individual agents on-demand when needed
+- Con: Not truly decentralized (single point of discovery)
+
+**Decision Rationale:**
+- **Cost-effective MVP**: Saves ~$100/month while providing full discovery
+- **Agents ready**: 48 user agents exist (wallets funded, registered on-chain)
+- **Dormant until needed**: Agents can be activated when clients want to purchase
+- **Matches current scale**: System agents (5) handle most traffic, user agents (48) are passive
+
+**Implementation:** `agents/marketplace/main.py` (324 lines)
+- Loads 48 agent cards from `demo/cards/*.json`
+- Loads 48 profiles from `demo/profiles/*.json`
+- Serves A2A protocol agent cards at `/agents/{username}/card`
+- Provides search, filtering, and marketplace statistics
+- Port 9000 (standard marketplace port)
+
+**Testing:**
+```bash
+cd agents/marketplace
+pip install -r requirements.txt
+python main.py
+
+# Test endpoints
+curl http://localhost:9000/health          # → 48 agents loaded
+curl http://localhost:9000/agents          # → List all agents
+curl http://localhost:9000/search?q=blockchain  # → 16 results
+curl http://localhost:9000/stats           # → Marketplace stats
+```
+
+**Next Steps:**
+- Deploy marketplace to ECS (one service, low cost)
+- Test agent discovery via marketplace
+- Optionally: Spin up individual user agents on-demand
+
 ---
 
 ### Sprint 4 (Weeks 7-8): Marketplace Activation & Visualization 🔥 **CURRENT PRIORITY**
@@ -504,7 +565,12 @@ python scripts/verify_user_agents.py
 **✅ UNBLOCKED:** Sprint 3.5 wallet infrastructure complete - all 48 agents ready
 
 **Priority 1: Marketplace Bootstrap (from Sprint 3):**
-1. 📋 Agent Card auto-generator for 48 user agents - **READY**
+1. ✅ **Central Marketplace API (Option C)** - **COMPLETE** (agents/marketplace/main.py)
+   - FastAPI service serving 48 static agent cards
+   - Endpoints: /agents, /search, /stats, /agents/{username}/card
+   - Cost-effective: One API instead of 48 deployed agents
+   - Tested locally: All endpoints operational
+   - Deployment strategy: Agents remain dormant, spun up on-demand
 2. 📋 Complete profile extraction automation (Skill + Voice extractors)
 3. 📋 Bootstrap marketplace test (agent discovery and first transactions) - **READY**
 4. ✅ User agent on-chain registration (53 agents total) - **COMPLETE** (IDs 1-6, 7-54)

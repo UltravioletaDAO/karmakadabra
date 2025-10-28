@@ -26,8 +26,8 @@ PROJECT_ROOT = Path(__file__).parent.parent
 AGENTS = {
     'facilitator': {
         'context': 'x402-rs',
-        'dockerfile': 'Dockerfile',
-        'use_prebuilt': True,  # Use upstream image (local source requires Rust nightly - see MASTER_PLAN.md)
+        'dockerfile': 'x402-rs/Dockerfile',
+        'use_prebuilt': False,  # Build from source to include landing page changes
         'prebuilt_image': 'ukstv/x402-facilitator:latest',
         'platform': 'linux/amd64'
     },
