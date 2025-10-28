@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>x402 Facilitator — Gasless Payments for the Agentic Economy</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-dark: #0a0a0f;
+            --bg-card: #13131a;
+            --bg-card-hover: #1a1a24;
+            --text: #ffffff;
+            --text-muted: #9ca3af;
+            --border: #1f1f2e;
+            --avalanche-red: #e84142;
+            --base-blue: #0052ff;
+            --accent: #00d4ff;
+            --success: #10b981;
+            --glow: rgba(0, 212, 255, 0.15);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* Animated background */
+        .bg-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                linear-gradient(var(--border) 1px, transparent 1px),
+                linear-gradient(90deg, var(--border) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0.3;
+            z-index: 0;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Header */
+        header {
+            padding: 2rem 0 4rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(180deg, var(--bg-dark) 0%, transparent 100%);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo-image {
+            width: 56px;
+            height: 56px;
+            object-fit: contain;
+            filter: drop-shadow(0 0 20px var(--glow));
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.9; }
+        }
+
+        h1 {
+            font-size: 1.75rem;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            background: linear-gradient(135deg, var(--accent), var(--base-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .header-subtitle {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-top: 0.25rem;
+        }
+
+        .lang-switcher {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-card);
+            padding: 0.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        .lang-btn {
+            padding: 0.5rem 1.25rem;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .lang-btn.active {
+            background: linear-gradient(135deg, var(--accent), var(--base-blue));
+            color: var(--bg-dark);
+            box-shadow: 0 4px 12px var(--glow);
+        }
+
+        .lang-btn:hover:not(.active) {
+            background: var(--bg-card-hover);
+            color: var(--text);
+            transform: translateY(-2px);
+        }
+
+        /* Hero */
+        .hero {
+            text-align: center;
+            padding: 6rem 0;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--glow) 0%, transparent 70%);
+            pointer-events: none;
+            animation: heroGlow 4s ease-in-out infinite;
+        }
+
+        @keyframes heroGlow {
+            0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+            50% { opacity: 0.8; transform: translate(-50%, -50%) scale(1.1); }
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 2rem;
+            letter-spacing: -0.04em;
+            position: relative;
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--accent) 0%, var(--base-blue) 50%, var(--avalanche-red) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            animation: gradientShift 8s ease infinite;
+            background-size: 200% 200%;
+        }
+
+        @keyframes gradientShift {
+            0%, 100% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            font-weight: 400;
+        }
+
+        /* Network badges */
+        .networks {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .network-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .network-badge::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .network-badge:hover::before {
+            left: 100%;
+        }
+
+        .network-badge:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4);
+        }
+
+        .network-badge.avalanche {
+            border-color: var(--avalanche-red);
+            box-shadow: 0 0 20px rgba(232, 65, 66, 0.2);
+        }
+
+        .network-badge.avalanche:hover {
+            border-color: var(--avalanche-red);
+            box-shadow: 0 8px 24px rgba(232, 65, 66, 0.3);
+        }
+
+        .network-badge.base {
+            border-color: var(--base-blue);
+            box-shadow: 0 0 20px rgba(0, 82, 255, 0.2);
+        }
+
+        .network-badge.base:hover {
+            border-color: var(--base-blue);
+            box-shadow: 0 8px 24px rgba(0, 82, 255, 0.3);
+        }
+
+        .network-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 12px var(--success);
+            animation: pulse 2s infinite;
+        }
+
+        .network-badge.avalanche .network-dot {
+            background: var(--avalanche-red);
+            box-shadow: 0 0 12px var(--avalanche-red);
+        }
+
+        .network-badge.base .network-dot {
+            background: var(--base-blue);
+            box-shadow: 0 0 12px var(--base-blue);
+        }
+
+        /* Status */
+        .status-card {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 100px;
+            font-weight: 600;
+            margin-bottom: 3rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Features grid */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--accent), var(--base-blue));
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .feature-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent);
+            box-shadow: 0 12px 32px rgba(0, 212, 255, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+            display: block;
+            filter: drop-shadow(0 0 12px var(--glow));
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            position: relative;
+        }
+
+        .feature-card p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        /* Code section */
+        .code-section {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 4rem 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .code-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, var(--glow), transparent);
+            pointer-events: none;
+        }
+
+        .code-section h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+        }
+
+        pre {
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            overflow-x: auto;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            line-height: 1.7;
+            position: relative;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .code-comment { color: #6b7280; }
+        .code-keyword { color: #c084fc; }
+        .code-string { color: #34d399; }
+        .code-function { color: #60a5fa; }
+        .code-number { color: #f59e0b; }
+
+        /* Endpoints */
+        .endpoints {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 4rem 0;
+        }
+
+        .endpoints h3 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 2rem;
+        }
+
+        .endpoint {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            padding: 1.25rem;
+            background: var(--bg-dark);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        .endpoint:hover {
+            border-color: var(--accent);
+            transform: translateX(8px);
+            box-shadow: 0 4px 16px var(--glow);
+        }
+
+        .method {
+            font-weight: 700;
+            padding: 0.375rem 0.875rem;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .method.get {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .method.post {
+            background: rgba(0, 82, 255, 0.2);
+            color: var(--base-blue);
+        }
+
+        .endpoint-path {
+            color: var(--accent);
+            font-weight: 600;
+            flex: 1;
+        }
+
+        .endpoint-desc {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        /* Interactive stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
+        }
+
+        .stat-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .stat-card:hover {
+            transform: scale(1.05);
+            border-color: var(--accent);
+            box-shadow: 0 8px 24px var(--glow);
+        }
+
+        .stat-value {
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--accent), var(--base-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Footer */
+        footer {
+            margin-top: 8rem;
+            padding: 3rem 0;
+            border-top: 1px solid var(--border);
+            text-align: center;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            gap: 2rem;
+            font-weight: 600;
+        }
+
+        .footer-links a {
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .footer-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -4px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), var(--base-blue));
+            transition: width 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: var(--accent);
+        }
+
+        .footer-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Section divider */
+        .section {
+            margin: 6rem 0;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .section-description {
+            text-align: center;
+            color: var(--text-muted);
+            max-width: 700px;
+            margin: 0 auto 3rem;
+            font-size: 1.125rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .hero {
+                padding: 4rem 0;
+            }
+
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+            }
+
+            .endpoint {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.75rem;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                text-align: center;
+            }
+        }
+
+        /* Loading animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.6s ease-out forwards;
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+
+    <div class="container">
+        <header class="fade-in">
+            <div class="header-content">
+                <div class="logo-section">
+                    <img src="/logo.png" alt="Logo" class="logo-image" id="logo" style="display: none;">
+                    <div>
+                        <h1>x402 Facilitator</h1>
+                        <div class="header-subtitle" data-i18n="header.subtitle">Payment infrastructure for autonomous agents</div>
+                    </div>
+                </div>
+                <div class="lang-switcher">
+                    <button class="lang-btn active" data-lang="en">EN</button>
+                    <button class="lang-btn" data-lang="es">ES</button>
+                </div>
+            </div>
+        </header>
+
+        <main>
+            <section class="hero fade-in">
+                <h2 class="hero-title">
+                    <span class="gradient-text" data-i18n="hero.title">Gasless Micropayments for the Agentic Economy</span>
+                </h2>
+                <p class="hero-description" data-i18n="hero.description">
+                    Enable AI agents to transact autonomously without gas fees. Built on x402 protocol with EIP-3009 meta-transactions.
+                </p>
+
+                <div class="networks">
+                    <div class="network-badge avalanche">
+                        <span class="network-dot"></span>
+                        <span>Avalanche Fuji</span>
+                    </div>
+                    <div class="network-badge base">
+                        <span class="network-dot"></span>
+                        <span>Base Sepolia</span>
+                    </div>
+                </div>
+
+                <div class="status-card">
+                    <span class="network-dot"></span>
+                    <span data-i18n="status">Service Online</span>
+                </div>
+            </section>
+
+            <section class="stats fade-in">
+                <div class="stat-card">
+                    <div class="stat-value">~2s</div>
+                    <div class="stat-label" data-i18n="stats.speed">Settlement Time</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">$0</div>
+                    <div class="stat-label" data-i18n="stats.fees">Gas Fees for Agents</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value">100%</div>
+                    <div class="stat-label" data-i18n="stats.trustless">Trustless Verification</div>
+                </div>
+            </section>
+
+            <section class="features fade-in">
+                <div class="feature-card">
+                    <span class="feature-icon">⚡</span>
+                    <h3 data-i18n="features.gasless.title">Gasless Transactions</h3>
+                    <p data-i18n="features.gasless.description">
+                        Agents never need AVAX or ETH for gas. The facilitator executes transferWithAuthorization via EIP-3009.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🔐</span>
+                    <h3 data-i18n="features.trustless.title">Trustless by Design</h3>
+                    <p data-i18n="features.trustless.description">
+                        EIP-712 signature verification ensures cryptographically valid payments before on-chain execution.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🌐</span>
+                    <h3 data-i18n="features.networks.title">Multi-Network Support</h3>
+                    <p data-i18n="features.networks.description">
+                        Currently supports Avalanche Fuji and Base Sepolia, with more networks coming soon.
+                    </p>
+                </div>
+                <div class="feature-card">
+                    <span class="feature-icon">🚀</span>
+                    <h3 data-i18n="features.instant.title">Instant Settlement</h3>
+                    <p data-i18n="features.instant.description">
+                        Complete payment verification and on-chain settlement in ~2-3 seconds end-to-end.
+                    </p>
+                </div>
+            </section>
+
+            <section class="code-section fade-in">
+                <h3 data-i18n="code.title">Integrate in Minutes</h3>
+                <pre><code><span class="code-keyword">import</span> { Hono } <span class="code-keyword">from</span> <span class="code-string">"hono"</span>;
+<span class="code-keyword">import</span> { paymentMiddleware, Network } <span class="code-keyword">from</span> <span class="code-string">"x402-hono"</span>;
+
+<span class="code-keyword">const</span> app = <span class="code-keyword">new</span> <span class="code-function">Hono</span>();
+
+<span class="code-comment">// Configure payment middleware</span>
+app.<span class="code-function">use</span>(<span class="code-function">paymentMiddleware</span>(
+  <span class="code-string">"0xYourAddress"</span>,
+  {
+    <span class="code-string">"/protected-route"</span>: {
+      price: <span class="code-string">"$0.01"</span>,
+      network: <span class="code-string">"avalanche-fuji"</span>,
+      config: {
+        description: <span class="code-string">"Access to premium content"</span>
+      }
+    }
+  },
+  {
+    url: <span class="code-string">'https://facilitator.ultravioletadao.xyz'</span> <span class="code-comment">// 👈 This facilitator</span>
+  }
+));</code></pre>
+            </section>
+
+            <section class="section fade-in">
+                <h3 class="section-title" data-i18n="what.title">What is x402?</h3>
+                <p class="section-description" data-i18n="what.description">
+                    x402 is a protocol for stateless, per-request payments over HTTP. Clients attach a signed payment payload to each request. The facilitator verifies it, executes the on-chain transfer, and grants access to protected resources—all without accounts, wallets, or user registration.
+                </p>
+            </section>
+
+            <section class="endpoints fade-in">
+                <h3 data-i18n="endpoints.title">API Endpoints</h3>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/health</span>
+                    <span class="endpoint-desc" data-i18n="endpoints.health">Check facilitator health status</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method get">GET</span>
+                    <span class="endpoint-path">/supported</span>
+                    <span class="endpoint-desc" data-i18n="endpoints.supported">List supported payment schemes and networks</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/verify</span>
+                    <span class="endpoint-desc" data-i18n="endpoints.verify">Verify payment signature and requirements</span>
+                </div>
+                <div class="endpoint">
+                    <span class="method post">POST</span>
+                    <span class="endpoint-path">/settle</span>
+                    <span class="endpoint-desc" data-i18n="endpoints.settle">Execute payment on-chain via EIP-3009</span>
+                </div>
+            </section>
+        </main>
+
+        <footer class="fade-in">
+            <div class="footer-content">
+                <div>
+                    <span data-i18n="footer.powered">Powered by</span>
+                    <a href="https://ultravioletadao.xyz" target="_blank" style="margin-left: 0.5rem;">Ultravioleta DAO</a>
+                </div>
+                <div class="footer-links">
+                    <a href="https://x402.org" target="_blank">Protocol</a>
+                    <a href="https://github.com/x402-rs/x402-rs" target="_blank">GitHub</a>
+                    <a href="/health" target="_blank">Status</a>
+                    <a href="/supported" target="_blank">Networks</a>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        const translations = {
+            en: {
+                "header.subtitle": "Payment infrastructure for autonomous agents",
+                "hero.title": "Gasless Micropayments for the Agentic Economy",
+                "hero.description": "Enable AI agents to transact autonomously without gas fees. Built on x402 protocol with EIP-3009 meta-transactions.",
+                "status": "Service Online",
+                "stats.speed": "Settlement Time",
+                "stats.fees": "Gas Fees for Agents",
+                "stats.trustless": "Trustless Verification",
+                "features.gasless.title": "Gasless Transactions",
+                "features.gasless.description": "Agents never need AVAX or ETH for gas. The facilitator executes transferWithAuthorization via EIP-3009.",
+                "features.trustless.title": "Trustless by Design",
+                "features.trustless.description": "EIP-712 signature verification ensures cryptographically valid payments before on-chain execution.",
+                "features.networks.title": "Multi-Network Support",
+                "features.networks.description": "Currently supports Avalanche Fuji and Base Sepolia, with more networks coming soon.",
+                "features.instant.title": "Instant Settlement",
+                "features.instant.description": "Complete payment verification and on-chain settlement in ~2-3 seconds end-to-end.",
+                "code.title": "Integrate in Minutes",
+                "what.title": "What is x402?",
+                "what.description": "x402 is a protocol for stateless, per-request payments over HTTP. Clients attach a signed payment payload to each request. The facilitator verifies it, executes the on-chain transfer, and grants access to protected resources—all without accounts, wallets, or user registration.",
+                "endpoints.title": "API Endpoints",
+                "endpoints.health": "Check facilitator health status",
+                "endpoints.supported": "List supported payment schemes and networks",
+                "endpoints.verify": "Verify payment signature and requirements",
+                "endpoints.settle": "Execute payment on-chain via EIP-3009",
+                "footer.powered": "Powered by"
+            },
+            es: {
+                "header.subtitle": "Infraestructura de pagos para agentes autónomos",
+                "hero.title": "Micropagos Sin Gas para la Economía de Agentes",
+                "hero.description": "Permite que los agentes IA transaccionen de forma autónoma sin comisiones de gas. Construido sobre el protocolo x402 con meta-transacciones EIP-3009.",
+                "status": "Servicio en Línea",
+                "stats.speed": "Tiempo de Liquidación",
+                "stats.fees": "Comisiones de Gas para Agentes",
+                "stats.trustless": "Verificación Sin Confianza",
+                "features.gasless.title": "Transacciones Sin Gas",
+                "features.gasless.description": "Los agentes nunca necesitan AVAX o ETH para gas. El facilitador ejecuta transferWithAuthorization vía EIP-3009.",
+                "features.trustless.title": "Sin Confianza por Diseño",
+                "features.trustless.description": "La verificación de firmas EIP-712 asegura pagos criptográficamente válidos antes de la ejecución en cadena.",
+                "features.networks.title": "Soporte Multi-Red",
+                "features.networks.description": "Actualmente soporta Avalanche Fuji y Base Sepolia, con más redes próximamente.",
+                "features.instant.title": "Liquidación Instantánea",
+                "features.instant.description": "Verificación y liquidación completa de pagos en ~2-3 segundos de extremo a extremo.",
+                "code.title": "Integra en Minutos",
+                "what.title": "¿Qué es x402?",
+                "what.description": "x402 es un protocolo para pagos sin estado por solicitud sobre HTTP. Los clientes adjuntan una carga de pago firmada a cada solicitud. El facilitador la verifica, ejecuta la transferencia en cadena y otorga acceso a recursos protegidos—todo sin cuentas, billeteras o registro de usuarios.",
+                "endpoints.title": "Endpoints de la API",
+                "endpoints.health": "Verificar estado de salud del facilitador",
+                "endpoints.supported": "Listar esquemas de pago y redes soportadas",
+                "endpoints.verify": "Verificar firma de pago y requisitos",
+                "endpoints.settle": "Ejecutar pago en cadena vía EIP-3009",
+                "footer.powered": "Desarrollado por"
+            }
+        };
+
+        let currentLang = 'en';
+
+        function updateTranslations(lang) {
+            currentLang = lang;
+            document.documentElement.lang = lang;
+
+            const elements = document.querySelectorAll('[data-i18n]');
+            elements.forEach(el => {
+                const key = el.getAttribute('data-i18n');
+                if (translations[lang] && translations[lang][key]) {
+                    el.textContent = translations[lang][key];
+                }
+            });
+
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-lang') === lang);
+            });
+        }
+
+        document.querySelectorAll('.lang-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const lang = btn.getAttribute('data-lang');
+                updateTranslations(lang);
+            });
+        });
+
+        // Logo handling
+        const logo = document.getElementById('logo');
+        const img = new Image();
+        img.onload = () => {
+            logo.style.display = 'block';
+        };
+        img.onerror = () => {
+            logo.style.display = 'none';
+        };
+        img.src = '/logo.png';
+
+        // Initialize with browser language
+        const browserLang = navigator.language.split('-')[0];
+        if (translations[browserLang]) {
+            updateTranslations(browserLang);
+        }
+
+        // Fade-in animation on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

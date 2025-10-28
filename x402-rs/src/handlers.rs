@@ -10,7 +10,7 @@
 //! and is compatible with official x402 client SDKs.
 
 use axum::extract::State;
-use axum::http::StatusCode;
+use axum::http::{StatusCode, header};
 use axum::response::Response;
 use axum::{Json, response::IntoResponse};
 use serde_json::json;
@@ -80,6 +80,34 @@ pub async fn get_health(State(facilitator): State<FacilitatorLocal>) -> impl Int
         Json(json!({
             "providers": health,
         })),
+    )
+}
+
+/// `GET /`: Serves the landing page HTML for the facilitator.
+///
+/// This is a bilingual (English/Spanish) landing page that explains
+/// the x402 protocol and available endpoints.
+#[instrument(skip_all)]
+pub async fn get_index() -> impl IntoResponse {
+    let html = include_str!("../static/index.html");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "text/html; charset=utf-8")],
+        html
+    )
+}
+
+/// `GET /logo.png`: Serves the Ultravioleta DAO logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/logo.png before building.
+#[instrument(skip_all)]
+pub async fn get_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/logo.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
     )
 }
 

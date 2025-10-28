@@ -72,7 +72,8 @@ async fn main() {
     let facilitator = FacilitatorLocal::new(provider_cache.unwrap());
 
     let app = Router::new()
-        .route("/", get(|| async { "Hello, World!" })) // Liveness or sanity check route
+        .route("/", get(handlers::get_index)) // Bilingual landing page
+        .route("/logo.png", get(handlers::get_logo)) // Ultravioleta DAO logo
         .route("/verify", get(handlers::get_verify_info))
         .route("/verify", post(handlers::post_verify))
         .route("/settle", get(handlers::get_settle_info))
