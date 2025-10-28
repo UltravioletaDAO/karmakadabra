@@ -41,15 +41,22 @@ ARG AGENT_PATH=agents/${AGENT_NAME}
 # Works for all agents: validator, karma-hello, abracadabra, skill-extractor, voice-extractor
 COPY ${AGENT_PATH}/ /app/
 
-# Copy mock data for testing (copy specific files to avoid Windows Docker bug)
-# karma-hello logs
-RUN mkdir -p /app/data/karma-hello/logs/20241021
-COPY data/karma-hello/logs/20241021/full.txt /app/data/karma-hello/logs/20241021/
-COPY data/karma-hello/logs/20241021/0xultravioleta.txt /app/data/karma-hello/logs/20241021/
+# Copy production data for all agents
+# Create directories (note: agents use ../data from /app, so files go in /data not /app/data)
+RUN mkdir -p /app/logs /data/karma-hello /transcripts /data/abracadabra /app/scripts
 
-# abracadabra transcripts
-RUN mkdir -p /app/data/abracadabra/transcripts/20241021
-COPY data/abracadabra/transcripts/20241021/transcripcion.json /app/data/abracadabra/transcripts/20241021/
+# Copy conversion script
+COPY scripts/convert_txt_logs_to_json.py /app/scripts/
+
+# Copy production logs (for karma-hello)
+COPY agents/karma-hello/logs/ /app/logs/
+
+# Convert TXT logs to JSON format (output to /data/karma-hello which is ../data/karma-hello from /app)
+RUN python3 /app/scripts/convert_txt_logs_to_json.py /app/logs /data/karma-hello || \
+    echo "Warning: Log conversion skipped (may not be karma-hello agent)"
+
+# Copy production transcripts (for abracadabra) to /transcripts (../transcripts from /app)
+COPY agents/abracadabra/transcripts/ /transcripts/
 
 # Health check (overridden per agent)
 HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \

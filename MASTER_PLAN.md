@@ -1,18 +1,20 @@
 # 🎯 MASTER PLAN: Trustless Agent Economy
 ## AI Agent Microeconomy with ERC-8004 + A2A + x402
 
-> **Version:** 1.5.0 | **Updated:** October 27, 2025 | **Status:** 🚧 BLOCKED - Sprint 3.5 Wallet Infrastructure Required
+> **Version:** 1.5.1 | **Updated:** October 27, 2025 | **Status:** 🚧 BLOCKED - Sprint 3.5 Wallet Infrastructure Required
 >
 > **Last Audit:** October 27, 2025 - Code audit completed, **CRITICAL BLOCKER IDENTIFIED**
 >
 > **⚠️ CRITICAL BLOCKER:** 48 user agents have NO WALLETS. Cannot test marketplace without wallet infrastructure.
 > **Current Priority:** Sprint 3.5 - Generate wallets, distribute AVAX/GLUE, register on-chain
 >
-> **📦 Latest Deployment (October 27, 2025):**
-> - ✅ Skill-Extractor Agent upgraded to bidirectional AI agent profiler (963 lines, +283 LOC)
-> - ✅ New features: User needs analysis, market opportunities, revenue projections, agent identity design
-> - ✅ Deployed to ECS Fargate: `skill-extractor.karmacadabra.ultravioletadao.xyz`
-> - ✅ System now produces 20-field comprehensive profiles (6→20 fields)
+> **📦 Latest Deployment (October 27, 2025 - Evening):**
+> - ✅ **Production Data Integration:** karma-hello and abracadabra now serve real production data
+> - ✅ Created TXT→JSON conversion script for karma-hello logs (6 dates: 20251014-20251021, 2,685 messages)
+> - ✅ Fixed Docker path mounting: `/data/karma-hello` for logs, `/transcripts` for abracadabra
+> - ✅ Rebuilt and redeployed both agents to ECS Fargate with production data
+> - ✅ **All E2E tests passing:** Health (5/5), Discovery, Validation, Purchase flows operational
+> - ✅ System ready for real marketplace testing with production chat logs and transcriptions
 
 ---
 
@@ -84,8 +86,8 @@ All contracts deployed and verified on Fuji. All system agent wallets funded. To
 | A2A Protocol | ✅ COMPLETE | a2a_protocol.py (599 lines) with AgentCard | shared/a2a_protocol.py |
 | CrewAI Integration | ✅ COMPLETE | validation_crew.py (558 lines) | shared/validation_crew.py |
 | Validator Agent | ✅ COMPLETE | Independent quality validation (443 lines) | validator/main.py |
-| Karma-Hello Agent | ✅ COMPLETE | Dual buyer/seller (571 lines) | agents/karma-hello/main.py |
-| Abracadabra Agent | ✅ COMPLETE | Dual buyer/seller (565 lines) | agents/abracadabra/main.py |
+| Karma-Hello Agent | ✅ COMPLETE + DATA | Dual buyer/seller with production logs (571 lines, 6 dates, 2,685 msgs) | agents/karma-hello/main.py |
+| Abracadabra Agent | ✅ COMPLETE + DATA | Dual buyer/seller with production transcripts (565 lines, 6 streams) | agents/abracadabra/main.py |
 | Skill-Extractor Agent | ✅ COMPLETE | Bidirectional AI agent profiler (963 lines) | agents/skill-extractor/main.py |
 | Voice-Extractor Agent | ✅ COMPLETE | Personality profiler (524 lines) | agents/voice-extractor/main.py |
 | Buyer+Seller Pattern | ✅ BUILT-IN | All agents inherit discover/buy/sell methods from base | shared/base_agent.py |

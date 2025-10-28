@@ -11,9 +11,11 @@ venv/
 env/
 .venv/
 
-# Logs
+# Logs (exclude general logs but allow agent production logs)
 *.log
 logs/
+!agents/karma-hello/logs/
+!agents/abracadabra/transcripts/
 
 # IDE
 .vscode/
@@ -73,8 +75,9 @@ x402-rs/
 target/
 Cargo.lock
 
-# Scripts
+# Scripts (exclude most but allow conversion script)
 scripts/
+!scripts/convert_txt_logs_to_json.py
 
 # Credentials
 .env
