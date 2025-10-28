@@ -220,6 +220,11 @@ variable "agents" {
       health_check_path = "/health"
       priority          = 500
     }
+    marketplace = {
+      port              = 9000
+      health_check_path = "/health"
+      priority          = 600
+    }
   }
 }
 
