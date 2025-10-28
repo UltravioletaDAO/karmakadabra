@@ -31,6 +31,81 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Why separate rotation**: ERC-20 deployer owns the GLUE token contract. Rotating it requires redeploying the entire token, so it's only rotated when specifically needed.
 
+### OpenAI API Key Rotation
+**When OpenAI keys need to be rotated:**
+
+**Quick Rotation Process (5 minutes total):**
+
+1. **Generate 6 new keys on OpenAI platform** (https://platform.openai.com/api-keys)
+   - karma-hello-agent-YYYY
+   - abracadabra-agent-YYYY
+   - validator-agent-YYYY
+   - voice-extractor-agent-YYYY
+   - skill-extractor-agent-YYYY
+   - client-agent-YYYY
+
+2. **Save keys to temporary file** `.unused/keys.txt`:
+   ```
+   karma-hello-agent-2025
+   sk-proj-NEW_KEY_HERE
+
+   abracadabra-agent-2025
+   sk-proj-NEW_KEY_HERE
+
+   validator-agent-2025
+   sk-proj-NEW_KEY_HERE
+
+   voice-extractor-agent-2025
+   sk-proj-NEW_KEY_HERE
+
+   skill-extractor-agent-2025
+   sk-proj-NEW_KEY_HERE
+
+   client-agent-2025
+   sk-proj-NEW_KEY_HERE
+   ```
+
+3. **Update AWS Secrets Manager**:
+   ```bash
+   python3 scripts/rotate_openai_keys.py
+   ```
+   Script automatically updates all 6 agents in the `karmacadabra` secret.
+
+4. **Redeploy ECS Fargate services** to pick up new keys:
+   ```bash
+   # Force new deployment for all services
+   for service in facilitator validator abracadabra voice-extractor skill-extractor karma-hello; do
+     aws ecs update-service \
+       --cluster karmacadabra-prod \
+       --service karmacadabra-prod-${service} \
+       --force-new-deployment \
+       --region us-east-1
+   done
+   ```
+   Services restart and fetch new keys from AWS (2-3 minutes).
+
+5. **Revoke old keys** on OpenAI platform immediately after confirming services are running.
+
+**IMPORTANT NOTES:**
+- ✅ Keys stored in `.unused/` are gitignored (safe from accidental commit)
+- ✅ AWS Secrets Manager is the single source of truth for production keys
+- ✅ Local Docker uses `.env` files (can override AWS for testing)
+- ✅ ECS Fargate always fetches from AWS Secrets Manager
+- ❌ **NEVER commit keys to git** - they go in `.unused/keys.txt` temporarily only
+- ⚠️ **Revoke exposed keys immediately** - they cannot be "un-exposed" from git history
+
+**Verification:**
+```bash
+# Check ECS service status
+aws ecs describe-services --cluster karmacadabra-prod --services karmacadabra-prod-validator --region us-east-1
+
+# Test agent endpoints
+curl https://validator.karmacadabra.ultravioletadao.xyz/health
+curl https://karma-hello.karmacadabra.ultravioletadao.xyz/health
+```
+
+**Why this process**: OpenAI keys were exposed in git history (GitHub push protection caught them). Quick rotation ensures no service interruption while maintaining security.
+
 ### SMART CONTRACT SAFETY - EXTREMELY CRITICAL
 **⚠️ SMART CONTRACTS ARE IMMUTABLE - ERRORS CANNOT BE UNDONE**
 
