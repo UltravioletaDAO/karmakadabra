@@ -60,6 +60,11 @@ AGENTS = {
         'dockerfile': 'Dockerfile.agent',
         'agent_path': 'agents/voice-extractor',
         'platform': 'linux/amd64'
+    },
+    'marketplace': {
+        'context': '.',
+        'dockerfile': 'agents/marketplace/Dockerfile',
+        'platform': 'linux/amd64'
     }
 }
 
