@@ -2,6 +2,14 @@
 
 ## [Unreleased] - 2025-10-28
 
+### Updated - 2025-10-28 (Evening)
+- **Network badges updated** to show all 4 supported networks:
+  - Avalanche Fuji (testnet) + Avalanche C-Chain (mainnet)
+  - Base Sepolia (testnet) + Base (mainnet)
+- **Network descriptions updated** in both English and Spanish
+  - English: "Supports Avalanche (Fuji testnet and C-Chain mainnet) and Base (Sepolia testnet and mainnet)."
+  - Spanish: "Soporta Avalanche (testnet Fuji y mainnet C-Chain) y Base (testnet Sepolia y mainnet)."
+
 ### Added - Interactive Landing Page
 
 #### New Features
@@ -9,7 +17,7 @@
   - Animated grid background with cyberpunk aesthetic
   - Bilingual support (English/Spanish) with instant switching
   - Gradient hero title with color-shifting animation
-  - Prominent network badges for Avalanche Fuji and Base Sepolia
+  - Prominent network badges for all supported networks (2 testnets + 2 mainnets)
   - Interactive stats cards (hover to scale)
   - Feature cards with glow effects on hover
   - Syntax-highlighted code example (JetBrains Mono font)

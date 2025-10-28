@@ -41,9 +41,10 @@ The x402 facilitator now features a clean, minimal, information-dense landing pa
    - Shows actual usage with `facilitator.ultravioletadao.xyz`
 
 5. **What chains are supported?**
-   - Grid of supported networks
-   - Mainnet and testnet options
-   - Avalanche Fuji (current deployment)
+   - Grid of supported networks showing all 4 networks
+   - Avalanche: Fuji (testnet) + C-Chain (mainnet)
+   - Base: Sepolia (testnet) + Base (mainnet)
+   - Visual network badges with brand colors (Avalanche red, Base blue)
 
 6. **How much does it cost?**
    - Clear: **no fees**

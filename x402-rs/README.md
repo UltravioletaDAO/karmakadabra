@@ -148,10 +148,12 @@ curl https://facilitator.ultravioletadao.xyz/supported
 ### Network Configuration
 
 **Supported Networks:**
-- ✅ **Avalanche Fuji Testnet** (primary)
-- ❌ Base Sepolia (not supported)
-- ❌ Ethereum Sepolia (not supported)
-- ❌ Polygon Amoy (not supported)
+- ✅ **Avalanche Fuji** (testnet)
+- ✅ **Avalanche C-Chain** (mainnet)
+- ✅ **Base Sepolia** (testnet)
+- ✅ **Base** (mainnet)
+- ❌ Ethereum Sepolia (not yet supported)
+- ❌ Polygon Amoy (not yet supported)
 
 **RPC Endpoints:**
 - **Primary**: Custom RPC (private endpoint)
