@@ -111,6 +111,20 @@ pub async fn get_logo() -> impl IntoResponse {
     )
 }
 
+/// `GET /favicon.ico`: Serves the favicon for the facilitator landing page.
+///
+/// The favicon is embedded in the binary at compile time.
+/// To customize: replace static/favicon.ico before building.
+#[instrument(skip_all)]
+pub async fn get_favicon() -> impl IntoResponse {
+    let favicon = include_bytes!("../static/favicon.ico");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/x-icon")],
+        favicon.as_ref()
+    )
+}
+
 /// `POST /verify`: Facilitator-side verification of a proposed x402 payment.
 ///
 /// This endpoint checks whether a given payment payload satisfies the declared

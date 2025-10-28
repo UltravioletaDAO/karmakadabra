@@ -74,6 +74,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(handlers::get_index)) // Bilingual landing page
         .route("/logo.png", get(handlers::get_logo)) // Ultravioleta DAO logo
+        .route("/favicon.ico", get(handlers::get_favicon)) // Favicon
         .route("/verify", get(handlers::get_verify_info))
         .route("/verify", post(handlers::post_verify))
         .route("/settle", get(handlers::get_settle_info))
