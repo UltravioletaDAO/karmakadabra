@@ -62,6 +62,81 @@ python scripts/deploy-all.py --skip-fund --skip-build
 
 ## Individual Scripts
 
+### `check_all_balances.py` ⭐ NEW
+
+**Comprehensive balance monitoring across all chains and wallets.**
+
+Checks native token (AVAX, ETH, CELO) and ERC-20 token (GLUE, USDC, cUSD) balances for all 57 wallets across 6 blockchains in a unified matrix view.
+
+**Supported Chains:**
+- 🔵 **Avalanche Fuji** (testnet) - Main development chain (GLUE token)
+- 🔵 **Base Sepolia** (testnet) - Base L2 testnet (USDC)
+- 🟢 **Celo Sepolia** (testnet) - Celo testnet
+- 🟠 **Avalanche Mainnet** - Production AVAX chain (USDC)
+- 🔵 **Base Mainnet** - Production Base L2 (USDC)
+- 🟢 **Celo Mainnet** - Production Celo (cUSD, USDC)
+
+**Features:**
+- ✅ Multi-chain support (3 testnets + 3 mainnets)
+- ✅ Matrix/table display with wallets as rows, chains as columns
+- ✅ Auto-derives addresses from private keys when needed
+- ✅ Color-coded output (red=empty, yellow=low, green=ok)
+- ✅ Categorized by wallet type (System Agents, Facilitators, Deployers, User Agents)
+- ✅ Flexible filtering by chain group (testnets/mainnets) and wallet type
+- ✅ Monitors facilitator wallets from separate AWS secrets
+
+**Wallet Categories:**
+- **System Agents** (7): validator, karma-hello, abracadabra, skill-extractor, voice-extractor, client, marketplace
+- **Facilitators** (2): facilitator-testnet, facilitator-mainnet
+- **Deployers** (1): erc-20
+- **User Agents** (48): Community member wallets
+
+**Usage:**
+```bash
+# Check all chains (default: testnets + mainnets)
+python3 scripts/check_all_balances.py
+
+# Check only testnets (Fuji, Base Sepolia, Celo Sepolia)
+python3 scripts/check_all_balances.py --chain testnets
+
+# Check only mainnets (Avalanche, Base, Celo)
+python3 scripts/check_all_balances.py --chain mainnets
+
+# Check specific chain
+python3 scripts/check_all_balances.py --chain fuji
+python3 scripts/check_all_balances.py --chain avalanche
+
+# Filter by wallet type
+python3 scripts/check_all_balances.py --wallet-type system        # System agents only
+python3 scripts/check_all_balances.py --wallet-type facilitators  # Facilitators only
+python3 scripts/check_all_balances.py --wallet-type deployers     # Deployers only
+python3 scripts/check_all_balances.py --wallet-type user          # User agents only
+
+# Show wallets with 0 balance
+python3 scripts/check_all_balances.py --show-empty
+
+# Combined filtering
+python3 scripts/check_all_balances.py --chain testnets --wallet-type system
+```
+
+**Output example (matrix format):**
+```
+## Facilitators (2 wallets)
+────────────────────────────────────────────────────────────────────────────────
+
+Wallet                    | Address                                    | fuji      | base-sepolia | celo-sepolia | avalanche | base     | celo     |
+─────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────
+facilitator-testnet       | 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8 | 4.537 AVAX| 0 ETH        | 0 CELO       | 0.03 AVAX | 0 ETH    | 0 CELO   |
+                          |                                            | 50 GLUE   | -            | -            | -         | -        | -        |
+
+facilitator-mainnet       | 0x103040545AC5031A11E8C03dd11324C7333a13C7 | 2.5 AVAX  | 0.01 ETH     | 5 CELO       | 1.1 AVAX  | 0.02 ETH | 5 CELO   |
+                          |                                            | -         | -            | -            | 10 USDC   | 5 USDC   | 8 cUSD   |
+```
+
+📚 **Full documentation:** [README_check_all_balances.md](./README_check_all_balances.md)
+
+---
+
 ### `fund-wallets.py`
 
 Funds all Karmacadabra wallets with AVAX for gas fees using the ERC-20 deployer wallet.
