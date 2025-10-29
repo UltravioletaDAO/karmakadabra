@@ -195,6 +195,14 @@ resource "aws_ecs_task_definition" "agents" {
           value = "https://rpc.ankr.com/celo_sepolia"
         },
         {
+          name  = "RPC_URL_HYPEREVM"
+          value = "https://rpc.hyperliquid.xyz/evm"
+        },
+        {
+          name  = "RPC_URL_HYPEREVM_TESTNET"
+          value = "https://rpc.hyperliquid-testnet.xyz/evm"
+        },
+        {
           name  = "GLUE_TOKEN_ADDRESS"
           value = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
         },
