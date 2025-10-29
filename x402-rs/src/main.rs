@@ -75,6 +75,10 @@ async fn main() {
         .route("/", get(handlers::get_index)) // Bilingual landing page
         .route("/logo.png", get(handlers::get_logo)) // Ultravioleta DAO logo
         .route("/favicon.ico", get(handlers::get_favicon)) // Favicon
+        .route("/celo-colombia.png", get(handlers::get_celo_colombia_logo)) // Celo Colombia logo
+        .route("/avalanche.png", get(handlers::get_avalanche_logo)) // Avalanche logo
+        .route("/base.png", get(handlers::get_base_logo)) // Base logo
+        .route("/celo.png", get(handlers::get_celo_logo)) // Celo logo
         .route("/verify", get(handlers::get_verify_info))
         .route("/verify", post(handlers::post_verify))
         .route("/settle", get(handlers::get_settle_info))

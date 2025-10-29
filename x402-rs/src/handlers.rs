@@ -125,6 +125,62 @@ pub async fn get_favicon() -> impl IntoResponse {
     )
 }
 
+/// `GET /celo-colombia.png`: Serves the Celo Colombia logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/celo-colombia.png before building.
+#[instrument(skip_all)]
+pub async fn get_celo_colombia_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/celo-colombia.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
+/// `GET /avalanche.png`: Serves the Avalanche logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/avalanche.png before building.
+#[instrument(skip_all)]
+pub async fn get_avalanche_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/avalanche.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
+/// `GET /base.png`: Serves the Base logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/base.png before building.
+#[instrument(skip_all)]
+pub async fn get_base_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/base.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
+/// `GET /celo.png`: Serves the Celo logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/celo.png before building.
+#[instrument(skip_all)]
+pub async fn get_celo_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/celo.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
 /// `POST /verify`: Facilitator-side verification of a proposed x402 payment.
 ///
 /// This endpoint checks whether a given payment payload satisfies the declared

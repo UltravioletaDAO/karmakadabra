@@ -24,6 +24,7 @@
             --border: #1f1f2e;
             --avalanche-red: #e84142;
             --base-blue: #0052ff;
+            --celo-gold: #fcff52;
             --accent: #00d4ff;
             --success: #10b981;
             --glow: rgba(0, 212, 255, 0.15);
@@ -77,8 +78,16 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 2rem;
+            padding: 1rem 0;
+        }
+
+        /* Responsive: Stack logo and languages vertically on mobile */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                align-items: center;
+                gap: 1rem;
+            }
         }
 
         .logo-section {
@@ -88,8 +97,8 @@
         }
 
         .logo-image {
-            width: 56px;
-            height: 56px;
+            width: 368px;
+            height: 106px;
             object-fit: contain;
             filter: drop-shadow(0 0 20px var(--glow));
             animation: pulse 3s ease-in-out infinite;
@@ -101,9 +110,9 @@
         }
 
         h1 {
-            font-size: 1.75rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
             background: linear-gradient(135deg, var(--accent), var(--base-blue));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -112,8 +121,8 @@
 
         .header-subtitle {
             color: var(--text-muted);
-            font-size: 0.875rem;
-            font-weight: 500;
+            font-size: 0.75rem;
+            font-weight: 400;
             margin-top: 0.25rem;
         }
 
@@ -203,7 +212,7 @@
             font-size: 1.25rem;
             color: var(--text-muted);
             max-width: 700px;
-            margin: 0 auto 3rem;
+            margin: 0 auto 1.5rem;
             font-weight: 400;
         }
 
@@ -272,6 +281,16 @@
             box-shadow: 0 8px 24px rgba(0, 82, 255, 0.3);
         }
 
+        .network-badge.celo {
+            border-color: var(--celo-gold);
+            box-shadow: 0 0 20px rgba(252, 255, 82, 0.2);
+        }
+
+        .network-badge.celo:hover {
+            border-color: var(--celo-gold);
+            box-shadow: 0 8px 24px rgba(252, 255, 82, 0.3);
+        }
+
         .network-dot {
             width: 12px;
             height: 12px;
@@ -291,6 +310,11 @@
             box-shadow: 0 0 12px var(--base-blue);
         }
 
+        .network-badge.celo .network-dot {
+            background: var(--celo-gold);
+            box-shadow: 0 0 12px var(--celo-gold);
+        }
+
         /* Status */
         .status-card {
             display: inline-flex;
@@ -301,7 +325,7 @@
             border: 1px solid var(--border);
             border-radius: 100px;
             font-weight: 600;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
         }
 
@@ -506,6 +530,20 @@
             box-shadow: 0 8px 24px var(--glow);
         }
 
+        .balance-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .balance-card:hover {
+            border-color: var(--accent);
+            box-shadow: 0 4px 16px var(--glow);
+            transform: translateY(-2px);
+        }
+
         .stat-value {
             font-size: 3rem;
             font-weight: 900;
@@ -526,8 +564,8 @@
 
         /* Footer */
         footer {
-            margin-top: 8rem;
-            padding: 3rem 0;
+            margin-top: 4rem;
+            padding: 1.5rem 0;
             border-top: 1px solid var(--border);
             text-align: center;
         }
@@ -641,10 +679,6 @@
             <div class="header-content">
                 <div class="logo-section">
                     <img src="/logo.png" alt="Logo" class="logo-image" id="logo" style="display: none;">
-                    <div>
-                        <h1>Ultravioleta DAO x402 Facilitator</h1>
-                        <div class="header-subtitle" data-i18n="header.subtitle">Payment infrastructure for autonomous agents</div>
-                    </div>
                 </div>
                 <div class="lang-switcher">
                     <button class="lang-btn active" data-lang="en">EN</button>
@@ -662,28 +696,94 @@
                     Enable AI agents to transact autonomously without gas fees. Built on x402 protocol with EIP-3009 meta-transactions.
                 </p>
 
-                <div class="networks">
-                    <div class="network-badge avalanche">
-                        <span class="network-dot"></span>
-                        <span>Avalanche Fuji</span>
+                <!-- Mainnets - Featured with Wallet Balances -->
+                <div style="margin-bottom: 1rem; text-align: center;">
+                    <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Mainnets</span>
+                </div>
+                <div class="networks" style="gap: 2rem; margin-bottom: 2.5rem;">
+                    <div class="network-badge avalanche" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/avalanche.png" alt="Avalanche" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Avalanche C-Chain</span>
+                        </div>
+                        <div class="balance-amount" data-balance="avalanche-mainnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">AVAX Balance</div>
                     </div>
-                    <div class="network-badge avalanche">
-                        <span class="network-dot"></span>
-                        <span>Avalanche C-Chain</span>
+                    <div class="network-badge base" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/base.png" alt="Base" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Base</span>
+                        </div>
+                        <div class="balance-amount" data-balance="base-mainnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">ETH Balance</div>
                     </div>
-                    <div class="network-badge base">
-                        <span class="network-dot"></span>
-                        <span>Base Sepolia</span>
-                    </div>
-                    <div class="network-badge base">
-                        <span class="network-dot"></span>
-                        <span>Base</span>
+                    <div class="network-badge celo" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/celo.png" alt="Celo" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Celo</span>
+                        </div>
+                        <div class="balance-amount" data-balance="celo-mainnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">CELO Balance</div>
+                        <a href="https://www.celocolombia.org/" target="_blank" style="display: flex; align-items: center; justify-content: center; margin-top: 0.5rem; text-decoration: none; transition: all 0.2s ease;">
+                            <img src="/celo-colombia.png" alt="Celo Colombia" style="width: 64px; height: 32px; object-fit: contain; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+                        </a>
                     </div>
                 </div>
 
-                <div class="status-card">
-                    <span class="network-dot"></span>
-                    <span data-i18n="status">Service Online</span>
+                <!-- Testnets - Secondary with Wallet Balances -->
+                <div style="margin-bottom: 1rem; text-align: center;">
+                    <span style="color: var(--text-muted); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Testnets</span>
+                </div>
+                <div class="networks" style="gap: 1rem; margin-bottom: 2rem;">
+                    <div class="network-badge avalanche" style="padding: 0.75rem 1.25rem; font-size: 0.9rem; opacity: 0.85; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <img src="/avalanche.png" alt="Avalanche" style="width: 20px; height: 20px; object-fit: contain;">
+                            <span>Avalanche Fuji</span>
+                        </div>
+                        <div class="balance-amount" data-balance="avalanche-testnet" style="font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.85);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.6rem; color: var(--text-muted);">AVAX</div>
+                    </div>
+                    <div class="network-badge base" style="padding: 0.75rem 1.25rem; font-size: 0.9rem; opacity: 0.85; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <img src="/base.png" alt="Base" style="width: 20px; height: 20px; object-fit: contain;">
+                            <span>Base Sepolia</span>
+                        </div>
+                        <div class="balance-amount" data-balance="base-testnet" style="font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.85);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.6rem; color: var(--text-muted);">ETH</div>
+                    </div>
+                    <div class="network-badge celo" style="padding: 0.75rem 1.25rem; font-size: 0.9rem; opacity: 0.85; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: flex; align-items: center; gap: 0.5rem;">
+                            <img src="/celo.png" alt="Celo" style="width: 20px; height: 20px; object-fit: contain;">
+                            <span>Celo Sepolia</span>
+                        </div>
+                        <div class="balance-amount" data-balance="celo-testnet" style="font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.85);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.6rem; color: var(--text-muted);">CELO</div>
+                        <a href="https://www.celocolombia.org/" target="_blank" style="display: flex; align-items: center; justify-content: center; margin-top: 0.4rem; text-decoration: none; transition: all 0.2s ease;">
+                            <img src="/celo-colombia.png" alt="Celo Colombia" style="width: 48px; height: 24px; object-fit: contain; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Wallet Addresses -->
+                <div style="display: flex; flex-direction: column; gap: 0.5rem; margin: 0 auto 2.5rem; max-width: 800px; padding: 1rem 1.5rem; background: rgba(255,255,255,0.02); border-radius: 8px; border: 1px solid rgba(255,255,255,0.05);">
+                    <div style="text-align: center; font-size: 0.7rem; color: var(--text-muted);">
+                        <span style="font-weight: 600;">Mainnet Wallet:</span> <span style="font-family: 'JetBrains Mono', monospace;">0x103040545AC5031A11E8C03dd11324C7333a13C7</span>
+                    </div>
+                    <div style="text-align: center; font-size: 0.7rem; color: var(--text-muted);">
+                        <span style="font-weight: 600;">Testnet Wallet:</span> <span style="font-family: 'JetBrains Mono', monospace;">0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8</span>
+                    </div>
                 </div>
             </section>
 
@@ -721,7 +821,7 @@
                     <span class="feature-icon">🌐</span>
                     <h3 data-i18n="features.networks.title">Multi-Network Support</h3>
                     <p data-i18n="features.networks.description">
-                        Supports Avalanche (Fuji testnet and C-Chain mainnet) and Base (Sepolia testnet and mainnet).
+                        Supports Avalanche (Fuji testnet and C-Chain mainnet), Base (Sepolia testnet and mainnet), and Celo (Sepolia testnet and mainnet).
                     </p>
                 </div>
                 <div class="feature-card">
@@ -810,7 +910,7 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
         const translations = {
             en: {
                 "header.subtitle": "Payment infrastructure for autonomous agents",
-                "hero.title": "Gasless Micropayments for the Agentic Economy",
+                "hero.title": "Payment infrastructure for autonomous agents",
                 "hero.description": "Enable AI agents to transact autonomously without gas fees. Built on x402 protocol with EIP-3009 meta-transactions.",
                 "status": "Service Online",
                 "stats.speed": "Settlement Time",
@@ -821,7 +921,7 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
                 "features.trustless.title": "Trustless by Design",
                 "features.trustless.description": "EIP-712 signature verification ensures cryptographically valid payments before on-chain execution.",
                 "features.networks.title": "Multi-Network Support",
-                "features.networks.description": "Supports Avalanche (Fuji testnet and C-Chain mainnet) and Base (Sepolia testnet and mainnet).",
+                "features.networks.description": "Supports Avalanche (Fuji testnet and C-Chain mainnet), Base (Sepolia testnet and mainnet), and Celo (Sepolia testnet and mainnet).",
                 "features.instant.title": "Instant Settlement",
                 "features.instant.description": "Complete payment verification and on-chain settlement in ~2-3 seconds end-to-end.",
                 "code.title": "Integrate in Minutes",
@@ -836,7 +936,7 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
             },
             es: {
                 "header.subtitle": "Infraestructura de pagos para agentes autónomos",
-                "hero.title": "Micropagos Sin Gas para la Economía de Agentes",
+                "hero.title": "Infraestructura de pagos para agentes autónomos",
                 "hero.description": "Permite que los agentes IA transaccionen de forma autónoma sin comisiones de gas. Construido sobre el protocolo x402 con meta-transacciones EIP-3009.",
                 "status": "Servicio en Línea",
                 "stats.speed": "Tiempo de Liquidación",
@@ -847,7 +947,7 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
                 "features.trustless.title": "Sin Confianza por Diseño",
                 "features.trustless.description": "La verificación de firmas EIP-712 asegura pagos criptográficamente válidos antes de la ejecución en cadena.",
                 "features.networks.title": "Soporte Multi-Red",
-                "features.networks.description": "Soporta Avalanche (testnet Fuji y mainnet C-Chain) y Base (testnet Sepolia y mainnet).",
+                "features.networks.description": "Soporta Avalanche (testnet Fuji y mainnet C-Chain), Base (testnet Sepolia y mainnet), y Celo (testnet Sepolia y mainnet).",
                 "features.instant.title": "Liquidación Instantánea",
                 "features.instant.description": "Verificación y liquidación completa de pagos en ~2-3 segundos de extremo a extremo.",
                 "code.title": "Integra en Minutos",
@@ -926,6 +1026,83 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
             el.style.transition = 'opacity 0.6s ease-out, transform 0.6s ease-out';
             observer.observe(el);
         });
+
+        // Fetch wallet balances for both mainnet and testnet wallets
+        async function fetchWalletBalances() {
+            // Hardcoded wallet addresses
+            const MAINNET_ADDRESS = '0x103040545AC5031A11E8C03dd11324C7333a13C7';
+            const TESTNET_ADDRESS = '0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8';
+
+            // RPC configurations for all 6 networks
+            const networks = {
+                'avalanche-mainnet': {
+                    rpc: 'https://avalanche-c-chain-rpc.publicnode.com',
+                    address: MAINNET_ADDRESS
+                },
+                'base-mainnet': {
+                    rpc: 'https://mainnet.base.org',
+                    address: MAINNET_ADDRESS
+                },
+                'celo-mainnet': {
+                    rpc: 'https://rpc.celocolombia.org',
+                    address: MAINNET_ADDRESS
+                },
+                'avalanche-testnet': {
+                    rpc: 'https://avalanche-fuji-c-chain-rpc.publicnode.com',
+                    address: TESTNET_ADDRESS
+                },
+                'base-testnet': {
+                    rpc: 'https://sepolia.base.org',
+                    address: TESTNET_ADDRESS
+                },
+                'celo-testnet': {
+                    rpc: 'https://rpc.ankr.com/celo_sepolia',
+                    address: TESTNET_ADDRESS
+                }
+            };
+
+            // Fetch balance for each network
+            for (const [network, config] of Object.entries(networks)) {
+                try {
+                    const response = await fetch(config.rpc, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            jsonrpc: '2.0',
+                            method: 'eth_getBalance',
+                            params: [config.address, 'latest'],
+                            id: 1
+                        })
+                    });
+
+                    const data = await response.json();
+                    if (data.result) {
+                        // Convert from wei to ether
+                        const balanceWei = BigInt(data.result);
+                        const balanceEther = Number(balanceWei) / 1e18;
+                        const formatted = balanceEther.toFixed(4);
+
+                        // Update the UI
+                        const balanceEl = document.querySelector(`[data-balance="${network}"]`);
+                        if (balanceEl) {
+                            balanceEl.textContent = formatted;
+                        }
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ${network} balance:`, error);
+                    const balanceEl = document.querySelector(`[data-balance="${network}"]`);
+                    if (balanceEl) {
+                        balanceEl.textContent = 'Error';
+                    }
+                }
+            }
+        }
+
+        // Fetch balances on page load
+        fetchWalletBalances();
+
+        // Refresh balances every 30 seconds
+        setInterval(fetchWalletBalances, 30000);
     </script>
 </body>
 </html>

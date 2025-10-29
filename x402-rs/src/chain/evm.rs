@@ -127,6 +127,8 @@ impl TryFrom<Network> for EvmChain {
             Network::Polygon => Ok(EvmChain::new(value, 137)),
             Network::Sei => Ok(EvmChain::new(value, 1329)),
             Network::SeiTestnet => Ok(EvmChain::new(value, 1328)),
+            Network::Celo => Ok(EvmChain::new(value, 42220)),
+            Network::CeloSepolia => Ok(EvmChain::new(value, 44787)),
         }
     }
 }
