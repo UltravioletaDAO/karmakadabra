@@ -25,6 +25,7 @@
             --avalanche-red: #e84142;
             --base-blue: #0052ff;
             --celo-gold: #fcff52;
+            --hyperevm-purple: #8c52ff;
             --accent: #00d4ff;
             --success: #10b981;
             --glow: rgba(0, 212, 255, 0.15);
@@ -291,6 +292,16 @@
             box-shadow: 0 8px 24px rgba(252, 255, 82, 0.3);
         }
 
+        .network-badge.hyperevm {
+            border-color: var(--hyperevm-purple);
+            box-shadow: 0 0 20px rgba(140, 82, 255, 0.2);
+        }
+
+        .network-badge.hyperevm:hover {
+            border-color: var(--hyperevm-purple);
+            box-shadow: 0 8px 24px rgba(140, 82, 255, 0.3);
+        }
+
         .network-dot {
             width: 12px;
             height: 12px;
@@ -313,6 +324,11 @@
         .network-badge.celo .network-dot {
             background: var(--celo-gold);
             box-shadow: 0 0 12px var(--celo-gold);
+        }
+
+        .network-badge.hyperevm .network-dot {
+            background: var(--hyperevm-purple);
+            box-shadow: 0 0 12px var(--hyperevm-purple);
         }
 
         /* Status */
@@ -700,8 +716,8 @@
                 <div style="margin-bottom: 1rem; text-align: center;">
                     <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Mainnets</span>
                 </div>
-                <div class="networks" style="gap: 2rem; margin-bottom: 2.5rem;">
-                    <div class="network-badge avalanche" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem;">
+                <div class="networks" style="gap: 2rem; margin-bottom: 2.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); justify-items: center;">
+                    <div class="network-badge avalanche" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <img src="/avalanche.png" alt="Avalanche" style="width: 32px; height: 32px; object-fit: contain;">
                             <span style="font-weight: 700;">Avalanche C-Chain</span>
@@ -711,7 +727,7 @@
                         </div>
                         <div style="font-size: 0.7rem; color: var(--text-muted);">AVAX Balance</div>
                     </div>
-                    <div class="network-badge base" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem;">
+                    <div class="network-badge base" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <img src="/base.png" alt="Base" style="width: 32px; height: 32px; object-fit: contain;">
                             <span style="font-weight: 700;">Base</span>
@@ -721,7 +737,7 @@
                         </div>
                         <div style="font-size: 0.7rem; color: var(--text-muted);">ETH Balance</div>
                     </div>
-                    <div class="network-badge celo" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem;">
+                    <div class="network-badge celo" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
                             <img src="/celo.png" alt="Celo" style="width: 32px; height: 32px; object-fit: contain;">
                             <span style="font-weight: 700;">Celo</span>
@@ -730,9 +746,20 @@
                             Loading...
                         </div>
                         <div style="font-size: 0.7rem; color: var(--text-muted);">CELO Balance</div>
-                        <a href="https://www.celocolombia.org/" target="_blank" style="display: flex; align-items: center; justify-content: center; margin-top: 0.5rem; text-decoration: none; transition: all 0.2s ease;">
+                        <a href="https://www.celocolombia.org/" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; text-decoration: none; transition: all 0.2s ease; gap: 0.25rem;">
+                            <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 500;">Powered by</span>
                             <img src="/celo-colombia.png" alt="Celo Colombia" style="width: 64px; height: 32px; object-fit: contain; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
                         </a>
+                    </div>
+                    <div class="network-badge hyperevm" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/hyperevm.png" alt="HyperEVM" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">HyperEVM</span>
+                        </div>
+                        <div class="balance-amount" data-balance="hyperevm-mainnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">HYPE Balance</div>
                     </div>
                 </div>
 
@@ -740,39 +767,50 @@
                 <div style="margin-bottom: 1rem; text-align: center;">
                     <span style="color: var(--text-muted); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Testnets</span>
                 </div>
-                <div class="networks" style="gap: 1rem; margin-bottom: 2rem;">
-                    <div class="network-badge avalanche" style="padding: 0.75rem 1.25rem; font-size: 0.9rem; opacity: 0.85; flex-direction: column; gap: 0.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <img src="/avalanche.png" alt="Avalanche" style="width: 20px; height: 20px; object-fit: contain;">
-                            <span>Avalanche Fuji</span>
+                <div class="networks" style="gap: 2rem; margin-bottom: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); justify-items: center;">
+                    <div class="network-badge avalanche" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/avalanche.png" alt="Avalanche" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Avalanche Fuji</span>
                         </div>
-                        <div class="balance-amount" data-balance="avalanche-testnet" style="font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.85);">
+                        <div class="balance-amount" data-balance="avalanche-testnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
                             Loading...
                         </div>
-                        <div style="font-size: 0.6rem; color: var(--text-muted);">AVAX</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">AVAX</div>
                     </div>
-                    <div class="network-badge base" style="padding: 0.75rem 1.25rem; font-size: 0.9rem; opacity: 0.85; flex-direction: column; gap: 0.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <img src="/base.png" alt="Base" style="width: 20px; height: 20px; object-fit: contain;">
-                            <span>Base Sepolia</span>
+                    <div class="network-badge base" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/base.png" alt="Base" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Base Sepolia</span>
                         </div>
-                        <div class="balance-amount" data-balance="base-testnet" style="font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.85);">
+                        <div class="balance-amount" data-balance="base-testnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
                             Loading...
                         </div>
-                        <div style="font-size: 0.6rem; color: var(--text-muted);">ETH</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">ETH</div>
                     </div>
-                    <div class="network-badge celo" style="padding: 0.75rem 1.25rem; font-size: 0.9rem; opacity: 0.85; flex-direction: column; gap: 0.5rem;">
-                        <div style="display: flex; align-items: center; gap: 0.5rem;">
-                            <img src="/celo.png" alt="Celo" style="width: 20px; height: 20px; object-fit: contain;">
-                            <span>Celo Sepolia</span>
+                    <div class="network-badge celo" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/celo.png" alt="Celo" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Celo Sepolia</span>
                         </div>
-                        <div class="balance-amount" data-balance="celo-testnet" style="font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.85);">
+                        <div class="balance-amount" data-balance="celo-testnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
                             Loading...
                         </div>
-                        <div style="font-size: 0.6rem; color: var(--text-muted);">CELO</div>
-                        <a href="https://www.celocolombia.org/" target="_blank" style="display: flex; align-items: center; justify-content: center; margin-top: 0.4rem; text-decoration: none; transition: all 0.2s ease;">
-                            <img src="/celo-colombia.png" alt="Celo Colombia" style="width: 48px; height: 24px; object-fit: contain; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">CELO</div>
+                        <a href="https://www.celocolombia.org/" target="_blank" style="display: flex; flex-direction: column; align-items: center; justify-content: center; margin-top: 0.5rem; text-decoration: none; transition: all 0.2s ease; gap: 0.25rem;">
+                            <span style="font-size: 0.65rem; color: var(--text-muted); font-weight: 500;">Powered by</span>
+                            <img src="/celo-colombia.png" alt="Celo Colombia" style="width: 64px; height: 32px; object-fit: contain; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
                         </a>
+                    </div>
+                    <div class="network-badge hyperevm" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/hyperevm.png" alt="HyperEVM" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">HyperEVM Testnet</span>
+                        </div>
+                        <div class="balance-amount" data-balance="hyperevm-testnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">HYPE</div>
                     </div>
                 </div>
 
@@ -1047,6 +1085,10 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
                     rpc: 'https://rpc.celocolombia.org',
                     address: MAINNET_ADDRESS
                 },
+                'hyperevm-mainnet': {
+                    rpc: 'https://rpc.hyperliquid.xyz/evm',
+                    address: MAINNET_ADDRESS
+                },
                 'avalanche-testnet': {
                     rpc: 'https://avalanche-fuji-c-chain-rpc.publicnode.com',
                     address: TESTNET_ADDRESS
@@ -1057,6 +1099,10 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
                 },
                 'celo-testnet': {
                     rpc: 'https://rpc.ankr.com/celo_sepolia',
+                    address: TESTNET_ADDRESS
+                },
+                'hyperevm-testnet': {
+                    rpc: 'https://rpc.hyperliquid-testnet.xyz/evm',
                     address: TESTNET_ADDRESS
                 }
             };

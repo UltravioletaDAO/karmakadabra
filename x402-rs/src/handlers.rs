@@ -181,6 +181,20 @@ pub async fn get_celo_logo() -> impl IntoResponse {
     )
 }
 
+/// `GET /hyperevm.png`: Serves the HyperEVM logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/hyperevm.png before building.
+#[instrument(skip_all)]
+pub async fn get_hyperevm_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/hyperevm.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
 /// `POST /verify`: Facilitator-side verification of a proposed x402 payment.
 ///
 /// This endpoint checks whether a given payment payload satisfies the declared

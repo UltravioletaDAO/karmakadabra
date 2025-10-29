@@ -57,6 +57,12 @@ pub enum Network {
     /// Celo Sepolia testnet (chain ID 44787).
     #[serde(rename = "celo-sepolia")]
     CeloSepolia,
+    /// HyperEVM mainnet (chain ID 998).
+    #[serde(rename = "hyperevm")]
+    HyperEvm,
+    /// HyperEVM testnet (chain ID 333).
+    #[serde(rename = "hyperevm-testnet")]
+    HyperEvmTestnet,
 }
 
 impl Display for Network {
@@ -75,6 +81,8 @@ impl Display for Network {
             Network::SeiTestnet => write!(f, "sei-testnet"),
             Network::Celo => write!(f, "celo"),
             Network::CeloSepolia => write!(f, "celo-sepolia"),
+            Network::HyperEvm => write!(f, "hyperevm"),
+            Network::HyperEvmTestnet => write!(f, "hyperevm-testnet"),
         }
     }
 }
@@ -101,6 +109,8 @@ impl From<Network> for NetworkFamily {
             Network::SeiTestnet => NetworkFamily::Evm,
             Network::Celo => NetworkFamily::Evm,
             Network::CeloSepolia => NetworkFamily::Evm,
+            Network::HyperEvm => NetworkFamily::Evm,
+            Network::HyperEvmTestnet => NetworkFamily::Evm,
         }
     }
 }
@@ -122,6 +132,8 @@ impl Network {
             Network::SeiTestnet,
             Network::Celo,
             Network::CeloSepolia,
+            Network::HyperEvm,
+            Network::HyperEvmTestnet,
         ]
     }
 }
@@ -315,6 +327,34 @@ static USDC_CELO_SEPOLIA: Lazy<USDCDeployment> = Lazy::new(|| {
     })
 });
 
+static USDC_HYPEREVM: Lazy<USDCDeployment> = Lazy::new(|| {
+    USDCDeployment(TokenDeployment {
+        asset: TokenAsset {
+            address: address!("0xC3B4b2C0faE2De7cF7e07c8c84f65d8df61Bf314").into(),
+            network: Network::HyperEvm,
+        },
+        decimals: 6,
+        eip712: Some(TokenDeploymentEip712 {
+            name: "USDC".into(),
+            version: "2".into(),
+        }),
+    })
+});
+
+static USDC_HYPEREVM_TESTNET: Lazy<USDCDeployment> = Lazy::new(|| {
+    USDCDeployment(TokenDeployment {
+        asset: TokenAsset {
+            address: address!("0xC3B4b2C0faE2De7cF7e07c8c84f65d8df61Bf314").into(),
+            network: Network::HyperEvmTestnet,
+        },
+        decimals: 6,
+        eip712: Some(TokenDeploymentEip712 {
+            name: "USDC".into(),
+            version: "2".into(),
+        }),
+    })
+});
+
 /// Lazily initialized UVD V2 deployment on Avalanche Fuji testnet as [`UVDDeployment`].
 /// Note: Address must be updated after deploying erc-20/UVD_V2.sol
 static UVD_AVALANCHE_FUJI: Lazy<UVDDeployment> = Lazy::new(|| {
@@ -405,6 +445,8 @@ impl USDCDeployment {
             Network::SeiTestnet => &USDC_SEI_TESTNET,
             Network::Celo => &USDC_CELO,
             Network::CeloSepolia => &USDC_CELO_SEPOLIA,
+            Network::HyperEvm => &USDC_HYPEREVM,
+            Network::HyperEvmTestnet => &USDC_HYPEREVM_TESTNET,
         }
     }
 }

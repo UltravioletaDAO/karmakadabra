@@ -79,6 +79,7 @@ async fn main() {
         .route("/avalanche.png", get(handlers::get_avalanche_logo)) // Avalanche logo
         .route("/base.png", get(handlers::get_base_logo)) // Base logo
         .route("/celo.png", get(handlers::get_celo_logo)) // Celo logo
+        .route("/hyperevm.png", get(handlers::get_hyperevm_logo)) // HyperEVM logo
         .route("/verify", get(handlers::get_verify_info))
         .route("/verify", post(handlers::post_verify))
         .route("/settle", get(handlers::get_settle_info))
