@@ -1,7 +1,7 @@
 # 🎯 MASTER PLAN: Trustless Agent Economy
 ## AI Agent Microeconomy with ERC-8004 + A2A + x402
 
-> **Version:** 1.6.1 | **Updated:** October 28, 2025 | **Status:** ✅ READY - Sprint 4 Marketplace Active
+> **Version:** 1.6.2 | **Updated:** October 28, 2025 | **Status:** ✅ READY - Sprint 4 Active
 >
 > **Last Audit:** October 27, 2025 - Code audit completed, **WALLET INFRASTRUCTURE COMPLETE**
 >
@@ -75,7 +75,7 @@
 
 ## ⚠️ IMPLEMENTATION STATUS
 
-**Last Updated:** October 27, 2025
+**Last Updated:** October 28, 2025
 **Last Audit:** October 27, 2025 - Full codebase audit completed (see AUDIT_FINDINGS_2025-10-27.md)
 
 ### ✅ PHASE 1 COMPLETE: Blockchain Infrastructure
@@ -565,12 +565,255 @@ curl http://localhost:9000/stats           # → Marketplace stats
 **✅ UNBLOCKED:** Sprint 3.5 wallet infrastructure complete - all 48 agents ready
 
 **Priority 1: Marketplace Bootstrap (from Sprint 3):**
-1. ✅ **Central Marketplace API (Option C)** - **COMPLETE** (agents/marketplace/main.py)
-   - FastAPI service serving 48 static agent cards
-   - Endpoints: /agents, /search, /stats, /agents/{username}/card
-   - Cost-effective: One API instead of 48 deployed agents
-   - Tested locally: All endpoints operational
-   - Deployment strategy: Agents remain dormant, spun up on-demand
+
+#### Sprint 4 Task 1: Central Marketplace API (Option C) ✅ **COMPLETE**
+
+**What:** FastAPI service serving 48 static agent cards via A2A protocol
+
+**Implementation:** `agents/marketplace/main.py` (324 lines)
+
+**Features:**
+- ✅ Loads 48 agent cards from `demo/cards/*.json`
+- ✅ Loads 48 profiles from `demo/profiles/*.json`
+- ✅ Endpoint: `/agents` - List all agents
+- ✅ Endpoint: `/search` - Full-text search across agents
+- ✅ Endpoint: `/stats` - Marketplace statistics
+- ✅ Endpoint: `/agents/{username}/card` - A2A protocol agent card
+- ✅ Cost-effective: One API instead of 48 deployed agents (~$100+/month saved)
+
+**Testing:**
+```bash
+cd agents/marketplace
+python main.py
+curl http://localhost:9000/health          # → 48 agents loaded
+curl http://localhost:9000/agents          # → List all
+curl http://localhost:9000/search?q=blockchain  # → 16 results
+```
+
+**Deployment Strategy:** Agents remain dormant, spun up on-demand when clients purchase
+
+**Status:** ✅ Tested locally, all endpoints operational
+
+---
+
+#### Sprint 4 Task 2: Facilitator Dual Wallet Display ✅ **COMPLETE**
+
+**Goal:** Update facilitator landing page to show separate testnet and mainnet wallet balances
+
+**Context:**
+- Current state: Single wallet display at `https://facilitator.ultravioletadao.xyz`
+- Reality: We use TWO wallets (testnet: 0x3403..., mainnet: 0x1030...)
+- Need: Transparent display of both wallets' balances across 3 networks each
+
+**Tasks:**
+
+**2.1: Update HTML Structure** (`x402-rs/static/index.html`)
+- [ ] Split wallet section into two: "Testnet Wallets" and "Mainnet Wallets"
+- [ ] Move wallet sections up (after network badges, before "Service Online" status)
+- [ ] Add 6 balance cards total:
+  - Testnet: Avalanche Fuji, Base Sepolia, Celo Sepolia
+  - Mainnet: Avalanche C-Chain, Base, Celo
+- [ ] Update card styling for clarity (testnet=blue accent, mainnet=green accent)
+
+**2.2: Update JavaScript** (`x402-rs/static/index.html` - inline script)
+- [ ] Hardcode both wallet addresses in fetchWalletBalances():
+  ```javascript
+  const TESTNET_WALLET = '0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8';
+  const MAINNET_WALLET = '0x103040545AC5031A11E8C03dd11324C7333a13C7';
+  ```
+- [ ] Fetch balances from appropriate RPC endpoints:
+  - Avalanche Fuji RPC for testnet AVAX
+  - Avalanche Mainnet RPC for mainnet AVAX
+  - Base Sepolia RPC for testnet ETH
+  - Base Mainnet RPC for mainnet ETH
+  - Celo Sepolia RPC for testnet CELO
+  - Celo Mainnet RPC for mainnet CELO
+- [ ] Display 6 balance cards with proper formatting (4 decimals for crypto)
+
+**2.3: RPC Configuration**
+- [ ] Add RPC URLs to facilitator environment variables (or hardcode in JS)
+- [ ] Test RPC connectivity for all 6 networks
+- [ ] Handle RPC errors gracefully (show "N/A" if fetch fails)
+
+**2.4: Testing**
+- [ ] Test locally: `cd x402-rs && cargo run`
+- [ ] Verify both wallets display correctly
+- [ ] Verify balance fetching works for all 6 networks
+- [ ] Test responsive layout (mobile + desktop)
+- [ ] Verify auto-refresh works (every 30 seconds)
+
+**Files Modified:**
+- `x402-rs/static/index.html` (HTML structure + JavaScript)
+- Optionally: `x402-rs/.env` (if RPC URLs added to config)
+
+**Estimated Effort:** 2-4 hours
+
+**Success Criteria:**
+- [x] Landing page shows 6 wallet balance cards (3 testnet + 3 mainnet)
+- [x] Balances update automatically every 30 seconds
+- [x] Clear visual distinction between testnet and mainnet
+- [x] Responsive design works on mobile and desktop
+
+---
+
+#### Sprint 4 Task 3: Facilitator Network Monitor 📋 **PENDING**
+
+**Goal:** Create a comprehensive monitoring system tracking uptime and health of ALL x402 facilitators in the ecosystem (not just ours)
+
+**Context:**
+- Inspiration: [x402scan facilitators config](https://github.com/Merit-Systems/x402scan/blob/main/facilitators/config.ts)
+- Tracks 9 facilitators: Coinbase, AurraCloud, thirdweb, X402rs/Karmacadabra, PayAI, Corbits, Daydreams, Mogami, Open X402
+- Provides ecosystem visibility and competitive intelligence
+
+**Tasks:**
+
+**3.1: DynamoDB Table Setup** (`terraform/ecs-fargate/dynamodb.tf`)
+- [ ] Create new Terraform file `dynamodb.tf`
+- [ ] Define `facilitator-uptime-metrics` table:
+  - Partition key: `facilitator_id` (string)
+  - Sort key: `timestamp` (number - Unix timestamp)
+  - Attributes: status, response_time, wallet_balances, last_error
+  - TTL: 90 days (auto-delete old metrics)
+  - Billing mode: PAY_PER_REQUEST (no capacity planning needed)
+- [ ] Create GSI for querying by timestamp (for time-series queries)
+- [ ] Terraform apply to create table
+
+**3.2: Rust Backend Implementation** (`x402-rs/src/facilitator_monitor.rs`)
+- [ ] Create new Rust module `facilitator_monitor.rs`
+- [ ] Define structs from x402scan config:
+  ```rust
+  pub struct Facilitator {
+      pub id: String,
+      pub name: String,
+      pub url: String,
+      pub logo_url: Option<String>,
+      pub wallet_addresses: Vec<WalletAddress>,
+  }
+  pub struct WalletAddress {
+      pub address: String,
+      pub network: Network,
+  }
+  ```
+- [ ] Function: `ping_facilitator_health(url: &str) -> Result<HealthStatus>`
+  - Call `/health` endpoint
+  - Measure response time
+  - Parse status (live/down)
+- [ ] Function: `fetch_wallet_balances(addresses: &[WalletAddress]) -> Vec<Balance>`
+  - Use Web3 RPC calls to fetch balances
+  - Support multiple networks (Avalanche, Base, Celo)
+- [ ] Function: `store_metrics(db: &DynamoDbClient, metrics: &Metrics)`
+  - Store in DynamoDB with timestamp
+  - Include uptime %, response time, wallet balances
+- [ ] Add DynamoDB dependencies to `Cargo.toml`:
+  ```toml
+  aws-sdk-dynamodb = "1.5"
+  tokio = { version = "1", features = ["time"] }
+  ```
+
+**3.3: REST API Endpoint** (`x402-rs/src/handlers.rs`)
+- [ ] Add new endpoint: `GET /facilitators/monitor`
+- [ ] Query DynamoDB for latest metrics (last 24 hours)
+- [ ] Calculate uptime percentage for each facilitator
+- [ ] Return JSON with facilitator status:
+  ```json
+  {
+    "facilitators": [
+      {
+        "id": "x402rs",
+        "name": "X402rs (Karmacadabra)",
+        "status": "live",
+        "uptime_24h": 99.8,
+        "avg_response_time_ms": 120,
+        "wallet_balances": [
+          { "network": "avalanche_fuji", "balance": "2.197 AVAX" }
+        ],
+        "last_ping": 1698765432
+      }
+    ]
+  }
+  ```
+
+**3.4: Background Task** (`x402-rs/src/main.rs`)
+- [ ] Add background task using `tokio::time::interval`
+- [ ] Ping all 9 facilitators every 5 minutes
+- [ ] Store results in DynamoDB
+- [ ] Handle errors gracefully (don't crash on failed pings)
+- [ ] Log monitoring activity to CloudWatch
+
+**3.5: Frontend Integration** (`x402-rs/static/index.html`)
+- [ ] Add new collapsible section: "Facilitator Network Monitor"
+- [ ] Grid layout with facilitator cards:
+  - Logo (if available)
+  - Name
+  - Status indicator (green=live, red=down, yellow=degraded)
+  - Uptime % (last 24h)
+  - Avg response time
+  - Wallet balances (collapsed, expand to view)
+  - Last ping timestamp
+- [ ] JavaScript to fetch from `/facilitators/monitor` endpoint
+- [ ] Auto-refresh every 30 seconds
+- [ ] Sorting options: name, uptime %, response time
+- [ ] Filter options: show all / only live / only down
+
+**3.6: Terraform IAM Permissions** (`terraform/ecs-fargate/iam.tf`)
+- [ ] Add DynamoDB read/write permissions to ECS task role:
+  ```hcl
+  resource "aws_iam_role_policy" "facilitator_dynamodb" {
+    role = aws_iam_role.ecs_task_role.name
+    policy = jsonencode({
+      Statement = [{
+        Effect = "Allow"
+        Action = [
+          "dynamodb:PutItem",
+          "dynamodb:GetItem",
+          "dynamodb:Query",
+          "dynamodb:Scan"
+        ]
+        Resource = aws_dynamodb_table.facilitator_metrics.arn
+      }]
+    })
+  }
+  ```
+
+**3.7: Testing**
+- [ ] Unit tests for Rust monitoring functions
+- [ ] Integration test: ping facilitator health endpoints
+- [ ] Test DynamoDB write/read operations
+- [ ] Test REST endpoint returns valid JSON
+- [ ] Test frontend rendering and auto-refresh
+- [ ] Load test: ensure monitoring doesn't impact facilitator performance
+
+**Files Created/Modified:**
+- NEW: `terraform/ecs-fargate/dynamodb.tf`
+- NEW: `x402-rs/src/facilitator_monitor.rs`
+- MODIFIED: `x402-rs/src/handlers.rs` (add `/facilitators/monitor` endpoint)
+- MODIFIED: `x402-rs/src/main.rs` (add background task)
+- MODIFIED: `x402-rs/static/index.html` (add monitoring section)
+- MODIFIED: `x402-rs/Cargo.toml` (add DynamoDB dependency)
+- MODIFIED: `terraform/ecs-fargate/iam.tf` (add DynamoDB permissions)
+
+**Estimated Effort:** 2-3 days
+
+**Success Criteria:**
+- [x] DynamoDB table created and accessible
+- [x] Rust backend pings all 9 facilitators every 5 minutes
+- [x] Metrics stored in DynamoDB with proper TTL
+- [x] REST endpoint returns accurate facilitator status
+- [x] Frontend displays real-time network health
+- [x] Auto-refresh works smoothly
+- [x] No performance degradation on facilitator (monitoring is lightweight)
+
+**Benefits:**
+- Ecosystem visibility: See all facilitators at a glance
+- Competitive intelligence: Compare uptime and performance
+- User trust: Transparency builds confidence
+- Differentiation: Show we're the most reliable facilitator
+- Early warning: Detect network-wide issues
+
+---
+
+**Remaining Sprint 4 Tasks:**
+
 2. 📋 Complete profile extraction automation (Skill + Voice extractors)
 3. 📋 Bootstrap marketplace test (agent discovery and first transactions) - **READY**
 4. ✅ User agent on-chain registration (53 agents total) - **COMPLETE** (IDs 1-6, 7-54)
@@ -587,6 +830,7 @@ curl http://localhost:9000/stats           # → Marketplace stats
 - Agent cards published for all user agents
 - First inter-agent transactions executed
 - Real-time monitoring dashboard operational
+- Facilitator network monitor showing ecosystem health
 
 ---
 
@@ -1958,4 +2202,4 @@ cargo build --release
 
 **🎉 End of Master Plan**
 
-**Version:** 1.3.0 | **Author:** Ultravioleta DAO | **License:** MIT
+**Version:** 1.6.2 | **Author:** Ultravioleta DAO | **License:** MIT
