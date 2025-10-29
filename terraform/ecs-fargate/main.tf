@@ -187,6 +187,14 @@ resource "aws_ecs_task_definition" "agents" {
           value = "https://avalanche-c-chain-rpc.publicnode.com"
         },
         {
+          name  = "RPC_URL_CELO"
+          value = "https://rpc.celocolombia.org"
+        },
+        {
+          name  = "RPC_URL_CELO_SEPOLIA"
+          value = "https://rpc.ankr.com/celo_sepolia"
+        },
+        {
           name  = "GLUE_TOKEN_ADDRESS"
           value = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
         },
@@ -311,9 +319,10 @@ resource "aws_ecs_service" "agents" {
   desired_count   = var.desired_count_per_service
   launch_type     = null # Use capacity provider strategy instead
 
-  # Capacity provider strategy (Fargate Spot)
+  # Capacity provider strategy
+  # Facilitator uses on-demand (more stable), other agents use Spot (cheaper)
   dynamic "capacity_provider_strategy" {
-    for_each = var.use_fargate_spot ? [1] : []
+    for_each = each.key == "facilitator" ? [] : (var.use_fargate_spot ? [1] : [])
     content {
       capacity_provider = "FARGATE_SPOT"
       weight            = var.fargate_spot_weight
@@ -322,10 +331,11 @@ resource "aws_ecs_service" "agents" {
   }
 
   dynamic "capacity_provider_strategy" {
-    for_each = var.use_fargate_spot ? [1] : []
+    for_each = each.key == "facilitator" ? [1] : (var.use_fargate_spot ? [1] : [])
     content {
       capacity_provider = "FARGATE"
-      weight            = var.fargate_ondemand_weight
+      weight            = each.key == "facilitator" ? 100 : var.fargate_ondemand_weight
+      base              = each.key == "facilitator" ? 1 : 0
     }
   }
 
