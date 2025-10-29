@@ -62,6 +62,11 @@ data "aws_secretsmanager_secret" "agent_secrets" {
   name     = each.key == "facilitator" ? "karmacadabra-facilitator-testnet" : "karmacadabra-${each.key}"
 }
 
+# Solana keypair secret for facilitator
+data "aws_secretsmanager_secret" "solana_keypair" {
+  name = "karmacadabra-solana-keypair"
+}
+
 # ----------------------------------------------------------------------------
 # ECS Cluster
 # ----------------------------------------------------------------------------
@@ -203,6 +208,10 @@ resource "aws_ecs_task_definition" "agents" {
           value = "https://rpc.hyperliquid-testnet.xyz/evm"
         },
         {
+          name  = "RPC_URL_SOLANA"
+          value = "https://api.mainnet-beta.solana.com"
+        },
+        {
           name  = "GLUE_TOKEN_ADDRESS"
           value = "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
         },
@@ -247,11 +256,15 @@ resource "aws_ecs_task_definition" "agents" {
 
       # Secrets from AWS Secrets Manager
       # Format: arn:...:secret-name:json-key::
-      # Facilitator uses EVM_PRIVATE_KEY (no OpenAI), agents use PRIVATE_KEY + OPENAI_API_KEY
+      # Facilitator uses EVM_PRIVATE_KEY + SOLANA_PRIVATE_KEY (no OpenAI), agents use PRIVATE_KEY + OPENAI_API_KEY
       secrets = each.key == "facilitator" ? [
         {
           name      = "EVM_PRIVATE_KEY"
           valueFrom = "${data.aws_secretsmanager_secret.agent_secrets[each.key].arn}:private_key::"
+        },
+        {
+          name      = "SOLANA_PRIVATE_KEY"
+          valueFrom = "${data.aws_secretsmanager_secret.solana_keypair.arn}:private_key::"
         }
       ] : [
         {
