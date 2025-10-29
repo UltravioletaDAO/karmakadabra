@@ -903,6 +903,55 @@ python scripts/rebuild_user_agent_marketplace.py --users 30
 - ✅ **Preserva wallets** - Restaura archivos .env con PRIVATE_KEY después de reconstruir
 - ✅ **Flexible** - Omitir pasos individuales con flags `--skip-*`
 
+### Monitoreo de Balances
+Monitorea todos los balances de wallets a través de múltiples cadenas en una vista de matriz unificada:
+
+```bash
+# Revisar todas las cadenas (testnets + mainnets)
+python3 scripts/check_all_balances.py
+
+# Revisar solo testnets (Fuji, Base Sepolia, Celo Sepolia)
+python3 scripts/check_all_balances.py --chain testnets
+
+# Revisar solo mainnets (Avalanche, Base, Celo)
+python3 scripts/check_all_balances.py --chain mainnets
+
+# Filtrar por tipo de wallet
+python3 scripts/check_all_balances.py --wallet-type system        # Agentes del sistema
+python3 scripts/check_all_balances.py --wallet-type facilitators  # Facilitadores
+python3 scripts/check_all_balances.py --wallet-type deployers     # Deployers
+python3 scripts/check_all_balances.py --wallet-type user          # Agentes de usuario
+
+# Mostrar wallets con balance 0
+python3 scripts/check_all_balances.py --show-empty
+
+# Filtrado combinado
+python3 scripts/check_all_balances.py --chain testnets --wallet-type system
+```
+
+**Qué monitorea**:
+- 📊 **57 wallets** en todas las categorías
+- 🌐 **6 cadenas** - Fuji, Base Sepolia, Celo Sepolia (testnets) + Avalanche, Base, Celo (mainnets)
+- 💎 **Tokens nativos** - AVAX, ETH, CELO
+- 🪙 **Tokens ERC-20** - GLUE, USDC, cUSD
+
+**Características**:
+- ✅ **Visualización en matriz** - Wallets como filas, cadenas como columnas
+- ✅ **Codificado por colores** - Rojo (vacío), Amarillo (bajo <0.05), Verde (suficiente)
+- ✅ **Auto-deriva direcciones** - Desde claves privadas en AWS Secrets Manager
+- ✅ **Filtrado flexible** - Por grupo de cadenas y tipo de wallet
+- ✅ **Multi-red** - Testnets y mainnets en una sola vista
+
+**Categorías de wallets**:
+| Categoría | Cantidad | Ejemplos |
+|-----------|----------|----------|
+| Agentes del Sistema | 7 | validator, karma-hello, abracadabra, skill-extractor, voice-extractor |
+| Facilitadores | 2 | facilitator-testnet, facilitator-mainnet |
+| Deployers | 1 | erc-20 |
+| Agentes de Usuario | 48 | Wallets de miembros de la comunidad |
+
+📚 **Documentación completa**: [scripts/README_check_all_balances.md](./scripts/README_check_all_balances.md)
+
 ---
 
 ## 🤝 Contribuir

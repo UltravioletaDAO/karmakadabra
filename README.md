@@ -903,6 +903,55 @@ python scripts/rebuild_user_agent_marketplace.py --users 30
 - ✅ **Preserves wallets** - Restores .env files with PRIVATE_KEY after rebuild
 - ✅ **Flexible** - Skip individual steps with `--skip-*` flags
 
+### Balance Monitoring
+Monitor all wallet balances across multiple chains in a unified matrix view:
+
+```bash
+# Check all chains (testnets + mainnets)
+python3 scripts/check_all_balances.py
+
+# Check only testnets (Fuji, Base Sepolia, Celo Sepolia)
+python3 scripts/check_all_balances.py --chain testnets
+
+# Check only mainnets (Avalanche, Base, Celo)
+python3 scripts/check_all_balances.py --chain mainnets
+
+# Filter by wallet type
+python3 scripts/check_all_balances.py --wallet-type system        # System agents
+python3 scripts/check_all_balances.py --wallet-type facilitators  # Facilitators
+python3 scripts/check_all_balances.py --wallet-type deployers     # Deployers
+python3 scripts/check_all_balances.py --wallet-type user          # User agents
+
+# Show wallets with 0 balance
+python3 scripts/check_all_balances.py --show-empty
+
+# Combined filtering
+python3 scripts/check_all_balances.py --chain testnets --wallet-type system
+```
+
+**What it monitors**:
+- 📊 **57 wallets** across all categories
+- 🌐 **6 chains** - Fuji, Base Sepolia, Celo Sepolia (testnets) + Avalanche, Base, Celo (mainnets)
+- 💎 **Native tokens** - AVAX, ETH, CELO
+- 🪙 **ERC-20 tokens** - GLUE, USDC, cUSD
+
+**Features**:
+- ✅ **Matrix display** - Wallets as rows, chains as columns
+- ✅ **Color-coded** - Red (empty), Yellow (low <0.05), Green (sufficient)
+- ✅ **Auto-derives addresses** - From AWS Secrets Manager private keys
+- ✅ **Flexible filtering** - By chain group and wallet type
+- ✅ **Multi-network** - Testnets and mainnets in one view
+
+**Wallet categories**:
+| Category | Count | Examples |
+|----------|-------|----------|
+| System Agents | 7 | validator, karma-hello, abracadabra, skill-extractor, voice-extractor |
+| Facilitators | 2 | facilitator-testnet, facilitator-mainnet |
+| Deployers | 1 | erc-20 |
+| User Agents | 48 | Community member wallets |
+
+📚 **Full documentation**: [scripts/README_check_all_balances.md](./scripts/README_check_all_balances.md)
+
 ---
 
 ## 🤝 Contributing
