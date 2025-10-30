@@ -131,6 +131,8 @@ impl TryFrom<Network> for EvmChain {
             Network::CeloSepolia => Ok(EvmChain::new(value, 44787)),
             Network::HyperEvm => Ok(EvmChain::new(value, 998)),
             Network::HyperEvmTestnet => Ok(EvmChain::new(value, 333)),
+            Network::Optimism => Ok(EvmChain::new(value, 10)),
+            Network::OptimismSepolia => Ok(EvmChain::new(value, 11155420)),
         }
     }
 }

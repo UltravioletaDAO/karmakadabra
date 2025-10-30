@@ -46,6 +46,8 @@ impl TryFrom<Network> for SolanaChain {
             Network::CeloSepolia => Err(FacilitatorLocalError::UnsupportedNetwork(None)),
             Network::HyperEvm => Err(FacilitatorLocalError::UnsupportedNetwork(None)),
             Network::HyperEvmTestnet => Err(FacilitatorLocalError::UnsupportedNetwork(None)),
+            Network::Optimism => Err(FacilitatorLocalError::UnsupportedNetwork(None)),
+            Network::OptimismSepolia => Err(FacilitatorLocalError::UnsupportedNetwork(None)),
         }
     }
 }

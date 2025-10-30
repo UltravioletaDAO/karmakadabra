@@ -50,6 +50,8 @@ const ENV_RPC_CELO: &str = "RPC_URL_CELO";
 const ENV_RPC_CELO_SEPOLIA: &str = "RPC_URL_CELO_SEPOLIA";
 const ENV_RPC_HYPEREVM: &str = "RPC_URL_HYPEREVM";
 const ENV_RPC_HYPEREVM_TESTNET: &str = "RPC_URL_HYPEREVM_TESTNET";
+const ENV_RPC_OPTIMISM: &str = "RPC_URL_OPTIMISM";
+const ENV_RPC_OPTIMISM_SEPOLIA: &str = "RPC_URL_OPTIMISM_SEPOLIA";
 
 /// A cache of pre-initialized [`EthereumProvider`] instances keyed by network.
 ///
@@ -109,6 +111,8 @@ impl ProviderCache {
                 Network::CeloSepolia => ENV_RPC_CELO_SEPOLIA,
                 Network::HyperEvm => ENV_RPC_HYPEREVM,
                 Network::HyperEvmTestnet => ENV_RPC_HYPEREVM_TESTNET,
+                Network::Optimism => ENV_RPC_OPTIMISM,
+                Network::OptimismSepolia => ENV_RPC_OPTIMISM_SEPOLIA,
             };
             let is_eip1559 = match network {
                 Network::BaseSepolia => true,
@@ -126,6 +130,8 @@ impl ProviderCache {
                 Network::CeloSepolia => true,
                 Network::HyperEvm => true,
                 Network::HyperEvmTestnet => true,
+                Network::Optimism => true,
+                Network::OptimismSepolia => true,
             };
 
             let rpc_url = env::var(env_var);

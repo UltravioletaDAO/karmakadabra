@@ -209,6 +209,22 @@ resource "aws_ecs_task_definition" "agents" {
         },
         {
           name  = "RPC_URL_SOLANA"
+        },
+        {
+          name  = "RPC_URL_POLYGON"
+          value = "https://polygon.drpc.org"
+        },
+        {
+          name  = "RPC_URL_POLYGON_AMOY"
+          value = "https://polygon-amoy.drpc.org"
+        },
+        {
+          name  = "RPC_URL_OPTIMISM"
+          value = "https://public-op-mainnet.fastnode.io"
+        },
+        {
+          name  = "RPC_URL_OPTIMISM_SEPOLIA"
+          value = "https://sepolia.optimism.io"
           value = "https://api.mainnet-beta.solana.com"
         },
         {

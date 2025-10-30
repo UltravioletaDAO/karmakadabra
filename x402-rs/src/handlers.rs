@@ -195,6 +195,50 @@ pub async fn get_hyperevm_logo() -> impl IntoResponse {
     )
 }
 
+
+/// `GET /polygon.png`: Serves the Polygon logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/polygon.png before building.
+#[instrument(skip_all)]
+pub async fn get_polygon_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/polygon.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
+/// `GET /solana.png`: Serves the Solana logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/solana.png before building.
+#[instrument(skip_all)]
+pub async fn get_solana_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/solana.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
+
+/// `GET /optimism.png`: Serves the Optimism logo.
+///
+/// The logo is embedded in the binary at compile time.
+/// To customize: replace static/optimism.png before building.
+#[instrument(skip_all)]
+pub async fn get_optimism_logo() -> impl IntoResponse {
+    let logo = include_bytes!("../static/optimism.png");
+    (
+        StatusCode::OK,
+        [(header::CONTENT_TYPE, "image/png")],
+        logo.as_ref()
+    )
+}
+
 /// `POST /verify`: Facilitator-side verification of a proposed x402 payment.
 ///
 /// This endpoint checks whether a given payment payload satisfies the declared
