@@ -96,6 +96,14 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
 
         # Format the settle request according to x402-rs spec
         # The facilitator expects exact structure matching Rust types with camelCase
+
+        # Combine r, s, v into 65-byte signature (r=32 bytes, s=32 bytes, v=1 byte)
+        # Remove '0x' prefix from r and s if present
+        r_bytes = bytes.fromhex(payment['r'][2:] if payment['r'].startswith('0x') else payment['r'])
+        s_bytes = bytes.fromhex(payment['s'][2:] if payment['s'].startswith('0x') else payment['s'])
+        v_byte = bytes([payment['v']])
+        signature_hex = '0x' + (r_bytes + s_bytes + v_byte).hex()
+
         payload = {
             "x402Version": 1,
             "paymentPayload": {
@@ -103,11 +111,7 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
                 "scheme": "exact",
                 "network": "avalanche-fuji",
                 "payload": {
-                    "signature": {
-                        "v": payment['v'],
-                        "r": payment['r'],
-                        "s": payment['s']
-                    },
+                    "signature": signature_hex,
                     "authorization": {
                         "from": payment['from'],
                         "to": payment['to'],
