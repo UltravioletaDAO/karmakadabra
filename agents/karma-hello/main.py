@@ -27,6 +27,7 @@ project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
 from shared.base_agent import ERC8004BaseAgent
+from x402_middleware import x402_required
 
 # Fix Windows console encoding
 if sys.platform == 'win32':
@@ -494,26 +495,28 @@ async def agent_card():
 
 
 @app.post("/get_chat_logs")
-async def get_chat_logs(request: ChatLogRequest):
+@x402_required(price=0.01, currency="GLUE")
+async def get_chat_logs(request: Request, chat_request: ChatLogRequest):
     """
-    Get chat logs endpoint
+    Get chat logs endpoint - PROTECTED by x402 payment
 
-    Supports x402 payment protocol via X-Payment header.
+    Requires valid x402 payment authorization in Authorization header.
+    Price: 0.01 GLUE per request
     """
     try:
         # Get data from appropriate source
         if agent.use_local_files:
-            response = await agent.get_chat_logs_from_file(request)
+            response = await agent.get_chat_logs_from_file(chat_request)
         else:
-            response = await agent.get_chat_logs_from_mongo(request)
+            response = await agent.get_chat_logs_from_mongo(chat_request)
 
-        # Calculate price
-        price = agent.calculate_price(response.total_messages)
+        # Calculate actual price based on messages
+        actual_price = agent.calculate_price(response.total_messages)
 
         return JSONResponse(
             content=response.model_dump(),
             headers={
-                "X-Price": str(price),
+                "X-Price": str(actual_price),
                 "X-Currency": "GLUE",
                 "X-Message-Count": str(response.total_messages)
             }
