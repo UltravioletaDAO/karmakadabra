@@ -1,0 +1,36 @@
+[
+  {
+    "timestamp": "2025-10-28T17:47:30.896033",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "f3l1p3_bx",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "voice-extractor",
+    "buyer_rating": 92,
+    "seller_rating": 99,
+    "rating_diff": -7,
+    "tx_hash": "0xtest8780821761688050",
+    "scenario": "good_transaction",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Both parties satisfied, ratings: 92/99"
+  },
+  {
+    "timestamp": "2025-10-28T17:47:30.896317",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "davidtherich",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "skill-extractor",
+    "buyer_rating": 95,
+    "seller_rating": 90,
+    "rating_diff": 5,
+    "tx_hash": "0xtest7503921761688050",
+    "scenario": "good_transaction",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Both parties satisfied, ratings: 95/90"
+  }
+]

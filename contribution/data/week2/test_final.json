@@ -1,0 +1,19 @@
+[
+  {
+    "timestamp": "2025-10-28T17:48:04.586582",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "aricreando",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "karma-hello",
+    "buyer_rating": 100,
+    "seller_rating": 98,
+    "rating_diff": 2,
+    "tx_hash": null,
+    "scenario": "good_transaction",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Both parties satisfied, ratings: 100/98"
+  }
+]

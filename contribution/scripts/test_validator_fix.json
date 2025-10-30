@@ -1,0 +1,36 @@
+[
+  {
+    "timestamp": "2025-10-28T22:21:59.844891",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "abracadabra",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "validator",
+    "buyer_rating": 100,
+    "seller_rating": 0,
+    "rating_diff": 100,
+    "tx_hash": "0x7d1e80d20f939ddf371be12ce470eecc396322e34747a99172ff6367005ad1c1",
+    "scenario": "validator_rating",
+    "block_number": 47257290,
+    "gas_used": 21557,
+    "notes": "Excellent validation: thorough, detailed, accurate"
+  },
+  {
+    "timestamp": "2025-10-28T22:22:02.921617",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "abracadabra",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "validator",
+    "buyer_rating": 25,
+    "seller_rating": 0,
+    "rating_diff": 25,
+    "tx_hash": "0x66a95b758f14af5538b7df0648b9fbf6b95cef1da2264973832e5409beea7c18",
+    "scenario": "validator_rating",
+    "block_number": 47257291,
+    "gas_used": 21557,
+    "notes": "Poor validation: rushed, generic, not helpful"
+  }
+]

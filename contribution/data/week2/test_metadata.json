@@ -1,0 +1,36 @@
+[
+  {
+    "timestamp": "2025-10-28T22:13:19.890083",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "derek_farming",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "voice-extractor",
+    "buyer_rating": 98,
+    "seller_rating": 90,
+    "rating_diff": 8,
+    "tx_hash": "0x2db277c83fe571be3bbfacf3a9952c23b240551109d46608ad9fc1b55848a352",
+    "scenario": "good_transaction",
+    "block_number": 47257061,
+    "gas_used": 51810,
+    "notes": "Both parties satisfied, ratings: 98/90"
+  },
+  {
+    "timestamp": "2025-10-28T22:13:23.048781",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "allan__lp",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "skill-extractor",
+    "buyer_rating": 99,
+    "seller_rating": 97,
+    "rating_diff": 2,
+    "tx_hash": "0x955be078bc0c6030fa931fcfd576225c4a005d990721cbf2fe082e5d208cff08",
+    "scenario": "good_transaction",
+    "block_number": 47257063,
+    "gas_used": 88810,
+    "notes": "Both parties satisfied, ratings: 99/97"
+  }
+]

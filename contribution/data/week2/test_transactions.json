@@ -1,0 +1,53 @@
+[
+  {
+    "timestamp": "2025-10-28T14:51:47.997764",
+    "buyer_id": 3,
+    "buyer_address": "0xCf3...",
+    "buyer_name": "client",
+    "seller_id": 1,
+    "seller_address": "0x2C3...",
+    "seller_name": "karma-hello",
+    "buyer_rating": 95,
+    "seller_rating": 92,
+    "rating_diff": 3,
+    "tx_hash": "0xabc123...",
+    "scenario": "good_transaction",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Test transaction"
+  },
+  {
+    "timestamp": "2025-10-28T14:51:47.997787",
+    "buyer_id": 3,
+    "buyer_address": "0xCf3...",
+    "buyer_name": "client",
+    "seller_id": 2,
+    "seller_address": "0x940...",
+    "seller_name": "abracadabra",
+    "buyer_rating": 88,
+    "seller_rating": 15,
+    "rating_diff": 73,
+    "tx_hash": "0xdef456...",
+    "scenario": "bad_client",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Client was difficult"
+  },
+  {
+    "timestamp": "2025-10-28T14:51:47.997791",
+    "buyer_id": 7,
+    "buyer_address": "0xF8f...",
+    "buyer_name": "0xultravioleta",
+    "seller_id": 1,
+    "seller_address": "0x2C3...",
+    "seller_name": "karma-hello",
+    "buyer_rating": 20,
+    "seller_rating": 95,
+    "rating_diff": -75,
+    "tx_hash": "0xghi789...",
+    "scenario": "bad_seller",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Poor quality service"
+  }
+]

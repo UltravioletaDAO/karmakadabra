@@ -573,6 +573,42 @@ class KarmaHelloAgent(ERC8004BaseAgent):
 
 ---
 
+## 🔗 Related Projects
+
+### Lighthouse - Universal Monitoring for Web3
+
+**Repository:** [github.com/UltravioletaDAO/lighthouse](https://github.com/UltravioletaDAO/lighthouse)
+
+Lighthouse is a **standalone universal monitoring platform** that monitors Karmacadabra agents and any other Web3 service.
+
+**Key Features:**
+- AWS Synthetics alternative (50x cheaper: $0.20/mo vs $51.84/mo)
+- Crypto-native payments (USDC on Avalanche, Base, Polygon)
+- Multi-chain support
+- TimescaleDB for time-series data
+- Trustless design (users control alert keys)
+
+**Tech Stack:**
+- Rust backend (Axum framework)
+- PostgreSQL + TimescaleDB (time-series optimization)
+- Docker Compose + Terraform (AWS EC2 + EBS)
+- Python workers (Celery + Playwright for canary flows)
+
+**Status:** Design phase complete, ready for Phase 1 development (Nov 2025)
+
+**Relationship to Karmacadabra:**
+- Lighthouse monitors Karmacadabra agents as one of many customers
+- Uses x402 facilitator as external service (optional)
+- No code dependencies - fully standalone
+- Developed within this repository initially, extracted Oct 2025
+
+**Documentation:**
+- [Master Plan](https://github.com/UltravioletaDAO/lighthouse/blob/main/lighthouse-master-plan.md) - Complete architecture (60+ pages)
+- [Deployment Guide](https://github.com/UltravioletaDAO/lighthouse/blob/main/DEPLOYMENT-STEP-BY-STEP.md) - Granular step-by-step
+- [Database Architecture](https://github.com/UltravioletaDAO/lighthouse/blob/main/DATABASE-ARCHITECTURE-ANALYSIS.md) - Why TimescaleDB
+
+---
+
 ## 📚 Documentation
 
 | Document | Description | Time |

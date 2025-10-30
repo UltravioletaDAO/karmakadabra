@@ -1,0 +1,25 @@
+{
+  "total_transactions": 99,
+  "unique_buyers": 46,
+  "unique_sellers": 5,
+  "avg_buyer_rating": 70.73737373737374,
+  "avg_seller_rating": 64.02020202020202,
+  "avg_rating_diff": 6.717171717171717,
+  "avg_gas_used": 58443.030303030304,
+  "total_gas_used": 5785860,
+  "min_gas": 21557,
+  "max_gas": 88810,
+  "date_range": [
+    "2025-10-28T22:23:07.467342",
+    "2025-10-28T22:30:35.510964"
+  ],
+  "time_span_seconds": 448.043622,
+  "scenarios": {
+    "good_transaction": 30,
+    "disputed": 20,
+    "bad_client": 15,
+    "bad_seller": 15,
+    "validator_rating": 10,
+    "rating_history": 9
+  }
+}

@@ -1,0 +1,36 @@
+[
+  {
+    "timestamp": "2025-10-28T17:47:45.955838",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "coleguin_",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "karma-hello",
+    "buyer_rating": 97,
+    "seller_rating": 100,
+    "rating_diff": -3,
+    "tx_hash": "0xtest3514581761688065",
+    "scenario": "good_transaction",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Both parties satisfied, ratings: 97/100"
+  },
+  {
+    "timestamp": "2025-10-28T17:47:46.316555",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "0xyuls",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "voice-extractor",
+    "buyer_rating": 97,
+    "seller_rating": 99,
+    "rating_diff": -2,
+    "tx_hash": "0xtest6895721761688066",
+    "scenario": "good_transaction",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Both parties satisfied, ratings: 97/99"
+  }
+]

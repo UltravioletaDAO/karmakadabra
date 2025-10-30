@@ -1,0 +1,2 @@
+timestamp,buyer_id,buyer_address,buyer_name,seller_id,seller_address,seller_name,buyer_rating,seller_rating,rating_diff,tx_hash,scenario,block_number,gas_used,notes
+2025-10-28T17:48:04.586582,,0x2C3e071df446B25B821F59425152838ae4931E75,aricreando,,0x2C3e071df446B25B821F59425152838ae4931E75,karma-hello,100,98,2,,good_transaction,,,"Both parties satisfied, ratings: 100/98"

@@ -1,0 +1,4 @@
+timestamp,buyer_id,buyer_address,buyer_name,seller_id,seller_address,seller_name,buyer_rating,seller_rating,rating_diff,tx_hash,scenario,block_number,gas_used,notes
+2025-10-28T14:51:47.997764,3,0xCf3...,client,1,0x2C3...,karma-hello,95,92,3,0xabc123...,good_transaction,,,Test transaction
+2025-10-28T14:51:47.997787,3,0xCf3...,client,2,0x940...,abracadabra,88,15,73,0xdef456...,bad_client,,,Client was difficult
+2025-10-28T14:51:47.997791,7,0xF8f...,0xultravioleta,1,0x2C3...,karma-hello,20,95,-75,0xghi789...,bad_seller,,,Poor quality service

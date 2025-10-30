@@ -1,0 +1,36 @@
+[
+  {
+    "timestamp": "2025-10-29T17:42:42.237544",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "karma-hello",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "validator",
+    "buyer_rating": 99,
+    "seller_rating": 0,
+    "rating_diff": 99,
+    "tx_hash": "0xf12aa146e912f4f8e4591eecc9816d0e2abf3a63221323390d850efac09acd3b",
+    "scenario": "validator_rating",
+    "block_number": 47282041,
+    "gas_used": 21557,
+    "notes": "Excellent validation: thorough, detailed, accurate"
+  },
+  {
+    "timestamp": "2025-10-29T17:42:45.353374",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "karma-hello",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "validator",
+    "buyer_rating": 20,
+    "seller_rating": 0,
+    "rating_diff": 20,
+    "tx_hash": "0x35862f0b180200d48626a995ce22d4ef4a0ed6aa619ecb3a5d64f10ea1d412ac",
+    "scenario": "validator_rating",
+    "block_number": 47282042,
+    "gas_used": 21557,
+    "notes": "Poor validation: rushed, generic, not helpful"
+  }
+]

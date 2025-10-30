@@ -1,0 +1,3 @@
+timestamp,buyer_id,buyer_address,buyer_name,seller_id,seller_address,seller_name,buyer_rating,seller_rating,rating_diff,tx_hash,scenario,block_number,gas_used,notes
+2025-10-28T17:47:30.896033,,0x2C3e071df446B25B821F59425152838ae4931E75,f3l1p3_bx,,0x2C3e071df446B25B821F59425152838ae4931E75,voice-extractor,92,99,-7,0xtest8780821761688050,good_transaction,,,"Both parties satisfied, ratings: 92/99"
+2025-10-28T17:47:30.896317,,0x2C3e071df446B25B821F59425152838ae4931E75,davidtherich,,0x2C3e071df446B25B821F59425152838ae4931E75,skill-extractor,95,90,5,0xtest7503921761688050,good_transaction,,,"Both parties satisfied, ratings: 95/90"

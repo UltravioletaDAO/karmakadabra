@@ -1,0 +1,19 @@
+[
+  {
+    "timestamp": "2025-10-28T22:09:10.566626",
+    "buyer_id": null,
+    "buyer_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "buyer_name": "craami",
+    "seller_id": null,
+    "seller_address": "0x2C3e071df446B25B821F59425152838ae4931E75",
+    "seller_name": "karma-hello",
+    "buyer_rating": 100,
+    "seller_rating": 91,
+    "rating_diff": 9,
+    "tx_hash": "0xtest4374921761703750",
+    "scenario": "good_transaction",
+    "block_number": "",
+    "gas_used": "",
+    "notes": "Both parties satisfied, ratings: 100/91"
+  }
+]

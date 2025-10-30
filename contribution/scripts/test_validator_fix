@@ -1,0 +1,3 @@
+timestamp,buyer_id,buyer_address,buyer_name,seller_id,seller_address,seller_name,buyer_rating,seller_rating,rating_diff,tx_hash,scenario,block_number,gas_used,notes
+2025-10-28T22:21:59.844891,,0x2C3e071df446B25B821F59425152838ae4931E75,abracadabra,,0x2C3e071df446B25B821F59425152838ae4931E75,validator,100,0,100,0x7d1e80d20f939ddf371be12ce470eecc396322e34747a99172ff6367005ad1c1,validator_rating,47257290,21557,"Excellent validation: thorough, detailed, accurate"
+2025-10-28T22:22:02.921617,,0x2C3e071df446B25B821F59425152838ae4931E75,abracadabra,,0x2C3e071df446B25B821F59425152838ae4931E75,validator,25,0,25,0x66a95b758f14af5538b7df0648b9fbf6b95cef1da2264973832e5409beea7c18,validator_rating,47257291,21557,"Poor validation: rushed, generic, not helpful"

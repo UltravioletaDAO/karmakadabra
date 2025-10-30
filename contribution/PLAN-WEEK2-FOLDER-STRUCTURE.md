@@ -63,12 +63,12 @@ contribution/
 │       ├── transaction_logger.py       # Log transactions
 │       └── web3_helper.py              # Web3 utilities
 │
-├── shared/                             # 🆕 Copied dependencies (minimal)
+├── lib/                                # 🆕 Dependencies copied from main repo
 │   ├── __init__.py
-│   ├── agent_config.py                 # Copy from /shared/
-│   ├── base_agent.py                   # Copy from /shared/ (or reference key methods)
-│   ├── secrets_manager.py              # Copy from /shared/
-│   └── README.md                       # Explains what's copied
+│   ├── agent_config.py                 # Copied from /shared/
+│   ├── base_agent.py                   # Copied from /shared/
+│   ├── secrets_manager.py              # Copied from /shared/
+│   └── README.md                       # What's included and why
 │
 ├── contracts/                          # 🆕 Contract code for reference
 │   ├── ReputationRegistry.sol          # The modified contract

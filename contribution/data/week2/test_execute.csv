@@ -1,0 +1,3 @@
+timestamp,buyer_id,buyer_address,buyer_name,seller_id,seller_address,seller_name,buyer_rating,seller_rating,rating_diff,tx_hash,scenario,block_number,gas_used,notes
+2025-10-28T17:45:58.400527,,0x2C3e071df446B25B821F59425152838ae4931E75,cyberpaisa,,0x2C3e071df446B25B821F59425152838ae4931E75,abracadabra,92,97,-5,0xtest1828831761687958,good_transaction,,,"Both parties satisfied, ratings: 92/97"
+2025-10-28T17:45:58.400547,,0x2C3e071df446B25B821F59425152838ae4931E75,allan__lp,,0x2C3e071df446B25B821F59425152838ae4931E75,karma-hello,100,99,1,0xtest1631481761687958,good_transaction,,,"Both parties satisfied, ratings: 100/99"
