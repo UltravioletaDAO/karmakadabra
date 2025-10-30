@@ -63,12 +63,6 @@ pub enum Network {
     /// HyperEVM testnet (chain ID 333).
     #[serde(rename = "hyperevm-testnet")]
     HyperEvmTestnet,
-    /// Optimism mainnet (chain ID 10).
-    #[serde(rename = "optimism")]
-    Optimism,
-    /// Optimism Sepolia testnet (chain ID 11155420).
-    #[serde(rename = "optimism-sepolia")]
-    OptimismSepolia,
 }
 
 impl Display for Network {
@@ -89,8 +83,6 @@ impl Display for Network {
             Network::CeloSepolia => write!(f, "celo-sepolia"),
             Network::HyperEvm => write!(f, "hyperevm"),
             Network::HyperEvmTestnet => write!(f, "hyperevm-testnet"),
-            Network::Optimism => write!(f, "optimism"),
-            Network::OptimismSepolia => write!(f, "optimism-sepolia"),
         }
     }
 }
@@ -119,8 +111,6 @@ impl From<Network> for NetworkFamily {
             Network::CeloSepolia => NetworkFamily::Evm,
             Network::HyperEvm => NetworkFamily::Evm,
             Network::HyperEvmTestnet => NetworkFamily::Evm,
-            Network::Optimism => NetworkFamily::Evm,
-            Network::OptimismSepolia => NetworkFamily::Evm,
         }
     }
 }
@@ -144,14 +134,6 @@ impl Network {
             Network::CeloSepolia,
             Network::HyperEvm,
             Network::HyperEvmTestnet,
-            Network::Optimism,
-            Network::OptimismSepolia,
-    /// Optimism mainnet (chain ID 10).
-    #[serde(rename = "optimism")]
-    Optimism,
-    /// Optimism Sepolia testnet (chain ID 11155420).
-    #[serde(rename = "optimism-sepolia")]
-    OptimismSepolia,
         ]
     }
 }
@@ -364,14 +346,6 @@ static USDC_HYPEREVM_TESTNET: Lazy<USDCDeployment> = Lazy::new(|| {
         asset: TokenAsset {
             address: address!("0xC3B4b2C0faE2De7cF7e07c8c84f65d8df61Bf314").into(),
             network: Network::HyperEvmTestnet,
-            Network::Optimism,
-            Network::OptimismSepolia,
-    /// Optimism mainnet (chain ID 10).
-    #[serde(rename = "optimism")]
-    Optimism,
-    /// Optimism Sepolia testnet (chain ID 11155420).
-    #[serde(rename = "optimism-sepolia")]
-    OptimismSepolia,
         },
         decimals: 6,
         eip712: Some(TokenDeploymentEip712 {
@@ -383,37 +357,6 @@ static USDC_HYPEREVM_TESTNET: Lazy<USDCDeployment> = Lazy::new(|| {
 
 /// Lazily initialized UVD V2 deployment on Avalanche Fuji testnet as [`UVDDeployment`].
 /// Note: Address must be updated after deploying erc-20/UVD_V2.sol
-
-/// Lazily initialized known USDC deployment on Optimism mainnet as [`USDCDeployment`].
-static USDC_OPTIMISM: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85").into(),
-            network: Network::Optimism,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USD Coin".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-/// Lazily initialized known USDC deployment on Optimism Sepolia testnet as [`USDCDeployment`].
-static USDC_OPTIMISM_SEPOLIA: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0x5fd84259d66Cd46123540766Be93DFE6D43130D7").into(),
-            network: Network::OptimismSepolia,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USD Coin".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
 static UVD_AVALANCHE_FUJI: Lazy<UVDDeployment> = Lazy::new(|| {
     UVDDeployment(TokenDeployment {
         asset: TokenAsset {
@@ -504,8 +447,6 @@ impl USDCDeployment {
             Network::CeloSepolia => &USDC_CELO_SEPOLIA,
             Network::HyperEvm => &USDC_HYPEREVM,
             Network::HyperEvmTestnet => &USDC_HYPEREVM_TESTNET,
-            Network::Optimism => &USDC_OPTIMISM,
-            Network::OptimismSepolia => &USDC_OPTIMISM_SEPOLIA,
         }
     }
 }

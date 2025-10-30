@@ -134,8 +134,8 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
                 "maxTimeoutSeconds": 300,
                 "asset": GLUE_TOKEN,
                 "extra": {
-                    "name": "Gasless Ultravioleta DAO Extended Token",
-                    "version": "2"
+                    "name": "GLUE Token",
+                    "version": "1"
                 }
             }
         }
