@@ -153,14 +153,26 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
 
         if response.status_code == 200:
             data = response.json()
+
+            # Check if payment is valid (facilitator validates signature + balance)
+            is_valid = data.get('isValid', False)
+            if not is_valid:
+                invalid_reason = data.get('invalidReason', 'Unknown')
+                payer = data.get('payer', 'Unknown')
+                print(f"❌ Payment invalid: {invalid_reason}")
+                print(f"   Payer: {payer}")
+                print(f"   Full response: {data}")
+                return None
+
             # Extract transaction hash from response
             tx_hash = data.get('transaction_hash') or data.get('tx_hash') or data.get('transactionHash')
             if tx_hash:
                 print(f"✅ Payment settled: {tx_hash}")
                 return tx_hash
             else:
-                print(f"⚠️  Settlement succeeded but no tx hash: {data}")
-                return "settled"  # Payment was accepted
+                print(f"⚠️  Payment valid but no tx hash yet: {data}")
+                # Payment was validated, may be pending
+                return "pending"
         else:
             print(f"Facilitator error: {response.status_code} - {response.text[:500]}")
             return None
