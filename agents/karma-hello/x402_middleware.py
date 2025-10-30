@@ -95,27 +95,39 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
         facilitator_endpoint = f"{FACILITATOR_URL}/settle"
 
         # Format the settle request according to x402-rs spec
-        # The facilitator expects EIP-3009 transferWithAuthorization parameters
+        # The facilitator expects exact structure matching Rust types with camelCase
         payload = {
-            "x402_version": "v1",
-            "payment_payload": {
-                "scheme": "eip3009",
-                "token_address": payment['token'],
-                "from_address": payment['from'],
-                "to_address": payment['to'],
-                "value": str(payment['value']),
-                "valid_after": payment['validAfter'],
-                "valid_before": payment['validBefore'],
-                "nonce": payment['nonce'],
-                "v": payment['v'],
-                "r": payment['r'],
-                "s": payment['s']
+            "x402Version": "v1",
+            "paymentPayload": {
+                "x402Version": "v1",
+                "scheme": "exact",
+                "network": "avalanche-fuji",
+                "payload": {
+                    "signature": {
+                        "v": payment['v'],
+                        "r": payment['r'],
+                        "s": payment['s']
+                    },
+                    "authorization": {
+                        "from": payment['from'],
+                        "to": payment['to'],
+                        "value": str(payment['value']),
+                        "validAfter": payment['validAfter'],
+                        "validBefore": payment['validBefore'],
+                        "nonce": payment['nonce']
+                    }
+                }
             },
-            "payment_requirements": {
-                "pay_to": seller_address,
-                "chain": "avalanche-fuji",
-                "token_address": GLUE_TOKEN,
-                "amount": str(payment['value'])
+            "paymentRequirements": {
+                "scheme": "exact",
+                "network": "avalanche-fuji",
+                "maxAmountRequired": str(payment['value']),
+                "resource": "https://karma-hello.karmacadabra.ultravioletadao.xyz/get_chat_logs",
+                "description": "Karma-Hello chat logs",
+                "mimeType": "application/json",
+                "payTo": seller_address,
+                "maxTimeoutSeconds": 300,
+                "asset": GLUE_TOKEN
             }
         }
 
