@@ -97,9 +97,9 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
         # Format the settle request according to x402-rs spec
         # The facilitator expects exact structure matching Rust types with camelCase
         payload = {
-            "x402Version": "v1",
+            "x402Version": 1,
             "paymentPayload": {
-                "x402Version": "v1",
+                "x402Version": 1,
                 "scheme": "exact",
                 "network": "avalanche-fuji",
                 "payload": {
