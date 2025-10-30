@@ -116,8 +116,8 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
                         "from": payment['from'],
                         "to": payment['to'],
                         "value": str(payment['value']),
-                        "validAfter": payment['validAfter'],
-                        "validBefore": payment['validBefore'],
+                        "validAfter": str(payment['validAfter']),
+                        "validBefore": str(payment['validBefore']),
                         "nonce": payment['nonce']
                     }
                 }
