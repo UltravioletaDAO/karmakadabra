@@ -103,9 +103,9 @@ def create_eip3009_authorization(
         dict with signature components (v, r, s)
     """
 
-    # EIP-712 domain for GLUE token
+    # EIP-712 domain for GLUE token (must match contract deployment)
     domain = {
-        'name': 'GLUE',
+        'name': 'Gasless Ultravioleta DAO Extended Token',
         'version': '1',
         'chainId': CHAIN_ID,
         'verifyingContract': GLUE_TOKEN
