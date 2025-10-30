@@ -7,6 +7,7 @@ Verifies EIP-3009 signatures and forwards to facilitator.
 
 import re
 import time
+import json
 import requests
 from typing import Optional, Callable, Dict, Any
 from functools import wraps
@@ -136,6 +137,8 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
         }
 
         print(f"Calling facilitator /settle with: from={payment['from'][:10]}... to={payment['to'][:10]}... value={payment['value']}")
+        print(f"DEBUG: Payload being sent to facilitator:")
+        print(json.dumps(payload, indent=2))
 
         response = requests.post(
             facilitator_endpoint,
