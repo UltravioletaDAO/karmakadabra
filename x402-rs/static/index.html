@@ -302,6 +302,36 @@
             box-shadow: 0 8px 24px rgba(140, 82, 255, 0.3);
         }
 
+        .network-badge.polygon {
+            border-color: #8247e5;
+            box-shadow: 0 0 20px rgba(130, 71, 229, 0.2);
+        }
+
+        .network-badge.polygon:hover {
+            border-color: #8247e5;
+            box-shadow: 0 8px 24px rgba(130, 71, 229, 0.3);
+        }
+
+        .network-badge.solana {
+            border-color: #14f195;
+            box-shadow: 0 0 20px rgba(20, 241, 149, 0.2);
+        }
+
+        .network-badge.solana:hover {
+            border-color: #14f195;
+            box-shadow: 0 8px 24px rgba(20, 241, 149, 0.3);
+        }
+
+        .network-badge.optimism {
+            border-color: #ff0420;
+            box-shadow: 0 0 20px rgba(255, 4, 32, 0.2);
+        }
+
+        .network-badge.optimism:hover {
+            border-color: #ff0420;
+            box-shadow: 0 8px 24px rgba(255, 4, 32, 0.3);
+        }
+
         .network-dot {
             width: 12px;
             height: 12px;
@@ -676,6 +706,48 @@
             }
         }
 
+        /* Tab styles */
+        .tabs-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .tab-button {
+            padding: 0.75rem 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tab-button.active {
+            background: linear-gradient(135deg, var(--accent), var(--base-blue));
+            border-color: var(--accent);
+            color: var(--bg-dark);
+            box-shadow: 0 4px 12px var(--glow);
+        }
+
+        .tab-button:hover:not(.active) {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-2px);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
         /* Loading animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
@@ -712,7 +784,14 @@
                     Enable AI agents to transact autonomously without gas fees. Built on x402 protocol with EIP-3009 meta-transactions.
                 </p>
 
-                <!-- Mainnets - Featured with Wallet Balances -->
+                <!-- Network Tabs -->
+                <div class="tabs-container">
+                    <button class="tab-button active" onclick="switchTab('mainnet')">Mainnets</button>
+                    <button class="tab-button" onclick="switchTab('testnet')">Testnets</button>
+                </div>
+
+                <!-- Mainnets Tab -->
+                <div id="mainnet-tab" class="tab-content active">
                 <div style="margin-bottom: 1rem; text-align: center;">
                     <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Mainnets</span>
                 </div>
@@ -761,11 +840,43 @@
                         </div>
                         <div style="font-size: 0.7rem; color: var(--text-muted);">HYPE Balance</div>
                     </div>
+                    <div class="network-badge polygon" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/polygon.png" alt="Polygon" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Polygon</span>
+                        </div>
+                        <div class="balance-amount" data-balance="polygon-mainnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">POL Balance</div>
+                    </div>
+                    <div class="network-badge solana" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/solana.png" alt="Solana" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Solana</span>
+                        </div>
+                        <div class="balance-amount" data-balance="solana-mainnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">SOL Balance</div>
+                    </div>
+                    <div class="network-badge optimism" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/optimism.png" alt="Optimism" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Optimism</span>
+                        </div>
+                        <div class="balance-amount" data-balance="optimism-mainnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">ETH Balance</div>
+                    </div>
+                </div>
                 </div>
 
-                <!-- Testnets - Secondary with Wallet Balances -->
+                <!-- Testnets Tab -->
+                <div id="testnet-tab" class="tab-content">
                 <div style="margin-bottom: 1rem; text-align: center;">
-                    <span style="color: var(--text-muted); font-size: 0.7rem; font-weight: 500; text-transform: uppercase; letter-spacing: 1px;">Testnets</span>
+                    <span style="color: var(--text-muted); font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">Testnets</span>
                 </div>
                 <div class="networks" style="gap: 2rem; margin-bottom: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); justify-items: center;">
                     <div class="network-badge avalanche" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
@@ -802,16 +913,27 @@
                             <img src="/celo-colombia.png" alt="Celo Colombia" style="width: 64px; height: 32px; object-fit: contain; opacity: 0.7;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.7'">
                         </a>
                     </div>
-                    <div class="network-badge hyperevm" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                    <div class="network-badge polygon" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
                         <div style="display: flex; align-items: center; gap: 0.75rem;">
-                            <img src="/hyperevm.png" alt="HyperEVM" style="width: 32px; height: 32px; object-fit: contain;">
-                            <span style="font-weight: 700;">HyperEVM Testnet</span>
+                            <img src="/polygon.png" alt="Polygon" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Polygon Amoy</span>
                         </div>
-                        <div class="balance-amount" data-balance="hyperevm-testnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                        <div class="balance-amount" data-balance="polygon-testnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
                             Loading...
                         </div>
-                        <div style="font-size: 0.7rem; color: var(--text-muted);">HYPE</div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">POL</div>
                     </div>
+                    <div class="network-badge optimism" style="padding: 1.25rem 2rem; font-size: 1.1rem; flex-direction: column; gap: 0.75rem; min-height: 180px; width: 100%;">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <img src="/optimism.png" alt="Optimism" style="width: 32px; height: 32px; object-fit: contain;">
+                            <span style="font-weight: 700;">Optimism Sepolia</span>
+                        </div>
+                        <div class="balance-amount" data-balance="optimism-testnet" style="font-size: 1.1rem; font-weight: 700; font-family: 'JetBrains Mono', monospace; color: rgba(255,255,255,0.9);">
+                            Loading...
+                        </div>
+                        <div style="font-size: 0.7rem; color: var(--text-muted);">ETH</div>
+                    </div>
+                </div>
                 </div>
 
                 <!-- Wallet Addresses -->
@@ -1071,7 +1193,7 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
             const MAINNET_ADDRESS = '0x103040545AC5031A11E8C03dd11324C7333a13C7';
             const TESTNET_ADDRESS = '0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8';
 
-            // RPC configurations for all 6 networks
+            // RPC configurations for all networks
             const networks = {
                 'avalanche-mainnet': {
                     rpc: 'https://avalanche-c-chain-rpc.publicnode.com',
@@ -1089,6 +1211,19 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
                     rpc: 'https://rpc.hyperliquid.xyz/evm',
                     address: MAINNET_ADDRESS
                 },
+                'polygon-mainnet': {
+                    rpc: 'https://polygon.drpc.org',
+                    address: MAINNET_ADDRESS
+                },
+                'solana-mainnet': {
+                    rpc: 'https://mainnet.helius-rpc.com/?api-key=f6fc10fb-cd9d-42e4-be78-900dde381d4a',
+                    address: 'F742C4VfFLQ9zRQyithoj5229ZgtX2WqKCSFKgH2EThq',
+                    isSolana: true
+                },
+                'optimism-mainnet': {
+                    rpc: 'https://mainnet.optimism.io',
+                    address: MAINNET_ADDRESS
+                },
                 'avalanche-testnet': {
                     rpc: 'https://avalanche-fuji-c-chain-rpc.publicnode.com',
                     address: TESTNET_ADDRESS
@@ -1101,37 +1236,69 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
                     rpc: 'https://rpc.ankr.com/celo_sepolia',
                     address: TESTNET_ADDRESS
                 },
-                'hyperevm-testnet': {
-                    rpc: 'https://rpc.hyperliquid-testnet.xyz/evm',
+                'polygon-testnet': {
+                    rpc: 'https://rpc-amoy.polygon.technology',
+                    address: TESTNET_ADDRESS
+                },
+                'optimism-testnet': {
+                    rpc: 'https://sepolia.optimism.io',
                     address: TESTNET_ADDRESS
                 }
             };
 
-            // Fetch balance for each network
+        // Fetch balance for each network
             for (const [network, config] of Object.entries(networks)) {
                 try {
-                    const response = await fetch(config.rpc, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            jsonrpc: '2.0',
-                            method: 'eth_getBalance',
-                            params: [config.address, 'latest'],
-                            id: 1
-                        })
-                    });
+                    if (config.isSolana) {
+                        // Solana uses different RPC method
+                        const response = await fetch(config.rpc, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                jsonrpc: '2.0',
+                                method: 'getBalance',
+                                params: [config.address],
+                                id: 1
+                            })
+                        });
 
-                    const data = await response.json();
-                    if (data.result) {
-                        // Convert from wei to ether
-                        const balanceWei = BigInt(data.result);
-                        const balanceEther = Number(balanceWei) / 1e18;
-                        const formatted = balanceEther.toFixed(4);
+                        const data = await response.json();
+                        if (data.result && data.result.value !== undefined) {
+                            // Solana balance is in lamports (1 SOL = 1e9 lamports)
+                            const balanceLamports = data.result.value;
+                            const balanceSOL = balanceLamports / 1e9;
+                            const formatted = balanceSOL.toFixed(4);
 
-                        // Update the UI
-                        const balanceEl = document.querySelector(`[data-balance="${network}"]`);
-                        if (balanceEl) {
-                            balanceEl.textContent = formatted;
+                            const balanceEl = document.querySelector(`[data-balance="${network}"]`);
+                            if (balanceEl) {
+                                balanceEl.textContent = formatted;
+                            }
+                        }
+                    } else {
+                        // EVM networks
+                        const response = await fetch(config.rpc, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                jsonrpc: '2.0',
+                                method: 'eth_getBalance',
+                                params: [config.address, 'latest'],
+                                id: 1
+                            })
+                        });
+
+                        const data = await response.json();
+                        if (data.result) {
+                            // Convert from wei to ether
+                            const balanceWei = BigInt(data.result);
+                            const balanceEther = Number(balanceWei) / 1e18;
+                            const formatted = balanceEther.toFixed(4);
+
+                            // Update the UI
+                            const balanceEl = document.querySelector(`[data-balance="${network}"]`);
+                            if (balanceEl) {
+                                balanceEl.textContent = formatted;
+                            }
                         }
                     }
                 } catch (error) {
@@ -1143,6 +1310,21 @@ app.<span class="code-function">use</span>(<span class="code-function">paymentMi
                 }
             }
         }
+
+        // Tab switching function (global scope for onclick attributes)
+        window.switchTab = function(tab) {
+            // Update button states
+            document.querySelectorAll('.tab-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Update content visibility
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tab + '-tab').classList.add('active');
+        };
 
         // Fetch balances on page load
         fetchWalletBalances();

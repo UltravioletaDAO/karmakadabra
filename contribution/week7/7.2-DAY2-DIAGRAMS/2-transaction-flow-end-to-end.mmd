@@ -1,0 +1,47 @@
+%% Complete Transaction Flow: Discovery → Payment → Service → Rating
+%% Shows bidirectional trust in action
+
+sequenceDiagram
+    participant Client as abracadabra<br/>(Client/Buyer)
+    participant Registry as IdentityRegistry<br/>(On-Chain)
+    participant Server as karma-hello<br/>(Server/Seller)
+    participant Faci as x402 Facilitator<br/>(Payment Gateway)
+    participant Token as GLUE Token<br/>(ERC-20 + EIP-3009)
+    participant Rep as ReputationRegistry<br/>(Bidirectional Ratings)
+
+    Note over Client,Rep: Step 1: Discovery (A2A Protocol)
+    Client->>Registry: resolveByDomain("karma-hello.karmacadabra...")
+    Registry-->>Client: agentId=1, address=0x2C3..., metadata_uri
+    Client->>Server: GET /.well-known/agent-card.json
+    Server-->>Client: {services: [{name: "chat_logs", price: "0.01 GLUE"}]}
+
+    Note over Client,Rep: Step 2: Check Reputation (NEW: Bidirectional)
+    Client->>Rep: getServerRating(serverId=1, clientId=2)
+    Rep-->>Client: (hasRating=false, rating=0) → First transaction, trust
+    Server->>Rep: getClientRating(clientId=2, serverId=1)
+    Rep-->>Server: (hasRating=false, rating=0) → First transaction, serve
+
+    Note over Client,Rep: Step 3: Payment Authorization (EIP-3009)
+    Client->>Client: Generate EIP-712 signature<br/>transferWithAuthorization(to: karma-hello, value: 0.01)
+    Client->>Server: GET /api/logs?date=2025-10-29<br/>X-Payment-Authorization: <signature>
+
+    Note over Client,Rep: Step 4: Server Validates & Serves
+    Server->>Faci: POST /verify<br/>{authorization: <signature>, price: "0.01"}
+    Faci->>Token: transferWithAuthorization(...signature)
+    Token->>Token: Verify signature, transfer 0.01 GLUE
+    Token-->>Faci: TxHash: 0x742d35..., Status: Success
+    Faci-->>Server: Payment verified ✅
+    Server->>Server: Fetch logs from MongoDB
+    Server-->>Client: HTTP 200: {logs: [...2,685 messages...]}
+
+    Note over Client,Rep: Step 5: Mutual Rating (NEW: Bidirectional)
+    Server->>Rep: rateClient(clientId=2, rating=97)<br/>"Excellent: Prompt payment, clear request"
+    Rep->>Rep: Store: _clientRatings[2][1] = 97
+    Rep-->>Server: Event: ClientRated(2, 1, 97)
+
+    Client->>Rep: rateServer_offchain(serverId=1, rating=95)<br/>"Excellent: Fast delivery, high quality"
+    Note over Client: (Client→Server rating stored off-chain in V1,<br/>future extension will standardize)
+
+    Note over Client,Rep: Final State: Mutual Trust Established
+    Note over Server: karma-hello has rating of abracadabra: 97/100<br/>(Will serve again with confidence)
+    Note over Client: abracadabra has rating of karma-hello: 95/100<br/>(Will buy again with confidence)

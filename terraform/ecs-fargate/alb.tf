@@ -323,6 +323,57 @@ resource "aws_lb_listener_rule" "facilitator_root_https" {
 }
 
 # ----------------------------------------------------------------------------
+# Test Seller Domain Routing (test-seller.karmacadabra.ultravioletadao.xyz)
+# ----------------------------------------------------------------------------
+# Note: This is already covered by the agents_hostname rules above,
+# but we keep it explicit for clarity and to ensure priority
+
+# Commented out - using the automatic agent hostname routing instead
+# The agents_hostname resource already creates rules for test-seller.karmacadabra.ultravioletadao.xyz
+
+# resource "aws_lb_listener_rule" "test_seller_http" {
+#   listener_arn = aws_lb_listener.http.arn
+#   priority     = 15 # High priority (after facilitator)
+#
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.agents["test-seller"].arn
+#   }
+#
+#   condition {
+#     host_header {
+#       values = ["test-seller.${var.base_domain}"]
+#     }
+#   }
+#
+#   tags = merge(var.tags, {
+#     Name = "${var.project_name}-${var.environment}-test-seller-http"
+#   })
+# }
+#
+# resource "aws_lb_listener_rule" "test_seller_https" {
+#   count = var.enable_https ? 1 : 0
+#
+#   listener_arn = aws_lb_listener.https[0].arn
+#   priority     = 15 # High priority (after facilitator)
+#
+#   action {
+#     type             = "forward"
+#     target_group_arn = aws_lb_target_group.agents["test-seller"].arn
+#   }
+#
+#   condition {
+#     host_header {
+#       values = ["test-seller.${var.base_domain}"]
+#     }
+#   }
+#
+#   tags = merge(var.tags, {
+#     Name = "${var.project_name}-${var.environment}-test-seller-https"
+#   })
+# }
+
+# ----------------------------------------------------------------------------
 # S3 Bucket for ALB Access Logs (Optional)
 # ----------------------------------------------------------------------------
 

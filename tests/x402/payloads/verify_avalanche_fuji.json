@@ -1,0 +1,26 @@
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "avalanche-fuji",
+    "payload": {
+      "signature": "0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef12",
+      "authorization": {
+        "from": "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8",
+        "to": "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8",
+        "value": "10000",
+        "validAfter": 0,
+        "validBefore": 9999999999,
+        "nonce": "0x0000000000000000000000000000000000000000000000000000000000000001"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "network": "avalanche-fuji",
+    "scheme": "exact",
+    "asset": "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743",
+    "recipient": "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8",
+    "amount": "10000"
+  }
+}

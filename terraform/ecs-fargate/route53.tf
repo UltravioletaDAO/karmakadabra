@@ -85,6 +85,27 @@ resource "aws_route53_record" "facilitator" {
 }
 
 # ----------------------------------------------------------------------------
+# Test Seller Record (test-seller.karmacadabra.ultravioletadao.xyz)
+# ----------------------------------------------------------------------------
+# Note: This is already covered by the wildcard *.karmacadabra.ultravioletadao.xyz
+# and also by the agents loop in route53.tf, but we keep it explicit for clarity
+
+# Commented out - using the automatic agent subdomain from agents map instead
+# resource "aws_route53_record" "test_seller" {
+#   count = var.enable_route53 ? 1 : 0
+#
+#   zone_id = data.aws_route53_zone.main[0].zone_id
+#   name    = "test-seller.${var.base_domain}"
+#   type    = "A"
+#
+#   alias {
+#     name                   = aws_lb.main.dns_name
+#     zone_id                = aws_lb.main.zone_id
+#     evaluate_target_health = true
+#   }
+# }
+
+# ----------------------------------------------------------------------------
 # Wildcard Record (Optional)
 # ----------------------------------------------------------------------------
 # Uncomment to create *.karmacadabra.ultravioletadao.xyz → ALB

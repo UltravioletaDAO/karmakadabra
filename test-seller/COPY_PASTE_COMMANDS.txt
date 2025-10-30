@@ -1,0 +1,245 @@
+================================================================================
+COPY-PASTE COMMANDS - Test Seller Load Testing
+================================================================================
+
+IMPORTANT: Fund the test-buyer wallet BEFORE running load tests!
+Test-Buyer Address: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+Network: Base mainnet
+Required: USDC (any amount, $10+ recommended for testing)
+
+================================================================================
+1. SETUP (One-time)
+================================================================================
+
+cd test-seller
+pip install -r load_test_requirements.txt
+
+================================================================================
+2. CHECK SERVICE HEALTH
+================================================================================
+
+curl https://test-seller.karmacadabra.ultravioletadao.xyz/health | jq .
+
+# Expected output:
+# {
+#   "status": "healthy",
+#   "service": "test-seller",
+#   "network": "base",
+#   "price_usdc": "10000",
+#   "seller_address": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+#   "facilitator": "https://facilitator.ultravioletadao.xyz"
+# }
+
+================================================================================
+3. CHECK TEST-BUYER WALLET BALANCE
+================================================================================
+
+python load_test.py --check-balance --num-requests 0
+
+# Output shows:
+# [INFO] Loaded test-buyer wallet from AWS Secrets Manager
+# [INIT] Payer wallet: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+# [INFO] USDC Balance: $X.XX USDC
+
+================================================================================
+4. LOAD TESTS (Uses AWS test-buyer automatically)
+================================================================================
+
+# TINY TEST - 10 requests ($0.10 USDC)
+python load_test.py --num-requests 10
+
+# SMALL TEST - 100 requests ($1.00 USDC)
+python load_test.py --num-requests 100
+
+# MEDIUM TEST - 1000 requests, concurrent ($10.00 USDC)
+python load_test.py --num-requests 1000 --concurrent --workers 20
+
+# LARGE TEST - 10000 requests, heavy load ($100.00 USDC)
+python load_test.py --num-requests 10000 --concurrent --workers 50
+
+# CUSTOM TEST - with balance check first
+python load_test.py --num-requests 500 --concurrent --workers 10 --check-balance
+
+================================================================================
+5. CHECK SERVICE STATISTICS
+================================================================================
+
+curl https://test-seller.karmacadabra.ultravioletadao.xyz/stats | jq .
+
+# Expected output:
+# {
+#   "total_requests": 1250,
+#   "paid_requests": 1200,
+#   "unpaid_requests": 50,
+#   "total_revenue_usdc": "$12.00",
+#   "price_per_request": "$0.01"
+# }
+
+================================================================================
+6. MONITOR REAL-TIME LOGS
+================================================================================
+
+aws logs tail /ecs/karmacadabra-prod/test-seller --follow --region us-east-1
+
+# Or view in browser:
+# https://us-east-1.console.aws.amazon.com/cloudwatch/home?region=us-east-1#logsV2:log-groups/log-group/$252Fecs$252Fkarmacadabra-prod$252Ftest-seller
+
+================================================================================
+7. ALTERNATIVE: Use Your Own Private Key
+================================================================================
+
+python load_test.py --private-key "0xYOUR_PRIVATE_KEY_HERE" --num-requests 10 --check-balance
+
+================================================================================
+8. FUND TEST-BUYER WALLET (If balance is low)
+================================================================================
+
+# Option 1: Direct transfer from another Base wallet
+# Send USDC to: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+# Network: Base mainnet
+# Contract: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+
+# Option 2: Bridge from Ethereum
+# Go to: https://bridge.base.org/
+# Destination address: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+# Asset: USDC
+# Network: Base
+
+# Option 3: Buy on Coinbase and withdraw to Base
+# Coinbase → Withdraw → Base Network
+# Address: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+
+================================================================================
+9. CHECK BALANCE WITH WEB3
+================================================================================
+
+python -c "
+from web3 import Web3
+w3 = Web3(Web3.HTTPProvider('https://mainnet.base.org'))
+usdc = w3.eth.contract(
+    address='0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+    abi=[{'constant': True, 'inputs': [{'name': '_owner', 'type': 'address'}], 'name': 'balanceOf', 'outputs': [{'name': 'balance', 'type': 'uint256'}], 'type': 'function'}]
+)
+balance = usdc.functions.balanceOf('0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011').call()
+print(f'Test-Buyer Balance: \${balance / 1000000:.2f} USDC')
+"
+
+================================================================================
+10. TROUBLESHOOTING
+================================================================================
+
+# Service not responding
+curl https://test-seller.karmacadabra.ultravioletadao.xyz/health
+
+# Check ECS service status
+aws ecs describe-services --cluster karmacadabra-prod --services karmacadabra-prod-test-seller --region us-east-1
+
+# Check ECS task status
+aws ecs list-tasks --cluster karmacadabra-prod --service-name karmacadabra-prod-test-seller --region us-east-1
+
+# View recent logs
+aws logs tail /ecs/karmacadabra-prod/test-seller --since 10m --region us-east-1
+
+# Check ALB target health
+aws elbv2 describe-target-health --target-group-arn $(aws elbv2 describe-target-groups --names karmacadabra-prod-test-seller-tg --query 'TargetGroups[0].TargetGroupArn' --output text --region us-east-1) --region us-east-1
+
+# Restart service if needed
+aws ecs update-service --cluster karmacadabra-prod --service karmacadabra-prod-test-seller --force-new-deployment --region us-east-1
+
+================================================================================
+11. QUICK EXAMPLE SESSION
+================================================================================
+
+# 1. Check service
+curl https://test-seller.karmacadabra.ultravioletadao.xyz/health | jq .status
+
+# 2. Check balance
+python load_test.py --check-balance --num-requests 0
+
+# 3. Run test (10 requests)
+python load_test.py --num-requests 10
+
+# 4. Check stats
+curl https://test-seller.karmacadabra.ultravioletadao.xyz/stats | jq .
+
+# 5. Run larger test (1000 requests)
+python load_test.py --num-requests 1000 --concurrent --workers 20
+
+# 6. Final stats
+curl https://test-seller.karmacadabra.ultravioletadao.xyz/stats | jq .
+
+================================================================================
+WALLET INFORMATION
+================================================================================
+
+Test-Buyer (Payer):
+  Address: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+  Private Key: Stored in AWS Secrets Manager (karmacadabra-test-buyer)
+  Network: Base mainnet
+  Status: YOU MUST FUND THIS WITH USDC
+
+Test-Seller (Receiver):
+  Address: 0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19
+  Private Key: Stored in AWS Secrets Manager (karmacadabra-test-seller)
+  Network: Base mainnet
+  Status: Deployed and running
+
+USDC Contract (Base):
+  Address: 0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+  Network: Base mainnet (Chain ID: 8453)
+
+================================================================================
+COST REFERENCE
+================================================================================
+
+10 requests = $0.10 USDC
+100 requests = $1.00 USDC
+1,000 requests = $10.00 USDC
+10,000 requests = $100.00 USDC
+100,000 requests = $1,000.00 USDC
+
+Note: Failed requests don't cost money (payment not executed)
+
+================================================================================
+LINKS
+================================================================================
+
+Service: https://test-seller.karmacadabra.ultravioletadao.xyz
+Facilitator: https://facilitator.ultravioletadao.xyz
+Base Bridge: https://bridge.base.org/
+BaseScan: https://basescan.org/
+
+Test-Buyer on BaseScan:
+https://basescan.org/address/0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+
+Test-Seller on BaseScan:
+https://basescan.org/address/0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19
+
+USDC Contract on BaseScan:
+https://basescan.org/token/0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913
+
+================================================================================
+
+================================================================================
+12. VERBOSE MODE (Show Full Request/Response Details)
+================================================================================
+
+# Show detailed information including nonce, signature, and facilitator response
+python load_test.py --num-requests 1 --verbose
+
+# Output includes:
+# - Nonce used for the request
+# - Signature (truncated)
+# - Valid time range
+# - HTTP status code
+# - Full response from test-seller
+# - Transaction hash (if available)
+# - BaseScan link
+
+# Verbose with concurrent test
+python load_test.py --num-requests 5 --concurrent --workers 2 --verbose
+
+# Short form
+python load_test.py --num-requests 1 -v
+
+================================================================================

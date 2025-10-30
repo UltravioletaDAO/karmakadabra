@@ -1,0 +1,34 @@
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xa403cca4982c6bd93b893f1a5f42f1be1183360444a465573bac2422f46fb19317570d1640a623cb1c95a1aac7aa944d99602761fe1746b444f7944b87d15e291c",
+      "authorization": {
+        "from": "0x87228cF28dd82546d76249A8Bb92AdEa9258F404",
+        "to": "0x87228cF28dd82546d76249A8Bb92AdEa9258F404",
+        "value": "100000",
+        "validAfter": "1761329327",
+        "validBefore": "1761829987",
+        "nonce": "0xa0c6b1edb9fed5b5cd99626dadf0e60b56013f94839d4fdcfa0117cce1f74485"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "100000",
+    "resource": "http://localhost:3000/api/x402/test",
+    "description": "Test payment",
+    "mimeType": "application/json",
+    "payTo": "0x87228cF28dd82546d76249A8Bb92AdEa9258F404",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "extra": {
+      "name": "USD Coin",
+      "version": "2"
+    }
+  }
+}

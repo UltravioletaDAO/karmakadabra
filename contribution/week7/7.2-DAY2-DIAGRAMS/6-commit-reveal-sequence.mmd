@@ -1,0 +1,61 @@
+%% Commit-Reveal Anti-Retaliation Scheme (V2 Enhancement)
+%% Prevents servers from rating clients low in anticipation of receiving low rating
+
+sequenceDiagram
+    participant Client as Client<br/>(abracadabra)
+    participant Server as Server<br/>(karma-hello)
+    participant Contract as ReputationRegistry<br/>(Smart Contract)
+
+    Note over Client,Contract: Phase 1: Transaction Completes
+    Client->>Server: Request service + payment
+    Server->>Client: Deliver service
+    Note over Client,Server: Both parties experienced the transaction<br/>Both have opinion on quality
+
+    Note over Client,Contract: Phase 2: Commit Phase (Ratings Hidden)
+    Client->>Client: Decide rating: 95/100<br/>Generate random nonce: 0x7f3a...
+    Client->>Client: Compute hash:<br/>keccak256(rating=95, nonce=0x7f3a...)
+    Client->>Contract: commitRating(serverId=1, hash=0x4e2d...)
+    Contract->>Contract: Store commitment:<br/>commitments[clientAddr][serverId] = {<br/>  hash: 0x4e2d...,<br/>  timestamp: now<br/>}
+
+    Server->>Server: Decide rating: 92/100<br/>Generate random nonce: 0x9b1c...
+    Server->>Server: Compute hash:<br/>keccak256(rating=92, nonce=0x9b1c...)
+    Server->>Contract: commitRating(clientId=2, hash=0x6a8f...)
+    Contract->>Contract: Store commitment:<br/>commitments[serverAddr][clientId] = {<br/>  hash: 0x6a8f...,<br/>  timestamp: now<br/>}
+
+    Note over Client,Contract: Both ratings committed (hidden)<br/>Neither party knows the other's rating
+
+    Note over Client,Contract: Phase 3: Wait Period (24 hours or both committed)
+    Contract->>Contract: Check: Both commitments exist?<br/>✅ Yes → Allow reveal<br/>OR<br/>Check: 24h elapsed?<br/>✅ Yes → Allow reveal (even if one-sided)
+
+    Note over Client,Contract: Phase 4: Reveal Phase (Ratings Published)
+    Client->>Contract: revealRating(serverId=1, rating=95, nonce=0x7f3a...)
+    Contract->>Contract: Verify:<br/>keccak256(95, 0x7f3a...) == 0x4e2d... ✅
+    Contract->>Contract: Store rating:<br/>_clientRatings[1][clientAddr] = 95
+    Contract-->>Client: Event: ClientRated(1, clientAddr, 95)
+
+    Server->>Contract: revealRating(clientId=2, rating=92, nonce=0x9b1c...)
+    Contract->>Contract: Verify:<br/>keccak256(92, 0x9b1c...) == 0x6a8f... ✅
+    Contract->>Contract: Store rating:<br/>_clientRatings[2][serverAddr] = 92
+    Contract-->>Server: Event: ClientRated(2, serverAddr, 92)
+
+    Note over Client,Contract: Result: Simultaneous Reveal<br/>Neither could retaliate based on other's rating
+
+    Note over Client,Server: Compare to V1 (No Commit-Reveal):
+    Note over Server: V1: Server sees client's rating BEFORE rating client<br/>→ Retaliation possible (rate low if received low)
+    Note over Client: Commit-Reveal: Ratings hidden until both commit<br/>→ Retaliation impossible (no information to retaliate on)
+
+    %% Edge Cases
+    rect rgb(255, 243, 224)
+        Note over Contract: Edge Case 1: One party never reveals
+        Note over Contract: Solution: 24h timeout → other party can reveal alone<br/>Non-revealing party gets default neutral rating (50)
+    end
+
+    rect rgb(255, 235, 238)
+        Note over Contract: Edge Case 2: Hash mismatch on reveal
+        Note over Contract: Solution: Transaction reverts<br/>Commitment remains, can retry with correct nonce
+    end
+
+    rect rgb(232, 245, 233)
+        Note over Contract: Edge Case 3: Front-running reveal
+        Note over Contract: Solution: Irrelevant (hash already committed)<br/>Revealing out of order doesn't help (both hidden)
+    end

@@ -1,0 +1,149 @@
+# Artillery Load Testing Configuration for x402 Facilitator
+#
+# Installation:
+#   npm install -g artillery
+#
+# Usage:
+#   artillery run artillery_config.yml
+#   artillery run --target https://facilitator.ultravioletadao.xyz artillery_config.yml
+#
+# Features:
+#   - Ramp-up load testing (0 → 20 → 50 VUs)
+#   - Tests /health, /supported, /verify, /settle
+#   - Custom metrics and thresholds
+#   - JSON reporting
+
+config:
+  target: "https://facilitator.ultravioletadao.xyz"
+  phases:
+    # Phase 1: Warm-up (5 users for 30s)
+    - duration: 30
+      arrivalRate: 5
+      name: "Warm-up"
+
+    # Phase 2: Ramp up (5 → 20 users over 1 min)
+    - duration: 60
+      arrivalRate: 5
+      rampTo: 20
+      name: "Ramp up"
+
+    # Phase 3: Sustained load (20 users for 2 min)
+    - duration: 120
+      arrivalRate: 20
+      name: "Sustained load"
+
+    # Phase 4: Peak load (50 users for 30s)
+    - duration: 30
+      arrivalRate: 50
+      name: "Peak load"
+
+    # Phase 5: Cool down (20 → 5 users over 30s)
+    - duration: 30
+      arrivalRate: 20
+      rampTo: 5
+      name: "Cool down"
+
+  # Performance thresholds
+  ensure:
+    maxErrorRate: 1          # Max 1% errors
+    p95: 500                 # 95th percentile < 500ms
+    p99: 1000                # 99th percentile < 1000ms
+
+  # Request settings
+  http:
+    timeout: 10
+    pool: 50                 # Max concurrent connections
+
+  # Custom metrics
+  plugins:
+    expect: {}
+    metrics-by-endpoint: {}
+
+  # Reporting
+  processor: "./artillery_processor.js"  # Optional custom logic
+
+# Test scenarios
+scenarios:
+  # Scenario 1: Health check (light load)
+  - name: "Health Check"
+    weight: 10
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: providers
+
+  # Scenario 2: Supported networks check
+  - name: "Supported Networks"
+    weight: 10
+    flow:
+      - get:
+          url: "/supported"
+          expect:
+            - statusCode: 200
+            - contentType: json
+            - hasProperty: kinds
+
+  # Scenario 3: Verify endpoint (main load)
+  - name: "Verify Payment"
+    weight: 60
+    flow:
+      - post:
+          url: "/verify"
+          json:
+            x402Version: 1
+            paymentPayload:
+              x402Version: 1
+              scheme: "exact"
+              network: "avalanche-fuji"
+              payload:
+                signature: "0x{{ $randomString(130, 'hex') }}"
+                authorization:
+                  from: "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
+                  to: "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
+                  value: "10000"
+                  validAfter: 0
+                  validBefore: "{{ $timestamp + 3600 }}"
+                  nonce: "0x{{ $randomString(64, 'hex') }}"
+            paymentRequirements:
+              network: "avalanche-fuji"
+              scheme: "exact"
+              asset: "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
+              recipient: "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
+              amount: "10000"
+          expect:
+            - statusCode: 200
+            - contentType: json
+
+  # Scenario 4: Settle endpoint (low weight due to on-chain txs)
+  - name: "Settle Payment"
+    weight: 20
+    flow:
+      - post:
+          url: "/settle"
+          json:
+            x402Version: 1
+            paymentPayload:
+              x402Version: 1
+              scheme: "exact"
+              network: "avalanche-fuji"
+              payload:
+                signature: "0x{{ $randomString(130, 'hex') }}"
+                authorization:
+                  from: "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
+                  to: "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
+                  value: "10000"
+                  validAfter: 0
+                  validBefore: "{{ $timestamp + 3600 }}"
+                  nonce: "0x{{ $randomString(64, 'hex') }}"
+            paymentRequirements:
+              network: "avalanche-fuji"
+              scheme: "exact"
+              asset: "0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743"
+              recipient: "0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8"
+              amount: "10000"
+          expect:
+            - statusCode: [200, 422]  # Accept both success and validation errors
+            - contentType: json

@@ -209,6 +209,7 @@ resource "aws_ecs_task_definition" "agents" {
         },
         {
           name  = "RPC_URL_SOLANA"
+          value = "https://api.mainnet-beta.solana.com"
         },
         {
           name  = "RPC_URL_POLYGON"
@@ -225,7 +226,6 @@ resource "aws_ecs_task_definition" "agents" {
         {
           name  = "RPC_URL_OPTIMISM_SEPOLIA"
           value = "https://sepolia.optimism.io"
-          value = "https://api.mainnet-beta.solana.com"
         },
         {
           name  = "GLUE_TOKEN_ADDRESS"

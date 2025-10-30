@@ -1,0 +1,4 @@
+eth-account==0.10.0
+web3==6.15.0
+requests==2.31.0
+boto3==1.34.0

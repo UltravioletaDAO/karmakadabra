@@ -1,0 +1,55 @@
+%% Rating Lifecycle State Transitions
+%% Shows how ratings move from non-existent → committed → confirmed → queryable
+
+stateDiagram-v2
+    [*] --> NoRating: Initial state<br/>(agents registered)
+
+    NoRating --> PendingRating: Server submits rateClient(clientId, rating)<br/>Transaction in mempool
+
+    PendingRating --> ConfirmedRating: Transaction mined<br/>(1 block on Avalanche ~2s)
+    PendingRating --> Failed: Transaction reverts<br/>(e.g., gas too low, invalid client)
+
+    Failed --> NoRating: Retry with correct parameters
+
+    ConfirmedRating --> Queryable: Event emitted:<br/>ClientRated(clientId, serverId, rating)<br/>Storage updated:<br/>_clientRatings[clientId][serverId] = rating
+
+    Queryable --> [*]: Rating is permanent<br/>(immutable, cannot edit/delete)
+
+    note right of NoRating
+        No prior transaction between
+        client and server.
+        getClientRating() returns:
+        (hasRating=false, rating=0)
+    end note
+
+    note right of PendingRating
+        Transaction submitted to blockchain
+        but not yet confirmed.
+        Wait for 1 block confirmation.
+    end note
+
+    note right of ConfirmedRating
+        Transaction confirmed on-chain.
+        Rating is now permanent and
+        visible to all queriers.
+    end note
+
+    note right of Queryable
+        Future servers can query:
+        getClientRating(clientId, serverId)
+        Returns: (hasRating=true, rating=X)
+
+        Use for decision:
+        if (rating < 70) → decline service
+        if (rating >= 70) → serve
+    end note
+
+    note left of Failed
+        Common failure reasons:
+        • Gas too low
+        • Client not registered
+        • Rating > 100
+        • Network congestion
+
+        Solution: Retry with fixes
+    end note

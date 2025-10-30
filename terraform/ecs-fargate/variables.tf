@@ -225,6 +225,11 @@ variable "agents" {
       health_check_path = "/health"
       priority          = 600
     }
+    test-seller = {
+      port              = 8080
+      health_check_path = "/health"
+      priority          = 700
+    }
   }
 }
 

@@ -63,12 +63,6 @@ pub enum Network {
     /// HyperEVM testnet (chain ID 333).
     #[serde(rename = "hyperevm-testnet")]
     HyperEvmTestnet,
-    /// Optimism mainnet (chain ID 10).
-    #[serde(rename = "optimism")]
-    Optimism,
-    /// Optimism Sepolia testnet (chain ID 11155420).
-    #[serde(rename = "optimism-sepolia")]
-    OptimismSepolia,
 }
 
 impl Display for Network {
@@ -89,6 +83,8 @@ impl Display for Network {
             Network::CeloSepolia => write!(f, "celo-sepolia"),
             Network::HyperEvm => write!(f, "hyperevm"),
             Network::HyperEvmTestnet => write!(f, "hyperevm-testnet"),
+            Network::Optimism => write!(f, "optimism"),
+            Network::OptimismSepolia => write!(f, "optimism-sepolia"),
             Network::Optimism => write!(f, "optimism"),
             Network::OptimismSepolia => write!(f, "optimism-sepolia"),
         }
@@ -119,6 +115,8 @@ impl From<Network> for NetworkFamily {
             Network::CeloSepolia => NetworkFamily::Evm,
             Network::HyperEvm => NetworkFamily::Evm,
             Network::HyperEvmTestnet => NetworkFamily::Evm,
+            Network::Optimism => NetworkFamily::Evm,
+            Network::OptimismSepolia => NetworkFamily::Evm,
             Network::Optimism => NetworkFamily::Evm,
             Network::OptimismSepolia => NetworkFamily::Evm,
         }
@@ -195,18 +193,17 @@ static USDC_XDC: Lazy<USDCDeployment> = Lazy::new(|| {
     })
 });
 
-/// Lazily initialized known GLUE deployment on Avalanche Fuji testnet as [`USDCDeployment`].
-/// NOTE: Karmacadabra uses GLUE token, not USDC, on Fuji testnet.
+/// Lazily initialized known USDC deployment on Avalanche Fuji testnet as [`USDCDeployment`].
 static USDC_AVALANCHE_FUJI: Lazy<USDCDeployment> = Lazy::new(|| {
     USDCDeployment(TokenDeployment {
         asset: TokenAsset {
-            address: address!("0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743").into(),
+            address: address!("0x5425890298aed601595a70AB815c96711a31Bc65").into(),
             network: Network::AvalancheFuji,
         },
         decimals: 6,
         eip712: Some(TokenDeploymentEip712 {
-            name: "GLUE Token".into(),
-            version: "1".into(),
+            name: "USD Coin".into(),
+            version: "2".into(),
         }),
     })
 });
@@ -396,6 +393,34 @@ static USDC_OPTIMISM_SEPOLIA: Lazy<USDCDeployment> = Lazy::new(|| {
     })
 });
 
+static USDC_OPTIMISM: Lazy<USDCDeployment> = Lazy::new(|| {
+    USDCDeployment(TokenDeployment {
+        asset: TokenAsset {
+            address: address!("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85").into(),
+            network: Network::Optimism,
+        },
+        decimals: 6,
+        eip712: Some(TokenDeploymentEip712 {
+            name: "USD Coin".into(),
+            version: "2".into(),
+        }),
+    })
+});
+
+static USDC_OPTIMISM_SEPOLIA: Lazy<USDCDeployment> = Lazy::new(|| {
+    USDCDeployment(TokenDeployment {
+        asset: TokenAsset {
+            address: address!("0x5fd84259d66Cd46123540766Be93DFE6D43130D7").into(),
+            network: Network::OptimismSepolia,
+        },
+        decimals: 6,
+        eip712: Some(TokenDeploymentEip712 {
+            name: "USDC".into(),
+            version: "2".into(),
+        }),
+    })
+});
+
 /// Lazily initialized UVD V2 deployment on Avalanche Fuji testnet as [`UVDDeployment`].
 /// Note: Address must be updated after deploying erc-20/UVD_V2.sol
 static UVD_AVALANCHE_FUJI: Lazy<UVDDeployment> = Lazy::new(|| {
@@ -417,7 +442,7 @@ static UVD_AVALANCHE_FUJI: Lazy<UVDDeployment> = Lazy::new(|| {
         decimals: 6,
         eip712: Some(TokenDeploymentEip712 {
             name: "Gasless Ultravioleta DAO Extended Token".into(),
-            version: "1".into(),
+            version: "2".into(),
         }),
     })
 });
@@ -432,7 +457,7 @@ static WAVAX_AVALANCHE_FUJI: Lazy<WAVAXDeployment> = Lazy::new(|| {
         decimals: 18,
         eip712: Some(TokenDeploymentEip712 {
             name: "Wrapped AVAX".into(),
-            version: "2".into(),
+            version: "1".into(),
         }),
     })
 });
@@ -488,6 +513,8 @@ impl USDCDeployment {
             Network::CeloSepolia => &USDC_CELO_SEPOLIA,
             Network::HyperEvm => &USDC_HYPEREVM,
             Network::HyperEvmTestnet => &USDC_HYPEREVM_TESTNET,
+            Network::Optimism => &USDC_OPTIMISM,
+            Network::OptimismSepolia => &USDC_OPTIMISM_SEPOLIA,
             Network::Optimism => &USDC_OPTIMISM,
             Network::OptimismSepolia => &USDC_OPTIMISM_SEPOLIA,
         }

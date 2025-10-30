@@ -91,12 +91,20 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
     Returns:
         Transaction hash if successful, None otherwise
     """
+    import sys
     try:
         # Call facilitator's /settle endpoint (executes payment on-chain)
         facilitator_endpoint = f"{FACILITATOR_URL}/settle"
 
         # Format the settle request according to x402-rs spec
         # The facilitator expects exact structure matching Rust types with camelCase
+
+        # CRITICAL: Ensure addresses are Web3 checksummed to match the EIP-712 signature
+        # The signature was created with checksummed addresses, so we must preserve exact case
+        w3 = Web3()
+        from_address = w3.to_checksum_address(payment['from'])
+        to_address = w3.to_checksum_address(payment['to'])
+        token_address = w3.to_checksum_address(GLUE_TOKEN)
 
         # Combine r, s, v into 65-byte signature (r=32 bytes, s=32 bytes, v=1 byte)
         # Remove '0x' prefix from r and s if present
@@ -114,8 +122,8 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
                 "payload": {
                     "signature": signature_hex,
                     "authorization": {
-                        "from": payment['from'],
-                        "to": payment['to'],
+                        "from": from_address,
+                        "to": to_address,
                         "value": str(payment['value']),
                         "validAfter": str(payment['validAfter']),
                         "validBefore": str(payment['validBefore']),
@@ -130,9 +138,9 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
                 "resource": "https://karma-hello.karmacadabra.ultravioletadao.xyz/get_chat_logs",
                 "description": "Karma-Hello chat logs",
                 "mimeType": "application/json",
-                "payTo": seller_address,
+                "payTo": to_address,
                 "maxTimeoutSeconds": 300,
-                "asset": GLUE_TOKEN,
+                "asset": token_address,
                 "extra": {
                     "name": "GLUE Token",
                     "version": "1"
@@ -141,8 +149,11 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
         }
 
         print(f"Calling facilitator /settle with: from={payment['from'][:10]}... to={payment['to'][:10]}... value={payment['value']}")
+        sys.stdout.flush()
         print(f"DEBUG: Payload being sent to facilitator:")
+        sys.stdout.flush()
         print(json.dumps(payload, indent=2))
+        sys.stdout.flush()
 
         response = requests.post(
             facilitator_endpoint,
@@ -160,27 +171,35 @@ def verify_payment_with_facilitator(payment: Dict[str, Any], seller_address: str
                 invalid_reason = data.get('invalidReason', 'Unknown')
                 payer = data.get('payer', 'Unknown')
                 print(f"❌ Payment invalid: {invalid_reason}")
+                sys.stdout.flush()
                 print(f"   Payer: {payer}")
+                sys.stdout.flush()
                 print(f"   Full response: {data}")
+                sys.stdout.flush()
                 return None
 
             # Extract transaction hash from response
             tx_hash = data.get('transaction_hash') or data.get('tx_hash') or data.get('transactionHash')
             if tx_hash:
                 print(f"✅ Payment settled: {tx_hash}")
+                sys.stdout.flush()
                 return tx_hash
             else:
                 print(f"⚠️  Payment valid but no tx hash yet: {data}")
+                sys.stdout.flush()
                 # Payment was validated, may be pending
                 return "pending"
         else:
             print(f"Facilitator error: {response.status_code} - {response.text[:500]}")
+            sys.stdout.flush()
             return None
 
     except Exception as e:
         print(f"Error calling facilitator: {e}")
+        sys.stdout.flush()
         import traceback
         traceback.print_exc()
+        sys.stdout.flush()
         return None
 
 
@@ -229,7 +248,9 @@ def x402_required(price: float, currency: str = "GLUE"):
                 )
 
             # Forward to facilitator for execution
+            import sys
             print(f"Processing payment: {payment['from'][:10]}... -> {payment['to'][:10]}... ({payment['value']} smallest units)")
+            sys.stdout.flush()
 
             seller_address = payment['to']
             tx_hash = verify_payment_with_facilitator(payment, seller_address)
@@ -241,6 +262,7 @@ def x402_required(price: float, currency: str = "GLUE"):
                 )
 
             print(f"✅ Payment successful: {tx_hash}")
+            sys.stdout.flush()
 
             # Execute the original endpoint function
             result = await func(request, *args, **kwargs)

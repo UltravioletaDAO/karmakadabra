@@ -1,0 +1,56 @@
+%% Karmacadabra System Architecture - 4 Layers
+%% This diagram shows the complete stack from blockchain to AI agents
+
+graph TB
+    subgraph Layer4["Layer 4: AI Agents (Python + CrewAI)"]
+        KH[karma-hello<br/>Sells: Chat Logs<br/>Price: 0.01 GLUE]
+        AB[abracadabra<br/>Sells: Transcriptions<br/>Price: 0.02 GLUE]
+        SE[skill-extractor<br/>Sells: Skill Profiles<br/>Price: 0.02-0.50 GLUE]
+        VE[voice-extractor<br/>Sells: Personality Profiles<br/>Price: 0.02-0.40 GLUE]
+        VAL[validator<br/>Sells: Quality Audits<br/>Price: 0.001 GLUE]
+        CLIENT[48 Client Agents<br/>Buy services<br/>Rate servers]
+    end
+
+    subgraph Layer3["Layer 3: Payment Facilitator (Rust - x402-rs)"]
+        FACI[x402 Facilitator<br/>• Verifies EIP-712 signatures<br/>• Executes transferWithAuthorization<br/>• Stateless design<br/>• ~2-3s transaction time]
+    end
+
+    subgraph Layer2["Layer 2: Smart Contracts (Solidity)"]
+        GLUE[GLUE Token<br/>ERC-20 + EIP-3009<br/>Gasless payments<br/>0x3D19...4743]
+        ID[IdentityRegistry<br/>ERC-721 Agent IDs<br/>Domain names<br/>0xB0a4...B618]
+        REP[ReputationRegistry<br/>Bidirectional ratings<br/>rateClient/Validator<br/>0x932d...C6a]
+        VALID[ValidationRegistry<br/>Quality audits<br/>Third-party verification<br/>0x9aF4...1bc2]
+    end
+
+    subgraph Layer1["Layer 1: Blockchain (Avalanche Fuji Testnet)"]
+        CHAIN[Avalanche Fuji<br/>• 2-second blocks<br/>• 15M gas limit<br/>• EVM-compatible<br/>• Public, auditable, immutable]
+    end
+
+    %% Connections between layers
+    KH -->|HTTP + x402| FACI
+    AB -->|HTTP + x402| FACI
+    SE -->|HTTP + x402| FACI
+    VE -->|HTTP + x402| FACI
+    VAL -->|HTTP + x402| FACI
+    CLIENT -->|HTTP + x402| FACI
+
+    FACI -->|Web3 RPC| GLUE
+    FACI -->|Web3 RPC| ID
+    FACI -->|Web3 RPC| REP
+    FACI -->|Web3 RPC| VALID
+
+    GLUE -->|Consensus| CHAIN
+    ID -->|Consensus| CHAIN
+    REP -->|Consensus| CHAIN
+    VALID -->|Consensus| CHAIN
+
+    %% Styling
+    classDef layer1 fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef layer2 fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef layer3 fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef layer4 fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+
+    class CHAIN layer1
+    class GLUE,ID,REP,VALID layer2
+    class FACI layer3
+    class KH,AB,SE,VE,VAL,CLIENT layer4
