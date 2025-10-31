@@ -200,9 +200,18 @@ impl IntoResponse for FacilitatorLocalError {
                 )),
             )
                 .into_response(),
-            FacilitatorLocalError::ContractCall(..)
-            | FacilitatorLocalError::InvalidAddress(..)
-            | FacilitatorLocalError::ClockError(_) => bad_request,
+            FacilitatorLocalError::ContractCall(ref e) => {
+                tracing::error!(error = %e, "ContractCall error - returning Invalid request");
+                bad_request
+            }
+            FacilitatorLocalError::InvalidAddress(ref e) => {
+                tracing::error!(error = %e, "InvalidAddress error - returning Invalid request");
+                bad_request
+            }
+            FacilitatorLocalError::ClockError(ref e) => {
+                tracing::error!(error = ?e, "ClockError - returning Invalid request");
+                bad_request
+            }
             FacilitatorLocalError::DecodingError(reason) => (
                 StatusCode::OK,
                 Json(VerifyResponse::invalid(
@@ -222,3 +231,4 @@ impl IntoResponse for FacilitatorLocalError {
         }
     }
 }
+

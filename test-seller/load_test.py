@@ -183,10 +183,12 @@ class TestSellerLoadTest:
             # Sign payment authorization
             signature, authorization = self.sign_transfer_authorization()
 
-            # Build x402 payment payload (facilitator expects direct structure without "x402Payment" wrapper)
+            # Build x402 payment payload (facilitator 0.9.0 format)
+            # NOTE: x402Version appears TWICE - at root level AND inside paymentPayload
             payload = {
+                "x402Version": 1,  # Root level (VerifyRequest struct)
                 "paymentPayload": {
-                    "x402Version": 1,
+                    "x402Version": 1,  # Inside paymentPayload (PaymentPayload struct)
                     "scheme": "exact",
                     "network": "base",
                     "payload": {
@@ -299,7 +301,8 @@ class TestSellerLoadTest:
                 self.stats.failed += 1
 
             # Small delay to avoid overwhelming the service
-            time.sleep(0.1)
+            # Increased to 2s to allow Base block confirmations
+            time.sleep(2.0)
 
         self.stats.end_time = time.time()
 
