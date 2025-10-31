@@ -6,10 +6,10 @@
 
 ## What It Is
 
-**EIP-8004a** extends EIP-8004 (Trustless Agents) with bidirectional trust: clients and servers rate each other mutually, preventing abuse seen in asymmetric systems (eBay, Amazon).
+**EIP-8004a** extends EIP-8004 (Trustless Agents) with bidirectional trust: clients and servers rate each other mutually, preventing abuse seen in limited reputation systems (Amazon, eBay).
 
-**Problem:** Asymmetric trust costs eBay $1.8B annually in fraud
-**Solution:** Mutual accountability (proven by Uber's 131M users, Airbnb's 150M users)
+**Problem:** Limited seller feedback enables buyer fraud - Amazon has no buyer ratings, eBay restricts sellers to positive/neutral only (no negative since 2008)
+**Solution:** Mutual accountability with full negative feedback power (proven by Uber's 131M users, Airbnb's 150M users)
 **Result:** 99 real transactions on Avalanche Fuji, zero fraud, 100% success rate
 
 ---
