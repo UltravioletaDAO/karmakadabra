@@ -231,11 +231,12 @@ async def post_hello_paid(request: Request):
                 )
 
             facilitator_data = response.json()
-            is_valid = facilitator_data.get('success', False)
+            # facilitator returns 'isValid' not 'success'
+            is_valid = facilitator_data.get('isValid', False)
 
             if not is_valid:
                 stats["unpaid_requests"] += 1
-                invalid_reason = facilitator_data.get('errorReason', 'Unknown')
+                invalid_reason = facilitator_data.get('invalidReason', 'Unknown')
                 logger.error(f"[INVALID] Payment invalid: {invalid_reason}")
                 raise HTTPException(
                     status_code=402,
