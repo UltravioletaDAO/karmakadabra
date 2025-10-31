@@ -125,12 +125,8 @@ class TestSellerLoadTest:
         # Generate random nonce
         nonce = "0x" + os.urandom(32).hex()
 
-        # Timestamps
-        # NOTE: The deployed facilitator has a bug - it rejects validAfter in the PAST
-        # and accepts validAfter in the FUTURE (opposite of EIP-3009 spec).
-        # Setting validAfter to +1s from now as a workaround (minimal delay).
-        # TODO: Fix facilitator and restore correct timestamps (validAfter in past)
-        valid_after = int(time.time()) + 1  # 1 second from now (WORKAROUND for facilitator bug)
+        # Timestamps (EIP-3009 spec)
+        valid_after = int(time.time()) - 60  # 1 minute ago (ensure immediate validity)
         valid_before = int(time.time()) + 600  # 10 minutes from now
 
         domain = self.create_eip712_domain()
@@ -187,33 +183,30 @@ class TestSellerLoadTest:
             # Sign payment authorization
             signature, authorization = self.sign_transfer_authorization()
 
-            # Build x402 payment payload
+            # Build x402 payment payload (facilitator expects direct structure without "x402Payment" wrapper)
             payload = {
-                "x402Payment": {
+                "paymentPayload": {
                     "x402Version": 1,
-                    "paymentPayload": {
-                        "x402Version": 1,
-                        "scheme": "exact",
-                        "network": "base",
-                        "payload": {
-                            "signature": signature,
-                            "authorization": authorization,
-                        },
+                    "scheme": "exact",
+                    "network": "base",
+                    "payload": {
+                        "signature": signature,
+                        "authorization": authorization,
                     },
-                    "paymentRequirements": {
-                        "scheme": "exact",
-                        "network": "base",
-                        "maxAmountRequired": PRICE_USDC,
-                        "resource": f"{TEST_SELLER_URL}/hello",
-                        "description": "Hello World message",
-                        "mimeType": "application/json",
-                        "payTo": SELLER_ADDRESS,
-                        "maxTimeoutSeconds": 60,
-                        "asset": USDC_BASE_ADDRESS,
-                        "extra": {
-                            "name": "USD Coin",
-                            "version": "2",
-                        },
+                },
+                "paymentRequirements": {
+                    "scheme": "exact",
+                    "network": "base",
+                    "maxAmountRequired": PRICE_USDC,
+                    "resource": f"{TEST_SELLER_URL}/hello",
+                    "description": "Hello World message",
+                    "mimeType": "application/json",
+                    "payTo": SELLER_ADDRESS,
+                    "maxTimeoutSeconds": 60,
+                    "asset": USDC_BASE_ADDRESS,
+                    "extra": {
+                        "name": "USD Coin",
+                        "version": "2",
                     },
                 },
             }

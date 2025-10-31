@@ -169,13 +169,16 @@ async def post_hello_paid(request: Request):
     """
     POST /hello - Process paid request with x402 payment
 
-    Expects payment metadata in request body:
+    Expects payment metadata in request body (with x402Payment wrapper):
     {
         "x402Payment": {
             "paymentPayload": { ... },
             "paymentRequirements": { ... }
         }
     }
+
+    Note: This endpoint extracts the payment from the wrapper and forwards it
+    directly to the facilitator (which expects the unwrapped structure).
     """
     stats["total_requests"] += 1
 
@@ -220,11 +223,11 @@ async def post_hello_paid(request: Request):
                 )
 
             facilitator_data = response.json()
-            is_valid = facilitator_data.get('isValid', False)
+            is_valid = facilitator_data.get('success', False)
 
             if not is_valid:
                 stats["unpaid_requests"] += 1
-                invalid_reason = facilitator_data.get('invalidReason', 'Unknown')
+                invalid_reason = facilitator_data.get('errorReason', 'Unknown')
                 logger.error(f"[INVALID] Payment invalid: {invalid_reason}")
                 raise HTTPException(
                     status_code=402,
