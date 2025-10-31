@@ -184,13 +184,21 @@ async def post_hello_paid(request: Request):
 
     try:
         body = await request.json()
-        payment = body.get("x402Payment")
 
-        if not payment:
+        # Support both wrapped and unwrapped formats for compatibility
+        # Wrapped format: {"x402Payment": {paymentPayload, paymentRequirements}}
+        # Unwrapped format: {paymentPayload, paymentRequirements}
+        if "x402Payment" in body:
+            # Legacy wrapped format
+            payment = body["x402Payment"]
+        elif "paymentPayload" in body and "paymentRequirements" in body:
+            # Direct format (matches facilitator expectation)
+            payment = body
+        else:
             stats["unpaid_requests"] += 1
             raise HTTPException(
                 status_code=400,
-                detail="Missing x402Payment in request body"
+                detail="Missing payment data. Expected either 'x402Payment' wrapper or direct 'paymentPayload'/'paymentRequirements' fields"
             )
 
         # Extract payer address from payment payload
