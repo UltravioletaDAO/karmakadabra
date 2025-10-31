@@ -45,6 +45,9 @@ pub enum Network {
     /// Polygon mainnet (chain ID 137).
     #[serde(rename = "polygon")]
     Polygon,
+    /// Optimism mainnet (chain ID 10).
+    #[serde(rename = "optimism")]
+    Optimism,
     /// Sei mainnet (chain ID 1329).
     #[serde(rename = "sei")]
     Sei,
@@ -65,6 +68,7 @@ impl Display for Network {
             Network::SolanaDevnet => write!(f, "solana-devnet"),
             Network::PolygonAmoy => write!(f, "polygon-amoy"),
             Network::Polygon => write!(f, "polygon"),
+            Network::Optimism => write!(f, "optimism"),
             Network::Sei => write!(f, "sei"),
             Network::SeiTestnet => write!(f, "sei-testnet"),
         }
@@ -89,6 +93,7 @@ impl From<Network> for NetworkFamily {
             Network::SolanaDevnet => NetworkFamily::Solana,
             Network::PolygonAmoy => NetworkFamily::Evm,
             Network::Polygon => NetworkFamily::Evm,
+            Network::Optimism => NetworkFamily::Evm,
             Network::Sei => NetworkFamily::Evm,
             Network::SeiTestnet => NetworkFamily::Evm,
         }
@@ -108,6 +113,7 @@ impl Network {
             Network::SolanaDevnet,
             Network::PolygonAmoy,
             Network::Polygon,
+            Network::Optimism,
             Network::Sei,
             Network::SeiTestnet,
         ]
@@ -247,6 +253,21 @@ static USDC_POLYGON: Lazy<USDCDeployment> = Lazy::new(|| {
     })
 });
 
+/// Lazily initialized known USDC deployment on Optimism mainnet as [`USDCDeployment`].
+static USDC_OPTIMISM: Lazy<USDCDeployment> = Lazy::new(|| {
+    USDCDeployment(TokenDeployment {
+        asset: TokenAsset {
+            address: address!("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85").into(),
+            network: Network::Optimism,
+        },
+        decimals: 6,
+        eip712: Some(TokenDeploymentEip712 {
+            name: "USD Coin".into(),
+            version: "2".into(),
+        }),
+    })
+});
+
 static USDC_SEI: Lazy<USDCDeployment> = Lazy::new(|| {
     USDCDeployment(TokenDeployment {
         asset: TokenAsset {
@@ -320,6 +341,7 @@ impl USDCDeployment {
             Network::SolanaDevnet => &USDC_SOLANA_DEVNET,
             Network::PolygonAmoy => &USDC_POLYGON_AMOY,
             Network::Polygon => &USDC_POLYGON,
+            Network::Optimism => &USDC_OPTIMISM,
             Network::Sei => &USDC_SEI,
             Network::SeiTestnet => &USDC_SEI_TESTNET,
         }
