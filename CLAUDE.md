@@ -93,6 +93,368 @@ AGENT_ADDRESS=0x2C3...  # Public (safe to store)
 - ✅ Only send to EOAs (wallet addresses with private keys)
 - Check contract code for withdrawal functions before sending funds
 
+### x402-rs Facilitator Upgrades - CRITICAL SAFEGUARDS
+**⚠️ THIS IS USER-FACING INFRASTRUCTURE WITH DAO BRANDING - LIVE STREAM VISIBLE**
+
+**INCIDENT HISTORY**: In the 0.7.9 → 0.9.0 upgrade, we used `cp -r upstream/* x402-rs/` which **OVERWROTE**:
+- Custom branded landing page (Ultravioleta DAO branding, 57KB HTML vs upstream's "Hello from x402-rs!" text)
+- Custom `get_root()` handler that served HTML via `include_str!()`
+- All static assets (logos, favicon, network images)
+- Recovery required: git history restoration, handler code rewrite, Docker rebuild, ECS redeploy
+
+**🚨 NEVER USE `cp -r` OR MASS FILE COPY FROM UPSTREAM 🚨**
+
+#### Protected Files - DO NOT OVERWRITE
+
+**Tier 1: NEVER Copy from Upstream (Immediate Production Breakage)**
+```
+x402-rs/static/                      # Entire folder - Ultravioleta DAO branding
+├── index.html                       # 57,662 bytes - custom branded landing page
+├── favicon.ico                      # DAO favicon
+└── images/                          # Network logos (avalanche.png, base.png, etc.)
+
+x402-rs/Dockerfile                   # Custom: RUN rustup default nightly (edition 2024)
+x402-rs/.env                         # If exists - production secrets
+terraform/ecs-fargate/               # AWS deployment configs (not in x402-rs but related)
+```
+
+**Tier 2: Merge with EXTREME Care (Silent Integration Failures)**
+```
+x402-rs/src/handlers.rs              # Lines ~76-85: get_root() uses include_str!("../static/index.html")
+                                     # Upstream: Returns Html("Hello from x402-rs!")
+                                     # Ours: Returns Html(include_str!("../static/index.html"))
+
+x402-rs/src/network.rs               # Custom networks added:
+                                     # - HyperEVM mainnet/testnet
+                                     # - Optimism (our primary addition)
+                                     # - Polygon
+                                     # - Solana
+                                     # Each has: RPC URLs, chain IDs, token addresses, gas settings
+
+x402-rs/src/main.rs                  # AWS Secrets Manager integration (if implemented)
+x402-rs/Cargo.toml                   # AWS SDK dependencies, custom version pins
+```
+
+**Tier 3: Safe to Upgrade (But Test Extensively)**
+```
+x402-rs/src/auth.rs                  # Core payment verification - test with test_glue_payment_simple.py
+x402-rs/src/error.rs                 # Error handling
+x402-rs/tests/                       # Our custom tests - preserve these
+```
+
+#### Safe Upgrade Process (MANDATORY - Follow Exactly)
+
+**Step 1: Prepare Git Branch Strategy**
+```bash
+cd x402-rs
+
+# First time only: Create upstream tracking branch
+git checkout -b upstream-mirror
+git remote add upstream https://github.com/polyphene/x402-rs  # Verify URL first
+git fetch upstream
+git reset --hard upstream/main
+git push origin upstream-mirror
+
+# Create production branch (first time only)
+git checkout -b karmacadabra-production
+git push origin karmacadabra-production
+```
+
+**Step 2: Before ANY Upgrade - Backup Customizations**
+```bash
+# Create timestamped backup
+$VERSION = "0.9.0"  # Change to target version
+$BACKUP_DIR = "x402-rs-backup-$VERSION-$(Get-Date -Format 'yyyyMMdd-HHmmss')"
+
+# Backup critical files
+mkdir $BACKUP_DIR
+cp x402-rs/static/ $BACKUP_DIR/static/ -Recurse
+cp x402-rs/src/handlers.rs $BACKUP_DIR/
+cp x402-rs/src/network.rs $BACKUP_DIR/
+cp x402-rs/Dockerfile $BACKUP_DIR/
+cp x402-rs/Cargo.toml $BACKUP_DIR/
+
+# Document current state
+cd x402-rs
+git diff upstream-mirror > ../$BACKUP_DIR/our-customizations.patch
+cd ..
+
+Write-Host "Backup saved to: $BACKUP_DIR"
+```
+
+**Step 3: Fetch Upstream Changes**
+```bash
+# Update upstream mirror
+git checkout upstream-mirror
+git pull upstream main  # Or specific tag: git pull upstream v0.10.0
+
+# Review what changed
+git log --oneline HEAD~10..HEAD  # Last 10 upstream commits
+git diff HEAD~1 -- src/handlers.rs src/network.rs  # Check critical files
+```
+
+**Step 4: Merge with Surgical Precision**
+```bash
+# Switch to production branch
+git checkout karmacadabra-production
+
+# Attempt merge (will likely have conflicts)
+git merge upstream-mirror
+
+# ⚠️ RESOLVE CONFLICTS CAREFULLY ⚠️
+# For each conflict, decide:
+# - handlers.rs: KEEP our include_str!() version
+# - network.rs: KEEP our custom networks, ADD new upstream networks if any
+# - Cargo.toml: MERGE dependencies (keep AWS SDK + add new upstream deps)
+# - Dockerfile: KEEP our nightly Rust line
+
+# Check what files have conflicts
+git status
+
+# For each conflicted file:
+# 1. Open in editor
+# 2. Search for <<<<<<< HEAD markers
+# 3. Keep our customizations, integrate upstream improvements
+# 4. Mark resolved: git add <file>
+```
+
+**Step 5: Restore Static Files (ALWAYS - Even if No Conflict)**
+```bash
+# Static files should NEVER come from upstream
+# Force restore from backup
+cp $BACKUP_DIR/static/ x402-rs/static/ -Recurse -Force
+
+# Verify branding intact
+Select-String -Path x402-rs/static/index.html -Pattern "Ultravioleta DAO"
+# Should output line containing "Ultravioleta DAO"
+```
+
+**Step 6: Manual Code Verification**
+```bash
+# Check critical functions preserved
+Select-String -Path x402-rs/src/handlers.rs -Pattern "include_str"
+# Should find: include_str!("../static/index.html")
+
+# Check custom networks preserved
+Select-String -Path x402-rs/src/network.rs -Pattern "HyperEVM|Optimism"
+# Should find both networks
+
+# Check Dockerfile preserved
+Select-String -Path x402-rs/Dockerfile -Pattern "rustup default nightly"
+# Should find nightly setup
+```
+
+**Step 7: MANDATORY Testing Checklist**
+```bash
+# 1. Build test
+cd x402-rs
+cargo clean  # Force full rebuild
+cargo build --release
+# ✅ Must succeed without errors
+
+# 2. Run locally
+cargo run &
+$FACILITATOR_PID = $LastExitCode
+Start-Sleep -Seconds 5
+
+# 3. Health check
+curl http://localhost:8080/health
+# ✅ Must return 200 OK
+
+# 4. Branding verification
+$response = curl http://localhost:8080/
+$response -match "Ultravioleta DAO"
+# ✅ Must be True
+
+# 5. Custom networks verification
+curl http://localhost:8080/networks | Select-String "HyperEVM"
+# ✅ Must find HyperEVM
+
+# 6. Payment flow test
+cd ../scripts
+python test_glue_payment_simple.py --facilitator http://localhost:8080
+# ✅ Must complete payment successfully
+
+# 7. Stop test instance
+Stop-Process -Id $FACILITATOR_PID
+
+# 8. Docker build test
+cd ../x402-rs
+docker build -t x402-test:latest .
+# ✅ Must build successfully
+
+# 9. Docker runtime test
+docker run -d -p 8080:8080 --name x402-test x402-test:latest
+Start-Sleep -Seconds 5
+curl http://localhost:8080/ | Select-String "Ultravioleta"
+# ✅ Must find "Ultravioleta"
+
+docker stop x402-test
+docker rm x402-test
+```
+
+**Step 8: Production Deployment (ONLY After All Tests Pass)**
+```bash
+# Commit merge
+git add .
+git commit -m "Merge upstream x402-rs v0.X.X
+
+- Preserved Ultravioleta DAO branding (static/)
+- Preserved custom handlers (include_str! in get_root)
+- Preserved custom networks (HyperEVM, Optimism, Polygon, Solana)
+- Integrated upstream improvements: [LIST WHAT YOU TOOK FROM UPSTREAM]
+
+Tested:
+- [x] Local cargo build/run
+- [x] Branding verification
+- [x] Payment flow
+- [x] Docker build/run
+- [x] All endpoints responding
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+Co-Authored-By: Claude <noreply@anthropic.com>"
+
+# Push to repository
+git push origin karmacadabra-production
+
+# Deploy to ECS (triggers automatic build + deploy via Terraform/CI)
+aws ecs update-service \
+  --cluster karmacadabra-prod \
+  --service karmacadabra-prod-facilitator \
+  --force-new-deployment \
+  --region us-east-1
+
+# Monitor deployment
+aws ecs describe-services \
+  --cluster karmacadabra-prod \
+  --services karmacadabra-prod-facilitator \
+  --region us-east-1 \
+  --query 'services[0].deployments'
+
+# Wait for healthy
+Start-Sleep -Seconds 60
+
+# Verify production
+curl https://facilitator.karmacadabra.ultravioletadao.xyz/health
+curl https://facilitator.karmacadabra.ultravioletadao.xyz/ | Select-String "Ultravioleta"
+```
+
+**Step 9: Post-Deployment Verification**
+```bash
+# Test production payment flow
+cd scripts
+python test_glue_payment_simple.py --production
+# ✅ Must succeed
+
+# Test from each agent (they depend on facilitator)
+curl https://validator.karmacadabra.ultravioletadao.xyz/health
+curl https://karma-hello.karmacadabra.ultravioletadao.xyz/health
+# All should respond
+
+# Check ECS logs for errors
+aws logs tail /ecs/karmacadabra-prod-facilitator --follow --region us-east-1
+# Should show no errors
+```
+
+#### Emergency Rollback Procedure
+
+**If production breaks after deployment:**
+
+```bash
+# 1. Immediate: Roll back ECS to previous task definition
+aws ecs update-service \
+  --cluster karmacadabra-prod \
+  --service karmacadabra-prod-facilitator \
+  --task-definition karmacadabra-prod-facilitator:PREVIOUS_REVISION \
+  --force-new-deployment \
+  --region us-east-1
+
+# 2. Git: Revert to last working commit
+git log --oneline -5  # Find last good commit
+git revert HEAD  # Or git reset --hard <commit> if not pushed
+git push origin karmacadabra-production
+
+# 3. Restore from backup
+cp $BACKUP_DIR/* x402-rs/ -Recurse -Force
+
+# 4. Verify local, then redeploy
+# Follow Step 7 (testing) and Step 8 (deployment) again
+```
+
+#### Architectural Decision: When to Fork vs Merge
+
+**Merge from upstream when:**
+- ✅ Upstream adds features we want (new networks, better error handling)
+- ✅ Security patches or bug fixes
+- ✅ Performance improvements
+- ✅ We can preserve customizations via git merge
+
+**Maintain permanent fork when:**
+- ❌ Upstream makes breaking API changes incompatible with our agents
+- ❌ Upstream removes features we depend on
+- ❌ Customizations become too extensive (>30% of codebase modified)
+- ❌ Upstream project abandoned or changes license
+
+**Current status**: MERGE strategy is viable. Customizations are isolated (~5% of codebase).
+
+**Review quarterly**: Check upstream activity, evaluate fork burden.
+
+#### Prevention: Automation (Future Enhancement)
+
+**Option 1: Pre-commit hook** (prevents accidental commits)
+```bash
+# .git/hooks/pre-commit
+#!/bin/bash
+if git diff --cached --name-only | grep -q "x402-rs/static/"; then
+  echo "⚠️  WARNING: You are committing changes to x402-rs/static/"
+  echo "This folder contains custom Ultravioleta DAO branding."
+  echo "Are you SURE this is intentional? (Ctrl+C to cancel)"
+  read -p "Continue? (yes/no): " confirm
+  if [ "$confirm" != "yes" ]; then
+    exit 1
+  fi
+fi
+```
+
+**Option 2: CI/CD verification** (catches before production)
+```yaml
+# .github/workflows/verify-branding.yml
+name: Verify x402-rs Branding
+on: [push, pull_request]
+jobs:
+  check-branding:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Verify Ultravioleta branding present
+        run: |
+          grep -q "Ultravioleta DAO" x402-rs/static/index.html || exit 1
+          grep -q "include_str!" x402-rs/src/handlers.rs || exit 1
+          grep -q "HyperEVM" x402-rs/src/network.rs || exit 1
+```
+
+**Option 3: Separate overlay directory** (advanced - requires build script)
+```
+x402-rs/
+├── upstream/          # Pure upstream code (git subtree)
+├── overlays/
+│   ├── static/        # Our branded files
+│   ├── handlers.patch # Patch for include_str!()
+│   └── network.patch  # Patch for custom networks
+└── build.sh           # Applies overlays to upstream
+```
+
+**Recommendation**: Start with **manual process** (this document). Add **CI/CD verification** (Option 2) next sprint. Consider **overlay system** (Option 3) only if we fork >5 files.
+
+#### Key Lessons from Incident
+
+1. **Never trust `cp -r` with customized codebases** - always use git merge
+2. **User-facing branding is critical** - automated tests must verify it
+3. **Infrastructure code needs version control discipline** - same as application code
+4. **Recovery is expensive** - prevention (this doc) pays for itself first incident avoided
+5. **Live streams amplify impact** - broken branding is public embarrassment + DAO reputation damage
+
 ### Documentation Synchronization
 - ✅ **README.md** ↔️ **README.es.md** MUST stay synchronized
 - Update both when changing architecture, features, or any content

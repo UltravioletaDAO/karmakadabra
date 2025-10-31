@@ -1,605 +1,379 @@
-# x402-rs: Payment Facilitator for Karmacadabra
+# x402-rs
 
-> HTTP 402 payment facilitator customized for Ultravioleta DAO's trustless agent economy
+[![Crates.io](https://img.shields.io/crates/v/x402-rs.svg)](https://crates.io/crates/x402-rs)
+[![Docs.rs](https://docs.rs/x402-rs/badge.svg)](https://docs.rs/x402-rs)
+[![Docker Pulls](https://img.shields.io/docker/pulls/ukstv/x402-facilitator.svg)](https://hub.docker.com/r/ukstv/x402-facilitator)
+[![GHCR](https://img.shields.io/badge/ghcr.io-x402--facilitator-blue)](https://github.com/orgs/x402-rs/packages)
 
-**Version**: 1.0.0 (Karmacadabra Custom)
-**Networks**: Avalanche Fuji + Avalanche Mainnet + Base Sepolia + Base Mainnet
-**Status**: ✅ Deployed and operational
-**Last Updated**: October 26, 2025
+> A Rust-based implementation of the x402 protocol.
 
----
+This repository provides:
 
-## 🗂️ Location in Project
+- `x402-rs` (current crate):
+  - Core protocol types, facilitator traits, and logic for on-chain payment verification and settlement
+  - Facilitator binary - production-grade HTTP server to verify and settle x402 payments
+- [`x402-axum`](./crates/x402-axum) - Axum middleware for accepting x402 payments,
+- [`x402-reqwest`](./crates/x402-reqwest) - Wrapper for reqwest for transparent x402 payments,
+- [`x402-axum-example`](./examples/x402-axum-example) - an example of `x402-axum` usage.
+- [`x402-reqwest-example`](./examples/x402-reqwest-example) - an example of `x402-reqwest` usage.
 
-```
-z:\ultravioleta\dao\karmacadabra\
-├── erc-20/                    (GLUE Token - facilitator settles with this)
-├── erc-8004/                  (ERC-8004 Registries)
-├── x402-rs/                   ← YOU ARE HERE
-├── validator/                 (Uses facilitator for validation fees)
-├── karma-hello-agent/         (Uses facilitator for 0.01 UVD payments)
-├── abracadabra-agent/         (Uses facilitator for 0.02 UVD payments)
-├── MASTER_PLAN.md
-└── MONETIZATION_OPPORTUNITIES.md
-```
+## About x402
 
-**Part of Master Plan**: Phase 1 - Blockchain Infrastructure (Week 1-2)
+The [x402 protocol](https://docs.cdp.coinbase.com/x402/docs/overview) is a proposed standard for making blockchain payments directly through HTTP using native `402 Payment Required` status code.
 
----
+Servers declare payment requirements for specific routes. Clients send cryptographically signed payment payloads. Facilitators verify and settle payments on-chain.
 
-## 🎯 Description
+## Getting Started
 
-The **x402-rs facilitator** is the **payment engine** for Karmacadabra's trustless agent economy. It enables:
+### Run facilitator
 
-- ✅ **Gasless micropayments** using EIP-3009 meta-transactions
-- ✅ **HTTP 402 protocol** for payment-gated APIs
-- ✅ **Stateless verification** (no database needed)
-- ✅ **Multi-token support** (USDC, UVD, WAVAX)
-- ✅ **OpenTelemetry** observability
-
-### Role in Ecosystem
-
-**All agent payments flow through this facilitator:**
-
-1. **Karma-Hello Seller** sells logs (0.01 UVD) → x402 verifies & settles
-2. **Abracadabra Seller** sells transcripts (0.02 UVD) → x402 verifies & settles
-3. **Validator Agent** charges validation fees (0.001 UVD) → x402 verifies & settles
-
-**Key Innovation**: Agents don't need AVAX for gas. The facilitator pays gas fees using its hot wallet, enabling fully autonomous agent operation.
-
----
-
-## 🌐 Supported Networks
-
-The facilitator supports **4 networks** across 2 blockchain ecosystems:
-
-### Avalanche Ecosystem
-
-**Avalanche Fuji (Testnet)**
-- **Chain ID**: 43113
-- **RPC URL**: `https://avalanche-fuji-c-chain-rpc.publicnode.com`
-- **Tokens**: GLUE, USDC, WAVAX
-- **Purpose**: Testing and development
-- **Explorer**: [Snowtrace Testnet](https://testnet.snowtrace.io)
-
-**Avalanche Mainnet (C-Chain)**
-- **Chain ID**: 43114
-- **RPC URL**: `https://avalanche-c-chain-rpc.publicnode.com`
-- **Tokens**: GLUE, USDC, WAVAX
-- **Purpose**: Production payments
-- **Explorer**: [Snowtrace](https://snowtrace.io)
-
-### Base Ecosystem (Optimistic Rollup)
-
-**Base Sepolia (Testnet)**
-- **Chain ID**: 84532
-- **RPC URL**: `https://sepolia.base.org`
-- **Tokens**: USDC
-- **Purpose**: Testing and development
-- **Explorer**: [Base Sepolia Explorer](https://sepolia.basescan.org)
-
-**Base Mainnet**
-- **Chain ID**: 8453
-- **RPC URL**: `https://mainnet.base.org`
-- **Tokens**: USDC
-- **Purpose**: Production payments
-- **Explorer**: [BaseScan](https://basescan.org)
-
-### Network Discovery
-
-Query the `/supported` endpoint to see all configured networks:
-
-```bash
-curl https://facilitator.ultravioletadao.xyz/supported
+```shell
+docker run --env-file .env -p 8080:8080 ukstv/x402-facilitator
 ```
 
-**Response:**
-```json
-{
-  "kinds": [
-    {"network":"avalanche-fuji","scheme":"exact","x402Version":1},
-    {"network":"avalanche","scheme":"exact","x402Version":1},
-    {"network":"base-sepolia","scheme":"exact","x402Version":1},
-    {"network":"base","scheme":"exact","x402Version":1}
-  ]
-}
+Or build locally:
+```shell
+docker build -t x402-rs .
+docker run --env-file .env -p 8080:8080 x402-rs
 ```
 
----
+See the [Facilitator](#facilitator) section below for full usage details
 
-## 🏗️ Architecture
+### Protect Axum Routes
 
-```
-┌─────────────────────────────────────────────┐
-│    facilitator.ultravioletadao.xyz          │
-│    (Docker on Cherry Servers)               │
-├─────────────────────────────────────────────┤
-│                                             │
-│  POST /verify                               │
-│  • Verify EIP-712 signature                 │
-│  • Check nonce not used on-chain            │
-│  • Validate UVD balance                     │
-│  • Return: {valid: true}                    │
-│                                             │
-│  POST /settle                               │
-│  • Execute transferWithAuthorization()      │
-│  • Submit to Avalanche Fuji                 │
-│  • Wait for confirmation                    │
-│  • Return: {txHash: "0x..."}                │
-│                                             │
-│  GET /supported                             │
-│  • Avalanche Fuji (testnet): GLUE, USDC,   │
-│    WAVAX                                    │
-│  • Avalanche Mainnet: GLUE, USDC, WAVAX    │
-│  • Base Sepolia (testnet): USDC             │
-│  • Base Mainnet: USDC                       │
-│  • Format: {"kinds":[{network, scheme}]}   │
-│                                             │
-│  GET /health                                │
-│  • Return service status                    │
-│                                             │
-└─────────────────────────────────────────────┘
+Use `x402-axum` to gate your routes behind on-chain payments:
+
+```rust
+let x402 = X402Middleware::try_from("https://x402.org/facilitator/").unwrap();
+let usdc = USDCDeployment::by_network(Network::BaseSepolia);
+
+let app = Router::new().route("/paid-content", get(handler).layer( 
+        x402.with_price_tag(usdc.amount("0.025").pay_to("0xYourAddress").unwrap())
+    ),
+);
 ```
 
----
+See [`x402-axum` crate docs](./crates/x402-axum/README.md).
 
-## 🔧 Karmacadabra Configuration
+### Send x402 payments
 
-### Network Configuration
+Use `x402-reqwest` to send payments:
 
-**Supported Networks:**
-- ✅ **Avalanche Fuji** (testnet)
-- ✅ **Avalanche C-Chain** (mainnet)
-- ✅ **Base Sepolia** (testnet)
-- ✅ **Base** (mainnet)
-- ❌ Ethereum Sepolia (not yet supported)
-- ❌ Polygon Amoy (not yet supported)
+```rust
+let signer: PrivateKeySigner = "0x...".parse()?; // never hardcode real keys!
 
-**RPC Endpoints:**
-- **Primary**: Custom RPC (private endpoint)
-- **Fallback**: `https://avalanche-fuji-c-chain-rpc.publicnode.com`
+let client = reqwest::Client::new()
+    .with_payments(signer)
+    .prefer(USDCDeployment::by_network(Network::Base))
+    .max(USDCDeployment::by_network(Network::Base).amount("1.00")?)
+    .build();
 
-### Supported Tokens
-
-Based on deployment addresses from `erc-20/deployment.json`:
-
-| Token | Network | Address | Decimals | Use Case |
-|-------|---------|---------|----------|----------|
-| **GLUE** | Fuji | `0x...` (from deployment) | 6 | Primary payment token |
-| **USDC** | Fuji | `0x5425890298aed601595a70AB815c96711a31Bc65` | 6 | Alternative payment |
-| **WAVAX** | Fuji | `0xd00ae08403B9bbb9124bB305C09058E32C39A48c` | 18 | Alternative payment |
-
-**Note**: Token addresses will be configured after deploying GLUE token in Phase 1.
-
-### Wallet Configuration
-
-**Hot Wallet Setup** (2 keys for rotation):
-
-```bash
-# Primary facilitator wallet
-FACILITATOR_WALLET_PRIMARY=0x...    # Active key
-FACILITATOR_BALANCE_MIN=1.0         # Min 1 AVAX for gas
-
-# Standby wallet (for key rotation)
-FACILITATOR_WALLET_STANDBY=0x...    # Backup key
+let res = client
+    .get("https://example.com/protected")
+    .send()
+    .await?;
 ```
 
-**Gas Strategy:**
-- Facilitator pays gas for all `transferWithAuthorization()` calls
-- Estimated cost: 0.001-0.01 AVAX per transaction
-- With 1 AVAX: ~100-1000 transactions
-- Monitoring alerts when balance < 1 AVAX
+See [`x402-reqwest` crate docs](./crates/x402-reqwest/README.md).
 
----
+## Roadmap
 
-## 📦 Deployment
+| Milestone                           | Description                                                                                              |   Status   |
+|:------------------------------------|:---------------------------------------------------------------------------------------------------------|:----------:|
+| Facilitator for Base USDC           | Payment verification and settlement service, enabling real-time pay-per-use transactions for Base chain. | ✅ Complete |
+| Metrics and Tracing                 | Expose OpenTelemetry metrics and structured tracing for observability, monitoring, and debugging         | ✅ Complete |
+| Server Middleware                   | Provide ready-to-use integration for Rust web frameworks such as axum and tower.                         | ✅ Complete |
+| Client Library                      | Provide a lightweight Rust library for initiating and managing x402 payment flows from Rust clients.     | ✅ Complete |
+| Solana Support                      | Support Solana chain.                                                                                    | ✅ Complete |
+| Multiple chains and multiple tokens | Support various tokens and EVM compatible chains.                                                        | ⏳ Planned  |
+| Payment Storage                     | Persist verified and settled payments for analytics, access control, and auditability.                   | 🔜 Planned |
+| Micropayment Support                | Enable fine-grained offchain usage-based payments, including streaming and per-request billing.          | 🔜 Planned |
 
-### Environment Variables
+The initial focus is on establishing a stable, production-quality Rust SDK and middleware ecosystem for x402 integration.
 
-Create `.env` for Karmacadabra:
+## Facilitator
 
-```bash
-# Network Configuration
-SIGNER_TYPE=private-key
-EVM_PRIVATE_KEY=0x...                           # Facilitator hot wallet
-RPC_URL_AVALANCHE_FUJI=https://your-rpc.xyz     # Primary RPC
-RPC_URL_AVALANCHE_FUJI_FALLBACK=https://avalanche-fuji-c-chain-rpc.publicnode.com
+The `x402-rs` crate (this repo) provides a runnable x402 facilitator binary. The _Facilitator_ role simplifies adoption of x402 by handling:
+- **Payment verification**: Confirming that client-submitted payment payloads match the declared requirements.
+- **Payment settlement**: Submitting validated payments to the blockchain and monitoring their confirmation.
 
-# Server Configuration
+By using a Facilitator, servers (sellers) do not need to:
+- Connect directly to a blockchain.
+- Implement complex cryptographic or blockchain-specific payment logic.
+
+Instead, they can rely on the Facilitator to perform verification and settlement, reducing operational overhead and accelerating x402 adoption.
+The Facilitator **never holds user funds**. It acts solely as a stateless verification and execution layer for signed payment payloads.
+
+For a detailed overview of the x402 payment flow and Facilitator role, see the [x402 protocol documentation](https://docs.cdp.coinbase.com/x402/docs/overview).
+
+### Usage
+
+#### 1. Provide environment variables
+
+Create a `.env` file or set environment variables directly. Example `.env`:
+
+```dotenv
 HOST=0.0.0.0
 PORT=8080
+RPC_URL_BASE_SEPOLIA=https://sepolia.base.org
+RPC_URL_BASE=https://mainnet.base.org
+SIGNER_TYPE=private-key
+EVM_PRIVATE_KEY=0xdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeefdeadbeef
+SOLANA_PRIVATE_KEY=6ASf5EcmmEHTgDJ4X4ZT5vT6iHVJBXPg5AN5YoTCpGWt
 RUST_LOG=info
-
-# Token Addresses (from erc-20/deployment.json)
-UVD_TOKEN_ADDRESS=0x...                         # After deployment
-USDC_FUJI_ADDRESS=0x5425890298aed601595a70AB815c96711a31Bc65
-WAVAX_FUJI_ADDRESS=0xd00ae08403B9bbb9124bB305C09058E32C39A48c
-
-# Observability (Prometheus + Grafana + Loki)
-OTEL_EXPORTER_OTLP_ENDPOINT=http://grafana.ultravioletadao.xyz:4317
-OTEL_EXPORTER_OTLP_PROTOCOL=grpc
-OTEL_SERVICE_NAME=x402-facilitator-karmacadabra
-
-# Rate Limiting (future)
-RATE_LIMIT_PER_MINUTE=60
-RATE_LIMIT_PER_HOUR=1000
-
-# Webhooks (future)
-WEBHOOK_URL=https://api.ultravioletadao.xyz/webhooks/payments
 ```
 
-### Build & Run (Docker on Cherry Servers)
+**Important:**
+The supported networks are determined by which RPC URLs you provide:
+- If you set only `RPC_URL_BASE_SEPOLIA`, then only Base Sepolia network is supported.
+- If you set both `RPC_URL_BASE_SEPOLIA` and `RPC_URL_BASE`, then both Base Sepolia and Base Mainnet are supported.
+- If an RPC URL for a network is missing, that network will not be available for settlement or verification.
 
-```bash
-# 1. Build Docker image
-docker build -t x402-facilitator-karmacadabra .
+#### 2. Build and Run with Docker
 
-# 2. Run container
-docker run -d \
-  --name facilitator \
-  --restart unless-stopped \
-  --env-file .env \
-  -p 8080:8080 \
-  -v /var/log/facilitator:/var/log \
-  x402-facilitator-karmacadabra
+Prebuilt Docker images are available at:
+- [GitHub Container Registry](https://ghcr.io/x402-rs/x402-facilitator): `ghcr.io/x402-rs/x402-facilitator`
+- [Docker Hub](https://hub.docker.com/r/ukstv/x402-facilitator): `ukstv/x402-facilitator`
 
-# 3. Check logs
-docker logs -f facilitator
-
-# 4. Health check
-curl https://facilitator.ultravioletadao.xyz/health
+Run the container from Docker Hub:
+```shell
+docker run --env-file .env -p 8080:8080 ukstv/x402-facilitator
 ```
 
-### HTTPS Setup (Caddy)
+To run using GitHub Container Registry:
+```shell
+docker run --env-file .env -p 8080:8080 ghcr.io/x402-rs/x402-facilitator
+```
 
-```caddyfile
-facilitator.ultravioletadao.xyz {
-    reverse_proxy localhost:8080
+Or build a Docker image locally:
+```shell
+docker build -t x402-rs .
+docker run --env-file .env -p 8080:8080 x402-rs
+```
 
-    # Rate limiting
-    rate_limit {
-        zone facilita facilitator {
-            key {remote_host}
-            events 60
-            window 1m
-        }
+The container:
+* Exposes port `8080` (or a port you configure with `PORT` environment variable).
+* Starts on http://localhost:8080 by default.
+* Requires minimal runtime dependencies (based on `debian:bullseye-slim`).
+
+#### 3. Point your application to your Facilitator
+
+If you are building an x402-powered application, update the Facilitator URL to point to your self-hosted instance.
+
+> ℹ️ **Tip:** For production deployments, ensure your Facilitator is reachable via HTTPS and protect it against public abuse.
+
+<details>
+<summary>If you use Hono and x402-hono</summary>
+From [x402.org Quickstart for Sellers](https://x402.gitbook.io/x402/getting-started/quickstart-for-sellers):
+
+```typescript
+import { Hono } from "hono";
+import { serve } from "@hono/node-server";
+import { paymentMiddleware } from "x402-hono";
+
+const app = new Hono();
+
+// Configure the payment middleware
+app.use(paymentMiddleware(
+  "0xYourAddress", // Your receiving wallet address
+  {
+    "/protected-route": {
+      price: "$0.10",
+      network: "base-sepolia",
+      config: {
+        description: "Access to premium content",
+      }
     }
+  },
+  {
+    url: "http://your-validator.url/", // 👈 Your self-hosted Facilitator
+  }
+));
 
-    # Logging
-    log {
-        output file /var/log/caddy/facilitator.log
-    }
-}
+// Implement your protected route
+app.get("/protected-route", (c) => {
+  return c.json({ message: "This content is behind a paywall" });
+});
+
+serve({
+  fetch: app.fetch,
+  port: 3000
+});
 ```
 
----
+</details>
 
-## 🔌 Integration with Agents
-
-### Server-Side (Sellers use x402-axum)
-
-**Karma-Hello Seller:**
-```rust
-// karma-hello-agent/src/main.rs (if using Rust API)
-use x402_axum::X402Middleware;
-
-let facilitator = X402Middleware::try_from(
-    "https://facilitator.ultravioletadao.xyz"
-).unwrap();
-
-let uvd = UVDDeployment::by_network(Network::AvalancheFuji);
-
-let app = Router::new()
-    .route("/api/logs", post(get_logs).layer(
-        facilitator.with_price_tag(
-            uvd.amount("0.01")
-                .pay_to("0xKarmaHelloSellerWallet")
-                .unwrap()
-        )
-    ));
-```
-
-**Or in Python (FastAPI + x402):**
-```python
-# karma-hello-agent/agents/karma_hello_seller.py
-from x402 import X402Middleware
-
-x402 = X402Middleware(
-    facilitator_url="https://facilitator.ultravioletadao.xyz",
-    token_address=UVD_TOKEN_ADDRESS,
-    price="0.01"  # 0.01 UVD
-)
-
-@app.post("/api/logs")
-@x402.require_payment
-async def get_logs(request: LogsRequest):
-    # Payment verified, return data
-    return {"logs": [...]}
-```
-
-### Client-Side (Buyers use x402-reqwest)
-
-**Karma-Hello Buyer:**
-```python
-# karma-hello-agent/agents/karma_hello_buyer.py
-from x402_client import X402Client
-
-client = X402Client(
-    private_key=BUYER_PRIVATE_KEY,
-    facilitator_url="https://facilitator.ultravioletadao.xyz"
-)
-
-# Buy transcript from Abracadabra
-response = await client.post(
-    url="https://abracadabra-seller.xyz/api/transcripts",
-    payment=UVD.amount("0.02").pay_to(abracadabra_wallet),
-    json={"stream_id": "12345"}
-)
-
-transcript = response.json()
-```
-
----
-
-## 📊 Monitoring & Observability
-
-### Prometheus Metrics
-
-**Exposed at**: `http://facilitator.ultravioletadao.xyz:8080/metrics`
-
-**Key Metrics:**
-- `x402_payments_total` - Total payments processed
-- `x402_payments_success` - Successful settlements
-- `x402_payments_failed` - Failed transactions
-- `x402_verify_latency_seconds` - Verification latency
-- `x402_settle_latency_seconds` - Settlement latency
-- `x402_gas_used_total` - Total gas consumed
-- `x402_balance_avax` - Facilitator AVAX balance
-
-### Grafana Dashboard
-
-**Panels:**
-1. **Payments Overview**
-   - Total payments/hour
-   - Success rate (%)
-   - Average transaction time
-
-2. **Agent Activity**
-   - Karma-Hello transactions
-   - Abracadabra transactions
-   - Validator fees
-
-3. **System Health**
-   - Facilitator balance (alert if < 1 AVAX)
-   - RPC endpoint status
-   - Error rate
-
-4. **Gas Metrics**
-   - Gas used per transaction
-   - Total gas cost (AVAX)
-   - Estimated runway
-
-### Alerts
-
-**Critical Alerts (PagerDuty/Discord):**
-```yaml
-- name: FacilitatorBalanceLow
-  condition: x402_balance_avax < 1.0
-  action: Send alert to ops channel
-
-- name: HighErrorRate
-  condition: (x402_payments_failed / x402_payments_total) > 0.1
-  action: Send alert + auto-restart
-
-- name: RpcEndpointDown
-  condition: x402_rpc_errors_total > 10 in 5min
-  action: Switch to fallback RPC + alert
-```
-
----
-
-## 🧪 Testing
-
-### Local Testing (Anvil)
-
-```bash
-# Terminal 1: Start Anvil (simulates Fuji)
-anvil --chain-id 43113 --port 8545
-
-# Terminal 2: Deploy UVD token to local chain
-cd ../erc-20
-forge script script/Deploy.s.sol \
-  --rpc-url http://localhost:8545 \
-  --broadcast
-
-# Terminal 3: Run facilitator with local RPC
-cd ../x402-rs
-RPC_URL_AVALANCHE_FUJI=http://localhost:8545 cargo run
-
-# Terminal 4: Test with curl
-curl -X POST http://localhost:8080/verify \
-  -H "Content-Type: application/json" \
-  -d '{
-    "from": "0x...",
-    "to": "0x...",
-    "value": "10000",
-    "validAfter": "0",
-    "validBefore": "9999999999",
-    "nonce": "0xabc...",
-    "v": 27,
-    "r": "0x...",
-    "s": "0x..."
-  }'
-```
-
-### Integration Testing
-
-```bash
-# Test with real agents
-cd ../karma-hello-agent
-python scripts/test_payment.py --facilitator http://localhost:8080
-
-# Expected output:
-# ✅ Payment verified
-# ✅ Transaction settled: 0x...
-# ✅ Balance updated on-chain
-```
-
----
-
-## 🚀 Deployment Checklist
-
-### Phase 1: Initial Deployment
-
-- [ ] Deploy GLUE token to Fuji
-- [ ] Save UVD address to `erc-20/deployment.json`
-- [ ] Update `.env` with UVD address
-- [ ] Build Docker image
-- [ ] Deploy to Cherry Servers
-- [ ] Configure Caddy reverse proxy
-- [ ] Setup HTTPS certificate
-- [ ] Test `/health` endpoint
-- [ ] Test `/supported` endpoint
-- [ ] Verify Prometheus metrics working
-
-### Phase 1.5: Observability
-
-- [ ] Configure Grafana data source
-- [ ] Import facilitator dashboard
-- [ ] Setup alerts in Prometheus
-- [ ] Test alert firing
-- [ ] Configure Discord/PagerDuty webhooks
-
-### Phase 2: Agent Integration
-
-- [ ] Karma-Hello Seller connects to facilitator
-- [ ] Abracadabra Seller connects to facilitator
-- [ ] Validator Agent connects to facilitator
-- [ ] Test end-to-end payment flow
-- [ ] Verify transactions on Snowtrace
-
-### Phase 3: Production Hardening
-
-- [ ] Enable rate limiting
-- [ ] Setup key rotation procedure
-- [ ] Configure automatic AVAX top-up
-- [ ] Load testing (100 tx/min)
-- [ ] Disaster recovery plan
-- [ ] Documentation for ops team
-
----
-
-## 🔒 Security Considerations
-
-### Hot Wallet Protection
-
-1. **Minimum Balance**: Keep only 5-10 AVAX max
-2. **Key Rotation**: Rotate every 30 days
-3. **Monitoring**: Alert if unexpected gas usage
-4. **Backup**: Standby key ready for immediate rotation
-
-### Rate Limiting
+<details>
+<summary>If you use `x402-axum`</summary>
 
 ```rust
-// Future implementation
-const MAX_REQUESTS_PER_MINUTE: u32 = 60;
-const MAX_REQUESTS_PER_HOUR: u32 = 1000;
+let x402 = X402Middleware::try_from("http://your-validator.url/").unwrap();  // 👈 Your self-hosted Facilitator
+let usdc = USDCDeployment::by_network(Network::BaseSepolia);
 
-// Per IP address
-// Per agent (via signature verification)
+let app = Router::new().route("/paid-content", get(handler).layer( 
+        x402.with_price_tag(usdc.amount("0.025").pay_to("0xYourAddress").unwrap())
+    ),
+);
 ```
 
-### Replay Protection
+</details>
 
-- ✅ EIP-3009 nonces prevent replay attacks
-- ✅ `validBefore` timestamp prevents expired payments
-- ✅ Signature verification ensures authenticity
+### Configuration
 
----
+The service reads configuration via `.env` file or directly through environment variables.
 
-## 📈 Performance Targets
+Available variables:
 
-| Metric | Target | Current |
-|--------|--------|---------|
-| Verify latency | < 100ms | TBD |
-| Settle latency | < 3s | TBD |
-| Throughput | 100 tx/min | TBD |
-| Uptime | 99.9% | TBD |
-| Error rate | < 1% | TBD |
+* `RUST_LOG`: Logging level (e.g., `info`, `debug`, `trace`),
+* `HOST`: HTTP host to bind to (default: `0.0.0.0`),
+* `PORT`: HTTP server port (default: `8080`),
+* `SIGNER_TYPE` (required): Type of signer to use. Only `private-key` is supported now,
+* `EVM_PRIVATE_KEY` (required): Private key in hex for EVM networks, like `0xdeadbeef...`,
+* `SOLANA_PRIVATE_KEY` (required): Private key in hex for Solana networks, like `0xdeadbeef...`,
+* `RPC_URL_BASE_SEPOLIA`: Ethereum RPC endpoint for Base Sepolia testnet,
+* `RPC_URL_BASE`: Ethereum RPC endpoint for Base mainnet,
+* `RPC_URL_AVALANCHE_FUJI`: Ethereum RPC endpoint for Avalanche Fuji testnet,
+* `RPC_URL_AVALANCHE`: Ethereum RPC endpoint for Avalanche C-Chain mainnet.
+* `RPC_URL_SOLANA`: RPC endpoint for Solana mainnet.
+* `RPC_URL_SOLANA_DEVNET`: RPC endpoint for Solana devnet.
+* `RPC_URL_POLYGON`: RPC endpoint for Polygon mainnet.
+* `RPC_URL_POLYGON_AMOY`: RPC endpoint for Polygon Amoy testnet.
+* `RPC_URL_SEI`: RPC endpoint for Sei mainnet.
+* `RPC_URL_SEI_TESTNET`: RPC endpoint for Sei testnet.
 
----
 
-## 🛠️ Future Enhancements
+### Observability
 
-### Phase 2+ Features (Post-MVP)
+The facilitator emits [OpenTelemetry](https://opentelemetry.io)-compatible traces and metrics to standard endpoints,
+making it easy to integrate with tools like Honeycomb, Prometheus, Grafana, and others.
+Tracing spans are annotated with HTTP method, status code, URI, latency, other request and process metadata.
 
-1. **Payment Receipts Export**
-   - JSON export: `/api/receipts?format=json&from=date&to=date`
-   - CSV export: `/api/receipts?format=csv`
+To enable tracing and metrics export, set the appropriate `OTEL_` environment variables:
 
-2. **Webhooks**
-   - POST to `WEBHOOK_URL` on every settlement
-   - Payload: `{txHash, from, to, amount, timestamp}`
+```dotenv
+# For Honeycomb, for example:
+# Endpoint URL for sending OpenTelemetry traces and metrics
+OTEL_EXPORTER_OTLP_ENDPOINT=https://api.honeycomb.io:443
+# Comma-separated list of key=value pairs to add as headers
+OTEL_EXPORTER_OTLP_HEADERS=x-honeycomb-team=your_api_key,x-honeycomb-dataset=x402-rs
+# Export protocol to use for telemetry. Supported values: `http/protobuf` (default), `grpc`
+OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf
+```
 
-3. **Analytics Dashboard**
-   - Revenue per agent
-   - Most popular services
-   - Peak usage times
+The service automatically detects and initializes exporters if `OTEL_EXPORTER_OTLP_*` variables are provided.
 
-4. **Multi-Wallet Support**
-   - Round-robin between multiple hot wallets
-   - Auto-distribute gas costs
+### Supported Networks
 
-5. **Advanced Rate Limiting**
-   - Per-agent quotas
-   - Dynamic pricing based on load
+The Facilitator supports different networks based on the environment variables you configure:
 
----
+| Network                   | Environment Variable     | Supported if Set | Notes                            |
+|:--------------------------|:-------------------------|:-----------------|:---------------------------------|
+| Base Sepolia Testnet      | `RPC_URL_BASE_SEPOLIA`   | ✅                | Testnet, Recommended for testing |
+| Base Mainnet              | `RPC_URL_BASE`           | ✅                | Mainnet                          |
+| XDC Mainnet               | `RPC_URL_XDC`            | ✅                | Mainnet                          |
+| Avalanche Fuji Testnet    | `RPC_URL_AVALANCHE_FUJI` | ✅                | Testnet                          |
+| Avalanche C-Chain Mainnet | `RPC_URL_AVALANCHE`      | ✅                | Mainnet                          |
+| Polygon Amoy Testnet      | `RPC_URL_POLYGON_AMOY`   | ✅                | Testnet                          |
+| Polygon Mainnet           | `RPC_URL_POLYGON`        | ✅                | Mainnet                          |
+| Sei Testnet               | `RPC_URL_SEI_TESTNET`    | ✅                | Testnet                          |
+| Sei Mainnet               | `RPC_URL_SEI`            | ✅                | Mainnet                          |
+| Solana Mainnet            | `RPC_URL_SOLANA`         | ✅                | Mainnet                          |
+| Solana Devnet             | `RPC_URL_SOLANA_DEVNET`  | ✅                | Testnet, Recommended for testing |
 
-## 📚 References
+- If you provide say only `RPC_URL_BASE_SEPOLIA`, only **Base Sepolia** will be available.
+- If you provide `RPC_URL_BASE_SEPOLIA`, `RPC_URL_BASE`, and other env variables on the list, then all the specified networks will be supported.
 
-### Karmacadabra Docs
+> ℹ️ **Tip:** For initial development and testing, you can start with Base Sepolia only.
 
-- **MASTER_PLAN.md**: Complete system architecture
-- **erc-20/README.md**: GLUE Token documentation
-- **MONETIZATION_OPPORTUNITIES.md**: All services & pricing
+### Development
 
-### x402 Protocol
+Prerequisites:
+- Rust 1.80+
+- `cargo` and a working toolchain
 
-- **x402 Spec**: https://www.x402.org
-- **EIP-3009**: https://eips.ethereum.org/EIPS/eip-3009
-- **EIP-712**: https://eips.ethereum.org/EIPS/eip-712
+Build locally:
+```shell
+cargo build
+```
+Run:
+```shell
+cargo run
+```
 
-### Original x402-rs
+## Upgrading from Upstream (Karmacadabra Fork)
 
-- **GitHub**: https://github.com/x402-rs/x402-rs
-- **Crates.io**: https://crates.io/crates/x402-rs
-- **Docker Hub**: https://hub.docker.com/r/ukstv/x402-facilitator
+> **⚠️ CRITICAL**: This fork has extensive customizations for Ultravioleta DAO. **NEVER** use `cp -r` or mass file copy from upstream.
 
----
+### What's Customized
 
-## 🤝 Support
+This fork includes:
+- **Custom branded landing page** (`static/index.html`) with Ultravioleta DAO branding
+- **Additional networks**: Optimism, Polygon, HyperEVM, Solana
+- **Custom handlers** (`src/handlers.rs`) that serve HTML via `include_str!()`
+- **Rust nightly requirement** (`Dockerfile`) for edition 2024 support
 
-**Deployment Issues:**
-- Check facilitator logs: `docker logs -f facilitator`
-- Verify RPC endpoint: `curl $RPC_URL_AVALANCHE_FUJI`
-- Check AVAX balance: `cast balance $FACILITATOR_WALLET --rpc-url $RPC_URL`
+### Safe Upgrade Process
 
-**Payment Failures:**
-- Verify UVD token address is correct
-- Check buyer has sufficient UVD balance
-- Verify nonce is unique (not reused)
-- Check signature validity with `cast`
+**Option 1: Automated (Recommended)**
+```powershell
+# From repository root
+.\scripts\upgrade_facilitator.ps1 -TargetVersion "vX.X.X" -DryRun  # Preview changes first
+.\scripts\upgrade_facilitator.ps1 -TargetVersion "vX.X.X"           # Execute upgrade
+```
 
-**Monitoring:**
-- Grafana: https://grafana.ultravioletadao.xyz
-- Metrics: https://facilitator.ultravioletadao.xyz/metrics
-- Logs: `/var/log/facilitator/`
+**Option 2: Manual**
+See [UPGRADE_CHECKLIST.md](./UPGRADE_CHECKLIST.md) for step-by-step manual upgrade process.
 
----
+### Files That Must NEVER Be Overwritten
 
-**Part of Karmacadabra**: Trustless Agent Economy by Ultravioleta DAO
+```
+x402-rs/static/                      # Entire folder - DAO branding
+x402-rs/Dockerfile                   # Custom: Rust nightly requirement
+x402-rs/src/handlers.rs              # Lines 76-85: get_root() uses include_str!()
+x402-rs/src/network.rs               # Custom networks (Optimism, Polygon, HyperEVM, Solana)
+```
 
-**Status**: Ready for Phase 1 deployment
+### Emergency Rollback
 
-**Next Step**: Deploy GLUE token, then configure and deploy facilitator
+If upgrade breaks production:
+```bash
+# Immediate rollback to previous ECS task definition
+aws ecs update-service \
+  --cluster karmacadabra-prod \
+  --service karmacadabra-prod-facilitator \
+  --task-definition karmacadabra-prod-facilitator:PREVIOUS_REVISION \
+  --region us-east-1
+```
+
+### Documentation
+
+- **[CUSTOMIZATIONS.md](./CUSTOMIZATIONS.md)** - Technical details of all customizations
+- **[UPGRADE_CHECKLIST.md](./UPGRADE_CHECKLIST.md)** - Manual upgrade checklist (72 steps)
+- **[../docs/X402_FORK_STRATEGY.md](../docs/X402_FORK_STRATEGY.md)** - Long-term fork strategy
+- **[../CLAUDE.md](../CLAUDE.md)** - Lines 96-456: Safe upgrade process
+
+### Testing After Upgrade
+
+```bash
+# Verify branding
+curl https://facilitator.karmacadabra.ultravioletadao.xyz/ | grep "Ultravioleta DAO"
+
+# Verify custom networks
+curl https://facilitator.karmacadabra.ultravioletadao.xyz/health | jq '.providers[] | select(.network=="optimism")'
+
+# Run payment test
+cd ../test-seller && python test_glue_payment_simple.py
+```
+
+## Related Resources
+
+* [x402 Protocol Documentation](https://x402.org)
+* [x402 Overview by Coinbase](https://docs.cdp.coinbase.com/x402/docs/overview)
+* [Facilitator Documentation by Coinbase](https://docs.cdp.coinbase.com/x402/docs/facilitator)
+
+## Contributions and feedback welcome!
+Feel free to open issues or pull requests to improve x402 support in the Rust ecosystem.
+
+## License
+
+[Apache-2.0](LICENSE)

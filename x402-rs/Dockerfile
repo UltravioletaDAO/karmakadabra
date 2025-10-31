@@ -9,6 +9,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libssl-dev \
  && rm -rf /var/lib/apt/lists/*
 
+# Install Rust nightly for edition 2024 support
+RUN rustup default nightly
+
 COPY . ./
 RUN cargo build --release --locked
 
@@ -19,10 +22,8 @@ ENV PORT=8080
 
 # much smaller than full ubuntu (~22MB compressed)
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    ca-certificates \
-    curl \
-    && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 

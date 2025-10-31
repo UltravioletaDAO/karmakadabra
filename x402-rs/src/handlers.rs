@@ -10,15 +10,15 @@
 //! and is compatible with official x402 client SDKs.
 
 use axum::extract::State;
-use axum::http::{StatusCode, header};
+use axum::http::StatusCode;
 use axum::response::Response;
-use axum::{Json, response::IntoResponse};
+use axum::routing::{get, post};
+use axum::{Json, Router, response::IntoResponse};
 use serde_json::json;
 use tracing::instrument;
 
 use crate::chain::FacilitatorLocalError;
 use crate::facilitator::Facilitator;
-use crate::facilitator_local::FacilitatorLocal;
 use crate::types::{
     ErrorResponse, FacilitatorErrorReason, MixedAddress, SettleRequest, VerifyRequest,
     VerifyResponse,
@@ -58,185 +58,55 @@ pub async fn get_settle_info() -> impl IntoResponse {
     }))
 }
 
+pub fn routes<A>() -> Router<A>
+where
+    A: Facilitator + Clone + Send + Sync + 'static,
+    A::Error: IntoResponse,
+{
+    Router::new()
+        .route("/", get(get_root))
+        .route("/verify", get(get_verify_info))
+        .route("/verify", post(post_verify::<A>))
+        .route("/settle", get(get_settle_info))
+        .route("/settle", post(post_settle::<A>))
+        .route("/health", get(get_health::<A>))
+        .route("/supported", get(get_supported::<A>))
+}
+
+/// `GET /`: Returns the Ultravioleta DAO branded landing page.
+#[instrument(skip_all)]
+pub async fn get_root() -> impl IntoResponse {
+    let html = include_str!("../static/index.html");
+    Response::builder()
+        .status(StatusCode::OK)
+        .header("content-type", "text/html; charset=utf-8")
+        .body(html.to_string())
+        .unwrap()
+}
+
 /// `GET /supported`: Lists the x402 payment schemes and networks supported by this facilitator.
 ///
 /// Facilitators may expose this to help clients dynamically configure their payment requests
 /// based on available network and scheme support.
 #[instrument(skip_all)]
-pub async fn get_supported(State(facilitator): State<FacilitatorLocal>) -> impl IntoResponse {
-    let kinds = facilitator.kinds();
-    (
-        StatusCode::OK,
-        Json(json!({
-            "kinds": kinds,
-        })),
-    )
+pub async fn get_supported<A>(State(facilitator): State<A>) -> impl IntoResponse
+where
+    A: Facilitator,
+    A::Error: IntoResponse,
+{
+    match facilitator.supported().await {
+        Ok(supported) => (StatusCode::OK, Json(json!(supported))).into_response(),
+        Err(error) => error.into_response(),
+    }
 }
 
-pub async fn get_health(State(facilitator): State<FacilitatorLocal>) -> impl IntoResponse {
-    let health = facilitator.health();
-    (
-        StatusCode::OK,
-        Json(json!({
-            "providers": health,
-        })),
-    )
-}
-
-/// `GET /`: Serves the landing page HTML for the facilitator.
-///
-/// This is a bilingual (English/Spanish) landing page that explains
-/// the x402 protocol and available endpoints.
 #[instrument(skip_all)]
-pub async fn get_index() -> impl IntoResponse {
-    let html = include_str!("../static/index.html");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "text/html; charset=utf-8")],
-        html
-    )
-}
-
-/// `GET /logo.png`: Serves the Ultravioleta DAO logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/logo.png before building.
-#[instrument(skip_all)]
-pub async fn get_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/logo.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-/// `GET /favicon.ico`: Serves the favicon for the facilitator landing page.
-///
-/// The favicon is embedded in the binary at compile time.
-/// To customize: replace static/favicon.ico before building.
-#[instrument(skip_all)]
-pub async fn get_favicon() -> impl IntoResponse {
-    let favicon = include_bytes!("../static/favicon.ico");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/x-icon")],
-        favicon.as_ref()
-    )
-}
-
-/// `GET /celo-colombia.png`: Serves the Celo Colombia logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/celo-colombia.png before building.
-#[instrument(skip_all)]
-pub async fn get_celo_colombia_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/celo-colombia.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-/// `GET /avalanche.png`: Serves the Avalanche logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/avalanche.png before building.
-#[instrument(skip_all)]
-pub async fn get_avalanche_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/avalanche.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-/// `GET /base.png`: Serves the Base logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/base.png before building.
-#[instrument(skip_all)]
-pub async fn get_base_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/base.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-/// `GET /celo.png`: Serves the Celo logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/celo.png before building.
-#[instrument(skip_all)]
-pub async fn get_celo_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/celo.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-/// `GET /hyperevm.png`: Serves the HyperEVM logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/hyperevm.png before building.
-#[instrument(skip_all)]
-pub async fn get_hyperevm_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/hyperevm.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-
-/// `GET /polygon.png`: Serves the Polygon logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/polygon.png before building.
-#[instrument(skip_all)]
-pub async fn get_polygon_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/polygon.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-/// `GET /solana.png`: Serves the Solana logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/solana.png before building.
-#[instrument(skip_all)]
-pub async fn get_solana_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/solana.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
-}
-
-
-/// `GET /optimism.png`: Serves the Optimism logo.
-///
-/// The logo is embedded in the binary at compile time.
-/// To customize: replace static/optimism.png before building.
-#[instrument(skip_all)]
-pub async fn get_optimism_logo() -> impl IntoResponse {
-    let logo = include_bytes!("../static/optimism.png");
-    (
-        StatusCode::OK,
-        [(header::CONTENT_TYPE, "image/png")],
-        logo.as_ref()
-    )
+pub async fn get_health<A>(State(facilitator): State<A>) -> impl IntoResponse
+where
+    A: Facilitator,
+    A::Error: IntoResponse,
+{
+    get_supported(State(facilitator)).await
 }
 
 /// `POST /verify`: Facilitator-side verification of a proposed x402 payment.
@@ -246,10 +116,14 @@ pub async fn get_optimism_logo() -> impl IntoResponse {
 ///
 /// Responds with a [`VerifyResponse`] indicating whether the payment can be accepted.
 #[instrument(skip_all)]
-pub async fn post_verify(
-    State(facilitator): State<FacilitatorLocal>,
+pub async fn post_verify<A>(
+    State(facilitator): State<A>,
     Json(body): Json<VerifyRequest>,
-) -> impl IntoResponse {
+) -> impl IntoResponse
+where
+    A: Facilitator,
+    A::Error: IntoResponse,
+{
     match facilitator.verify(&body).await {
         Ok(valid_response) => (StatusCode::OK, Json(valid_response)).into_response(),
         Err(error) => {
@@ -270,10 +144,14 @@ pub async fn post_verify(
 ///
 /// This endpoint is typically called after a successful `/verify` step.
 #[instrument(skip_all)]
-pub async fn post_settle(
-    State(facilitator): State<FacilitatorLocal>,
+pub async fn post_settle<A>(
+    State(facilitator): State<A>,
     Json(body): Json<SettleRequest>,
-) -> impl IntoResponse {
+) -> impl IntoResponse
+where
+    A: Facilitator,
+    A::Error: IntoResponse,
+{
     match facilitator.settle(&body).await {
         Ok(valid_response) => (StatusCode::OK, Json(valid_response)).into_response(),
         Err(error) => {

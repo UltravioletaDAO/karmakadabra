@@ -2121,8 +2121,10 @@ cargo build --release
 - [x] Fixed x402 payment payload format (signature encoding + schema)
 - [x] All 6 facilitator integration tests passing
 - [x] Facilitator wallet separation (testnet vs mainnet)
-  - [x] `karmacadabra-facilitator-testnet` → 0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8
-  - [x] `karmacadabra-facilitator-mainnet` → 0x103040545AC5031A11E8C03dd11324C7333a13C7
+  - [x] **EVM Networks (Testnet):** `0x34033041a5944B8F10f8E4D8496Bfb84f1A293A8`
+  - [x] **EVM Networks (Mainnet):** `0x103040545AC5031A11E8C03dd11324C7333a13C7`
+  - [x] **Solana Devnet (Testnet):** `6xNPewUdKRbEZDReQdpyfNUdgNg8QRc8Mt263T5GZSRv`
+  - [x] **Solana Mainnet:** `F742C4VfFLQ9zRQyithoj5229ZgtX2WqKCSFKgH2EThq`
 
 **Wallet Security & Separation:** 🔄 **IN PROGRESS**
 

@@ -28,6 +28,8 @@ As of 2025-10-26 16:45 UTC, the production facilitator wallet has the following 
 | **Avalanche Mainnet** | 43114 | 1.1 AVAX | ✅ Operational | [snowtrace.io](https://snowtrace.io/address/0x103040545AC5031A11E8C03dd11324C7333a13C7) |
 | **Base Sepolia** | 84532 | 0.001 ETH | ⚠️ Limited | [sepolia.basescan.org](https://sepolia.basescan.org/address/0x103040545AC5031A11E8C03dd11324C7333a13C7) |
 | **Base Mainnet** | 8453 | 0.02 ETH | ✅ Operational | [basescan.org](https://basescan.org/address/0x103040545AC5031A11E8C03dd11324C7333a13C7) |
+| **Solana Devnet** | N/A | - SOL | ✅ Operational | [explorer.solana.com](https://explorer.solana.com/address/6xNPewUdKRbEZDReQdpyfNUdgNg8QRc8Mt263T5GZSRv?cluster=devnet) |
+| **Solana Mainnet** | N/A | - SOL | ✅ Operational | [explorer.solana.com](https://explorer.solana.com/address/F742C4VfFLQ9zRQyithoj5229ZgtX2WqKCSFKgH2EThq) |
 
 **Recommended Balances (for reference):**
 - Avalanche networks: 5-10 AVAX for sustained operations
