@@ -51,24 +51,6 @@ pub enum Network {
     /// Sei testnet (chain ID 1328).
     #[serde(rename = "sei-testnet")]
     SeiTestnet,
-    /// Celo mainnet (chain ID 42220).
-    #[serde(rename = "celo")]
-    Celo,
-    /// Celo Sepolia testnet (chain ID 44787).
-    #[serde(rename = "celo-sepolia")]
-    CeloSepolia,
-    /// HyperEVM mainnet (chain ID 998).
-    #[serde(rename = "hyperevm")]
-    HyperEvm,
-    /// HyperEVM testnet (chain ID 333).
-    #[serde(rename = "hyperevm-testnet")]
-    HyperEvmTestnet,
-    /// Optimism mainnet (chain ID 10).
-    #[serde(rename = "optimism")]
-    Optimism,
-    /// Optimism Sepolia testnet (chain ID 11155420).
-    #[serde(rename = "optimism-sepolia")]
-    OptimismSepolia,
 }
 
 impl Display for Network {
@@ -85,12 +67,6 @@ impl Display for Network {
             Network::Polygon => write!(f, "polygon"),
             Network::Sei => write!(f, "sei"),
             Network::SeiTestnet => write!(f, "sei-testnet"),
-            Network::Celo => write!(f, "celo"),
-            Network::CeloSepolia => write!(f, "celo-sepolia"),
-            Network::HyperEvm => write!(f, "hyperevm"),
-            Network::HyperEvmTestnet => write!(f, "hyperevm-testnet"),
-            Network::Optimism => write!(f, "optimism"),
-            Network::OptimismSepolia => write!(f, "optimism-sepolia"),
         }
     }
 }
@@ -115,12 +91,6 @@ impl From<Network> for NetworkFamily {
             Network::Polygon => NetworkFamily::Evm,
             Network::Sei => NetworkFamily::Evm,
             Network::SeiTestnet => NetworkFamily::Evm,
-            Network::Celo => NetworkFamily::Evm,
-            Network::CeloSepolia => NetworkFamily::Evm,
-            Network::HyperEvm => NetworkFamily::Evm,
-            Network::HyperEvmTestnet => NetworkFamily::Evm,
-            Network::Optimism => NetworkFamily::Evm,
-            Network::OptimismSepolia => NetworkFamily::Evm,
         }
     }
 }
@@ -140,12 +110,6 @@ impl Network {
             Network::Polygon,
             Network::Sei,
             Network::SeiTestnet,
-            Network::Celo,
-            Network::CeloSepolia,
-            Network::HyperEvm,
-            Network::HyperEvmTestnet,
-            Network::Optimism,
-            Network::OptimismSepolia,
         ]
     }
 }
@@ -195,18 +159,17 @@ static USDC_XDC: Lazy<USDCDeployment> = Lazy::new(|| {
     })
 });
 
-/// Lazily initialized known GLUE deployment on Avalanche Fuji testnet as [`USDCDeployment`].
-/// NOTE: Karmacadabra uses GLUE token, not USDC, on Fuji testnet.
+/// Lazily initialized known USDC deployment on Avalanche Fuji testnet as [`USDCDeployment`].
 static USDC_AVALANCHE_FUJI: Lazy<USDCDeployment> = Lazy::new(|| {
     USDCDeployment(TokenDeployment {
         asset: TokenAsset {
-            address: address!("0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743").into(),
+            address: address!("0x5425890298aed601595a70AB815c96711a31Bc65").into(),
             network: Network::AvalancheFuji,
         },
         decimals: 6,
         eip712: Some(TokenDeploymentEip712 {
-            name: "GLUE Token".into(),
-            version: "1".into(),
+            name: "USD Coin".into(),
+            version: "2".into(),
         }),
     })
 });
@@ -302,136 +265,11 @@ static USDC_SEI_TESTNET: Lazy<USDCDeployment> = Lazy::new(|| {
     USDCDeployment(TokenDeployment {
         asset: TokenAsset {
             address: address!("0x4fCF1784B31630811181f670Aea7A7bEF803eaED").into(),
-            network: Network::Sei,
+            network: Network::SeiTestnet,
         },
         decimals: 6,
         eip712: Some(TokenDeploymentEip712 {
             name: "USDC".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-static USDC_CELO: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0xcebA9300f2b948710d2653dD7B07f33A8B32118C").into(),
-            network: Network::Celo,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USD Coin".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-static USDC_CELO_SEPOLIA: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0x2F25deB3848C207fc8E0c34035B3Ba7fC157602B").into(),
-            network: Network::CeloSepolia,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USDC".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-static USDC_HYPEREVM: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0xC3B4b2C0faE2De7cF7e07c8c84f65d8df61Bf314").into(),
-            network: Network::HyperEvm,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USDC".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-static USDC_HYPEREVM_TESTNET: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0xC3B4b2C0faE2De7cF7e07c8c84f65d8df61Bf314").into(),
-            network: Network::HyperEvmTestnet,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USDC".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-static USDC_OPTIMISM: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85").into(),
-            network: Network::Optimism,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USD Coin".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-static USDC_OPTIMISM_SEPOLIA: Lazy<USDCDeployment> = Lazy::new(|| {
-    USDCDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0x5fd84259d66Cd46123540766Be93DFE6D43130D7").into(),
-            network: Network::OptimismSepolia,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "USDC".into(),
-            version: "2".into(),
-        }),
-    })
-});
-
-/// Lazily initialized UVD V2 deployment on Avalanche Fuji testnet as [`UVDDeployment`].
-/// Note: Address must be updated after deploying erc-20/UVD_V2.sol
-static UVD_AVALANCHE_FUJI: Lazy<UVDDeployment> = Lazy::new(|| {
-    UVDDeployment(TokenDeployment {
-        asset: TokenAsset {
-            // Reads from GLUE_TOKEN_ADDRESS or GLUE_TOKEN_ADDRESS_AVALANCHE_FUJI environment variable
-            // See: erc-20/deployment.json after running ./deploy-fuji.sh
-            address: std::env::var("GLUE_TOKEN_ADDRESS_AVALANCHE_FUJI")
-                .or_else(|_| std::env::var("GLUE_TOKEN_ADDRESS"))  // Fallback for backwards compatibility
-                .ok()
-                .and_then(|s| s.parse().ok())
-                .map(|addr| MixedAddress::Evm(addr))
-                .unwrap_or_else(|| {
-                    // Default placeholder address (must be replaced)
-                    address!("0x0000000000000000000000000000000000000000").into()
-                }),
-            network: Network::AvalancheFuji,
-        },
-        decimals: 6,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "Gasless Ultravioleta DAO Extended Token".into(),
-            version: "1".into(),
-        }),
-    })
-});
-
-/// Lazily initialized WAVAX deployment on Avalanche Fuji testnet as [`WAVAXDeployment`].
-static WAVAX_AVALANCHE_FUJI: Lazy<WAVAXDeployment> = Lazy::new(|| {
-    WAVAXDeployment(TokenDeployment {
-        asset: TokenAsset {
-            address: address!("0xd00ae08403B9bbb9124bB305C09058E32C39A48c").into(),
-            network: Network::AvalancheFuji,
-        },
-        decimals: 18,
-        eip712: Some(TokenDeploymentEip712 {
-            name: "Wrapped AVAX".into(),
             version: "2".into(),
         }),
     })
@@ -484,94 +322,6 @@ impl USDCDeployment {
             Network::Polygon => &USDC_POLYGON,
             Network::Sei => &USDC_SEI,
             Network::SeiTestnet => &USDC_SEI_TESTNET,
-            Network::Celo => &USDC_CELO,
-            Network::CeloSepolia => &USDC_CELO_SEPOLIA,
-            Network::HyperEvm => &USDC_HYPEREVM,
-            Network::HyperEvmTestnet => &USDC_HYPEREVM_TESTNET,
-            Network::Optimism => &USDC_OPTIMISM,
-            Network::OptimismSepolia => &USDC_OPTIMISM_SEPOLIA,
-        }
-    }
-}
-
-/// A known UVD (Gasless Ultravioleta DAO Extended Token) deployment as a wrapper around [`TokenDeployment`].
-#[derive(Clone, Debug)]
-pub struct UVDDeployment(pub TokenDeployment);
-
-impl Deref for UVDDeployment {
-    type Target = TokenDeployment;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl From<&UVDDeployment> for TokenDeployment {
-    fn from(deployment: &UVDDeployment) -> Self {
-        deployment.0.clone()
-    }
-}
-
-impl From<UVDDeployment> for Vec<TokenAsset> {
-    fn from(deployment: UVDDeployment) -> Self {
-        vec![deployment.asset.clone()]
-    }
-}
-
-impl From<&UVDDeployment> for Vec<TokenAsset> {
-    fn from(deployment: &UVDDeployment) -> Self {
-        vec![deployment.asset.clone()]
-    }
-}
-
-impl UVDDeployment {
-    /// Return the known UVD deployment for the given network.
-    ///
-    /// Currently only supports Avalanche Fuji testnet.
-    pub fn by_network<N: Borrow<Network>>(network: N) -> &'static UVDDeployment {
-        match network.borrow() {
-            Network::AvalancheFuji => &UVD_AVALANCHE_FUJI,
-            _ => panic!("UVD/GLUE token only deployed on Avalanche Fuji testnet"),
-        }
-    }
-}
-
-/// A known WAVAX (Wrapped AVAX) deployment as a wrapper around [`TokenDeployment`].
-#[derive(Clone, Debug)]
-pub struct WAVAXDeployment(pub TokenDeployment);
-
-impl Deref for WAVAXDeployment {
-    type Target = TokenDeployment;
-
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl From<&WAVAXDeployment> for TokenDeployment {
-    fn from(deployment: &WAVAXDeployment) -> Self {
-        deployment.0.clone()
-    }
-}
-
-impl From<WAVAXDeployment> for Vec<TokenAsset> {
-    fn from(deployment: WAVAXDeployment) -> Self {
-        vec![deployment.asset.clone()]
-    }
-}
-
-impl From<&WAVAXDeployment> for Vec<TokenAsset> {
-    fn from(deployment: &WAVAXDeployment) -> Self {
-        vec![deployment.asset.clone()]
-    }
-}
-
-impl WAVAXDeployment {
-    /// Return the known WAVAX deployment for Avalanche Fuji.
-    pub fn by_network<N: Borrow<Network>>(network: N) -> &'static WAVAXDeployment {
-        match network.borrow() {
-            Network::AvalancheFuji => &WAVAX_AVALANCHE_FUJI,
-            _ => panic!("WAVAX token only deployed on Avalanche Fuji testnet for Karmacadabra"),
         }
     }
 }
