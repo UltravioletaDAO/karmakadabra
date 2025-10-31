@@ -13,7 +13,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN rustup default nightly
 
 COPY . ./
-RUN cargo build --release --locked
+RUN cargo build --release
 
 # --- Stage 2 ---
 FROM --platform=$BUILDPLATFORM debian:bullseye-slim
