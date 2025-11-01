@@ -84,6 +84,121 @@ pub async fn get_root() -> impl IntoResponse {
         .unwrap()
 }
 
+/// Alias for `get_root` to match main.rs routing.
+pub async fn get_index() -> impl IntoResponse {
+    get_root().await
+}
+
+/// `GET /logo.png`: Returns Ultravioleta DAO logo.
+#[instrument(skip_all)]
+pub async fn get_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/logo.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /favicon.ico`: Returns favicon.
+#[instrument(skip_all)]
+pub async fn get_favicon() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/favicon.ico");
+    (
+        StatusCode::OK,
+        [("content-type", "image/x-icon")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /celo-colombia.png`: Returns Celo Colombia logo.
+#[instrument(skip_all)]
+pub async fn get_celo_colombia_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/celo-colombia.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /avalanche.png`: Returns Avalanche logo.
+#[instrument(skip_all)]
+pub async fn get_avalanche_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/avalanche.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /base.png`: Returns Base logo.
+#[instrument(skip_all)]
+pub async fn get_base_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/base.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /celo.png`: Returns Celo logo.
+#[instrument(skip_all)]
+pub async fn get_celo_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/celo.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /hyperevm.png`: Returns HyperEVM logo.
+#[instrument(skip_all)]
+pub async fn get_hyperevm_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/hyperevm.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /polygon.png`: Returns Polygon logo.
+#[instrument(skip_all)]
+pub async fn get_polygon_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/polygon.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /solana.png`: Returns Solana logo.
+#[instrument(skip_all)]
+pub async fn get_solana_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/solana.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
+/// `GET /optimism.png`: Returns Optimism logo.
+#[instrument(skip_all)]
+pub async fn get_optimism_logo() -> impl IntoResponse {
+    let bytes = include_bytes!("../static/optimism.png");
+    (
+        StatusCode::OK,
+        [("content-type", "image/png")],
+        bytes.as_slice(),
+    )
+}
+
 /// `GET /supported`: Lists the x402 payment schemes and networks supported by this facilitator.
 ///
 /// Facilitators may expose this to help clients dynamically configure their payment requests
@@ -201,16 +316,34 @@ impl IntoResponse for FacilitatorLocalError {
             )
                 .into_response(),
             FacilitatorLocalError::ContractCall(ref e) => {
-                tracing::error!(error = %e, "ContractCall error - returning Invalid request");
-                bad_request
+                tracing::error!(error = %e, "ContractCall error");
+                (
+                    StatusCode::BAD_REQUEST,
+                    Json(ErrorResponse {
+                        error: format!("Contract call failed: {}", e),
+                    }),
+                )
+                    .into_response()
             }
             FacilitatorLocalError::InvalidAddress(ref e) => {
-                tracing::error!(error = %e, "InvalidAddress error - returning Invalid request");
-                bad_request
+                tracing::error!(error = %e, "InvalidAddress error");
+                (
+                    StatusCode::BAD_REQUEST,
+                    Json(ErrorResponse {
+                        error: format!("Invalid address: {}", e),
+                    }),
+                )
+                    .into_response()
             }
             FacilitatorLocalError::ClockError(ref e) => {
-                tracing::error!(error = ?e, "ClockError - returning Invalid request");
-                bad_request
+                tracing::error!(error = ?e, "ClockError");
+                (
+                    StatusCode::BAD_REQUEST,
+                    Json(ErrorResponse {
+                        error: format!("Clock error: {:?}", e),
+                    }),
+                )
+                    .into_response()
             }
             FacilitatorLocalError::DecodingError(reason) => (
                 StatusCode::OK,
