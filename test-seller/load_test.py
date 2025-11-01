@@ -12,6 +12,7 @@ import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass
 from typing import Dict, Any
+from datetime import datetime
 
 import requests
 from eth_account import Account
@@ -60,10 +61,10 @@ class LoadTestStats:
 
 
 class TestSellerLoadTest:
-    def __init__(self, private_key: str = None):
+    def __init__(self, private_key: str = None, buyer_id: int = 0):
         # Load from AWS Secrets Manager if no private key provided
         if private_key is None:
-            private_key = self._load_private_key_from_aws()
+            private_key = self._load_private_key_from_aws(buyer_id)
 
         self.account = Account.from_key(private_key)
         self.w3 = Web3(Web3.HTTPProvider("https://mainnet.base.org"))
@@ -85,17 +86,30 @@ class TestSellerLoadTest:
         print(f"[INIT] Test seller: {TEST_SELLER_URL}")
         print(f"[INIT] Price per request: ${float(PRICE_USDC)/1000000:.2f} USDC")
 
-    def _load_private_key_from_aws(self) -> str:
-        """Load test-buyer private key from AWS Secrets Manager"""
+    def _load_private_key_from_aws(self, buyer_id: int = 0) -> str:
+        """Load test-buyer private key from AWS Secrets Manager
+
+        Args:
+            buyer_id: 0 for karmacadabra-test-buyer, 1 for test-buyer-client-1, 2 for test-buyer-client-2
+        """
         try:
             import boto3
             import json
 
+            # Map buyer_id to secret name
+            secret_names = {
+                0: 'karmacadabra-test-buyer',
+                1: 'test-buyer-client-1',
+                2: 'test-buyer-client-2'
+            }
+
+            secret_name = secret_names.get(buyer_id, 'karmacadabra-test-buyer')
+
             secrets_client = boto3.client('secretsmanager', region_name='us-east-1')
-            response = secrets_client.get_secret_value(SecretId='karmacadabra-test-buyer')
+            response = secrets_client.get_secret_value(SecretId=secret_name)
             config = json.loads(response['SecretString'])
 
-            print("[INFO] Loaded test-buyer wallet from AWS Secrets Manager")
+            print(f"[INFO] Loaded {secret_name} wallet from AWS Secrets Manager")
             return config['private_key']
         except Exception as e:
             print(f"[ERROR] Failed to load from AWS Secrets Manager: {e}")
@@ -127,7 +141,7 @@ class TestSellerLoadTest:
 
         # Timestamps (EIP-3009 spec)
         valid_after = int(time.time()) - 60  # 1 minute ago (ensure immediate validity)
-        valid_before = int(time.time()) + 600  # 10 minutes from now
+        valid_before = int(time.time()) + 3600  # 1 hour from now (generous window)
 
         domain = self.create_eip712_domain()
 
@@ -214,11 +228,13 @@ class TestSellerLoadTest:
             }
 
             if verbose:
-                print(f"\n[{request_id:04d}] ========== REQUEST DETAILS ==========")
-                print(f"[{request_id:04d}] Nonce: {authorization['nonce']}")
-                print(f"[{request_id:04d}] Signature: {signature[:20]}...{signature[-20:]}")
-                print(f"[{request_id:04d}] Valid: {authorization['validAfter']} to {authorization['validBefore']}")
-                print(f"[{request_id:04d}] Full x402Payment JSON:")
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                print(f"\n[{request_id:04d}] [{timestamp}] ========== REQUEST DETAILS ==========")
+                print(f"[{request_id:04d}] [{timestamp}] Payer: {self.account.address}")
+                print(f"[{request_id:04d}] [{timestamp}] Nonce: {authorization['nonce']}")
+                print(f"[{request_id:04d}] [{timestamp}] Signature: {signature[:20]}...{signature[-20:]}")
+                print(f"[{request_id:04d}] [{timestamp}] Valid: {authorization['validAfter']} to {authorization['validBefore']}")
+                print(f"[{request_id:04d}] [{timestamp}] Full x402Payment JSON:")
                 import json
                 print(json.dumps(payload, indent=2)[:1000])
 
@@ -233,51 +249,63 @@ class TestSellerLoadTest:
                 data = response.json()
 
                 if verbose:
-                    safe_print(f"[{request_id:04d}] ========== RESPONSE ==========")
-                    safe_print(f"[{request_id:04d}] Status: {response.status_code}")
-                    safe_print(f"[{request_id:04d}] Message: {data.get('message')}")
-                    safe_print(f"[{request_id:04d}] Price: {data.get('price')}")
-                    safe_print(f"[{request_id:04d}] Payer: {data.get('payer')}")
-                    safe_print(f"[{request_id:04d}] Seller: {data.get('seller')}")
-                    safe_print(f"[{request_id:04d}] Network: {data.get('network')}")
+                    timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                    safe_print(f"[{request_id:04d}] [{timestamp}] ========== RESPONSE ==========")
+                    safe_print(f"[{request_id:04d}] [{timestamp}] Status: {response.status_code}")
+                    safe_print(f"[{request_id:04d}] [{timestamp}] Message: {data.get('message')}")
+                    safe_print(f"[{request_id:04d}] [{timestamp}] Price: {data.get('price')}")
+                    safe_print(f"[{request_id:04d}] [{timestamp}] Payer: {data.get('payer')}")
+                    safe_print(f"[{request_id:04d}] [{timestamp}] Seller: {data.get('seller')}")
+                    safe_print(f"[{request_id:04d}] [{timestamp}] Network: {data.get('network')}")
 
                     # Try to get transaction hash from response headers or facilitator
                     tx_hash = data.get('transaction_hash') or data.get('tx_hash') or data.get('txHash')
                     if tx_hash:
-                        safe_print(f"[{request_id:04d}] TX Hash: {tx_hash}")
-                        safe_print(f"[{request_id:04d}] BaseScan: https://basescan.org/tx/{tx_hash}")
+                        safe_print(f"[{request_id:04d}] [{timestamp}] TX Hash: {tx_hash}")
+                        safe_print(f"[{request_id:04d}] [{timestamp}] BaseScan: https://basescan.org/tx/{tx_hash}")
 
-                    safe_print(f"[{request_id:04d}] =====================================\n")
+                    safe_print(f"[{request_id:04d}] [{timestamp}] =====================================\n")
                 else:
                     safe_print(f"[{request_id:04d}] SUCCESS - {data.get('message')} - {data.get('price')} - Payer: {data.get('payer', 'unknown')[:10]}...")
 
                 return True
             else:
-                print(f"[{request_id:04d}] FAILED - HTTP {response.status_code}")
+                timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+                print(f"[{request_id:04d}] [{timestamp}] FAILED - HTTP {response.status_code}")
 
                 if verbose:
-                    print(f"[{request_id:04d}] ========== ERROR RESPONSE ==========")
+                    print(f"[{request_id:04d}] [{timestamp}] ========== ERROR RESPONSE ==========")
                     try:
                         error_data = response.json()
-                        print(f"[{request_id:04d}] Error: {json.dumps(error_data, indent=2)}")
+                        print(f"[{request_id:04d}] [{timestamp}] Error: {json.dumps(error_data, indent=2)}")
                     except:
-                        print(f"[{request_id:04d}] Response: {response.text[:500]}")
-                    print(f"[{request_id:04d}] ===================================\n")
+                        print(f"[{request_id:04d}] [{timestamp}] Response: {response.text[:500]}")
+                    print(f"[{request_id:04d}] [{timestamp}] ===================================\n")
                 else:
-                    print(f"[{request_id:04d}] Response: {response.text[:100]}")
+                    print(f"[{request_id:04d}] [{timestamp}] Response: {response.text[:100]}")
 
                 return False
 
         except Exception as e:
-            print(f"[{request_id:04d}] ERROR - {str(e)}")
+            timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+            print(f"[{request_id:04d}] [{timestamp}] ERROR - {str(e)}")
             if verbose:
                 import traceback
-                print(f"[{request_id:04d}] Traceback: {traceback.format_exc()}")
+                print(f"[{request_id:04d}] [{timestamp}] Traceback: {traceback.format_exc()}")
             return False
 
-    def run_sequential_test(self, num_requests: int, verbose: bool = False, check_balances: bool = False):
-        """Run sequential load test (one request at a time)"""
+    def run_sequential_test(self, num_requests: int, verbose: bool = False, check_balances: bool = False, round_robin: bool = True):
+        """Run sequential load test (one request at a time)
+
+        Args:
+            num_requests: Number of requests to make
+            verbose: Print detailed output
+            check_balances: Check USDC balances before/after
+            round_robin: Rotate through all 3 buyer wallets (default: True)
+        """
         print(f"\n[START] Sequential test: {num_requests} requests")
+        if round_robin:
+            print("[MODE] Round-robin across 3 buyer wallets")
         print("=" * 60)
 
         # Check initial balances
@@ -292,17 +320,49 @@ class TestSellerLoadTest:
         self.stats = LoadTestStats()
         self.stats.start_time = time.time()
 
+        # If round-robin, create instances for all 3 buyers
+        buyers = []
+        if round_robin:
+            print("[INIT] Loading 3 buyer wallets for round-robin...")
+            for buyer_id in [0, 1, 2]:
+                try:
+                    # Temporarily suppress buyer init output
+                    import sys
+                    from io import StringIO
+                    old_stdout = sys.stdout
+                    sys.stdout = StringIO()
+
+                    buyer = TestSellerLoadTest(buyer_id=buyer_id)
+
+                    sys.stdout = old_stdout
+                    buyers.append(buyer)
+                    print(f"[INIT] Buyer {buyer_id}: {buyer.account.address}")
+                except Exception as e:
+                    sys.stdout = old_stdout
+                    print(f"[WARNING] Could not load buyer {buyer_id}: {e}")
+
+            if not buyers:
+                print("[ERROR] No buyers could be loaded. Falling back to single buyer.")
+                buyers = [self]
+            else:
+                print(f"[INIT] Loaded {len(buyers)} buyer wallets")
+        else:
+            buyers = [self]
+
         for i in range(num_requests):
+            # Select buyer (round-robin if multiple buyers)
+            buyer = buyers[i % len(buyers)] if len(buyers) > 1 else self
+
             self.stats.total_requests += 1
-            if self.make_paid_request(i + 1, verbose=verbose):
+            if buyer.make_paid_request(i + 1, verbose=verbose):
                 self.stats.successful += 1
                 self.stats.total_cost_usdc += float(PRICE_USDC) / 1000000
             else:
                 self.stats.failed += 1
 
             # Small delay to avoid overwhelming the service
-            # Increased to 2s to allow Base block confirmations
-            time.sleep(2.0)
+            # Increased to 5s to avoid rate limiting
+            time.sleep(5.0)
 
         self.stats.end_time = time.time()
 
@@ -475,14 +535,28 @@ def main():
         action="store_true",
         help="Show detailed request/response information including nonce, signature, and facilitator responses",
     )
+    parser.add_argument(
+        "--buyer-id",
+        type=int,
+        default=None,
+        choices=[0, 1, 2],
+        help="Single buyer wallet ID (disables round-robin): 0=karmacadabra-test-buyer, 1=test-buyer-client-1, 2=test-buyer-client-2",
+    )
 
     args = parser.parse_args()
 
-    # Initialize load tester
-    tester = TestSellerLoadTest(args.private_key)
+    # Determine if round-robin mode
+    use_round_robin = (args.buyer_id is None and not args.private_key)
 
-    # Check balance if requested
-    if args.check_balance:
+    # Initialize load tester with specific buyer if requested
+    if args.buyer_id is not None:
+        tester = TestSellerLoadTest(args.private_key, buyer_id=args.buyer_id)
+    else:
+        # Use default buyer (will be overridden in round-robin mode)
+        tester = TestSellerLoadTest(args.private_key, buyer_id=0)
+
+    # Check balance if requested (only for single buyer mode)
+    if args.check_balance and not use_round_robin:
         balance = check_balance(tester.account.address)
         required = (args.num_requests * float(PRICE_USDC)) / 1000000
         print(f"[INFO] Required for {args.num_requests} requests: ${required:.2f} USDC")
@@ -498,7 +572,7 @@ def main():
     if args.concurrent:
         tester.run_concurrent_test(args.num_requests, args.workers, verbose=args.verbose, check_balances=args.check_balance)
     else:
-        tester.run_sequential_test(args.num_requests, verbose=args.verbose, check_balances=args.check_balance)
+        tester.run_sequential_test(args.num_requests, verbose=args.verbose, check_balances=args.check_balance, round_robin=use_round_robin)
 
 
 if __name__ == "__main__":

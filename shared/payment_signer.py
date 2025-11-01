@@ -184,9 +184,9 @@ class PaymentSigner:
         from_address = Web3.to_checksum_address(from_address)
         to_address = Web3.to_checksum_address(to_address)
 
-        # Set time window (default: now to +1 hour)
+        # Set time window (default: 1 minute ago to +1 hour for clock skew tolerance)
         if valid_after is None:
-            valid_after = int(time.time())
+            valid_after = int(time.time()) - 60  # 1 minute ago for clock skew tolerance
 
         if valid_before is None:
             valid_before = int(time.time()) + 3600  # 1 hour
