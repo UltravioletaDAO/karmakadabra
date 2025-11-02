@@ -219,7 +219,7 @@ async def post_hello_paid(request: Request):
                 f"{FACILITATOR_URL}/settle",
                 json=payment,
                 headers={'Content-Type': 'application/json'},
-                timeout=30
+                timeout=90  # Increased from 30s to allow for Base mainnet confirmation times
             )
 
             if response.status_code != 200:

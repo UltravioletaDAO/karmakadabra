@@ -124,12 +124,12 @@ x402-rs/src/handlers.rs              # Lines ~76-85: get_root() uses include_str
                                      # Upstream: Returns Html("Hello from x402-rs!")
                                      # Ours: Returns Html(include_str!("../static/index.html"))
 
-x402-rs/src/network.rs               # Custom networks added:
-                                     # - HyperEVM mainnet/testnet
-                                     # - Optimism (our primary addition)
-                                     # - Polygon
-                                     # - Solana
-                                     # Each has: RPC URLs, chain IDs, token addresses, gas settings
+x402-rs/src/network.rs               # ALL 17 FUNDED NETWORKS - NEVER REMOVE ANY:
+                                     # Mainnets (7): Base, Avalanche, Celo, HyperEVM, Polygon, Solana, Optimism
+                                     # Testnets (10): Base Sepolia, Avalanche Fuji, Celo Sepolia, HyperEVM Testnet,
+                                     #                Polygon Amoy, Solana Devnet, Optimism Sepolia, Sei, Sei Testnet, XDC
+                                     # ⚠️ ALL wallets are funded - removing networks BREAKS production
+                                     # Each has: Network enum, Display impl, NetworkFamily, variants(), USDC deployment
 
 x402-rs/src/main.rs                  # AWS Secrets Manager integration (if implemented)
 x402-rs/Cargo.toml                   # AWS SDK dependencies, custom version pins
@@ -783,3 +783,8 @@ logs_path = "z:/ultravioleta/dao/karmacadabra/karma-hello-agent/logs"   # forwar
 
 **Scripts**: `erc-8004/deploy-fuji.ps1`, `erc-8004/deploy-fuji.bat`
 **venv**: `venv\Scripts\activate` (Windows), `source venv/bin/activate` (Linux/Mac)
+- mira, NUCNA ok NUNCA le agreges emotes a los logs de rust, se daña el build o algo malo siempre pasa
+- The latest nightly now defaults to edition 2024, which has breaking changes that are incompatible       
+  with the current codebase.
+- i think the nightly build is not gonna ever work, never use it
+- OK COMMIT EVERY TIME YOU DEEM IT NESSESARY

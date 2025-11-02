@@ -1,0 +1,173 @@
+[INFO] Loaded karmacadabra-test-buyer wallet from AWS Secrets Manager
+[INIT] Payer wallet: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Test seller: https://test-seller.karmacadabra.ultravioletadao.xyz
+[INIT] Price per request: $0.01 USDC
+
+[START] Sequential test: 2 requests
+[MODE] Round-robin across 3 buyer wallets
+============================================================
+[INIT] Loading 3 buyer wallets for round-robin...
+[INIT] Buyer 0: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Buyer 1: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[INIT] Buyer 2: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[INIT] Loaded 3 buyer wallets
+
+[0001] [2025-11-01 23:50:23.649] ========== REQUEST DETAILS ==========
+[0001] [2025-11-01 23:50:23.649] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0001] [2025-11-01 23:50:23.649] Nonce: 0x7f82aafe728862a2d67d52c826ccd10add1f82692af0c0a5427eb52f0818655e
+[0001] [2025-11-01 23:50:23.649] Signature: 7be35e1ef4f5b2e06c81...cd0e60f5018c7d306b1b
+[0001] [2025-11-01 23:50:23.649] Valid: 1762055363 to 1762059023
+[0001] [2025-11-01 23:50:23.649] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "7be35e1ef4f5b2e06c81da08b2b75bfab337d70d0720efcc1285c3aa30a75cf419cb0019df36dc3343dfc760d653ecf072b97913e8049bcd0e60f5018c7d306b1b",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1762055363",
+        "validBefore": "1762059023",
+        "nonce": "0x7f82aafe728862a2d67d52c826ccd10add1f82692af0c0a5427eb52f0818655e"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x
+[0001] [2025-11-01 23:50:24.562] FAILED - HTTP 402
+[0001] [2025-11-01 23:50:24.562] ========== ERROR RESPONSE ==========
+[0001] [2025-11-01 23:50:24.562] Error: {
+  "detail": "Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { code: 3, message: \\\"execution reverted: Fia"
+}
+[0001] [2025-11-01 23:50:24.562] ===================================
+
+
+[0002] [2025-11-01 23:50:29.568] ========== REQUEST DETAILS ==========
+[0002] [2025-11-01 23:50:29.568] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0002] [2025-11-01 23:50:29.568] Nonce: 0x1883dc8e8bfe8e9ca66eb771af2acbf68eed3ded30c4666e7819872f33a2108a
+[0002] [2025-11-01 23:50:29.568] Signature: 9dfd640931de21d64fc2...57c0657fd2713294b11b
+[0002] [2025-11-01 23:50:29.568] Valid: 1762055369 to 1762059029
+[0002] [2025-11-01 23:50:29.568] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "9dfd640931de21d64fc25c6faf52c60140369ef927e5abe1ac17bbbba1348b6d2fba7de13bceacc64543943711f8c843214b51f03e36b657c0657fd2713294b11b",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1762055369",
+        "validBefore": "1762059029",
+        "nonce": "0x1883dc8e8bfe8e9ca66eb771af2acbf68eed3ded30c4666e7819872f33a2108a"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x
+[0002] [2025-11-01 23:50:59.804] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0002] [2025-11-01 23:50:59.804] Traceback: Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 537, in _make_request
+    response = conn.getresponse()
+               ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/urllib3/connection.py", line 461, in getresponse
+    httplib_response = super().getresponse()
+                       ^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/http/client.py", line 1428, in getresponse
+    response.begin()
+  File "/usr/lib/python3.12/http/client.py", line 331, in begin
+    version, status, reason = self._read_status()
+                              ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/http/client.py", line 292, in _read_status
+    line = str(self.fp.readline(_MAXLINE + 1), "iso-8859-1")
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/socket.py", line 707, in readinto
+    return self._sock.recv_into(b)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/ssl.py", line 1252, in recv_into
+    return self.read(nbytes, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/ssl.py", line 1104, in read
+    return self._sslobj.read(len, buffer)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TimeoutError: The read operation timed out
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 486, in send
+    resp = conn.urlopen(
+           ^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 845, in urlopen
+    retries = retries.increment(
+              ^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/urllib3/util/retry.py", line 472, in increment
+    raise reraise(type(error), error, _stacktrace)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/urllib3/util/util.py", line 39, in reraise
+    raise value
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 791, in urlopen
+    response = self._make_request(
+               ^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 539, in _make_request
+    self._raise_timeout(err=e, url=url, timeout_value=read_timeout)
+  File "/usr/lib/python3/dist-packages/urllib3/connectionpool.py", line 371, in _raise_timeout
+    raise ReadTimeoutError(
+urllib3.exceptions.ReadTimeoutError: HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/mnt/z/ultravioleta/dao/karmacadabra/test-seller/load_test.py", line 242, in make_paid_request
+    response = requests.post(
+               ^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 115, in post
+    return request("post", url, data=data, json=json, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/requests/api.py", line 59, in request
+    return session.request(method=method, url=url, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 589, in request
+    resp = self.send(prep, **send_kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/requests/sessions.py", line 703, in send
+    r = adapter.send(request, **kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3/dist-packages/requests/adapters.py", line 532, in send
+    raise ReadTimeout(e, request=request)
+requests.exceptions.ReadTimeout: HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+
+
+============================================================
+LOAD TEST RESULTS
+============================================================
+Total Requests:    2
+Successful:        0 (0.0%)
+Failed:            2
+Duration:          41.78s
+Requests/sec:      0.05
+Total Cost:        $0.00 USDC
+============================================================

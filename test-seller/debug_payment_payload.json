@@ -1,0 +1,34 @@
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x55c264bdf91e736e5550d79c145d21e6777cfe0548adc4e30ff4356aeae2191c68e87a9c601dcafa6de5c4d68e40a40e0aceb6add2edba045f3b4d5d3740a2f61b",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1761924682",
+        "validBefore": "1761925342",
+        "nonce": "0x557d32dd39152569962a110ce6aa2ba11326cf2b067974b319352fcfa26c3b13"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+    "extra": {
+      "name": "USD Coin",
+      "version": "2"
+    }
+  }
+}

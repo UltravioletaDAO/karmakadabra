@@ -190,11 +190,6 @@ variable "agents" {
     priority          = number # ALB listener rule priority
   }))
   default = {
-    facilitator = {
-      port              = 8080
-      health_check_path = "/health"
-      priority          = 50
-    }
     validator = {
       port              = 9001
       health_check_path = "/health"
@@ -248,9 +243,9 @@ variable "secrets_manager_secret_name" {
 # ----------------------------------------------------------------------------
 
 variable "alb_idle_timeout" {
-  description = "ALB idle timeout in seconds"
+  description = "ALB idle timeout in seconds (CRITICAL: Must be > Base mainnet settlement time)"
   type        = number
-  default     = 60
+  default     = 180  # Increased from 60s to accommodate Base mainnet tx confirmations
 }
 
 variable "enable_alb_access_logs" {

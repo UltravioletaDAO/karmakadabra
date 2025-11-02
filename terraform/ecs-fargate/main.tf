@@ -55,11 +55,11 @@ data "aws_caller_identity" "current" {}
 data "aws_region" "current" {}
 
 # Data sources for individual agent secrets (flat JSON structure)
-# Facilitator uses network-specific secret naming: karmacadabra-facilitator-testnet
+# Facilitator uses network-specific secret naming: karmacadabra-facilitator-mainnet
 # All other agents use: karmacadabra-{agent-name}
 data "aws_secretsmanager_secret" "agent_secrets" {
   for_each = var.agents
-  name     = each.key == "facilitator" ? "karmacadabra-facilitator-testnet" : "karmacadabra-${each.key}"
+  name     = each.key == "facilitator" ? "karmacadabra-facilitator-mainnet" : "karmacadabra-${each.key}"
 }
 
 # Solana keypair secret for facilitator

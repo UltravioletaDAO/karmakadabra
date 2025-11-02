@@ -1,0 +1,1284 @@
+[INFO] Loaded karmacadabra-test-buyer wallet from AWS Secrets Manager
+[INIT] Payer wallet: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Test seller: https://test-seller.karmacadabra.ultravioletadao.xyz
+[INIT] Price per request: $0.01 USDC
+
+[START] Sequential test: 30 requests
+[MODE] Round-robin across 3 buyer wallets
+============================================================
+[INIT] Loading 3 buyer wallets for round-robin...
+[INIT] Buyer 0: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Buyer 1: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[INIT] Buyer 2: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[INIT] Loaded 3 buyer wallets
+
+[0001] [2025-11-01 15:18:38.908] ========== REQUEST DETAILS ==========
+[0001] [2025-11-01 15:18:38.908] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0001] [2025-11-01 15:18:38.908] Nonce: 0x79c277bc7506ec126250e8e73e913e50eb82dd8be298860e166d3dabb4d4ae2c
+[0001] [2025-11-01 15:18:38.908] Signature: 0xa7a11f2d980069f79a...f7935d246358d8d6ac1c
+[0001] [2025-11-01 15:18:38.908] Valid: 1762024658 to 1762028318
+[0001] [2025-11-01 15:18:38.908] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xa7a11f2d980069f79aba90f5498494ee2651d5113e90524baebe4b645054d7221a6174e5ced9fcd798f9a647632f664bc3f5baaad01e90f7935d246358d8d6ac1c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024658,
+        "validBefore": 1762028318,
+        "nonce": "0x79c277bc7506ec126250e8e73e913e50eb82dd8be298860e166d3dabb4d4ae2c"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0001] [2025-11-01 15:18:39.192] FAILED - HTTP 402
+[0001] [2025-11-01 15:18:39.192] ========== ERROR RESPONSE ==========
+[0001] [2025-11-01 15:18:39.192] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0001] [2025-11-01 15:18:39.192] ===================================
+
+
+[0002] [2025-11-01 15:18:44.197] ========== REQUEST DETAILS ==========
+[0002] [2025-11-01 15:18:44.197] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0002] [2025-11-01 15:18:44.197] Nonce: 0x84081e43fee88041a8a3a5b536233603139659428d984c4fab62e5a71f7fb2e4
+[0002] [2025-11-01 15:18:44.197] Signature: 0x848ebc6a00f073a8ad...bc14031ad95094efa91c
+[0002] [2025-11-01 15:18:44.197] Valid: 1762024664 to 1762028324
+[0002] [2025-11-01 15:18:44.197] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x848ebc6a00f073a8adc284bbe27a4a1c4710bd399e16077ccc5ab1e38aa257b25bcfd5b5a652071857f13caaa4c9641c2edce6ba108236bc14031ad95094efa91c",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024664,
+        "validBefore": 1762028324,
+        "nonce": "0x84081e43fee88041a8a3a5b536233603139659428d984c4fab62e5a71f7fb2e4"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0002] [2025-11-01 15:18:44.484] FAILED - HTTP 402
+[0002] [2025-11-01 15:18:44.484] ========== ERROR RESPONSE ==========
+[0002] [2025-11-01 15:18:44.484] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0002] [2025-11-01 15:18:44.484] ===================================
+
+
+[0003] [2025-11-01 15:18:49.490] ========== REQUEST DETAILS ==========
+[0003] [2025-11-01 15:18:49.490] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0003] [2025-11-01 15:18:49.490] Nonce: 0xfbab2128488c068d492e7c0840b466af21189332bbdf958720f17a1e3fe7cdf8
+[0003] [2025-11-01 15:18:49.490] Signature: 0x1829a6d6797816bf61...dc1c4faa9b63d3adbb1b
+[0003] [2025-11-01 15:18:49.490] Valid: 1762024669 to 1762028329
+[0003] [2025-11-01 15:18:49.490] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x1829a6d6797816bf6181f79e672ce6568aa46197a92f1129a25ca95ace8c45700b9912eac0ab37d8da1212330980ad9e779eb642c1762adc1c4faa9b63d3adbb1b",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024669,
+        "validBefore": 1762028329,
+        "nonce": "0xfbab2128488c068d492e7c0840b466af21189332bbdf958720f17a1e3fe7cdf8"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0003] [2025-11-01 15:18:49.761] FAILED - HTTP 402
+[0003] [2025-11-01 15:18:49.761] ========== ERROR RESPONSE ==========
+[0003] [2025-11-01 15:18:49.761] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0003] [2025-11-01 15:18:49.761] ===================================
+
+
+[0004] [2025-11-01 15:18:54.766] ========== REQUEST DETAILS ==========
+[0004] [2025-11-01 15:18:54.766] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0004] [2025-11-01 15:18:54.766] Nonce: 0xce3c017dcac13655347bf1ff092fcfb6520dd41d0ca6bace40a5cf13729be8d6
+[0004] [2025-11-01 15:18:54.766] Signature: 0xa97ba4871dc36b1b06...82e2f78fa8c875ec791c
+[0004] [2025-11-01 15:18:54.766] Valid: 1762024674 to 1762028334
+[0004] [2025-11-01 15:18:54.766] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xa97ba4871dc36b1b06893c71e3eee7915b8ac9bca17c0b6cd55444aced4753764e47d45f8e1f82f5fc4685ac6fb1dec94a9494aa2ebafd82e2f78fa8c875ec791c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024674,
+        "validBefore": 1762028334,
+        "nonce": "0xce3c017dcac13655347bf1ff092fcfb6520dd41d0ca6bace40a5cf13729be8d6"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0004] [2025-11-01 15:18:55.011] FAILED - HTTP 402
+[0004] [2025-11-01 15:18:55.011] ========== ERROR RESPONSE ==========
+[0004] [2025-11-01 15:18:55.011] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0004] [2025-11-01 15:18:55.011] ===================================
+
+
+[0005] [2025-11-01 15:19:00.016] ========== REQUEST DETAILS ==========
+[0005] [2025-11-01 15:19:00.016] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0005] [2025-11-01 15:19:00.016] Nonce: 0xfa4e4a2445c65f55b9eec573a2d1a4b9b4a34aacd8e41debebebaae0dc9f8df7
+[0005] [2025-11-01 15:19:00.016] Signature: 0xe93d239bc2feec86bf...a5137a251528f789d71b
+[0005] [2025-11-01 15:19:00.016] Valid: 1762024680 to 1762028340
+[0005] [2025-11-01 15:19:00.016] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xe93d239bc2feec86bfee5106e82f0aa867c24e7b55512a540a4a905aa6b20a5270270128260a86b4900ec331b47cb62319b7bf633667d3a5137a251528f789d71b",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024680,
+        "validBefore": 1762028340,
+        "nonce": "0xfa4e4a2445c65f55b9eec573a2d1a4b9b4a34aacd8e41debebebaae0dc9f8df7"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0005] [2025-11-01 15:19:00.289] FAILED - HTTP 402
+[0005] [2025-11-01 15:19:00.289] ========== ERROR RESPONSE ==========
+[0005] [2025-11-01 15:19:00.289] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0005] [2025-11-01 15:19:00.289] ===================================
+
+
+[0006] [2025-11-01 15:19:05.295] ========== REQUEST DETAILS ==========
+[0006] [2025-11-01 15:19:05.295] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0006] [2025-11-01 15:19:05.295] Nonce: 0x408f169b2f4c8ea8e3907c460c8c10505680fda702dcc1770f1df4b32690714e
+[0006] [2025-11-01 15:19:05.295] Signature: 0x646244421fb5a6efce...61e1d1d7b79725c15e1c
+[0006] [2025-11-01 15:19:05.295] Valid: 1762024685 to 1762028345
+[0006] [2025-11-01 15:19:05.295] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x646244421fb5a6efcea45f017211c9d10202c02cbc94901705966a268855ebba72648eea34ecabc57f727fc01f270de62f56790f0156e561e1d1d7b79725c15e1c",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024685,
+        "validBefore": 1762028345,
+        "nonce": "0x408f169b2f4c8ea8e3907c460c8c10505680fda702dcc1770f1df4b32690714e"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0006] [2025-11-01 15:19:05.532] FAILED - HTTP 402
+[0006] [2025-11-01 15:19:05.532] ========== ERROR RESPONSE ==========
+[0006] [2025-11-01 15:19:05.532] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0006] [2025-11-01 15:19:05.532] ===================================
+
+
+[0007] [2025-11-01 15:19:10.537] ========== REQUEST DETAILS ==========
+[0007] [2025-11-01 15:19:10.537] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0007] [2025-11-01 15:19:10.537] Nonce: 0xc5171b1d13f270fc8cf0b86a38c0ab518f72422abb89f2c8d9e0afdb61e196f1
+[0007] [2025-11-01 15:19:10.537] Signature: 0x66e31c13b5ca4e2c09...f3908c2edad19ac2691c
+[0007] [2025-11-01 15:19:10.537] Valid: 1762024690 to 1762028350
+[0007] [2025-11-01 15:19:10.537] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x66e31c13b5ca4e2c09f6c530f320274161e0c368b5746d810853687bee295b171998b87c8f2b36cf16405164e938cd3656c8dd6a46c16ef3908c2edad19ac2691c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024690,
+        "validBefore": 1762028350,
+        "nonce": "0xc5171b1d13f270fc8cf0b86a38c0ab518f72422abb89f2c8d9e0afdb61e196f1"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0007] [2025-11-01 15:19:10.764] FAILED - HTTP 402
+[0007] [2025-11-01 15:19:10.764] ========== ERROR RESPONSE ==========
+[0007] [2025-11-01 15:19:10.764] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0007] [2025-11-01 15:19:10.764] ===================================
+
+
+[0008] [2025-11-01 15:19:15.770] ========== REQUEST DETAILS ==========
+[0008] [2025-11-01 15:19:15.770] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0008] [2025-11-01 15:19:15.770] Nonce: 0xbef9e9c6ec0ad63964e942ae7ff3921bf3aba6ce6d73f0c57cdcd6e9f895429d
+[0008] [2025-11-01 15:19:15.770] Signature: 0xc31cf96d5031d780c9...f07d3f9a90d35023081b
+[0008] [2025-11-01 15:19:15.770] Valid: 1762024695 to 1762028355
+[0008] [2025-11-01 15:19:15.770] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xc31cf96d5031d780c908ce2682122adff127316d3f02c8c12188eb0861400e284e0601d8a48807d869531b2b815787a065ae4622c4985af07d3f9a90d35023081b",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024695,
+        "validBefore": 1762028355,
+        "nonce": "0xbef9e9c6ec0ad63964e942ae7ff3921bf3aba6ce6d73f0c57cdcd6e9f895429d"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0008] [2025-11-01 15:19:15.999] FAILED - HTTP 402
+[0008] [2025-11-01 15:19:15.999] ========== ERROR RESPONSE ==========
+[0008] [2025-11-01 15:19:15.999] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0008] [2025-11-01 15:19:15.999] ===================================
+
+
+[0009] [2025-11-01 15:19:21.006] ========== REQUEST DETAILS ==========
+[0009] [2025-11-01 15:19:21.006] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0009] [2025-11-01 15:19:21.006] Nonce: 0xa7f8f6cdfea6a29956f96ec9a33fd950be38b4d8183abbcaa5980d0ce99fbce7
+[0009] [2025-11-01 15:19:21.006] Signature: 0x50606e801d3c16f18f...1c493214814b1e95681c
+[0009] [2025-11-01 15:19:21.006] Valid: 1762024701 to 1762028361
+[0009] [2025-11-01 15:19:21.006] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x50606e801d3c16f18f17cc6d7c1dcc6a5a8940754aaca4bba98255c8aa27b5337f2378aa7295eb6e1648b626e200c11189ed592ba88b521c493214814b1e95681c",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024701,
+        "validBefore": 1762028361,
+        "nonce": "0xa7f8f6cdfea6a29956f96ec9a33fd950be38b4d8183abbcaa5980d0ce99fbce7"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0009] [2025-11-01 15:19:21.314] FAILED - HTTP 402
+[0009] [2025-11-01 15:19:21.314] ========== ERROR RESPONSE ==========
+[0009] [2025-11-01 15:19:21.314] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0009] [2025-11-01 15:19:21.314] ===================================
+
+
+[0010] [2025-11-01 15:19:26.319] ========== REQUEST DETAILS ==========
+[0010] [2025-11-01 15:19:26.319] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0010] [2025-11-01 15:19:26.319] Nonce: 0x39b8a7fb193c1fd8d5f42917671eb605095dbc8417b998c734206c119e65898b
+[0010] [2025-11-01 15:19:26.319] Signature: 0x50bb4d7665ef9e1b66...ba60b697bc23c7b2f61c
+[0010] [2025-11-01 15:19:26.319] Valid: 1762024706 to 1762028366
+[0010] [2025-11-01 15:19:26.319] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x50bb4d7665ef9e1b665b2068e86b9beb8bb693a7340247929d3ea52afbb1f1ce2807f46d7c9df515ebab09c33dd9e6c9ef71c565eb9bb1ba60b697bc23c7b2f61c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024706,
+        "validBefore": 1762028366,
+        "nonce": "0x39b8a7fb193c1fd8d5f42917671eb605095dbc8417b998c734206c119e65898b"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0010] [2025-11-01 15:19:26.589] FAILED - HTTP 402
+[0010] [2025-11-01 15:19:26.589] ========== ERROR RESPONSE ==========
+[0010] [2025-11-01 15:19:26.589] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0010] [2025-11-01 15:19:26.589] ===================================
+
+
+[0011] [2025-11-01 15:19:31.595] ========== REQUEST DETAILS ==========
+[0011] [2025-11-01 15:19:31.595] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0011] [2025-11-01 15:19:31.595] Nonce: 0x821da2e9c0668e33323e14eb05ca586630b20a23582dee0009fd6e671bccdef0
+[0011] [2025-11-01 15:19:31.595] Signature: 0x16e9540e4b4334e4aa...a4f255019db630f4fd1c
+[0011] [2025-11-01 15:19:31.595] Valid: 1762024711 to 1762028371
+[0011] [2025-11-01 15:19:31.595] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x16e9540e4b4334e4aade8765dd1ab5481f57e00fe6186ea1c9928e0551abeb7579ee4da8e0fa7816179aed7d9edd61c802a7a5fc2a4127a4f255019db630f4fd1c",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024711,
+        "validBefore": 1762028371,
+        "nonce": "0x821da2e9c0668e33323e14eb05ca586630b20a23582dee0009fd6e671bccdef0"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0011] [2025-11-01 15:19:31.859] FAILED - HTTP 402
+[0011] [2025-11-01 15:19:31.859] ========== ERROR RESPONSE ==========
+[0011] [2025-11-01 15:19:31.859] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0011] [2025-11-01 15:19:31.859] ===================================
+
+
+[0012] [2025-11-01 15:19:36.864] ========== REQUEST DETAILS ==========
+[0012] [2025-11-01 15:19:36.864] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0012] [2025-11-01 15:19:36.864] Nonce: 0xef05484bd561ba9a1906bc0739b1685c07762b2c8d623524e12f01734c8fccac
+[0012] [2025-11-01 15:19:36.864] Signature: 0x8b162fe8552e7c2574...041cdf2903a10554c71b
+[0012] [2025-11-01 15:19:36.864] Valid: 1762024716 to 1762028376
+[0012] [2025-11-01 15:19:36.864] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x8b162fe8552e7c2574dc92f236e5acffc2102b6e072911957b9ed57da54b5dae0ba15298abc77fc89bdae5b5e4434224e445300e40ae85041cdf2903a10554c71b",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024716,
+        "validBefore": 1762028376,
+        "nonce": "0xef05484bd561ba9a1906bc0739b1685c07762b2c8d623524e12f01734c8fccac"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0012] [2025-11-01 15:19:37.127] FAILED - HTTP 402
+[0012] [2025-11-01 15:19:37.127] ========== ERROR RESPONSE ==========
+[0012] [2025-11-01 15:19:37.127] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0012] [2025-11-01 15:19:37.127] ===================================
+
+
+[0013] [2025-11-01 15:19:42.133] ========== REQUEST DETAILS ==========
+[0013] [2025-11-01 15:19:42.133] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0013] [2025-11-01 15:19:42.133] Nonce: 0x45b99340902139d2c09d368ba1db61f3342958ec94b92bdccce9bdb9384bfa5b
+[0013] [2025-11-01 15:19:42.133] Signature: 0xccb24c8aa45c3abf42...cd3622e114a34997b71b
+[0013] [2025-11-01 15:19:42.133] Valid: 1762024722 to 1762028382
+[0013] [2025-11-01 15:19:42.133] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xccb24c8aa45c3abf42bed3ad9aff1cb4c868bdcc314f9249597acd34b2114fa8015a7024f071ee4748c60d309c0237050bb9c1880aec09cd3622e114a34997b71b",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024722,
+        "validBefore": 1762028382,
+        "nonce": "0x45b99340902139d2c09d368ba1db61f3342958ec94b92bdccce9bdb9384bfa5b"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0013] [2025-11-01 15:19:42.383] FAILED - HTTP 402
+[0013] [2025-11-01 15:19:42.383] ========== ERROR RESPONSE ==========
+[0013] [2025-11-01 15:19:42.383] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0013] [2025-11-01 15:19:42.383] ===================================
+
+
+[0014] [2025-11-01 15:19:47.390] ========== REQUEST DETAILS ==========
+[0014] [2025-11-01 15:19:47.390] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0014] [2025-11-01 15:19:47.390] Nonce: 0x7a878c817e626045463d18ec84943d29d44ca3f92e5b12cf771c027cbb3ee708
+[0014] [2025-11-01 15:19:47.390] Signature: 0x4abfc1ffc48d7ed0db...93459b2f931b6bccd61c
+[0014] [2025-11-01 15:19:47.390] Valid: 1762024727 to 1762028387
+[0014] [2025-11-01 15:19:47.390] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x4abfc1ffc48d7ed0db8aebd54a0cf9e1c171001225ebc6dbc37167d395c573cf2e819801e56db178e75836651cd7ae467709f483217c4593459b2f931b6bccd61c",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024727,
+        "validBefore": 1762028387,
+        "nonce": "0x7a878c817e626045463d18ec84943d29d44ca3f92e5b12cf771c027cbb3ee708"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0014] [2025-11-01 15:19:47.650] FAILED - HTTP 402
+[0014] [2025-11-01 15:19:47.650] ========== ERROR RESPONSE ==========
+[0014] [2025-11-01 15:19:47.650] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0014] [2025-11-01 15:19:47.650] ===================================
+
+
+[0015] [2025-11-01 15:19:52.655] ========== REQUEST DETAILS ==========
+[0015] [2025-11-01 15:19:52.655] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0015] [2025-11-01 15:19:52.655] Nonce: 0xc4c10622e561139e6595b04163252084fad441d7a15760b20a8e53bb212b287c
+[0015] [2025-11-01 15:19:52.655] Signature: 0x7c9e33707cdd7cd0d3...1af802b112861ac4741c
+[0015] [2025-11-01 15:19:52.655] Valid: 1762024732 to 1762028392
+[0015] [2025-11-01 15:19:52.655] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x7c9e33707cdd7cd0d382ed4d46f5eb2557fb8365aee3e5e4f92245f53217359f5630aefb3c44dbd3a6e81a97e14336ea15f7d672b6cfd31af802b112861ac4741c",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024732,
+        "validBefore": 1762028392,
+        "nonce": "0xc4c10622e561139e6595b04163252084fad441d7a15760b20a8e53bb212b287c"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0015] [2025-11-01 15:19:52.902] FAILED - HTTP 402
+[0015] [2025-11-01 15:19:52.902] ========== ERROR RESPONSE ==========
+[0015] [2025-11-01 15:19:52.902] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0015] [2025-11-01 15:19:52.902] ===================================
+
+
+[0016] [2025-11-01 15:19:57.908] ========== REQUEST DETAILS ==========
+[0016] [2025-11-01 15:19:57.908] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0016] [2025-11-01 15:19:57.908] Nonce: 0xbdd06a7441fb4dd1bf53e77f86d9dc35cbe53037439a219cc7c030c822ba5ba3
+[0016] [2025-11-01 15:19:57.908] Signature: 0x08902febd6ad79b49d...38a78d49be5cd2812a1c
+[0016] [2025-11-01 15:19:57.908] Valid: 1762024737 to 1762028397
+[0016] [2025-11-01 15:19:57.908] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x08902febd6ad79b49dbafa4a18ea9c9323cb378c5d195c7ce62d8835cf900cf7149d952feee84b232d81b138c4aecff5162f2fdb845fe838a78d49be5cd2812a1c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024737,
+        "validBefore": 1762028397,
+        "nonce": "0xbdd06a7441fb4dd1bf53e77f86d9dc35cbe53037439a219cc7c030c822ba5ba3"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0016] [2025-11-01 15:19:58.156] FAILED - HTTP 402
+[0016] [2025-11-01 15:19:58.156] ========== ERROR RESPONSE ==========
+[0016] [2025-11-01 15:19:58.156] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0016] [2025-11-01 15:19:58.156] ===================================
+
+
+[0017] [2025-11-01 15:20:03.161] ========== REQUEST DETAILS ==========
+[0017] [2025-11-01 15:20:03.161] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0017] [2025-11-01 15:20:03.161] Nonce: 0xdb3b4e70ec302ec69a2fac96770c76671e0326ecf0f011d0e7049fe7ac382c01
+[0017] [2025-11-01 15:20:03.161] Signature: 0x5bf9a131389a79cb2c...7e03cdf7b527ba31301c
+[0017] [2025-11-01 15:20:03.161] Valid: 1762024743 to 1762028403
+[0017] [2025-11-01 15:20:03.161] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x5bf9a131389a79cb2ca6230a3bdd44453c43d05829a0e3d71692b95ea838935f710f618a9b07e86ce6a8c99b09a1d66b644c8f2439ed037e03cdf7b527ba31301c",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024743,
+        "validBefore": 1762028403,
+        "nonce": "0xdb3b4e70ec302ec69a2fac96770c76671e0326ecf0f011d0e7049fe7ac382c01"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0017] [2025-11-01 15:20:03.451] FAILED - HTTP 402
+[0017] [2025-11-01 15:20:03.451] ========== ERROR RESPONSE ==========
+[0017] [2025-11-01 15:20:03.451] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0017] [2025-11-01 15:20:03.451] ===================================
+
+
+[0018] [2025-11-01 15:20:08.457] ========== REQUEST DETAILS ==========
+[0018] [2025-11-01 15:20:08.457] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0018] [2025-11-01 15:20:08.457] Nonce: 0xc4b23dc8e5eafb14b27dbabd4e02b5b87a3ddd5eef603f11fd50434f79369a07
+[0018] [2025-11-01 15:20:08.457] Signature: 0x0cdbc2e829b3ed5b10...571f9f5c97128ef4d21b
+[0018] [2025-11-01 15:20:08.457] Valid: 1762024748 to 1762028408
+[0018] [2025-11-01 15:20:08.457] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x0cdbc2e829b3ed5b100e4de6afdd899e75cbbf36449b86b046c001a6d081177954dc08711e5f390ab7271978e5cb91c64e713df94608a0571f9f5c97128ef4d21b",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024748,
+        "validBefore": 1762028408,
+        "nonce": "0xc4b23dc8e5eafb14b27dbabd4e02b5b87a3ddd5eef603f11fd50434f79369a07"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0018] [2025-11-01 15:20:08.691] FAILED - HTTP 402
+[0018] [2025-11-01 15:20:08.691] ========== ERROR RESPONSE ==========
+[0018] [2025-11-01 15:20:08.691] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0018] [2025-11-01 15:20:08.691] ===================================
+
+
+[0019] [2025-11-01 15:20:13.696] ========== REQUEST DETAILS ==========
+[0019] [2025-11-01 15:20:13.696] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0019] [2025-11-01 15:20:13.696] Nonce: 0xa181891dfe030b9342ca449ddd5c2fa87eb4199f32cabb3b1881746a7253dff9
+[0019] [2025-11-01 15:20:13.696] Signature: 0xa88225e46e906da376...a57827157970b7ad891c
+[0019] [2025-11-01 15:20:13.696] Valid: 1762024753 to 1762028413
+[0019] [2025-11-01 15:20:13.696] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xa88225e46e906da3764ad07e27851358905a5d07e2fe93d6a795db3609dc8061607404716fdb64166c1379c9a885fe379434fd0fc35ffda57827157970b7ad891c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024753,
+        "validBefore": 1762028413,
+        "nonce": "0xa181891dfe030b9342ca449ddd5c2fa87eb4199f32cabb3b1881746a7253dff9"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0019] [2025-11-01 15:20:13.941] FAILED - HTTP 402
+[0019] [2025-11-01 15:20:13.941] ========== ERROR RESPONSE ==========
+[0019] [2025-11-01 15:20:13.941] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0019] [2025-11-01 15:20:13.941] ===================================
+
+
+[0020] [2025-11-01 15:20:18.948] ========== REQUEST DETAILS ==========
+[0020] [2025-11-01 15:20:18.948] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0020] [2025-11-01 15:20:18.948] Nonce: 0x7a071c53764ab1a55180fba19e60028f58e9f7513fbe35bc74a9c952ac0fba02
+[0020] [2025-11-01 15:20:18.948] Signature: 0xc7a7c885b313b2424d...280c8c492658906c8e1b
+[0020] [2025-11-01 15:20:18.948] Valid: 1762024758 to 1762028418
+[0020] [2025-11-01 15:20:18.948] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xc7a7c885b313b2424d6219b9d913b4986e7bf813a068238353ef77f6b5ef8ca55992bb731fb5f436933965142da654b83f22f93fc5bc71280c8c492658906c8e1b",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024758,
+        "validBefore": 1762028418,
+        "nonce": "0x7a071c53764ab1a55180fba19e60028f58e9f7513fbe35bc74a9c952ac0fba02"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0020] [2025-11-01 15:20:19.197] FAILED - HTTP 402
+[0020] [2025-11-01 15:20:19.197] ========== ERROR RESPONSE ==========
+[0020] [2025-11-01 15:20:19.197] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0020] [2025-11-01 15:20:19.197] ===================================
+
+
+[0021] [2025-11-01 15:20:24.203] ========== REQUEST DETAILS ==========
+[0021] [2025-11-01 15:20:24.203] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0021] [2025-11-01 15:20:24.203] Nonce: 0x9c3ea849017d459a8b8d81aa5a79e69de841457b5c70b653a8253657eb026c88
+[0021] [2025-11-01 15:20:24.203] Signature: 0x10713ec21af25d37bd...d31c00fcd26d464dd81b
+[0021] [2025-11-01 15:20:24.203] Valid: 1762024764 to 1762028424
+[0021] [2025-11-01 15:20:24.203] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x10713ec21af25d37bd891c42adb57c4a095e8407cddc53e7b111124725b47bd40727f27771c7358efcb595c3aec0862c8cd184e6dfc271d31c00fcd26d464dd81b",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024764,
+        "validBefore": 1762028424,
+        "nonce": "0x9c3ea849017d459a8b8d81aa5a79e69de841457b5c70b653a8253657eb026c88"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0021] [2025-11-01 15:20:24.480] FAILED - HTTP 402
+[0021] [2025-11-01 15:20:24.480] ========== ERROR RESPONSE ==========
+[0021] [2025-11-01 15:20:24.480] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0021] [2025-11-01 15:20:24.480] ===================================
+
+
+[0022] [2025-11-01 15:20:29.486] ========== REQUEST DETAILS ==========
+[0022] [2025-11-01 15:20:29.486] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0022] [2025-11-01 15:20:29.486] Nonce: 0x8a9b4ac9c3d232da6e86c1800eb009016962230d26dbb697e907e8e00925dc43
+[0022] [2025-11-01 15:20:29.486] Signature: 0x4dfc88c4ff1ce3154b...75dca18e47de69ed5b1c
+[0022] [2025-11-01 15:20:29.486] Valid: 1762024769 to 1762028429
+[0022] [2025-11-01 15:20:29.486] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x4dfc88c4ff1ce3154b58994deb95f104b8962c3980745330efe1abc5dfcae6dd6f4bf8c9fa2d12ea58ed83a007456d2ae803b1005b6fcd75dca18e47de69ed5b1c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024769,
+        "validBefore": 1762028429,
+        "nonce": "0x8a9b4ac9c3d232da6e86c1800eb009016962230d26dbb697e907e8e00925dc43"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0022] [2025-11-01 15:20:29.742] FAILED - HTTP 402
+[0022] [2025-11-01 15:20:29.742] ========== ERROR RESPONSE ==========
+[0022] [2025-11-01 15:20:29.742] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0022] [2025-11-01 15:20:29.742] ===================================
+
+
+[0023] [2025-11-01 15:20:34.748] ========== REQUEST DETAILS ==========
+[0023] [2025-11-01 15:20:34.748] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0023] [2025-11-01 15:20:34.748] Nonce: 0xb8220c8ee7424e81a934830cc25078c5440854f5116b589ab6d1a40e77560b51
+[0023] [2025-11-01 15:20:34.748] Signature: 0xcba9c5c8af7cc043f7...0d5dc3c7548aa2f2af1b
+[0023] [2025-11-01 15:20:34.748] Valid: 1762024774 to 1762028434
+[0023] [2025-11-01 15:20:34.748] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xcba9c5c8af7cc043f70931ebc0865260f100f30aabfdd69789926849c995bdd912df9794495eddb5b1b6ac982eb6fdc5075dece43027ab0d5dc3c7548aa2f2af1b",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024774,
+        "validBefore": 1762028434,
+        "nonce": "0xb8220c8ee7424e81a934830cc25078c5440854f5116b589ab6d1a40e77560b51"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0023] [2025-11-01 15:20:35.004] FAILED - HTTP 402
+[0023] [2025-11-01 15:20:35.004] ========== ERROR RESPONSE ==========
+[0023] [2025-11-01 15:20:35.004] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0023] [2025-11-01 15:20:35.004] ===================================
+
+
+[0024] [2025-11-01 15:20:40.010] ========== REQUEST DETAILS ==========
+[0024] [2025-11-01 15:20:40.010] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0024] [2025-11-01 15:20:40.010] Nonce: 0x6ce07226b55c902cb4029a5809cca2b8381d45119c9675be3144118a9d8edee5
+[0024] [2025-11-01 15:20:40.010] Signature: 0xb586b100fb644ba170...5dd98b26dd5986648d1c
+[0024] [2025-11-01 15:20:40.010] Valid: 1762024780 to 1762028440
+[0024] [2025-11-01 15:20:40.010] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xb586b100fb644ba17099f31dbdeb879d1cf6d45407e4283e2c81e75dc01487d64698122a46fc89c919ad29c8f5c201a306983463827be25dd98b26dd5986648d1c",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024780,
+        "validBefore": 1762028440,
+        "nonce": "0x6ce07226b55c902cb4029a5809cca2b8381d45119c9675be3144118a9d8edee5"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0024] [2025-11-01 15:20:40.250] FAILED - HTTP 402
+[0024] [2025-11-01 15:20:40.250] ========== ERROR RESPONSE ==========
+[0024] [2025-11-01 15:20:40.250] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0024] [2025-11-01 15:20:40.250] ===================================
+
+
+[0025] [2025-11-01 15:20:45.258] ========== REQUEST DETAILS ==========
+[0025] [2025-11-01 15:20:45.258] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0025] [2025-11-01 15:20:45.258] Nonce: 0x6d9a9969d9c9d3cfa060397572e15519061a2fa91b5c0054de09036dc1ed5fea
+[0025] [2025-11-01 15:20:45.258] Signature: 0x6f09bb4e16d1947014...41660e8fcd7641d8f81c
+[0025] [2025-11-01 15:20:45.258] Valid: 1762024785 to 1762028445
+[0025] [2025-11-01 15:20:45.258] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x6f09bb4e16d19470141ddc87834c9652108b127891cd4d1c47da1b9cbfbda15341ea29931decaccc71ece390dc9b24ce72a93104413a4341660e8fcd7641d8f81c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024785,
+        "validBefore": 1762028445,
+        "nonce": "0x6d9a9969d9c9d3cfa060397572e15519061a2fa91b5c0054de09036dc1ed5fea"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0025] [2025-11-01 15:20:45.592] FAILED - HTTP 402
+[0025] [2025-11-01 15:20:45.592] ========== ERROR RESPONSE ==========
+[0025] [2025-11-01 15:20:45.592] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0025] [2025-11-01 15:20:45.592] ===================================
+
+
+[0026] [2025-11-01 15:20:50.597] ========== REQUEST DETAILS ==========
+[0026] [2025-11-01 15:20:50.597] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0026] [2025-11-01 15:20:50.597] Nonce: 0x7539ac1f2c789a5d93061cb4df5eeb1acaff116e14d4a32281b8c5fe40a6262b
+[0026] [2025-11-01 15:20:50.597] Signature: 0x7bf65e4dcaebccf0c2...778f72b50fff9987571b
+[0026] [2025-11-01 15:20:50.597] Valid: 1762024790 to 1762028450
+[0026] [2025-11-01 15:20:50.597] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x7bf65e4dcaebccf0c24ba2fc936626220636d7de8d4fef0fb60f687208117f015f7d8a5bcbefd06072c103dda8414d35cb38c6304b6cf4778f72b50fff9987571b",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024790,
+        "validBefore": 1762028450,
+        "nonce": "0x7539ac1f2c789a5d93061cb4df5eeb1acaff116e14d4a32281b8c5fe40a6262b"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0026] [2025-11-01 15:20:50.881] FAILED - HTTP 402
+[0026] [2025-11-01 15:20:50.881] ========== ERROR RESPONSE ==========
+[0026] [2025-11-01 15:20:50.881] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0026] [2025-11-01 15:20:50.881] ===================================
+
+
+[0027] [2025-11-01 15:20:55.886] ========== REQUEST DETAILS ==========
+[0027] [2025-11-01 15:20:55.886] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0027] [2025-11-01 15:20:55.886] Nonce: 0xd3f2edfe4237445da24ea23acdab17e75538dcc073bbf7159c6171a055e29d6d
+[0027] [2025-11-01 15:20:55.886] Signature: 0x8c6318e853ecbb32eb...497221c63fa086d79f1c
+[0027] [2025-11-01 15:20:55.886] Valid: 1762024795 to 1762028455
+[0027] [2025-11-01 15:20:55.886] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x8c6318e853ecbb32eb81c1b7adce9d9246eaf21615a36241609b6ffe89342039595fd22a3c3d00164856b1c7d49556b7c18ce914f87922497221c63fa086d79f1c",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024795,
+        "validBefore": 1762028455,
+        "nonce": "0xd3f2edfe4237445da24ea23acdab17e75538dcc073bbf7159c6171a055e29d6d"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0027] [2025-11-01 15:20:56.129] FAILED - HTTP 402
+[0027] [2025-11-01 15:20:56.129] ========== ERROR RESPONSE ==========
+[0027] [2025-11-01 15:20:56.129] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0027] [2025-11-01 15:20:56.129] ===================================
+
+
+[0028] [2025-11-01 15:21:01.135] ========== REQUEST DETAILS ==========
+[0028] [2025-11-01 15:21:01.135] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0028] [2025-11-01 15:21:01.135] Nonce: 0x4daf14eab77216d33c7927e1a720dd1c943ea95a7cc830e8f4041f08361721e4
+[0028] [2025-11-01 15:21:01.135] Signature: 0x48c3fbcddc827534a2...5bc5cc08315b84c42b1b
+[0028] [2025-11-01 15:21:01.135] Valid: 1762024801 to 1762028461
+[0028] [2025-11-01 15:21:01.135] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x48c3fbcddc827534a212ec5365241754a852a22617e393b10e160735e81732426bdb5ddaca57b3f3a962c830d919ef737338c1b1ec5c675bc5cc08315b84c42b1b",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024801,
+        "validBefore": 1762028461,
+        "nonce": "0x4daf14eab77216d33c7927e1a720dd1c943ea95a7cc830e8f4041f08361721e4"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0028] [2025-11-01 15:21:01.537] FAILED - HTTP 402
+[0028] [2025-11-01 15:21:01.537] ========== ERROR RESPONSE ==========
+[0028] [2025-11-01 15:21:01.537] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0028] [2025-11-01 15:21:01.537] ===================================
+
+
+[0029] [2025-11-01 15:21:06.544] ========== REQUEST DETAILS ==========
+[0029] [2025-11-01 15:21:06.544] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0029] [2025-11-01 15:21:06.544] Nonce: 0x7c62cd0cf712cfddde5159c51f1a32cfa699f3057d0048fecf2f6e67bc230119
+[0029] [2025-11-01 15:21:06.544] Signature: 0xd177437e38c960f2cb...00082f9bfd0e4f1dbc1c
+[0029] [2025-11-01 15:21:06.544] Valid: 1762024806 to 1762028466
+[0029] [2025-11-01 15:21:06.544] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0xd177437e38c960f2cb224e533aab4489f45b6109ed4b28889c29d1c6061d22995a1654fc5654856c15099424a3cf00aa70b80b9612f60b00082f9bfd0e4f1dbc1c",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024806,
+        "validBefore": 1762028466,
+        "nonce": "0x7c62cd0cf712cfddde5159c51f1a32cfa699f3057d0048fecf2f6e67bc230119"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0029] [2025-11-01 15:21:06.803] FAILED - HTTP 402
+[0029] [2025-11-01 15:21:06.803] ========== ERROR RESPONSE ==========
+[0029] [2025-11-01 15:21:06.803] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0029] [2025-11-01 15:21:06.803] ===================================
+
+
+[0030] [2025-11-01 15:21:11.809] ========== REQUEST DETAILS ==========
+[0030] [2025-11-01 15:21:11.809] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0030] [2025-11-01 15:21:11.809] Nonce: 0x3bb9c0015b80b4266d542b5f2c7488875883e87d2a8bbaf892860218c789f071
+[0030] [2025-11-01 15:21:11.809] Signature: 0x82ecb037b8eea4905b...a9ace08bc01b4fa95f1c
+[0030] [2025-11-01 15:21:11.809] Valid: 1762024811 to 1762028471
+[0030] [2025-11-01 15:21:11.809] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "0x82ecb037b8eea4905b14eb9f6987d259b5b83bcc36301a608033a05e76d737eb0192e13f094b4cf4723d06eb2356db6d64d0f3cac162e5a9ace08bc01b4fa95f1c",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": 10000,
+        "validAfter": 1762024811,
+        "validBefore": 1762028471,
+        "nonce": "0x3bb9c0015b80b4266d542b5f2c7488875883e87d2a8bbaf892860218c789f071"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x8335
+[0030] [2025-11-01 15:21:12.087] FAILED - HTTP 402
+[0030] [2025-11-01 15:21:12.087] ========== ERROR RESPONSE ==========
+[0030] [2025-11-01 15:21:12.087] Error: {
+  "detail": "Payment verification failed: Failed to deserialize the JSON body into the target type: paymentPayload.payload: data did not match"
+}
+[0030] [2025-11-01 15:21:12.087] ===================================
+
+
+============================================================
+LOAD TEST RESULTS
+============================================================
+Total Requests:    30
+Successful:        0 (0.0%)
+Failed:            30
+Duration:          158.76s
+Requests/sec:      0.19
+Total Cost:        $0.00 USDC
+============================================================

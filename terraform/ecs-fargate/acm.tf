@@ -12,8 +12,8 @@ resource "aws_acm_certificate" "main" {
 
   domain_name               = var.base_domain
   subject_alternative_names = [
-    "*.${var.base_domain}",                # Wildcard for all agent subdomains
-    "facilitator.${var.hosted_zone_name}"  # Facilitator at root domain
+    "*.${var.base_domain}"  # Wildcard for all agent subdomains
+    # Facilitator removed - now standalone deployment
   ]
   validation_method = "DNS"
 

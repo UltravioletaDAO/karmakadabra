@@ -1,0 +1,75 @@
+[INFO] Loaded karmacadabra-test-buyer wallet from AWS Secrets Manager
+[INIT] Payer wallet: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Test seller: https://test-seller.karmacadabra.ultravioletadao.xyz
+[INIT] Price per request: $0.01 USDC
+
+[START] Sequential test: 30 requests
+[MODE] Round-robin across 3 buyer wallets
+============================================================
+[INIT] Loading 3 buyer wallets for round-robin...
+[INIT] Buyer 0: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Buyer 1: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[INIT] Buyer 2: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[INIT] Loaded 3 buyer wallets
+[0001] [2025-11-01 14:46:10.526] FAILED - HTTP 402
+[0001] [2025-11-01 14:46:10.526] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0002] [2025-11-01 14:46:45.725] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0003] [2025-11-01 14:46:51.385] FAILED - HTTP 402
+[0003] [2025-11-01 14:46:51.385] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0004] [2025-11-01 14:46:56.996] FAILED - HTTP 402
+[0004] [2025-11-01 14:46:56.996] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0005] [2025-11-01 14:47:32.161] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0006] [2025-11-01 14:47:37.827] FAILED - HTTP 402
+[0006] [2025-11-01 14:47:37.827] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0007] [2025-11-01 14:47:43.257] FAILED - HTTP 402
+[0007] [2025-11-01 14:47:43.257] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0008] [2025-11-01 14:48:18.406] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0009] [2025-11-01 14:48:24.114] FAILED - HTTP 402
+[0009] [2025-11-01 14:48:24.114] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0010] [2025-11-01 14:48:29.586] FAILED - HTTP 402
+[0010] [2025-11-01 14:48:29.586] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0011] [2025-11-01 14:49:04.757] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0012] [2025-11-01 14:49:10.350] FAILED - HTTP 402
+[0012] [2025-11-01 14:49:10.350] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0013] [2025-11-01 14:49:16.011] FAILED - HTTP 402
+[0013] [2025-11-01 14:49:16.011] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0014] [2025-11-01 14:49:51.181] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0015] [2025-11-01 14:50:26.403] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0016] [2025-11-01 14:50:32.112] FAILED - HTTP 402
+[0016] [2025-11-01 14:50:32.112] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0017] [2025-11-01 14:51:07.299] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0018] [2025-11-01 14:51:12.963] FAILED - HTTP 402
+[0018] [2025-11-01 14:51:12.963] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0019] [2025-11-01 14:51:48.156] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0020] SUCCESS - Hello World! ? - $0.01 USDC - Payer: 0xaeabb3ee...
+[0021] [2025-11-01 14:52:06.165] FAILED - HTTP 402
+[0021] [2025-11-01 14:52:06.165] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0022] [2025-11-01 14:52:11.809] FAILED - HTTP 402
+[0022] [2025-11-01 14:52:11.809] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0023] [2025-11-01 14:52:17.550] FAILED - HTTP 402
+[0023] [2025-11-01 14:52:17.550] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0024] [2025-11-01 14:52:23.280] FAILED - HTTP 402
+[0024] [2025-11-01 14:52:23.280] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0025] [2025-11-01 14:52:29.017] FAILED - HTTP 402
+[0025] [2025-11-01 14:52:29.017] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0026] [2025-11-01 14:52:34.639] FAILED - HTTP 402
+[0026] [2025-11-01 14:52:34.639] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0027] [2025-11-01 14:52:40.334] FAILED - HTTP 402
+[0027] [2025-11-01 14:52:40.334] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0028] [2025-11-01 14:52:45.713] FAILED - HTTP 402
+[0028] [2025-11-01 14:52:45.713] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0029] [2025-11-01 14:52:51.450] FAILED - HTTP 402
+[0029] [2025-11-01 14:52:51.450] Response: {"detail":"Payment verification failed: {\"error\":\"Invalid request\"}"}
+[0030] [2025-11-01 14:52:57.278] FAILED - HTTP 402
+[0030] [2025-11-01 14:52:57.278] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+
+============================================================
+LOAD TEST RESULTS
+============================================================
+Total Requests:    30
+Successful:        1 (3.3%)
+Failed:            29
+Duration:          437.07s
+Requests/sec:      0.07
+Total Cost:        $0.01 USDC
+============================================================

@@ -32,7 +32,7 @@ def safe_print(msg: str):
 
 # Configuration
 TEST_SELLER_URL = "https://test-seller.karmacadabra.ultravioletadao.xyz"
-FACILITATOR_URL = "https://facilitator.prod.ultravioletadao.xyz"
+FACILITATOR_URL = "https://facilitator.ultravioletadao.xyz"
 USDC_BASE_ADDRESS = "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913"
 SELLER_ADDRESS = "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19"
 PRICE_USDC = "10000"  # $0.01 USDC
@@ -140,7 +140,7 @@ class TestSellerLoadTest:
         nonce = "0x" + os.urandom(32).hex()
 
         # Timestamps (EIP-3009 spec)
-        valid_after = int(time.time()) - 300  # 5 minutes ago (buffer for async load test delays)
+        valid_after = int(time.time()) - 60  # 1 minute ago (ensure immediate validity)
         valid_before = int(time.time()) + 3600  # 1 hour from now (generous window)
 
         domain = self.create_eip712_domain()
@@ -179,7 +179,7 @@ class TestSellerLoadTest:
         encoded = encode_typed_data(full_message=structured_data)
         signed = self.account.sign_message(encoded)
 
-        # Return signature and authorization (keep types consistent with signing)
+        # Return signature and authorization (with timestamps as strings)
         authorization = {
             "from": self.account.address,
             "to": SELLER_ADDRESS,

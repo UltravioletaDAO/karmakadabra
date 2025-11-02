@@ -1,0 +1,4 @@
+# Requirements for load_test_solana.py
+requests==2.31.0
+solders==0.21.0
+spl-token==0.2.0

@@ -1,0 +1,234 @@
+[INFO] Loaded karmacadabra-test-buyer wallet from AWS Secrets Manager
+[INIT] Payer wallet: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Test seller: https://test-seller.karmacadabra.ultravioletadao.xyz
+[INIT] Price per request: $0.01 USDC
+
+[START] Sequential test: 5 requests
+[MODE] Round-robin across 3 buyer wallets
+============================================================
+[INIT] Loading 3 buyer wallets for round-robin...
+[INIT] Buyer 0: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Buyer 1: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[INIT] Buyer 2: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[INIT] Loaded 3 buyer wallets
+
+[0001] [2025-11-01 23:43:07.817] ========== REQUEST DETAILS ==========
+[0001] [2025-11-01 23:43:07.817] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0001] [2025-11-01 23:43:07.817] Nonce: 0x1f451720b3c0fd47a6a3220d2f9a92df62a4ec2b0777ff1ae1153560f043852e
+[0001] [2025-11-01 23:43:07.817] Signature: 3e7a4c8138d03e57172c...00b53a555016fbdab81c
+[0001] [2025-11-01 23:43:07.817] Valid: 1762054687 to 1762058587
+[0001] [2025-11-01 23:43:07.817] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "3e7a4c8138d03e57172c0cf94ccd8d2a7302515e92fe32bcb495218454338dee372ec92c2e82f72748c905ea1da68fe5f822f87f0accf400b53a555016fbdab81c",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1762054687",
+        "validBefore": "1762058587",
+        "nonce": "0x1f451720b3c0fd47a6a3220d2f9a92df62a4ec2b0777ff1ae1153560f043852e"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x
+[0001] [2025-11-01 23:43:08.725] FAILED - HTTP 402
+[0001] [2025-11-01 23:43:08.725] ========== ERROR RESPONSE ==========
+[0001] [2025-11-01 23:43:08.725] Error: {
+  "detail": "Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { code: 3, message: \\\"execution reverted: Fia"
+}
+[0001] [2025-11-01 23:43:08.725] ===================================
+
+
+[0002] [2025-11-01 23:43:13.732] ========== REQUEST DETAILS ==========
+[0002] [2025-11-01 23:43:13.732] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0002] [2025-11-01 23:43:13.732] Nonce: 0xa63b0bb4e688e9cf357e9a79d0e30cc6acc9f9351dd8540d891b72e5a62c189e
+[0002] [2025-11-01 23:43:13.732] Signature: dd96739b145739156f84...8f222b0ee89a36efb91c
+[0002] [2025-11-01 23:43:13.732] Valid: 1762054693 to 1762058593
+[0002] [2025-11-01 23:43:13.732] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "dd96739b145739156f846212c2bbd50943d048571bf3935a8ff0c7e7cfbad20f191f6c5c2ef9e534a5269c2313bd8d04e986bb1525ccc48f222b0ee89a36efb91c",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1762054693",
+        "validBefore": "1762058593",
+        "nonce": "0xa63b0bb4e688e9cf357e9a79d0e30cc6acc9f9351dd8540d891b72e5a62c189e"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x
+[0002] [2025-11-01 23:43:21.427] FAILED - HTTP 402
+[0002] [2025-11-01 23:43:21.427] ========== ERROR RESPONSE ==========
+[0002] [2025-11-01 23:43:21.427] Error: {
+  "detail": "Payment invalid: Unknown"
+}
+[0002] [2025-11-01 23:43:21.427] ===================================
+
+
+[0003] [2025-11-01 23:43:26.432] ========== REQUEST DETAILS ==========
+[0003] [2025-11-01 23:43:26.432] Payer: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[0003] [2025-11-01 23:43:26.432] Nonce: 0x1a95e4aa1bbe4c8e6d7be3a20ebec2d087efd7122e2bd9e5c8599bf64e1577bc
+[0003] [2025-11-01 23:43:26.432] Signature: f0f2045e0b3ed9fc46b9...2a26e390a7db71a5761b
+[0003] [2025-11-01 23:43:26.432] Valid: 1762054706 to 1762058606
+[0003] [2025-11-01 23:43:26.432] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "f0f2045e0b3ed9fc46b99fc9399cfb1748c3f7434bb08484dc3a424e582b4e9e0b220eddf2858906606b139f2157a23f95f4a8852fc2132a26e390a7db71a5761b",
+      "authorization": {
+        "from": "0x20Bb866105414Ef7AAC273d5fa782C7F83336b50",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1762054706",
+        "validBefore": "1762058606",
+        "nonce": "0x1a95e4aa1bbe4c8e6d7be3a20ebec2d087efd7122e2bd9e5c8599bf64e1577bc"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x
+[0003] [2025-11-01 23:43:26.924] FAILED - HTTP 402
+[0003] [2025-11-01 23:43:26.924] ========== ERROR RESPONSE ==========
+[0003] [2025-11-01 23:43:26.924] Error: {
+  "detail": "Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { code: -32000, message: \\\"nonce too low: nex"
+}
+[0003] [2025-11-01 23:43:26.924] ===================================
+
+
+[0004] [2025-11-01 23:43:31.928] ========== REQUEST DETAILS ==========
+[0004] [2025-11-01 23:43:31.928] Payer: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[0004] [2025-11-01 23:43:31.928] Nonce: 0x3f5de9883e6fd4af21a38f1e4299db716b6b55bf123d767b0f038170c789de14
+[0004] [2025-11-01 23:43:31.928] Signature: 7cb5022df4cd8380553e...f06fa9eac0346ff45f1b
+[0004] [2025-11-01 23:43:31.928] Valid: 1762054711 to 1762058611
+[0004] [2025-11-01 23:43:31.928] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "7cb5022df4cd8380553e1a4ec9ecc11e188957a48215490e60f0f7b6b7207ed14d98779cedee063dfa44a7a83311437a8383f4fb02ed69f06fa9eac0346ff45f1b",
+      "authorization": {
+        "from": "0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1762054711",
+        "validBefore": "1762058611",
+        "nonce": "0x3f5de9883e6fd4af21a38f1e4299db716b6b55bf123d767b0f038170c789de14"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x
+[0004] [2025-11-01 23:43:32.807] FAILED - HTTP 402
+[0004] [2025-11-01 23:43:32.807] ========== ERROR RESPONSE ==========
+[0004] [2025-11-01 23:43:32.807] Error: {
+  "detail": "Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { code: 3, message: \\\"execution reverted: Fia"
+}
+[0004] [2025-11-01 23:43:32.807] ===================================
+
+
+[0005] [2025-11-01 23:43:37.812] ========== REQUEST DETAILS ==========
+[0005] [2025-11-01 23:43:37.812] Payer: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[0005] [2025-11-01 23:43:37.812] Nonce: 0x58500dd0e0a45bafbfb9d8ea3b048d620a2da7a1ad68f1889b424e6af7574103
+[0005] [2025-11-01 23:43:37.812] Signature: 088918e6a8cf90e500ca...52b99c58f1f2f0a25e1c
+[0005] [2025-11-01 23:43:37.812] Valid: 1762054717 to 1762058617
+[0005] [2025-11-01 23:43:37.812] Full x402Payment JSON:
+{
+  "x402Version": 1,
+  "paymentPayload": {
+    "x402Version": 1,
+    "scheme": "exact",
+    "network": "base",
+    "payload": {
+      "signature": "088918e6a8cf90e500ca888c88c14cdfff750791305341f99c71eb0ff972c9ae5d0ee03b4530fbc2048dbb7c3107780b93e6f25298b79752b99c58f1f2f0a25e1c",
+      "authorization": {
+        "from": "0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B",
+        "to": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+        "value": "10000",
+        "validAfter": "1762054717",
+        "validBefore": "1762058617",
+        "nonce": "0x58500dd0e0a45bafbfb9d8ea3b048d620a2da7a1ad68f1889b424e6af7574103"
+      }
+    }
+  },
+  "paymentRequirements": {
+    "scheme": "exact",
+    "network": "base",
+    "maxAmountRequired": "10000",
+    "resource": "https://test-seller.karmacadabra.ultravioletadao.xyz/hello",
+    "description": "Hello World message",
+    "mimeType": "application/json",
+    "payTo": "0x4dFB1Cd42604194e79eDaCff4e0d28A576e40d19",
+    "maxTimeoutSeconds": 60,
+    "asset": "0x
+[0005] [2025-11-01 23:43:38.610] FAILED - HTTP 402
+[0005] [2025-11-01 23:43:38.610] ========== ERROR RESPONSE ==========
+[0005] [2025-11-01 23:43:38.610] Error: {
+  "detail": "Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { code: 3, message: \\\"execution reverted: Fia"
+}
+[0005] [2025-11-01 23:43:38.610] ===================================
+
+
+============================================================
+LOAD TEST RESULTS
+============================================================
+Total Requests:    5
+Successful:        0 (0.0%)
+Failed:            5
+Duration:          36.43s
+Requests/sec:      0.14
+Total Cost:        $0.00 USDC
+============================================================

@@ -66,23 +66,11 @@ resource "aws_route53_record" "agents" {
 }
 
 # ----------------------------------------------------------------------------
-# Facilitator Record (facilitator.ultravioletadao.xyz)
+# Facilitator Record - REMOVED
 # ----------------------------------------------------------------------------
-# Special case: facilitator sits at root domain, not under karmacadabra
-
-resource "aws_route53_record" "facilitator" {
-  count = var.enable_route53 ? 1 : 0
-
-  zone_id = data.aws_route53_zone.main[0].zone_id
-  name    = "facilitator.${var.hosted_zone_name}"
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.main.dns_name
-    zone_id                = aws_lb.main.zone_id
-    evaluate_target_health = true
-  }
-}
+# Facilitator has been extracted to standalone deployment
+# Production endpoint: facilitator.ultravioletadao.xyz
+# See: plans/final-facilitator-cleanup.md
 
 # ----------------------------------------------------------------------------
 # Test Seller Record (test-seller.karmacadabra.ultravioletadao.xyz)

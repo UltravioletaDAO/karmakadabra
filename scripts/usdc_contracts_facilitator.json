@@ -1,0 +1,92 @@
+{
+  "mainnets": {
+    "Avalanche": {
+      "address": "0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E",
+      "decimals": 6,
+      "eip712_name": "USD Coin",
+      "eip712_version": "2",
+      "variable": "USDC_AVALANCHE"
+    },
+    "Base": {
+      "address": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
+      "decimals": 6,
+      "eip712_name": "USD Coin",
+      "eip712_version": "2",
+      "variable": "USDC_BASE"
+    },
+    "Optimism": {
+      "address": "0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85",
+      "decimals": 6,
+      "eip712_name": "USD Coin",
+      "eip712_version": "2",
+      "variable": "USDC_OPTIMISM"
+    },
+    "Polygon": {
+      "address": "0x3c499c542cEF5E3811e1192ce70d8cC03d5c3359",
+      "decimals": 6,
+      "eip712_name": "USDC",
+      "eip712_version": "2",
+      "variable": "USDC_POLYGON"
+    },
+    "Sei": {
+      "address": "0xe15fC38F6D8c56aF07bbCBe3BAf5708A2Bf42392",
+      "decimals": 6,
+      "eip712_name": "USDC",
+      "eip712_version": "2",
+      "variable": "USDC_SEI"
+    },
+    "Solana": {
+      "address": "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v",
+      "decimals": 6,
+      "eip712_name": "N/A (Solana)",
+      "eip712_version": "N/A",
+      "variable": "USDC_SOLANA"
+    },
+    "XdcMainnet": {
+      "address": "0x2A8E898b6242355c290E1f4Fc966b8788729A4D4",
+      "decimals": 6,
+      "eip712_name": "Bridged USDC(XDC)",
+      "eip712_version": "2",
+      "variable": "USDC_XDC"
+    }
+  },
+  "testnets": {
+    "AvalancheFuji": {
+      "address": "0x5425890298aed601595a70AB815c96711a31Bc65",
+      "decimals": 6,
+      "eip712_name": "USD Coin",
+      "eip712_version": "2",
+      "variable": "USDC_AVALANCHE_FUJI"
+    },
+    "BaseSepolia": {
+      "address": "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
+      "decimals": 6,
+      "eip712_name": "USDC",
+      "eip712_version": "2",
+      "variable": "USDC_BASE_SEPOLIA"
+    },
+    "PolygonAmoy": {
+      "address": "0x41E94Eb019C0762f9Bfcf9Fb1E58725BfB0e7582",
+      "decimals": 6,
+      "eip712_name": "USDC",
+      "eip712_version": "2",
+      "variable": "USDC_POLYGON_AMOY"
+    },
+    "SeiTestnet": {
+      "address": "0x4fCF1784B31630811181f670Aea7A7bEF803eaED",
+      "decimals": 6,
+      "eip712_name": "USDC",
+      "eip712_version": "2",
+      "variable": "USDC_SEI_TESTNET"
+    },
+    "SolanaDevnet": {
+      "address": "4zMMC9srt5Ri5X14GAgXhaHii3GnPAEERYPJgZJDncDU",
+      "decimals": 6,
+      "eip712_name": "N/A (Solana)",
+      "eip712_version": "N/A",
+      "variable": "USDC_SOLANA_DEVNET"
+    }
+  },
+  "extracted_at": "2025-10-31",
+  "source_file": "x402-rs/src/network.rs"
+}

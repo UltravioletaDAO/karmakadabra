@@ -1,0 +1,81 @@
+[INFO] Loaded karmacadabra-test-buyer wallet from AWS Secrets Manager
+[INIT] Payer wallet: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Test seller: https://test-seller.karmacadabra.ultravioletadao.xyz
+[INIT] Price per request: $0.01 USDC
+
+[START] Sequential test: 30 requests
+[MODE] Round-robin across 3 buyer wallets
+============================================================
+[INIT] Loading 3 buyer wallets for round-robin...
+[INIT] Buyer 0: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Buyer 1: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[INIT] Buyer 2: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[INIT] Loaded 3 buyer wallets
+[0001] [2025-11-01 16:59:42.574] FAILED - HTTP 402
+[0001] [2025-11-01 16:59:42.574] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0002] [2025-11-01 16:59:48.135] FAILED - HTTP 402
+[0002] [2025-11-01 16:59:48.135] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0003] [2025-11-01 16:59:53.718] FAILED - HTTP 402
+[0003] [2025-11-01 16:59:53.718] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0004] [2025-11-01 16:59:59.246] FAILED - HTTP 402
+[0004] [2025-11-01 16:59:59.246] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0005] [2025-11-01 17:00:04.834] FAILED - HTTP 402
+[0005] [2025-11-01 17:00:04.834] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0006] [2025-11-01 17:00:10.532] FAILED - HTTP 402
+[0006] [2025-11-01 17:00:10.532] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0007] [2025-11-01 17:00:16.120] FAILED - HTTP 402
+[0007] [2025-11-01 17:00:16.120] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0008] [2025-11-01 17:00:21.718] FAILED - HTTP 402
+[0008] [2025-11-01 17:00:21.718] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0009] [2025-11-01 17:00:27.376] FAILED - HTTP 402
+[0009] [2025-11-01 17:00:27.376] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0010] [2025-11-01 17:00:32.927] FAILED - HTTP 402
+[0010] [2025-11-01 17:00:32.927] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0011] [2025-11-01 17:00:38.496] FAILED - HTTP 402
+[0011] [2025-11-01 17:00:38.496] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0012] [2025-11-01 17:00:44.128] FAILED - HTTP 402
+[0012] [2025-11-01 17:00:44.128] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0013] [2025-11-01 17:00:49.687] FAILED - HTTP 402
+[0013] [2025-11-01 17:00:49.687] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0014] [2025-11-01 17:00:55.322] FAILED - HTTP 402
+[0014] [2025-11-01 17:00:55.322] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0015] [2025-11-01 17:01:00.962] FAILED - HTTP 402
+[0015] [2025-11-01 17:01:00.962] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0016] [2025-11-01 17:01:06.571] FAILED - HTTP 402
+[0016] [2025-11-01 17:01:06.571] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0017] [2025-11-01 17:01:12.185] FAILED - HTTP 402
+[0017] [2025-11-01 17:01:12.185] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0018] [2025-11-01 17:01:17.759] FAILED - HTTP 402
+[0018] [2025-11-01 17:01:17.759] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0019] [2025-11-01 17:01:23.429] FAILED - HTTP 402
+[0019] [2025-11-01 17:01:23.429] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0020] [2025-11-01 17:01:29.006] FAILED - HTTP 402
+[0020] [2025-11-01 17:01:29.006] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0021] [2025-11-01 17:02:04.188] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0022] [2025-11-01 17:02:09.890] FAILED - HTTP 402
+[0022] [2025-11-01 17:02:09.890] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0023] [2025-11-01 17:02:15.422] FAILED - HTTP 402
+[0023] [2025-11-01 17:02:15.422] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0024] [2025-11-01 17:02:21.017] FAILED - HTTP 402
+[0024] [2025-11-01 17:02:21.017] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0025] [2025-11-01 17:02:56.204] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0026] [2025-11-01 17:03:01.876] FAILED - HTTP 402
+[0026] [2025-11-01 17:03:01.876] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0027] [2025-11-01 17:03:37.053] ERROR - HTTPSConnectionPool(host='test-seller.karmacadabra.ultravioletadao.xyz', port=443): Read timed out. (read timeout=30)
+[0028] [2025-11-01 17:03:42.694] FAILED - HTTP 402
+[0028] [2025-11-01 17:03:42.694] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0029] [2025-11-01 17:03:48.356] FAILED - HTTP 402
+[0029] [2025-11-01 17:03:48.356] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0030] [2025-11-01 17:03:54.015] FAILED - HTTP 402
+[0030] [2025-11-01 17:03:54.015] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+
+============================================================
+LOAD TEST RESULTS
+============================================================
+Total Requests:    30
+Successful:        0 (0.0%)
+Failed:            30
+Duration:          257.56s
+Requests/sec:      0.12
+Total Cost:        $0.00 USDC
+============================================================

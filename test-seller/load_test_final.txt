@@ -1,0 +1,29 @@
+[INFO] Loaded karmacadabra-test-buyer wallet from AWS Secrets Manager
+[INIT] Payer wallet: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Test seller: https://test-seller.karmacadabra.ultravioletadao.xyz
+[INIT] Price per request: $0.01 USDC
+
+[START] Sequential test: 30 requests
+[MODE] Round-robin across 3 buyer wallets
+============================================================
+[INIT] Loading 3 buyer wallets for round-robin...
+[INIT] Buyer 0: 0x6bdc03ae4BBAb31843dDDaAE749149aE675ea011
+[INIT] Buyer 1: 0xaeabb3ee30d13FA83AD8e3FDa8322C98530B7F3B
+[INIT] Buyer 2: 0x20Bb866105414Ef7AAC273d5fa782C7F83336b50
+[INIT] Loaded 3 buyer wallets
+[0001] SUCCESS - Hello World! ? - $0.01 USDC - Payer: 0x6bdc03ae...
+[0002] SUCCESS - Hello World! ? - $0.01 USDC - Payer: 0xaeabb3ee...
+[0003] SUCCESS - Hello World! ? - $0.01 USDC - Payer: 0x20Bb8661...
+[0004] [2025-11-01 15:11:56.565] FAILED - HTTP 402
+[0004] [2025-11-01 15:11:56.565] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0005] [2025-11-01 15:12:02.235] FAILED - HTTP 402
+[0005] [2025-11-01 15:12:02.235] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0006] [2025-11-01 15:12:07.753] FAILED - HTTP 402
+[0006] [2025-11-01 15:12:07.753] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0007] [2025-11-01 15:12:13.490] FAILED - HTTP 402
+[0007] [2025-11-01 15:12:13.490] Response: {"detail":"Payment verification failed: {\"error\":\"Contract call failed: ErrorResp(ErrorPayload { 
+[0008] [2025-11-01 15:12:18.716] FAILED - HTTP 503
+[0008] [2025-11-01 15:12:18.716] Response: <html>
+<head><title>503 Service Temporarily Unavailable</title></head>
+<body>
+<center><h1>503 Ser

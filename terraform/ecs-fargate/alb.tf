@@ -277,50 +277,11 @@ resource "aws_lb_listener_rule" "agents_hostname_https" {
 }
 
 # ----------------------------------------------------------------------------
-# Facilitator Root Domain Routing (facilitator.ultravioletadao.xyz)
+# Facilitator Routing - REMOVED
 # ----------------------------------------------------------------------------
-
-resource "aws_lb_listener_rule" "facilitator_root_http" {
-  listener_arn = aws_lb_listener.http.arn
-  priority     = 10 # High priority
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.agents["facilitator"].arn
-  }
-
-  condition {
-    host_header {
-      values = ["facilitator.${var.hosted_zone_name}"]
-    }
-  }
-
-  tags = merge(var.tags, {
-    Name = "${var.project_name}-${var.environment}-facilitator-root-http"
-  })
-}
-
-resource "aws_lb_listener_rule" "facilitator_root_https" {
-  count = var.enable_https ? 1 : 0
-
-  listener_arn = aws_lb_listener.https[0].arn
-  priority     = 10 # High priority
-
-  action {
-    type             = "forward"
-    target_group_arn = aws_lb_target_group.agents["facilitator"].arn
-  }
-
-  condition {
-    host_header {
-      values = ["facilitator.${var.hosted_zone_name}"]
-    }
-  }
-
-  tags = merge(var.tags, {
-    Name = "${var.project_name}-${var.environment}-facilitator-root-https"
-  })
-}
+# Facilitator has been extracted to standalone deployment
+# Production endpoint: facilitator.ultravioletadao.xyz
+# See: plans/final-facilitator-cleanup.md
 
 # ----------------------------------------------------------------------------
 # Test Seller Domain Routing (test-seller.karmacadabra.ultravioletadao.xyz)
