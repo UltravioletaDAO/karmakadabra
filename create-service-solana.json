@@ -1,0 +1,28 @@
+{
+  "cluster": "karmacadabra-prod",
+  "serviceName": "karmacadabra-prod-test-seller-solana",
+  "taskDefinition": "karmacadabra-prod-test-seller-solana:1",
+  "loadBalancers": [
+    {
+      "targetGroupArn": "arn:aws:elasticloadbalancing:us-east-1:518898403364:targetgroup/kc-prod-test-seller-solana/4df1c1b1fa5db315",
+      "containerName": "test-seller-solana",
+      "containerPort": 8080
+    }
+  ],
+  "desiredCount": 1,
+  "launchType": "FARGATE",
+  "platformVersion": "LATEST",
+  "networkConfiguration": {
+    "awsvpcConfiguration": {
+      "subnets": [
+        "subnet-0eb54a6ce2fee574a",
+        "subnet-0e53bcd040dfd80b5"
+      ],
+      "securityGroups": [
+        "sg-0e147495bdc3e6f18"
+      ],
+      "assignPublicIp": "DISABLED"
+    }
+  },
+  "healthCheckGracePeriodSeconds": 60
+}
