@@ -11,7 +11,7 @@
   "containerDefinitions": [
     {
       "name": "test-seller-solana",
-      "image": "518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/test-seller-solana:latest",
+      "image": "518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/test-seller-solana@sha256:eb44dc00904f654ff6b60cb9134a29858e2ba911cb035e9a86bd0a257a0789a9",
       "essential": true,
       "portMappings": [
         {

@@ -93,6 +93,17 @@ AGENT_ADDRESS=0x2C3...  # Public (safe to store)
 - ✅ Only send to EOAs (wallet addresses with private keys)
 - Check contract code for withdrawal functions before sending funds
 
+### Facilitator DNS - DO NOT TOUCH
+**⚠️ CRITICAL: User manages facilitator infrastructure separately**
+
+- **Facilitator address**: `facilitator.ultravioletadao.xyz` (punto final, no discutir)
+- ❌ **NEVER attempt to create/modify facilitator DNS records**
+- ❌ **NEVER attempt to deploy/configure facilitator**
+- ✅ User handles facilitator setup independently
+- ✅ If facilitator has DNS issues, report to user - DO NOT fix
+
+**Why separate**: Facilitator is critical infrastructure managed outside normal deployment flow.
+
 ### ECS Docker Deployments - CRITICAL CHECKLIST
 **⚠️ INCIDENT: 2025-11-02 - 2 HOURS WASTED ON SIMPLE URL CHANGE**
 
