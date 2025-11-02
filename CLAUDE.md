@@ -93,6 +93,84 @@ AGENT_ADDRESS=0x2C3...  # Public (safe to store)
 - ✅ Only send to EOAs (wallet addresses with private keys)
 - Check contract code for withdrawal functions before sending funds
 
+### ECS Docker Deployments - CRITICAL CHECKLIST
+**⚠️ INCIDENT: 2025-11-02 - 2 HOURS WASTED ON SIMPLE URL CHANGE**
+
+**PROBLEM**: Changed `facilitator.prod.ultravioletadao.xyz` → `facilitator.ultravioletadao.xyz` in code, but ECS kept serving old code.
+
+**ROOT CAUSES**:
+1. Docker cache prevented new code from being copied to image
+2. Pushed to WRONG ECR repository (didn't check task definition first)
+3. ECS cached `:latest` tag, didn't pull fresh image
+
+**MANDATORY CHECKLIST - FOLLOW BEFORE EVERY DEPLOYMENT:**
+
+```bash
+# 🚨 STEP 1: CHECK TASK DEFINITION FIRST - DO NOT SKIP
+aws ecs describe-task-definition \
+  --task-definition SERVICE-NAME:1 \
+  --region us-east-1 \
+  --query 'taskDefinition.containerDefinitions[0].image' \
+  --output text
+# Example output: 518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/test-seller:latest
+#                                                              ^^^^^^^^^^^ THIS IS THE REPO NAME
+
+# 🚨 STEP 2: FOR CODE CHANGES - ALWAYS USE --no-cache
+docker build --no-cache --platform linux/amd64 -t SERVICE:latest .
+
+# 🚨 STEP 3: TAG AND PUSH TO CORRECT REPOSITORY (from Step 1)
+docker tag SERVICE:latest ECR_REPO_FROM_STEP_1:latest
+docker push ECR_REPO_FROM_STEP_1:latest
+
+# 🚨 STEP 4: VERIFY IMAGE DIGEST MATCHES
+# Get latest in ECR:
+aws ecr describe-images \
+  --repository-name REPO_NAME \
+  --region us-east-1 \
+  --query 'sort_by(imageDetails,&imagePushedAt)[-1].imageDigest' \
+  --output text
+
+# 🚨 STEP 5: FORCE FRESH PULL - STOP OLD TASK FIRST
+aws ecs stop-task \
+  --cluster karmacadabra-prod \
+  --task TASK_ID \
+  --reason "Force pull latest image" \
+  --region us-east-1
+
+aws ecs update-service \
+  --cluster karmacadabra-prod \
+  --service SERVICE_NAME \
+  --force-new-deployment \
+  --region us-east-1
+
+# 🚨 STEP 6: WAIT AND VERIFY
+sleep 90
+curl -s https://SERVICE.karmacadabra.ultravioletadao.xyz/health
+# VERIFY the change is actually there
+```
+
+**WHAT WENT WRONG (2025-11-02 incident)**:
+1. ❌ Used deploy.sh which hit Docker cache → old code stayed
+2. ❌ Rebuilt with `--no-cache` but pushed to `karmacadabra-prod-test-seller`
+3. ❌ Task definition pointed to `karmacadabra/test-seller` (different repo!)
+4. ❌ ECS kept pulling old cached image from correct repo
+5. ❌ Took 2 HOURS to realize repository mismatch
+
+**WHAT FINALLY WORKED**:
+1. ✅ Checked task definition FIRST to get correct ECR repo
+2. ✅ Built with `--no-cache`
+3. ✅ Tagged and pushed to CORRECT repository
+4. ✅ Stopped old task to force fresh image pull
+5. ✅ 5 MINUTES total once done correctly
+
+**KEY LESSONS**:
+- **NEVER assume deploy scripts push to the right place** - ALWAYS check task definition first
+- **Docker cache WILL break code changes** - use `--no-cache` for ANY code modification
+- **`:latest` tag LIES** - ECS caches it, always verify image digest matches
+- **For simple changes**: Check task def → Build no-cache → Push to correct repo → Stop old task → Done in 5 min
+
+**SIMPLE CHANGES SHOULD TAKE 5 MINUTES, NOT 2 HOURS**
+
 ### x402-rs Facilitator Upgrades - CRITICAL SAFEGUARDS
 **⚠️ THIS IS USER-FACING INFRASTRUCTURE WITH DAO BRANDING - LIVE STREAM VISIBLE**
 
