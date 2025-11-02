@@ -182,3 +182,8 @@ nul
 # Docker
 .dockerignore
 docker-compose.override.yml
+*_keypair.json
+*_KEYS.txt
+PHANTOM_IMPORT_KEYS.txt
+NEW_BUYER_WALLET.txt
+buyer_keypair_NEW.json

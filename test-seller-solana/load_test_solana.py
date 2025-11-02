@@ -9,7 +9,9 @@ import os
 import sys
 import time
 import base64
-from typing import Dict, Any
+import logging
+import logging
+from typing import Dict, Any, Optional, Optional
 from datetime import datetime
 
 # Add parent directory to path for shared modules
@@ -31,6 +33,20 @@ from spl.token.instructions import (  # type: ignore
 )
 from spl.token.constants import TOKEN_PROGRAM_ID  # type: ignore
 
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
 # Configuration
 TEST_SELLER_URL = os.getenv(
     "TEST_SELLER_URL",
@@ -42,22 +58,114 @@ PRICE_USDC = 10000  # 0.01 USDC (6 decimals)
 USDC_DECIMALS = 6
 
 
+
+
+def load_buyer_keypair(keypair_path: Optional[str] = None) -> Keypair:
+    """
+    Load buyer keypair from AWS Secrets Manager or local file
+
+    Args:
+        keypair_path: Optional path to local keypair file (for local testing)
+
+    Returns:
+        Solana Keypair object
+    """
+    # Try AWS Secrets Manager first
+    try:
+        import boto3
+
+        logger.info("Loading buyer keypair from AWS Secrets Manager...")
+        secrets_client = boto3.client('secretsmanager', region_name='us-east-1')
+        response = secrets_client.get_secret_value(SecretId='karmacadabra-test-buyer-solana')
+        config = json.loads(response['SecretString'])
+
+        keypair_bytes = config.get('keypair')
+        if not keypair_bytes:
+            raise ValueError("No keypair found in AWS Secrets Manager")
+
+        keypair = Keypair.from_bytes(bytes(keypair_bytes))
+        logger.info(f"Loaded buyer keypair from AWS: {keypair.pubkey()}")
+        return keypair
+
+    except Exception as e:
+        logger.warning(f"Could not load from AWS Secrets Manager: {e}")
+
+        # Fall back to local file if provided
+        if keypair_path:
+            logger.info(f"Falling back to local keypair file: {keypair_path}")
+            with open(keypair_path, 'r') as f:
+                keypair_data = json.load(f)
+            keypair = Keypair.from_bytes(bytes(keypair_data))
+            logger.info(f"Loaded buyer keypair from file: {keypair.pubkey()}")
+            return keypair
+        else:
+            raise ValueError(
+                "Could not load buyer keypair from AWS Secrets Manager and no local file provided. "
+                "Either ensure AWS credentials are configured or provide --keypair argument."
+            )
+
+
+
+
+
+def load_buyer_keypair(keypair_path: Optional[str] = None) -> Keypair:
+    """
+    Load buyer keypair from AWS Secrets Manager or local file
+
+    Args:
+        keypair_path: Optional path to local keypair file (for local testing)
+
+    Returns:
+        Solana Keypair object
+    """
+    # Try AWS Secrets Manager first
+    try:
+        import boto3
+
+        logger.info("Loading buyer keypair from AWS Secrets Manager...")
+        secrets_client = boto3.client('secretsmanager', region_name='us-east-1')
+        response = secrets_client.get_secret_value(SecretId='karmacadabra-test-buyer-solana')
+        config = json.loads(response['SecretString'])
+
+        keypair_bytes = config.get('keypair')
+        if not keypair_bytes:
+            raise ValueError("No keypair found in AWS Secrets Manager")
+
+        keypair = Keypair.from_bytes(bytes(keypair_bytes))
+        logger.info(f"Loaded buyer keypair from AWS: {keypair.pubkey()}")
+        return keypair
+
+    except Exception as e:
+        logger.warning(f"Could not load from AWS Secrets Manager: {e}")
+
+        # Fall back to local file if provided
+        if keypair_path:
+            logger.info(f"Falling back to local keypair file: {keypair_path}")
+            with open(keypair_path, 'r') as f:
+                keypair_data = json.load(f)
+            keypair = Keypair.from_bytes(bytes(keypair_data))
+            logger.info(f"Loaded buyer keypair from file: {keypair.pubkey()}")
+            return keypair
+        else:
+            raise ValueError(
+                "Could not load buyer keypair from AWS Secrets Manager and no local file provided. "
+                "Either ensure AWS credentials are configured or provide --keypair argument."
+            )
+
+
+
 class SolanaLoadTest:
     """Load tester for Solana x402 payment system"""
 
-    def __init__(self, buyer_keypair_path: str, seller_pubkey: str):
+    def __init__(self, buyer_keypair: Keypair, seller_pubkey: str):
         """
         Initialize load tester
 
         Args:
-            buyer_keypair_path: Path to buyer's Solana keypair JSON file
+            buyer_keypair: Buyer's Solana keypair (already loaded)
             seller_pubkey: Seller's Solana public key
         """
-        # Load buyer keypair
-        with open(buyer_keypair_path, 'r') as f:
-            keypair_data = json.load(f)
-
-        self.buyer = Keypair.from_bytes(bytes(keypair_data))
+        self.buyer = buyer_keypair
         self.seller = Pubkey.from_string(seller_pubkey)
 
         print(f"[INIT] Buyer pubkey: {self.buyer.pubkey()}")
@@ -264,7 +372,7 @@ class SolanaLoadTest:
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Load test for Solana test-seller")
-    parser.add_argument("--keypair", type=str, required=True, help="Path to buyer keypair JSON file")
+    parser.add_argument("--keypair", type=str, help="Path to buyer keypair JSON file (optional if AWS configured)")
     parser.add_argument("--seller", type=str, help="Seller's Solana public key (overrides SELLER_PUBKEY env)")
     parser.add_argument("--num-requests", type=int, default=5, help="Number of requests (default: 5)")
     parser.add_argument("--verbose", action="store_true", help="Print detailed output")
@@ -288,5 +396,8 @@ if __name__ == "__main__":
     print(f"  Verbose:      {args.verbose}")
     print()
 
-    tester = SolanaLoadTest(args.keypair, seller_pubkey)
+    # Load buyer keypair (from AWS or file)
+    buyer_keypair = load_buyer_keypair(args.keypair)
+
+    tester = SolanaLoadTest(buyer_keypair, seller_pubkey)
     tester.run_sequential_test(args.num_requests, verbose=args.verbose)

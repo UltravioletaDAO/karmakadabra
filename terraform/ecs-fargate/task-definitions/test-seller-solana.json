@@ -21,10 +21,6 @@
         {
           "name": "FACILITATOR_URL",
           "value": "https://facilitator.ultravioletadao.xyz"
-        },
-        {
-          "name": "SELLER_PUBKEY",
-          "value": "Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB"
         }
       ],
       "logConfiguration": {

@@ -11,12 +11,44 @@ import requests
 import os
 import uvicorn
 from datetime import datetime
+import json
+import logging
+
+# Configure logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
+
+
+def load_seller_config():
+    """Load seller configuration from AWS Secrets Manager or fall back to environment variables"""
+    try:
+        import boto3
+
+        secrets_client = boto3.client('secretsmanager', region_name='us-east-1')
+        response = secrets_client.get_secret_value(SecretId='karmacadabra-test-seller-solana')
+        config = json.loads(response['SecretString'])
+
+        # Extract public key from keypair
+        seller_pubkey = config.get('pubkey')
+
+        logger.info(f"Loaded seller config from AWS Secrets Manager: {seller_pubkey}")
+        return {'seller_pubkey': seller_pubkey}
+
+    except Exception as e:
+        logger.warning(f"Could not load from AWS Secrets Manager: {e}")
+        logger.info("Falling back to environment variables")
+        return {'seller_pubkey': os.getenv("SELLER_PUBKEY")}
+
 
 app = FastAPI(title="Test Seller Solana", version="1.0.0")
 
-# Configuration
+# Load configuration
+config = load_seller_config()
 FACILITATOR_URL = os.getenv("FACILITATOR_URL", "https://facilitator.ultravioletadao.xyz")
-SELLER_PUBKEY = os.getenv("SELLER_PUBKEY")  # Solana public key of seller
+SELLER_PUBKEY = config['seller_pubkey']
 PRICE_USDC = "10000"  # 0.01 USDC (6 decimals)
 USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v"  # USDC on Solana mainnet
 
