@@ -230,6 +230,11 @@ variable "agents" {
       health_check_path = "/health"
       priority          = 700
     }
+    test-seller-solana = {
+      port              = 8080
+      health_check_path = "/health"
+      priority          = 750
+    }
   }
 }
 
