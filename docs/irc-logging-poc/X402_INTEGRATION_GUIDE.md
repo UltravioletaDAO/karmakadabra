@@ -305,7 +305,7 @@ docker run -e IRC_ENABLED=true -e IRC_CHANNEL=#karmacadabra -p 8080:8080 x402-te
 
 ### 7. Update ECS Task Definition
 
-**File**: `terraform/ecs-fargate/facilitator-task-def-mainnet.json` (or wherever your task definition is)
+**File**: `terraform/ecs-fargate/task-definitions/facilitator-task-def-mainnet.json`
 
 **Add environment variables** to the container definition:
 

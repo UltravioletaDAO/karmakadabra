@@ -1,0 +1,53 @@
+{
+  "family": "karmacadabra-prod-test-seller-solana",
+  "networkMode": "awsvpc",
+  "taskRoleArn": "arn:aws:iam::518898403364:role/karmacadabra-prod-ecs-task-20251026204347632600000003",
+  "executionRoleArn": "arn:aws:iam::518898403364:role/karmacadabra-prod-ecs-exec-20251026204347677000000004",
+  "cpu": "256",
+  "memory": "512",
+  "containerDefinitions": [
+    {
+      "name": "test-seller-solana",
+      "image": "518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/test-seller-solana:latest",
+      "cpu": 0,
+      "portMappings": [
+        {
+          "containerPort": 8080,
+          "hostPort": 8080,
+          "protocol": "tcp"
+        }
+      ],
+      "essential": true,
+      "environment": [
+        {
+          "name": "FACILITATOR_URL",
+          "value": "https://facilitator.ultravioletadao.xyz"
+        }
+      ],
+      "mountPoints": [],
+      "volumesFrom": [],
+      "logConfiguration": {
+        "logDriver": "awslogs",
+        "options": {
+          "awslogs-group": "/ecs/karmacadabra-prod-test-seller-solana",
+          "awslogs-region": "us-east-1",
+          "awslogs-stream-prefix": "ecs"
+        }
+      },
+      "healthCheck": {
+        "command": [
+          "CMD-SHELL",
+          "python -c 'import requests; requests.get(\"http://localhost:8080/health\")'"
+        ],
+        "interval": 30,
+        "timeout": 5,
+        "retries": 3,
+        "startPeriod": 10
+      },
+      "systemControls": []
+    }
+  ],
+  "requiresCompatibilities": [
+    "FARGATE"
+  ]
+}

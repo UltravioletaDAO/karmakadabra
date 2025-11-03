@@ -549,21 +549,170 @@ x402-rs/
 - Update both when changing architecture, features, or any content
 - **NON-NEGOTIABLE** for bilingual community
 
-### File Organization
+### File Organization - STRICT ROOT DIRECTORY RULES
+
+**⚠️ ROOT DIRECTORY POLLUTION IS A RECURRING PROBLEM**
+
+**ONLY 4 markdown files allowed in root:**
+1. `README.md` - Main documentation (English)
+2. `README.es.md` - Main documentation (Spanish) - MUST stay synced with README.md
+3. `MASTER_PLAN.md` - Project vision and roadmap
+4. `CLAUDE.md` - This file (AI assistant guidelines)
+
+**ALL other documentation MUST be organized:**
+
 ```
 karmacadabra/
-├── tests/          # ALL test files
-├── scripts/        # ALL utility scripts
-├── logs/           # ALL log files (gitignored)
-├── shared/         # Shared libraries
-├── *-agent/        # Agent implementations
-├── erc-20/         # GLUE token
-├── erc-8004/       # Registry contracts
-├── x402-rs/        # Facilitator (Rust)
-└── *.md            # Documentation only
+├── plans/                    # Major architectural plans and master plans
+│   ├── FACILITATOR_CLEANUP_PLAN.md
+│   ├── FACILITATOR_EXTRACTION_MASTER_PLAN.md
+│   └── rpc-resilience-master-plan.md
+│
+├── docs/
+│   ├── reports/              # Bug investigations, infrastructure analysis
+│   │   ├── BASE_USDC_BUG_INVESTIGATION_REPORT.md
+│   │   ├── AWS_INFRASTRUCTURE_ANALYSIS_*.md
+│   │   ├── GLUE_PAYMENT_DEBUG_SUMMARY.md
+│   │   └── *_BUG.md, *_INVESTIGATION.md, *_ANALYSIS.md
+│   │
+│   ├── plans/                # Sprint plans, status reports, daily check-ins
+│   │   ├── SPRINT_*_SUMMARY.md
+│   │   ├── DEPLOYMENT_SUCCESS.md
+│   │   └── SYSTEM_STATUS_REPORT.md
+│   │
+│   ├── guides/               # How-to guides and tutorials
+│   │   ├── QUICKSTART.md
+│   │   └── DOCKER_GUIDE.md
+│   │
+│   ├── ARCHITECTURE.md       # Technical architecture docs
+│   ├── MONETIZATION_OPPORTUNITIES.md
+│   ├── *_SUMMARY.md          # Project summaries
+│   ├── *_DELIVERY.md         # Delivery documentation
+│   └── *_LOCATION.md         # Configuration locations
+│
+├── tests/                    # ALL test files
+├── scripts/                  # ALL utility scripts
+├── logs/                     # ALL log files (gitignored)
+├── shared/                   # Shared libraries
+├── *-agent/                  # Agent implementations
+├── erc-20/                   # GLUE token
+├── erc-8004/                 # Registry contracts
+└── x402-rs/                  # Facilitator (Rust)
 ```
 
-**Rules**: tests → `tests/`, scripts → `scripts/`, logs → `logs/`, never in root
+**Classification Rules:**
+
+**→ `plans/`** (root-level, major plans):
+- ✅ Master plans with >20KB content
+- ✅ Multi-sprint architectural roadmaps
+- ✅ Major feature integration plans
+- ✅ Pattern: `*_MASTER_PLAN.md`, `*-integration-plan.md`
+
+**→ `docs/reports/`** (investigations & analysis):
+- ✅ Bug investigation reports
+- ✅ Infrastructure analysis
+- ✅ Debug summaries
+- ✅ Technical diagrams
+- ✅ Pattern: `*_BUG*.md`, `*_INVESTIGATION*.md`, `*_ANALYSIS*.md`, `*_DEBUG*.md`, `*_DIAGRAM.md`, `*_EXTRACTION*.md`
+
+**→ `docs/plans/`** (smaller plans & status):
+- ✅ Sprint summaries
+- ✅ Daily check-ins
+- ✅ Deployment reports
+- ✅ System status
+- ✅ Pattern: `SPRINT_*.md`, `DAILY_*.md`, `DEPLOYMENT_*.md`, `SYSTEM_*.md`
+
+**→ `docs/`** (general documentation):
+- ✅ Feature summaries
+- ✅ Delivery documentation
+- ✅ Configuration locations
+- ✅ Architecture docs
+- ✅ Monetization docs
+- ✅ Pattern: `*_SUMMARY.md`, `*_DELIVERY.md`, `*_LOCATION.md`, `ARCHITECTURE*.md`
+
+**→ `docs/guides/`** (tutorials):
+- ✅ Quickstart guides
+- ✅ How-to documentation
+- ✅ Setup tutorials
+- ✅ Pattern: `*_GUIDE.md`, `QUICKSTART*.md`, `HOW_TO_*.md`
+
+**ENFORCEMENT:**
+
+**Before creating ANY new .md file, ask:**
+1. Is this README.md, README.es.md, MASTER_PLAN.md, or CLAUDE.md? → Root only if yes
+2. Is this a major architectural plan (>20KB)? → `plans/`
+3. Is this a bug report or investigation? → `docs/reports/`
+4. Is this a sprint/status/deployment report? → `docs/plans/`
+5. Is this a tutorial or guide? → `docs/guides/`
+6. Everything else → `docs/`
+
+**❌ NEVER create files in root without explicit justification**
+**✅ ALWAYS use organized folders for new documentation**
+
+**Cleanup checklist (run quarterly):**
+```bash
+# List all .md files in root (should only show 4)
+ls -1 *.md
+# Expected: CLAUDE.md, MASTER_PLAN.md, README.md, README.es.md
+
+# If there are more, classify and move them:
+# - Plans → plans/
+# - Reports → docs/reports/
+# - Status → docs/plans/
+# - Docs → docs/
+```
+
+### JSON File Organization - NO .json FILES IN ROOT
+
+**⚠️ CRITICAL: NO .json FILES SHOULD EVER EXIST IN ROOT DIRECTORY**
+
+All JSON configuration files must be organized in appropriate subdirectories:
+
+**→ `terraform/ecs-fargate/task-definitions/`** (ECS task definitions):
+- ✅ All ECS Fargate task definition JSON files
+- ✅ Pattern: `*-task-def*.json`, `task-def-*.json`
+- ✅ Examples: `facilitator-task-def-mainnet.json`, `test-seller-solana.json`
+
+**→ `terraform/ecs-fargate/service-configs/`** (ECS service configs):
+- ✅ ECS service creation configurations
+- ✅ Pattern: `create-service-*.json`, `*-service-config.json`
+- ✅ Examples: `create-service-solana.json`
+
+**→ `terraform/ecs-fargate/route53-changes/`** (DNS configurations):
+- ✅ Route53 DNS change batch files
+- ✅ Pattern: `route53-change-*.json`, `dns-*.json`
+- ✅ Examples: `route53-change-solana.json`
+
+**→ Component-specific folders** (other configs):
+- `erc-20/`: Token contract configs
+- `erc-8004/`: Registry contract configs
+- `*-agent/`: Agent-specific configurations
+- `scripts/`: Script configuration files
+
+**ENFORCEMENT:**
+
+**Before creating ANY .json file:**
+1. Is this an ECS task definition? → `terraform/ecs-fargate/task-definitions/`
+2. Is this an ECS service config? → `terraform/ecs-fargate/service-configs/`
+3. Is this a Route53 DNS change? → `terraform/ecs-fargate/route53-changes/`
+4. Is this agent/contract config? → Respective component folder
+5. Is this a script config? → `scripts/` or component folder
+
+**❌ NEVER create .json files in root**
+**✅ ALWAYS place in appropriate infrastructure or component folder**
+
+**When moving .json files:**
+- ❌ Don't just move - ALWAYS search for references first
+- ✅ Use grep to find all references: `grep -r "filename.json"`
+- ✅ Update ALL references to new paths
+- ✅ Test scripts/tools that use the file
+
+**Verification:**
+```bash
+# Should return empty or error
+ls -1 *.json 2>/dev/null
+# Expected: "No such file or directory" or nothing
+```
 
 ---
 
@@ -877,3 +1026,13 @@ logs_path = "z:/ultravioleta/dao/karmacadabra/karma-hello-agent/logs"   # forwar
   with the current codebase.
 - i think the nightly build is not gonna ever work, never use it
 - OK COMMIT EVERY TIME YOU DEEM IT NESSESARY
+- if you need to check the facilitator code, use this Z:\ultravioleta\dao\facilitator
+- the facilitator is running in aws fargate in us-east-2 and this is the command to check the logs so you know:\
+\
+Check facilitator logs:
+```bash
+aws logs filter-log-events \
+  --log-group-name /ecs/facilitator-production \
+  --filter-pattern "[SETTLEMENT]" \
+  --region us-east-2
+```

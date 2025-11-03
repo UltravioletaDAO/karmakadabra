@@ -168,9 +168,10 @@ mv FACILITATOR_VALIDATION_BUG.md .unused/facilitator-old/docs/
 mv BASE_USDC_BUG_INVESTIGATION_REPORT.md .unused/facilitator-old/docs/
 mv AWS_FACILITATOR_INFRASTRUCTURE_EXTRACTION.md .unused/facilitator-old/docs/
 
-# Task definitions (root)
-mv facilitator-task-def-mainnet.json .unused/facilitator-old/root/
-mv facilitator-task-def-mainnet-v2.json .unused/facilitator-old/root/
+# Task definitions (root) - MOVED to terraform/ecs-fargate/task-definitions/
+# mv facilitator-task-def-mainnet.json .unused/facilitator-old/root/
+# mv facilitator-task-def-mainnet-v2.json .unused/facilitator-old/root/
+# NOTE: These files are now in terraform/ecs-fargate/task-definitions/
 
 # Extraction docs (root)
 mv FACILITATOR_EXTRACTION_MASTER_PLAN.md .unused/facilitator-old/root/
@@ -410,13 +411,13 @@ nano CLAUDE.md
 - BASE_USDC_BUG_INVESTIGATION_REPORT.md (root)
 - AWS_FACILITATOR_INFRASTRUCTURE_EXTRACTION.md (root)
 
-**root/** (6 archivos):
-- facilitator-task-def-mainnet.json
-- facilitator-task-def-mainnet-v2.json
-- FACILITATOR_EXTRACTION_MASTER_PLAN.md
-- EXTRACTION_MASTER_PLAN_TERRAFORM_ANALYSIS.md
-- TERRAFORM_EXTRACTION_SUMMARY.md
-- TERRAFORM_EXTRACTION_DIAGRAM.md
+**root/** (6 archivos) - NOW ORGANIZED:
+- ~~facilitator-task-def-mainnet.json~~ → terraform/ecs-fargate/task-definitions/
+- ~~facilitator-task-def-mainnet-v2.json~~ → terraform/ecs-fargate/task-definitions/
+- ~~FACILITATOR_EXTRACTION_MASTER_PLAN.md~~ → plans/
+- ~~EXTRACTION_MASTER_PLAN_TERRAFORM_ANALYSIS.md~~ → plans/
+- ~~TERRAFORM_EXTRACTION_SUMMARY.md~~ → docs/reports/
+- ~~TERRAFORM_EXTRACTION_DIAGRAM.md~~ → docs/reports/
 
 **x402-rs/** (SOLO en Fase 5 - después de 1 semana):
 - Todo el directorio completo

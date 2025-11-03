@@ -111,7 +111,7 @@ In `x402-rs/src/telemetry.rs`, modify the `register()` function to include IRC l
 
 ### 4. Configure ECS Task Definition
 
-Add environment variables to `facilitator-task-def-mainnet.json`:
+Add environment variables to `terraform/ecs-fargate/task-definitions/facilitator-task-def-mainnet.json`:
 
 ```json
 {
