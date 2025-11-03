@@ -187,3 +187,4 @@ docker-compose.override.yml
 PHANTOM_IMPORT_KEYS.txt
 NEW_BUYER_WALLET.txt
 buyer_keypair_NEW.json
+.x402-reference/
