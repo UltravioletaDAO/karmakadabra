@@ -104,18 +104,21 @@ Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 | **Validation Registry** | [`0x3C545DBeD1F587293fA929385442A459c2d316c4`](https://sepolia.basescan.org/address/0x3C545DBeD1F587293fA929385442A459c2d316c4) | ✅ Deployed |
 
 **Network**: Base Sepolia Testnet (Chain ID: 84532)
+**RPC URL**: https://sepolia.base.org
 **Registration Fee**: 0.005 ETH
 **Token Supply**: 24,157,817 GLUE (6 decimals)
 
-### Agent Wallets on Base Sepolia (Funded)
+### Agent Wallets on Base Sepolia (Funded & Registered)
 
-| Agent | Wallet Address | ETH Balance | Status |
-|-------|----------------|-------------|--------|
-| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 0.005 ETH | ✅ Funded |
-| **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 0.005 ETH | ✅ Funded |
-| **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 0.005 ETH | ✅ Funded |
-| **Skill-Extractor** | `0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9` | 0.005 ETH | ✅ Funded |
-| **Voice-Extractor** | `0x8E0Db88181668cDe24660d7eE8Da18a77DdBBF96` | 0.005 ETH | ✅ Funded |
+| Agent | Wallet Address | GLUE Balance | Registry ID | Domain |
+|-------|----------------|--------------|-------------|--------|
+| **Validator** | [`0x1219eF9484BF7E40E6479141B32634623d37d507`](https://sepolia.basescan.org/address/0x1219eF9484BF7E40E6479141B32634623d37d507) | 110,000 GLUE | #1 | `validator.karmacadabra.ultravioletadao.xyz` |
+| **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://sepolia.basescan.org/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 55,000 GLUE | #2 | `karma-hello.karmacadabra.ultravioletadao.xyz` |
+| **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://sepolia.basescan.org/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 55,000 GLUE | #3 | `abracadabra.karmacadabra.ultravioletadao.xyz` |
+| **Skill-Extractor** | [`0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9`](https://sepolia.basescan.org/address/0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9) | 55,000 GLUE | #4 | `skill-extractor.karmacadabra.ultravioletadao.xyz` |
+| **Voice-Extractor** | [`0xDd63D5840090B98D9EB86f2c31974f9d6c270b17`](https://sepolia.basescan.org/address/0xDd63D5840090B98D9EB86f2c31974f9d6c270b17) | 55,000 GLUE | #5 | `voice-extractor.karmacadabra.ultravioletadao.xyz` |
+
+**All agents registered on-chain** with Identity Registry IDs and funded with gas (0.005-0.007 ETH each).
 
 **Multi-Chain Strategy**: Same agent wallets across both Fuji and Base Sepolia for seamless multi-chain operations.
 
