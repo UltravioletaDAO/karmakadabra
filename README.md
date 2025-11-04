@@ -4,14 +4,15 @@
 
 **[🇪🇸 Versión en Español](./README.es.md)** | **🇺🇸 English Version**
 
-> **⚡ Important:** This implements an **ERC-8004 EXTENDED version** with bidirectional reputation (NOT the base spec!) deployed on **Avalanche** - the home of **Ultravioleta DAO**. Both buyers and sellers rate each other after transactions.
+> **⚡ Important:** This implements an **ERC-8004 EXTENDED version** with bidirectional reputation (NOT the base spec!) deployed on **Base Sepolia** (previously Avalanche Fuji). Both buyers and sellers rate each other after transactions.
 
-[![Avalanche](https://img.shields.io/badge/Avalanche-Fuji-E84142?logo=avalanche)](https://testnet.snowtrace.io/)
+[![Base](https://img.shields.io/badge/Base-Sepolia-0052FF?logo=ethereum)](https://sepolia.basescan.org/)
+[![Multi-Chain](https://img.shields.io/badge/Multi--Chain-Fuji%20+%20Base-purple)](https://github.com/UltravioletaDAO/karmacadabra)
 [![ERC-8004](https://img.shields.io/badge/ERC--8004%20Extended-Bidirectional%20Rating-blue)](https://eips.ethereum.org/EIPS/eip-8004)
 [![x402](https://img.shields.io/badge/x402-Payment%20Protocol-green)](https://www.x402.org)
 [![Python](https://img.shields.io/badge/Python-3.11+-blue?logo=python)](https://www.python.org/)
 [![Rust](https://img.shields.io/badge/Rust-Latest-orange?logo=rust)](https://www.rust-lang.org/)
-[![Deployed](https://img.shields.io/badge/Deployed-Fuji%20Testnet-success)](https://testnet.snowtrace.io/)
+[![Deployed](https://img.shields.io/badge/Deployed-Base%20Sepolia-success)](https://sepolia.basescan.org/)
 
 ---
 
@@ -23,18 +24,20 @@
 - **A2A protocol** (Pydantic AI) for agent-to-agent communication
 - **x402 + EIP-3009** for HTTP micropayments (gasless!)
 - **CrewAI** for multi-agent orchestration
-- **Avalanche blockchain** - our home chain and the foundation of Ultravioleta DAO
+- **Multi-chain support** - Base Sepolia (primary) + Avalanche Fuji (backup)
 
-### 🏔️ Deployed on Avalanche - Our Home
+### 🌐 Multi-Chain Strategy - Now on Base Sepolia
 
-**Karmacadabra lives on Avalanche**, the native blockchain home of **Ultravioleta DAO**. We chose Avalanche for:
+**Karmacadabra migrated to Base Sepolia** (Nov 2025) as the primary testnet:
 
+- **Ethereum L2 ecosystem**: Access to broader developer tooling and community
 - **Fast finality**: 2-second block times for instant agent transactions
-- **Low costs**: Minimal gas fees make micropayments economically viable
-- **EVM compatibility**: Full Solidity support with Ethereum tooling
-- **DAO alignment**: Avalanche is where Ultravioleta DAO was born and thrives
+- **Low costs**: Optimistic rollup reduces gas fees significantly
+- **Mainnet path**: Clearer path to Base Mainnet deployment
 
-Currently on **Fuji testnet**, with mainnet deployment planned after audits.
+**Avalanche Fuji remains as backup network** - all contracts deployed on both testnets with identical agent infrastructure.
+
+See `docs/BASE_SEPOLIA_INTEGRATION_COMPLETE.md` for full multi-chain details.
 
 ### The Problem We Solve
 
@@ -63,52 +66,27 @@ Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 
 ---
 
-## 🚀 **LIVE ON FUJI TESTNET** - Deployed October 22, 2025
+## 🚀 **LIVE ON BASE SEPOLIA** - Migrated November 4, 2025
+
+### Primary Network: Base Sepolia (Chain ID: 84532)
 
 | Contract | Address | Status |
 |----------|---------|--------|
-| **GLUE Token (EIP-3009)** | [`0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743`](https://testnet.snowtrace.io/address/0x3D19A80b3bD5CC3a4E55D4b5B753bC36d6A44743) | ✅ Verified |
-| **Identity Registry** | [`0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618`](https://testnet.snowtrace.io/address/0xB0a405a7345599267CDC0dD16e8e07BAB1f9B618) | ✅ Verified |
-| **Reputation Registry** | [`0x932d32194C7A47c0fe246C1d61caF244A4804C6a`](https://testnet.snowtrace.io/address/0x932d32194C7A47c0fe246C1d61caF244A4804C6a) | ✅ Verified |
-| **Validation Registry** | [`0x9aF4590035C109859B4163fd8f2224b820d11bc2`](https://testnet.snowtrace.io/address/0x9aF4590035C109859B4163fd8f2224b820d11bc2) | ✅ Verified |
-| **Transaction Logger** | [`0x85ea82dDc0d3dDC4473AAAcc7E7514f4807fF654`](https://testnet.snowtrace.io/address/0x85ea82dDc0d3dDC4473AAAcc7E7514f4807fF654) | ✅ Verified |
-
-**Network**: Avalanche Fuji Testnet (Chain ID: 43113)
-**Registration Fee**: 0.005 AVAX
-**Token Supply**: 24,157,817 GLUE (6 decimals)
-
-### Agent Wallets (Funded with GLUE Tokens)
-
-| Agent | Wallet Address | GLUE Balance | Domain |
-|-------|----------------|--------------|--------|
-| **Client Agent** | [`0xCf30021812F27132d36dc791E0eC17f34B4eE8BA`](https://testnet.snowtrace.io/address/0xCf30021812F27132d36dc791E0eC17f34B4eE8BA) | 220,000 GLUE | `client.karmacadabra.ultravioletadao.xyz` |
-| **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://testnet.snowtrace.io/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 55,000 GLUE | `karma-hello.karmacadabra.ultravioletadao.xyz` |
-| **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://testnet.snowtrace.io/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 55,000 GLUE | `abracadabra.karmacadabra.ultravioletadao.xyz` |
-| **Validator** | [`0x1219eF9484BF7E40E6479141B32634623d37d507`](https://testnet.snowtrace.io/address/0x1219eF9484BF7E40E6479141B32634623d37d507) | 55,000 GLUE | `validator.karmacadabra.ultravioletadao.xyz` |
-| **Voice-Extractor** | [`0xDd63D5840090B98D9EB86f2c31974f9d6c270b17`](https://testnet.snowtrace.io/address/0xDd63D5840090B98D9EB86f2c31974f9d6c270b17) | 110,000 GLUE | `voice-extractor.karmacadabra.ultravioletadao.xyz` |
-| **Skill-Extractor** | [`0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9`](https://testnet.snowtrace.io/address/0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9) | 55,000 GLUE | `skill-extractor.karmacadabra.ultravioletadao.xyz` |
-
-**Domain Convention**: All agents use `<agent-name>.karmacadabra.ultravioletadao.xyz` format (registered on-chain)
-
-**View All Contracts**: [Snowtrace Explorer](https://testnet.snowtrace.io/)
-
----
-
-## 🔵 **ALSO ON BASE SEPOLIA** - Deployed November 3, 2025
-
-| Contract | Address | Status |
-|----------|---------|--------|
-| **GLUE Token (EIP-3009)** | [`0xfEe5CC33479E748f40F5F299Ff6494b23F88C425`](https://sepolia.basescan.org/address/0xfEe5CC33479E748f40F5F299Ff6494b23F88C425) | ✅ Verified |
-| **Identity Registry** | [`0x8a20f665c02a33562a0462a0908a64716Ed7463d`](https://sepolia.basescan.org/address/0x8a20f665c02a33562a0462a0908a64716Ed7463d) | ✅ Verified |
-| **Reputation Registry** | [`0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F`](https://sepolia.basescan.org/address/0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F) | ✅ Verified |
-| **Validation Registry** | [`0x3C545DBeD1F587293fA929385442A459c2d316c4`](https://sepolia.basescan.org/address/0x3C545DBeD1F587293fA929385442A459c2d316c4) | ✅ Verified |
+| **GLUE Token (EIP-3009)** | [`0xfEe5CC33479E748f40F5F299Ff6494b23F88C425`](https://sepolia.basescan.org/address/0xfEe5CC33479E748f40F5F299Ff6494b23F88C425) | ✅ Verified (Sourcify) |
+| **Identity Registry** | [`0x8a20f665c02a33562a0462a0908a64716Ed7463d`](https://sepolia.basescan.org/address/0x8a20f665c02a33562a0462a0908a64716Ed7463d) | ✅ Verified (Sourcify) |
+| **Reputation Registry** | [`0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F`](https://sepolia.basescan.org/address/0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F) | ✅ Verified (Sourcify) |
+| **Validation Registry** | [`0x3C545DBeD1F587293fA929385442A459c2d316c4`](https://sepolia.basescan.org/address/0x3C545DBeD1F587293fA929385442A459c2d316c4) | ✅ Verified (Sourcify) |
 
 **Network**: Base Sepolia Testnet (Chain ID: 84532)
-**RPC URL**: https://sepolia.base.org
 **Registration Fee**: 0.005 ETH
 **Token Supply**: 24,157,817 GLUE (6 decimals)
+**Block Explorer**: https://sepolia.basescan.org
 
-### Agent Wallets on Base Sepolia (Funded & Registered)
+### Backup Network: Avalanche Fuji (Chain ID: 43113)
+
+Contracts also deployed on Avalanche Fuji for redundancy. See `docs/BASE_SEPOLIA_INTEGRATION_COMPLETE.md` for addresses.
+
+### Agent Wallets (Base Sepolia - Funded)
 
 | Agent | Wallet Address | GLUE Balance | Registry ID | Domain |
 |-------|----------------|--------------|-------------|--------|
@@ -116,13 +94,13 @@ Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 | **Karma-Hello** | [`0x2C3e071df446B25B821F59425152838ae4931E75`](https://sepolia.basescan.org/address/0x2C3e071df446B25B821F59425152838ae4931E75) | 55,000 GLUE | #2 | `karma-hello.karmacadabra.ultravioletadao.xyz` |
 | **Abracadabra** | [`0x940DDDf6fB28E611b132FbBedbc4854CC7C22648`](https://sepolia.basescan.org/address/0x940DDDf6fB28E611b132FbBedbc4854CC7C22648) | 55,000 GLUE | #3 | `abracadabra.karmacadabra.ultravioletadao.xyz` |
 | **Skill-Extractor** | [`0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9`](https://sepolia.basescan.org/address/0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9) | 55,000 GLUE | #4 | `skill-extractor.karmacadabra.ultravioletadao.xyz` |
-| **Voice-Extractor** | [`0xDd63D5840090B98D9EB86f2c31974f9d6c270b17`](https://sepolia.basescan.org/address/0xDd63D5840090B98D9EB86f2c31974f9d6c270b17) | 55,000 GLUE | #5 | `voice-extractor.karmacadabra.ultravioletadao.xyz` |
+| **Voice-Extractor** | [`0x8E0Db88181668cDe24660d7eE8Da18a77DdBBF96`](https://sepolia.basescan.org/address/0x8E0Db88181668cDe24660d7eE8Da18a77DdBBF96) | 55,000 GLUE | #5 | `voice-extractor.karmacadabra.ultravioletadao.xyz` |
 
-**All agents registered on-chain** with Identity Registry IDs and funded with gas (0.005-0.007 ETH each).
+**Total Distributed**: 330,000 GLUE | **All agents registered on-chain** | **Gas funded**: 0.005-0.007 ETH each
 
-**Multi-Chain Strategy**: Same agent wallets across both Fuji and Base Sepolia for seamless multi-chain operations.
+**Domain Convention**: All agents use `<agent-name>.karmacadabra.ultravioletadao.xyz` format (registered on-chain)
 
-**View Base Contracts**: [BaseScan Explorer](https://sepolia.basescan.org/)
+**View All Contracts**: [Base Sepolia Explorer](https://sepolia.basescan.org/)
 
 ---
 

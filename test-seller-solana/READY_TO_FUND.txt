@@ -1,0 +1,69 @@
+================================================================================
+TEST-SELLER-SOLANA: READY TO FUND AND TEST
+================================================================================
+
+ROOT CAUSE IDENTIFIED:
+The test-seller-solana service is working correctly. The payment is failing because:
+
+1. **Seller has 0 SOL** - Cannot create USDC ATA without SOL for transaction fees
+2. **Seller has no USDC ATA** - Cannot receive USDC payments without an Associated Token Account
+
+SELLER WALLET:
+  Address: Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB
+  Network: Solana Mainnet
+  Current SOL Balance: 0 SOL
+  USDC ATA: 2cavsoVqv7E5BXBVEAWV6kVF2ybeEztVdQvM9YDnvjFv (NOT CREATED YET)
+
+STEPS TO FIX:
+===============
+
+Step 1: Fund the seller wallet with SOL
+----------------------------------------
+Send ~0.01 SOL to: Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB
+
+This SOL will be used to:
+- Create the USDC ATA (~0.002 SOL rent-exempt minimum)
+- Pay for future transaction fees
+
+Step 2: Create the USDC ATA
+----------------------------
+After funding with SOL, run:
+
+  cd test-seller-solana
+  python create_seller_ata.py
+
+This will create the Associated Token Account at:
+  2cavsoVqv7E5BXBVEAWV6kVF2ybeEztVdQvM9YDnvjFv
+
+Step 3: Test the payment flow
+------------------------------
+After the ATA is created, run:
+
+  python load_test_solana_v2.py --seller Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB --num-requests 1
+
+This should now succeed!
+
+FACILITATOR ERROR DETAILS:
+==========================
+The facilitator was returning:
+{
+  "isValid": false,
+  "invalidReason": "invalid_exact_svm_payload_transaction_receiver_ata_not_found"
+}
+
+This error is expected when the seller's USDC ATA doesn't exist. After creating
+the ATA, this error will disappear.
+
+SERVICE STATUS:
+==============
+✓ test-seller-solana: https://test-seller-solana.karmacadabra.ultravioletadao.xyz/health
+✓ Facilitator: https://facilitator.ultravioletadao.xyz/health
+✓ Buyer wallet funded: Hn344ScrpYT99Vp9pwQPfAtA3tfMLrhoVhQ445efCvNP
+✗ Seller wallet: Needs SOL + USDC ATA
+
+NEXT ACTIONS:
+============
+1. Fund seller wallet with 0.01 SOL
+2. Run create_seller_ata.py
+3. Test payment flow
+4. Update error handling to show actual facilitator errors (optional improvement)

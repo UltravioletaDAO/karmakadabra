@@ -1,0 +1,49 @@
+2025-11-02 14:47:33,639 - INFO - Loading buyer keypair from AWS Secrets Manager...
+2025-11-02 14:47:33,649 - INFO - Found credentials in shared credentials file: ~/.aws/credentials
+2025-11-02 14:47:33,995 - INFO - Loaded buyer keypair: Hn344ScrpYT99Vp9pwQPfAtA3tfMLrhoVhQ445efCvNP
+2025-11-02 14:47:34,271 - INFO - HTTP Request: POST https://api.mainnet-beta.solana.com "HTTP/1.1 200 OK"
+============================================================
+SOLANA LOAD TESTER v4.0.0 - Spec-Compliant
+============================================================
+Configuration:
+  Test Seller:  https://test-seller-solana.karmacadabra.ultravioletadao.xyz
+  Seller:       Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB
+  Facilitator:  F742C4VfFLQ9zRQyithoj5229ZgtX2WqKCSFKgH2EThq
+  Requests:     1
+  Verbose:      True
+  Spec:         SOLANA_SPEC.md
+
+
+============================================================
+SPEC-COMPLIANT SOLANA LOAD TEST v4.0.0
+============================================================
+Buyer:       Hn344ScrpYT99Vp9pwQPfAtA3tfMLrhoVhQ445efCvNP
+Seller:      Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB
+Facilitator: F742C4VfFLQ9zRQyithoj5229ZgtX2WqKCSFKgH2EThq
+Test Seller: https://test-seller-solana.karmacadabra.ultravioletadao.xyz
+Price:       0.01 USDC
+Spec:        SOLANA_SPEC.md (facilitator golden source)
+============================================================
+
+
+[START] Sequential test: 1 requests
+============================================================
+
+[0001] [2025-11-02 14:47:33.996] REQUEST DETAILS
+  Buyer: Hn344ScrpYT99Vp9pwQPfAtA3tfMLrhoVhQ445efCvNP
+  Seller: Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB
+  Amount: 0.01 USDC
+  Transaction: AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA...
+[0001] [2025-11-02 14:49:04.644] FAILED - HTTP 402
+  Error: {"detail":"Failed to contact facilitator: HTTPSConnectionPool(host='facilitator.ultravioletadao.xyz', port=443): Read timed out. (read timeout=90)"}
+
+============================================================
+LOAD TEST RESULTS
+============================================================
+Total Requests:    1
+Successful:        0 (0.0%)
+Failed:            1
+Duration:          90.65s
+Requests/sec:      0.01
+Total Cost:        $0.00 USDC
+============================================================

@@ -1,0 +1,148 @@
+=================================================================
+SOLANA LOAD TEST RESULTS - 2025-11-03
+=================================================================
+
+TEST COMMAND:
+python load_test_solana_v4.py --seller Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB --num-requests 1 --verbose
+
+RESULT: ❌ TIMEOUT (90 seconds)
+Error: HTTPSConnectionPool(host='facilitator.ultravioletadao.xyz', port=443): Read timed out. (read timeout=90)
+
+=================================================================
+PRE-FLIGHT CHECKS - ALL PASSED ✅
+=================================================================
+
+✅ Buyer USDC Balance: 4.585501 USDC
+   Account: AzgAnxD1g3UbrA5tQzM2M9uQx72pNjHbaiKZyJZerHJ1
+   Owner: Hn344ScrpYT99Vp9pwQPfAtA3tfMLrhoVhQ445efCvNP
+
+✅ Seller USDC ATA: Exists and initialized
+   Account: 2cavsoVqv7E5BXBVEAWV6kVF2ybeEztVdQvM9YDnvjFv
+   Owner: Ez4frLQzDbV1AT9BNJkQFEjyTFRTsEwJ5YFaSGG8nRGB
+   Balance: 0.24 USDC
+
+✅ Facilitator SOL Balance: 0.11 SOL (110,183,726 lamports)
+   Wallet: F742C4VfFLQ9zRQyithoj5229ZgtX2WqKCSFKgH2EThq
+
+✅ Transaction Validation: PASSES
+   Endpoint: /verify
+   Response: {"isValid": true, "payer": "Hn344ScrpYT99Vp9pwQPfAtA3tfMLrhoVhQ445efCvNP"}
+
+=================================================================
+WHAT THIS MEANS
+=================================================================
+
+The implementation is CORRECT:
+- Transaction structure: ✅ Spec-compliant
+- Accounts: ✅ All funded and configured
+- Validation: ✅ Facilitator confirms transaction is valid
+- Facilitator wallet: ✅ Has sufficient SOL for fees
+
+The timeout occurs ONLY during settlement (/settle endpoint).
+
+This means the transaction is being sent to Solana but not confirming.
+The facilitator waits forever for confirmation → HTTP timeout after 90s.
+
+=================================================================
+NEXT STEP: CHECK FACILITATOR LOGS
+=================================================================
+
+You said "the logging in the facilitator has been enabled" - now we need
+to see those logs to find out what's happening.
+
+The facilitator is deployed on Cherry Servers (not AWS ECS).
+
+HOW TO ACCESS LOGS:
+See detailed guide in: FACILITATOR_LOGS_GUIDE.md
+
+Quick commands (if you have SSH access to Cherry Servers):
+
+1. SSH to facilitator server
+2. Run: docker logs -f <facilitator-container-id> --tail 100
+3. In another terminal, run the test again
+4. Look for these log lines:
+   - "Submitting Solana transaction for settlement..."
+   - "Transaction signature: <sig>"
+   - "Transaction confirmed" OR "Transaction timeout"
+
+=================================================================
+WHAT TO LOOK FOR IN LOGS
+=================================================================
+
+IF YOU SEE: "Transaction confirmed successfully! Signature: <sig>"
+→ Transaction is working but client timing out (increase client timeout)
+
+IF YOU SEE: "Transaction confirmation timeout after 60s. Signature: <sig>"
+→ Copy the signature and check on Solscan:
+   https://solscan.io/tx/<signature>
+→ This will show why the transaction isn't confirming
+
+IF YOU SEE: Error before "Submitting Solana transaction..."
+→ There's a validation issue we need to investigate
+
+IF YOU SEE: Nothing (no logs)
+→ Logging not enabled correctly, or wrong container
+
+=================================================================
+POSSIBLE ROOT CAUSES (Based on Logs)
+=================================================================
+
+1. Blockhash expired (most likely)
+   - Client fetches blockhash, builds tx, sends to facilitator
+   - Facilitator validates (slow), then tries to send
+   - By then blockhash expired (~60 seconds)
+   - Transaction rejected by Solana
+   
+   Solution: Facilitator should fetch fresh blockhash before sending
+
+2. RPC endpoint issues
+   - Facilitator's Solana RPC down/slow
+   - Rate limiting
+   
+   Solution: Check facilitator RPC configuration
+
+3. Priority fee too high/low
+   - 5M microlamports might be rejected
+   - Or insufficient for current congestion
+   
+   Solution: Check Solana network status
+
+=================================================================
+FILES CREATED FOR DEBUGGING
+=================================================================
+
+1. FACILITATOR_LOGS_GUIDE.md
+   - Detailed guide on how to access logs
+   - What to look for
+   - Troubleshooting steps
+
+2. STATUS_REPORT.md
+   - Complete analysis of the issue
+   - Facilitator source code analysis
+   - Recommended fixes for facilitator
+
+3. SOLANA_SPEC.md
+   - Complete specification from facilitator source
+   - Transaction requirements
+   - Error codes
+
+4. test_verify_only.py
+   - Quick test that only validates (no settlement)
+   - Confirms transaction structure is correct
+
+=================================================================
+RECOMMENDATION
+=================================================================
+
+1. Access facilitator logs (see FACILITATOR_LOGS_GUIDE.md)
+2. Run test again while watching logs
+3. Look for transaction signature in logs
+4. Check signature on Solscan: https://solscan.io/tx/<signature>
+5. Based on what Solscan shows:
+   - Transaction confirmed → increase client timeout
+   - Transaction pending forever → blockhash/fee issue
+   - Transaction failed → see error details on Solscan
+
+The logs will tell us exactly what's happening.
+
+=================================================================

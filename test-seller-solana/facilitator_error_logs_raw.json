@@ -1,0 +1,28 @@
+﻿{
+    "events": [
+        {
+            "logStreamName": "ecs/facilitator/9ad9f5e382ef4eb3b57f8b2837a63df5",
+            "timestamp": 1762179638801,
+            "message": "\u001b[2m2025-11-03T14:20:38.801087Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[1mhttp_request\u001b[0m\u001b[1m{\u001b[0m\u001b[3motel.kind\u001b[0m\u001b[2m=\u001b[0m\"server\" \u001b[3motel.name\u001b[0m\u001b[2m=\u001b[0mPOST /settle \u001b[3mmethod\u001b[0m\u001b[2m=\u001b[0mPOST \u001b[3muri\u001b[0m\u001b[2m=\u001b[0m/settle \u001b[3mversion\u001b[0m\u001b[2m=\u001b[0mHTTP/1.1\u001b[1m}\u001b[0m\u001b[2m:\u001b[0m\u001b[1mpost_settle\u001b[0m\u001b[2m:\u001b[0m \u001b[2mx402_rs::handlers\u001b[0m\u001b[2m:\u001b[0m === SETTLE REQUEST DEBUG ===",
+            "ingestionTime": 1762179643458,
+            "eventId": "39297919118939828525619208395911529530478909303486939149"
+        },
+        {
+            "logStreamName": "ecs/facilitator/9ad9f5e382ef4eb3b57f8b2837a63df5",
+            "timestamp": 1762179638801,
+            "message": "\u001b[2m2025-11-03T14:20:38.801093Z\u001b[0m \u001b[31mERROR\u001b[0m \u001b[1mhttp_request\u001b[0m\u001b[1m{\u001b[0m\u001b[3motel.kind\u001b[0m\u001b[2m=\u001b[0m\"server\" \u001b[3motel.name\u001b[0m\u001b[2m=\u001b[0mPOST /settle \u001b[3mmethod\u001b[0m\u001b[2m=\u001b[0mPOST \u001b[3muri\u001b[0m\u001b[2m=\u001b[0m/settle \u001b[3mversion\u001b[0m\u001b[2m=\u001b[0mHTTP/1.1\u001b[1m}\u001b[0m\u001b[2m:\u001b[0m\u001b[1mpost_settle\u001b[0m\u001b[2m:\u001b[0m \u001b[2mx402_rs::handlers\u001b[0m\u001b[2m:\u001b[0m Raw JSON body: {\"x402Version\":1,\"paymentPayload\":{\"x402Version\":1,\"scheme\":\"exact\",\"network\":\"solana\",\"payload\":{\"transaction\":\"AgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACrAJgFNomfISBDnBOKzHjo1iI1a6dcvix3nZwKwZe06PGB6cq3MDMvkJ+Wrkmg2hImC6l4oEkdPjcASDkPGoQBgAIBBgrRkIRjuO+PGcKm1aQL5SXgRVp2n/C/uup2Zj0wdv3ewOiPZWtTfNvWL77zJA1AV2E2E3uoPLoZdtfTC8Ikk1qkGSH86Wbo7spqK1Hwy8WBBQdo3fjz8NM+1fVcsyd62mSqAnjNMabfo2uI3RiqvLERmNXHXDhmLXVQ/wa8Fy0ZsQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAaK78XF9amSRzaBfKqz6Br8GPLyoOEkyXCDr8Ax+4T2MlyWPTiSJ8bs9ECkUjg2DC1oTmdr/EIQEjnvY2+n4WQMGRm/lIRcy/+ytunLDm+e8jOW7xfcSayxDmzpAAAAAxvp6877brTo9ZfNqq8l0MbG75MLS9uDkfKYCA0UvXWEG3fbh12Whk9nL4UbO63msHLSF7V9bN5E6jPWFfv8AqYUTKgIv6KrIdU+2vv3u6RrNyH9Lv7/PFhy71cO/dWIxBAcABQKkaQAABwAJAwEAAAAAAAAABgYAAgUIBAkBAAkEAwgCAQoMZAAAAAAAAAAGAA==\"}},\"paymentRequirements\":{\"scheme\":\"exact\",\"network\":\"solana\",\"maxAmountRequired\":\"100\",\"resource\":\"http://localhost:3001/premium\",\"description\":\"\",\"mimeType\":\"\",\"payTo\":\"7PLBAVp96r71SAzJh33Ch5R5tCth2PSDaCjhGZiHEon\",\"maxTimeoutSeconds\":60,\"asset\":\"EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v\",\"outputSchema\":{\"input\":{\"type\":\"http\",\"method\":\"GET\",\"discoverable\":true}},\"extra\":{\"feePayer\":\"F742C4VfFLQ9zRQyithoj5229ZgtX2WqKCSFKgH2EThq\"}}}",
+            "ingestionTime": 1762179643458,
+            "eventId": "39297919118939828525619208395911529530478909303486939150"
+        },
+        {
+            "logStreamName": "ecs/facilitator/9ad9f5e382ef4eb3b57f8b2837a63df5",
+            "timestamp": 1762179638801,
+aws : 
+At Z:\ultravioleta\dao\karmacadabra\test-seller-solana\extract_error_logs.ps1:8 char:14
++ $rawOutput = aws logs filter-log-events `
++              ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo          : NotSpecified: (:String) [], RemoteException
+    + FullyQualifiedErrorId : NativeCommandError
+ 
+'charmap' codec can't encode character '\u2713' in position 527: character maps to <undefined>
+            "message": 

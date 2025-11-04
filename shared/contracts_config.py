@@ -87,7 +87,8 @@ NETWORKS: Dict[str, Dict[str, Any]] = {
 }
 
 # Default network (primary deployment)
-DEFAULT_NETWORK: NetworkName = "fuji"
+# Changed to Base Sepolia as primary network (2025-11-04)
+DEFAULT_NETWORK: NetworkName = "base-sepolia"
 
 
 # =============================================================================
