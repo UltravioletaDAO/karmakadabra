@@ -34,12 +34,18 @@ gas_reports = ["*"]
 fuji = "${RPC_URL_AVALANCHE_FUJI}"
 fuji_fallback = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
 
+# Base Sepolia Testnet
+base_sepolia = "https://sepolia.base.org"
+
 # Local development (Anvil)
 localhost = "http://localhost:8545"
 
 [etherscan]
 # Snowtrace (Avalanche block explorer)
 fuji = { key = "${SNOWTRACE_API_KEY}", url = "https://api-testnet.snowtrace.io/api" }
+
+# Basescan (Base Sepolia block explorer)
+base_sepolia = { key = "${BASESCAN_API_KEY}", url = "https://api-sepolia.basescan.org/api" }
 
 # =============================================================================
 # Test Configuration

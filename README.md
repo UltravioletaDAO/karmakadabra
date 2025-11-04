@@ -98,10 +98,10 @@ Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 
 | Contract | Address | Status |
 |----------|---------|--------|
-| **GLUE Token (EIP-3009)** | [`0xfEe5CC33479E748f40F5F299Ff6494b23F88C425`](https://sepolia.basescan.org/address/0xfEe5CC33479E748f40F5F299Ff6494b23F88C425) | ✅ Deployed |
-| **Identity Registry** | [`0x8a20f665c02a33562a0462a0908a64716Ed7463d`](https://sepolia.basescan.org/address/0x8a20f665c02a33562a0462a0908a64716Ed7463d) | ✅ Deployed |
-| **Reputation Registry** | [`0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F`](https://sepolia.basescan.org/address/0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F) | ✅ Deployed |
-| **Validation Registry** | [`0x3C545DBeD1F587293fA929385442A459c2d316c4`](https://sepolia.basescan.org/address/0x3C545DBeD1F587293fA929385442A459c2d316c4) | ✅ Deployed |
+| **GLUE Token (EIP-3009)** | [`0xfEe5CC33479E748f40F5F299Ff6494b23F88C425`](https://sepolia.basescan.org/address/0xfEe5CC33479E748f40F5F299Ff6494b23F88C425) | ✅ Verified |
+| **Identity Registry** | [`0x8a20f665c02a33562a0462a0908a64716Ed7463d`](https://sepolia.basescan.org/address/0x8a20f665c02a33562a0462a0908a64716Ed7463d) | ✅ Verified |
+| **Reputation Registry** | [`0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F`](https://sepolia.basescan.org/address/0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F) | ✅ Verified |
+| **Validation Registry** | [`0x3C545DBeD1F587293fA929385442A459c2d316c4`](https://sepolia.basescan.org/address/0x3C545DBeD1F587293fA929385442A459c2d316c4) | ✅ Verified |
 
 **Network**: Base Sepolia Testnet (Chain ID: 84532)
 **RPC URL**: https://sepolia.base.org
