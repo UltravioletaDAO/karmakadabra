@@ -22,6 +22,7 @@ from typing import Optional
 from dotenv import load_dotenv
 
 from .secrets_manager import get_private_key, get_openai_api_key
+from .contracts_config import get_network_config, DEFAULT_NETWORK
 
 
 @dataclass
@@ -36,6 +37,9 @@ class AgentConfig:
     private_key: str
     openai_api_key: str
     agent_address: Optional[str] = None
+
+    # Network Selection
+    network: str = "fuji"  # "fuji" or "base-sepolia"
 
     # Blockchain
     rpc_url: str = "https://avalanche-fuji-c-chain-rpc.publicnode.com"
@@ -61,26 +65,35 @@ class AgentConfig:
 
 def load_agent_config(
     agent_name: str,
-    agent_domain: Optional[str] = None
+    agent_domain: Optional[str] = None,
+    network: Optional[str] = None
 ) -> AgentConfig:
     """
     Load complete agent configuration from environment and AWS
 
     Priority:
     1. Environment variables (.env file) - if set and non-empty
-    2. AWS Secrets Manager - fallback for credentials
+    2. contracts_config.py - network defaults
+    3. AWS Secrets Manager - fallback for credentials
 
     Args:
         agent_name: Agent name for AWS lookup (e.g., "karma-hello-agent")
         agent_domain: Optional domain override
+        network: Network to use ("fuji" or "base-sepolia"). If None, uses NETWORK env var or default.
 
     Returns:
         AgentConfig with all settings loaded
 
     Example:
+        >>> # Use default network (Fuji)
         >>> config = load_agent_config("validator-agent")
-        >>> print(config.openai_api_key[:15])
-        sk-proj-qk_p5o6...
+
+        >>> # Use Base Sepolia
+        >>> config = load_agent_config("validator-agent", network="base-sepolia")
+
+        >>> # Or set via environment
+        >>> os.environ["NETWORK"] = "base-sepolia"
+        >>> config = load_agent_config("validator-agent")
     """
     # Load .env file
     load_dotenv()
@@ -89,21 +102,27 @@ def load_agent_config(
     private_key = get_private_key(agent_name)
     openai_api_key = get_openai_api_key(agent_name)
 
+    # Determine network to use
+    selected_network = network or os.getenv("NETWORK", DEFAULT_NETWORK)
+
+    # Load network-specific configuration
+    network_config = get_network_config(selected_network)
+
     # Agent identity
     domain = agent_domain or os.getenv("AGENT_DOMAIN", f"{agent_name}.karmacadabra.ultravioletadao.xyz")
 
-    # Blockchain config
-    rpc_url = os.getenv("RPC_URL_FUJI", "https://avalanche-fuji-c-chain-rpc.publicnode.com")
-    chain_id = int(os.getenv("CHAIN_ID", "43113"))
+    # Blockchain config (env vars override network config)
+    rpc_url = os.getenv("RPC_URL") or network_config["rpc_url"]
+    chain_id = int(os.getenv("CHAIN_ID") or network_config["chain_id"])
 
-    # Contract addresses
-    glue_token = os.getenv("GLUE_TOKEN_ADDRESS")
-    identity_registry = os.getenv("IDENTITY_REGISTRY")
-    reputation_registry = os.getenv("REPUTATION_REGISTRY")
-    validation_registry = os.getenv("VALIDATION_REGISTRY")
+    # Contract addresses (env vars override network config)
+    glue_token = os.getenv("GLUE_TOKEN_ADDRESS") or network_config["glue_token"]
+    identity_registry = os.getenv("IDENTITY_REGISTRY") or network_config["identity_registry"]
+    reputation_registry = os.getenv("REPUTATION_REGISTRY") or network_config["reputation_registry"]
+    validation_registry = os.getenv("VALIDATION_REGISTRY") or network_config["validation_registry"]
 
-    # x402
-    facilitator_url = os.getenv("FACILITATOR_URL", "https://facilitator.ultravioletadao.xyz")
+    # x402 (env var overrides network config)
+    facilitator_url = os.getenv("FACILITATOR_URL") or network_config["facilitator_url"]
 
     # Server config
     host = os.getenv("HOST", "0.0.0.0")
@@ -122,6 +141,7 @@ def load_agent_config(
         private_key=private_key,
         openai_api_key=openai_api_key,
         agent_address=agent_address,
+        network=selected_network,
         rpc_url=rpc_url,
         chain_id=chain_id,
         glue_token_address=glue_token,
@@ -150,7 +170,9 @@ if __name__ == "__main__":
     try:
         config = load_agent_config(agent_name)
 
-        print(f"\n✅ Configuration loaded for: {config.agent_name}")
+        print(f"\n[+] Configuration loaded for: {config.agent_name}")
+        print(f"\nNetwork:")
+        print(f"  Selected: {config.network}")
         print(f"\nIdentity:")
         print(f"  Domain: {config.agent_domain}")
         print(f"  Address: {config.agent_address or 'Not set in .env'}")
@@ -163,6 +185,10 @@ if __name__ == "__main__":
         print(f"\nContracts:")
         print(f"  GLUE: {config.glue_token_address}")
         print(f"  Identity Registry: {config.identity_registry}")
+        print(f"  Reputation Registry: {config.reputation_registry}")
+        print(f"  Validation Registry: {config.validation_registry}")
+        print(f"\nx402 Facilitator:")
+        print(f"  URL: {config.facilitator_url}")
         print(f"\nServer:")
         print(f"  {config.host}:{config.port}")
         print(f"\nPricing:")
@@ -171,5 +197,5 @@ if __name__ == "__main__":
         print()
 
     except Exception as e:
-        print(f"\n❌ Error: {e}")
+        print(f"\n[-] Error: {e}")
         sys.exit(1)
