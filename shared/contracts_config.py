@@ -40,6 +40,10 @@ FUJI_CONFIG = {
     "validation_registry": "0x9aF4590035C109859B4163fd8f2224b820d11bc2",
     "transaction_logger": "0x85ea82dDc0d3dDC4473AAAcc7E7514f4807fF654",
 
+    # GLUE Token EIP-712 Metadata (for x402 facilitator)
+    "glue_eip712_name": "Gasless Ultravioleta DAO Extended Token",
+    "glue_eip712_version": "1",
+
     # x402 Facilitator
     "facilitator_url": "https://facilitator.ultravioletadao.xyz",
 
@@ -62,6 +66,10 @@ BASE_SEPOLIA_CONFIG = {
     "reputation_registry": "0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F",
     "validation_registry": "0x3C545DBeD1F587293fA929385442A459c2d316c4",
     "transaction_logger": None,  # Not deployed yet
+
+    # GLUE Token EIP-712 Metadata (for x402 facilitator)
+    "glue_eip712_name": "Gasless Ultravioleta DAO Extended Token",
+    "glue_eip712_version": "1",
 
     # x402 Facilitator (same as Fuji - multi-chain support)
     "facilitator_url": "https://facilitator.ultravioletadao.xyz",

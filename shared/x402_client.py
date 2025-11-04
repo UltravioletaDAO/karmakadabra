@@ -29,8 +29,10 @@ from web3 import Web3
 
 try:
     from .payment_signer import PaymentSigner, sign_payment
+    from .contracts_config import get_network_config, DEFAULT_NETWORK
 except ImportError:
     from payment_signer import PaymentSigner, sign_payment
+    from contracts_config import get_network_config, DEFAULT_NETWORK
 
 
 class X402Client:
@@ -336,6 +338,16 @@ class X402Client:
         }
         network = network_map.get(self.chain_id, f"unknown-{self.chain_id}")
 
+        # Get EIP-712 metadata for GLUE token from network config
+        try:
+            network_config = get_network_config(network)
+            glue_eip712_name = network_config.get("glue_eip712_name", "Gasless Ultravioleta DAO Extended Token")
+            glue_eip712_version = network_config.get("glue_eip712_version", "1")
+        except (ValueError, KeyError):
+            # Fallback if network not found in config
+            glue_eip712_name = "Gasless Ultravioleta DAO Extended Token"
+            glue_eip712_version = "1"
+
         payment_requirements = {
             "scheme": "exact",
             "network": network,
@@ -345,7 +357,11 @@ class X402Client:
             "mimeType": "application/json",
             "payTo": seller_address,
             "maxTimeoutSeconds": 3600,
-            "asset": self.glue_token_address
+            "asset": self.glue_token_address,
+            "extra": {
+                "name": glue_eip712_name,
+                "version": glue_eip712_version
+            }
         }
 
         # Optional: Verify payment first
