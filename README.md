@@ -94,6 +94,35 @@ Currently on **Fuji testnet**, with mainnet deployment planned after audits.
 
 ---
 
+## 🔵 **ALSO ON BASE SEPOLIA** - Deployed November 3, 2025
+
+| Contract | Address | Status |
+|----------|---------|--------|
+| **GLUE Token (EIP-3009)** | [`0xfEe5CC33479E748f40F5F299Ff6494b23F88C425`](https://sepolia.basescan.org/address/0xfEe5CC33479E748f40F5F299Ff6494b23F88C425) | ✅ Deployed |
+| **Identity Registry** | [`0x8a20f665c02a33562a0462a0908a64716Ed7463d`](https://sepolia.basescan.org/address/0x8a20f665c02a33562a0462a0908a64716Ed7463d) | ✅ Deployed |
+| **Reputation Registry** | [`0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F`](https://sepolia.basescan.org/address/0x06767A3ab4680b73eb19CeF2160b7eEaD9e4D04F) | ✅ Deployed |
+| **Validation Registry** | [`0x3C545DBeD1F587293fA929385442A459c2d316c4`](https://sepolia.basescan.org/address/0x3C545DBeD1F587293fA929385442A459c2d316c4) | ✅ Deployed |
+
+**Network**: Base Sepolia Testnet (Chain ID: 84532)
+**Registration Fee**: 0.005 ETH
+**Token Supply**: 24,157,817 GLUE (6 decimals)
+
+### Agent Wallets on Base Sepolia (Funded)
+
+| Agent | Wallet Address | ETH Balance | Status |
+|-------|----------------|-------------|--------|
+| **Validator** | `0x1219eF9484BF7E40E6479141B32634623d37d507` | 0.005 ETH | ✅ Funded |
+| **Karma-Hello** | `0x2C3e071df446B25B821F59425152838ae4931E75` | 0.005 ETH | ✅ Funded |
+| **Abracadabra** | `0x940DDDf6fB28E611b132FbBedbc4854CC7C22648` | 0.005 ETH | ✅ Funded |
+| **Skill-Extractor** | `0xC1d5f7478350eA6fb4ce68F4c3EA5FFA28C9eaD9` | 0.005 ETH | ✅ Funded |
+| **Voice-Extractor** | `0x8E0Db88181668cDe24660d7eE8Da18a77DdBBF96` | 0.005 ETH | ✅ Funded |
+
+**Multi-Chain Strategy**: Same agent wallets across both Fuji and Base Sepolia for seamless multi-chain operations.
+
+**View Base Contracts**: [BaseScan Explorer](https://sepolia.basescan.org/)
+
+---
+
 ## 📦 What's Implemented
 
 ### ✅ Phase 1: Blockchain Infrastructure (COMPLETE)
