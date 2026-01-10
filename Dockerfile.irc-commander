@@ -1,0 +1,26 @@
+# Dockerfile for IRC Commander
+# Bridges IRC commands to the Karmacadabra agent fleet via Redis
+
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+
+# Install Python dependencies
+RUN pip install --no-cache-dir \
+    irc \
+    redis \
+    python-dotenv
+
+# Copy shared modules
+COPY shared/ /app/shared/
+
+# Set Python path
+ENV PYTHONPATH=/app
+
+# Run the commander
+CMD ["python", "-m", "shared.irc_commander"]

@@ -1,0 +1,131 @@
+# Docker Compose override for IRC Control Plane
+#
+# Usage:
+#   # Start with IRC control
+#   docker-compose -f docker-compose.yml -f docker-compose.irc.yml up -d
+#
+#   # Start only IRC infrastructure
+#   docker-compose -f docker-compose.irc.yml up redis irc-commander -d
+#
+# IRC Commands (from your IRC client):
+#   !agents                    - List online agents
+#   !ping agent:all |sig=xxx   - Ping all agents
+#   !status karma-hello |sig=xxx - Get karma-hello status
+#   !halt karma-cabra:all |sig=xxx - Halt all agents
+#   !resume karma-cabra:all |sig=xxx - Resume all agents
+
+version: '3.8'
+
+networks:
+  karmacadabra:
+    external: true
+
+volumes:
+  redis-data:
+
+services:
+  # ===========================================================================
+  # REDIS (Port 6379)
+  # ===========================================================================
+  # Message bus for IRC control plane
+  # Streams: uvd:tasks, uvd:results, uvd:events
+  redis:
+    image: redis:7-alpine
+    container_name: karmacadabra-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    networks:
+      - karmacadabra
+    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # IRC COMMANDER
+  # ===========================================================================
+  # Bridge between IRC and agent fleet
+  # Listens for signed commands, publishes to Redis, relays results
+  irc-commander:
+    build:
+      context: .
+      dockerfile: Dockerfile.irc-commander
+    container_name: karmacadabra-irc-commander
+    depends_on:
+      redis:
+        condition: service_healthy
+    environment:
+      # IRC Settings (configure these)
+      - IRC_SERVER=${IRC_SERVER:-irc.libera.chat}
+      - IRC_PORT=${IRC_PORT:-6667}
+      - IRC_NICK=${IRC_NICK:-uvd_commander}
+      - IRC_CHANNELS=${IRC_CHANNELS:-#karma-cabra}
+      - IRC_USE_SSL=${IRC_USE_SSL:-false}
+      # Security (REQUIRED - generate with: python -c "import secrets; print(secrets.token_hex(32))")
+      - IRC_HMAC_SECRET=${IRC_HMAC_SECRET}
+      # Optional: restrict to specific users (comma-separated nicks)
+      - IRC_ALLOWED_USERS=${IRC_ALLOWED_USERS:-}
+      - IRC_PRIVILEGED_USERS=${IRC_PRIVILEGED_USERS:-}
+      # Redis
+      - REDIS_URL=redis://redis:6379/0
+      # Rate limiting
+      - IRC_RATE_LIMIT=20
+      - IRC_RATE_WINDOW=60
+    networks:
+      - karmacadabra
+    restart: unless-stopped
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  # ===========================================================================
+  # AGENT OVERRIDES - Add IRC control to existing agents
+  # ===========================================================================
+  # These extend the base agent definitions with IRC capabilities
+
+  validator:
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - IRC_ENABLED=true
+    depends_on:
+      - redis
+
+  karma-hello:
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - IRC_ENABLED=true
+    depends_on:
+      - redis
+
+  abracadabra:
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - IRC_ENABLED=true
+    depends_on:
+      - redis
+
+  skill-extractor:
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - IRC_ENABLED=true
+    depends_on:
+      - redis
+
+  voice-extractor:
+    environment:
+      - REDIS_URL=redis://redis:6379/0
+      - IRC_ENABLED=true
+    depends_on:
+      - redis
