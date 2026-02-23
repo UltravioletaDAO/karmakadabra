@@ -1,0 +1,849 @@
+{
+  "version": "1.0",
+  "budget_usd": 200,
+  "source_chain": "avalanche",
+  "generated": "2026-02-20T02:42:53.445Z",
+  "seed": 2026,
+  "chains": {
+    "base": {
+      "total_usd": 28,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "1.23",
+          "token": "EURC"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "0.96",
+          "token": "USDC"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "1.61",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "1.54",
+          "token": "USDC"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "0.68",
+          "token": "USDC"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "0.80",
+          "token": "EURC"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "1.65",
+          "token": "USDC"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "1.87",
+          "token": "EURC"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.94",
+          "token": "USDC"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "0.47",
+          "token": "USDC"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "0.52",
+          "token": "EURC"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "1.54",
+          "token": "USDC"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "1.11",
+          "token": "EURC"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "0.61",
+          "token": "EURC"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "0.73",
+          "token": "USDC"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "1.01",
+          "token": "EURC"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "1.14",
+          "token": "EURC"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "2.09",
+          "token": "USDC"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "1.44",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "0.40",
+          "token": "USDC"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "0.77",
+          "token": "EURC"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "0.90",
+          "token": "EURC"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "1.83",
+          "token": "USDC"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "2.16",
+          "token": "USDC"
+        }
+      }
+    },
+    "ethereum": {
+      "total_usd": 24,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "0.94",
+          "token": "USDC"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "1.32",
+          "token": "USDC"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "1.29",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "1.04",
+          "token": "AUSD"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "1.17",
+          "token": "AUSD"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "1.56",
+          "token": "USDC"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "0.77",
+          "token": "AUSD"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "0.30",
+          "token": "USDC"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.52",
+          "token": "USDC"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "0.39",
+          "token": "USDC"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "1.54",
+          "token": "USDC"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "1.50",
+          "token": "AUSD"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "0.51",
+          "token": "USDC"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "0.51",
+          "token": "USDC"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "0.92",
+          "token": "USDC"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "1.06",
+          "token": "USDC"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "0.66",
+          "token": "AUSD"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "1.53",
+          "token": "USDC"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "1.47",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "0.30",
+          "token": "AUSD"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "1.56",
+          "token": "USDC"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "1.10",
+          "token": "AUSD"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "1.45",
+          "token": "USDC"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "0.59",
+          "token": "USDC"
+        }
+      }
+    },
+    "polygon": {
+      "total_usd": 24,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "0.54",
+          "token": "AUSD"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "1.33",
+          "token": "USDC"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "1.29",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "0.66",
+          "token": "USDC"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "0.70",
+          "token": "USDC"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "0.84",
+          "token": "AUSD"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "0.59",
+          "token": "USDC"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "1.76",
+          "token": "USDC"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.91",
+          "token": "USDC"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "0.43",
+          "token": "USDC"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "0.97",
+          "token": "AUSD"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "0.91",
+          "token": "USDC"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "1.78",
+          "token": "USDC"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "1.66",
+          "token": "AUSD"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "1.35",
+          "token": "USDC"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "1.52",
+          "token": "USDC"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "0.91",
+          "token": "AUSD"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "0.73",
+          "token": "USDC"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "1.09",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "0.70",
+          "token": "USDC"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "0.42",
+          "token": "USDC"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "0.50",
+          "token": "USDC"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "1.85",
+          "token": "USDC"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "0.56",
+          "token": "USDC"
+        }
+      }
+    },
+    "arbitrum": {
+      "total_usd": 24,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "0.41",
+          "token": "USDC"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "0.95",
+          "token": "AUSD"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "0.96",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "0.55",
+          "token": "USDT"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "0.62",
+          "token": "USDC"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "0.68",
+          "token": "USDC"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "1.28",
+          "token": "USDC"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "1.30",
+          "token": "USDC"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.76",
+          "token": "USDC"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "0.46",
+          "token": "USDC"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "0.62",
+          "token": "USDC"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "1.55",
+          "token": "USDT"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "1.64",
+          "token": "USDC"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "1.57",
+          "token": "USDC"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "1.32",
+          "token": "USDC"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "0.55",
+          "token": "USDC"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "0.72",
+          "token": "USDC"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "0.87",
+          "token": "USDC"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "1.72",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "1.11",
+          "token": "USDC"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "0.75",
+          "token": "USDC"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "1.68",
+          "token": "USDC"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "1.01",
+          "token": "USDT"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "0.92",
+          "token": "USDC"
+        }
+      }
+    },
+    "avalanche": {
+      "total_usd": 28,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "0.50",
+          "token": "USDC"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "1.39",
+          "token": "AUSD"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "1.46",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "1.48",
+          "token": "USDC"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "1.23",
+          "token": "AUSD"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "0.76",
+          "token": "AUSD"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "1.38",
+          "token": "AUSD"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "1.37",
+          "token": "USDC"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.49",
+          "token": "USDC"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "1.33",
+          "token": "EURC"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "1.31",
+          "token": "USDC"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "1.04",
+          "token": "EURC"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "0.49",
+          "token": "EURC"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "1.75",
+          "token": "USDC"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "1.04",
+          "token": "AUSD"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "1.04",
+          "token": "EURC"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "1.06",
+          "token": "USDC"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "1.16",
+          "token": "USDC"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "1.34",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "1.68",
+          "token": "USDC"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "0.88",
+          "token": "AUSD"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "0.86",
+          "token": "AUSD"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "1.38",
+          "token": "EURC"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "1.58",
+          "token": "USDC"
+        }
+      }
+    },
+    "optimism": {
+      "total_usd": 24,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "1.63",
+          "token": "USDT"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "1.59",
+          "token": "USDC"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "1.53",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "1.00",
+          "token": "USDT"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "1.49",
+          "token": "USDC"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "1.67",
+          "token": "USDC"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "1.60",
+          "token": "USDC"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "0.34",
+          "token": "USDC"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.51",
+          "token": "USDT"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "1.07",
+          "token": "USDC"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "0.60",
+          "token": "USDC"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "0.45",
+          "token": "USDC"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "0.90",
+          "token": "USDC"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "0.46",
+          "token": "USDC"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "1.06",
+          "token": "USDC"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "0.45",
+          "token": "USDT"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "1.45",
+          "token": "USDT"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "1.08",
+          "token": "USDT"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "0.83",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "1.12",
+          "token": "USDC"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "0.55",
+          "token": "USDC"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "0.51",
+          "token": "USDT"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "1.12",
+          "token": "USDC"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "0.99",
+          "token": "USDC"
+        }
+      }
+    },
+    "celo": {
+      "total_usd": 20,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "1.16",
+          "token": "USDC"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "1.11",
+          "token": "USDT"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "1.27",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "1.09",
+          "token": "USDT"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "1.21",
+          "token": "USDC"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "1.11",
+          "token": "USDC"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "0.43",
+          "token": "USDT"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "0.48",
+          "token": "USDC"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.50",
+          "token": "USDT"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "0.42",
+          "token": "USDC"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "1.03",
+          "token": "USDC"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "1.32",
+          "token": "USDT"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "0.56",
+          "token": "USDT"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "0.94",
+          "token": "USDT"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "0.83",
+          "token": "USDC"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "0.75",
+          "token": "USDC"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "0.31",
+          "token": "USDC"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "1.26",
+          "token": "USDC"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "0.69",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "0.71",
+          "token": "USDT"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "0.74",
+          "token": "USDT"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "0.69",
+          "token": "USDC"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "0.52",
+          "token": "USDC"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "0.87",
+          "token": "USDC"
+        }
+      }
+    },
+    "monad": {
+      "total_usd": 20,
+      "agents": {
+        "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48": {
+          "amount": "0.71",
+          "token": "AUSD"
+        },
+        "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A": {
+          "amount": "0.96",
+          "token": "AUSD"
+        },
+        "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC": {
+          "amount": "1.28",
+          "token": "USDC"
+        },
+        "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC": {
+          "amount": "0.41",
+          "token": "USDC"
+        },
+        "0x7a729393D3854a6B85F84a86F62e19f74f4234F7": {
+          "amount": "0.93",
+          "token": "AUSD"
+        },
+        "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA": {
+          "amount": "0.61",
+          "token": "USDC"
+        },
+        "0x3aebb73a33377F0d6FC2195F83559635aDeE8408": {
+          "amount": "1.40",
+          "token": "USDC"
+        },
+        "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1": {
+          "amount": "0.65",
+          "token": "AUSD"
+        },
+        "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99": {
+          "amount": "0.76",
+          "token": "AUSD"
+        },
+        "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD": {
+          "amount": "0.34",
+          "token": "AUSD"
+        },
+        "0x64dbE996E626260F21F5c4FaD3C9bA209978c368": {
+          "amount": "0.39",
+          "token": "USDC"
+        },
+        "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d": {
+          "amount": "0.57",
+          "token": "USDC"
+        },
+        "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a": {
+          "amount": "0.40",
+          "token": "AUSD"
+        },
+        "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D": {
+          "amount": "1.24",
+          "token": "USDC"
+        },
+        "0x914c38fC1AEc27912B90609cA82383630d64B5e4": {
+          "amount": "1.41",
+          "token": "USDC"
+        },
+        "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7": {
+          "amount": "0.43",
+          "token": "AUSD"
+        },
+        "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529": {
+          "amount": "1.52",
+          "token": "USDC"
+        },
+        "0x724159D6F1060B160Ae3408B76787D082987C749": {
+          "amount": "1.51",
+          "token": "AUSD"
+        },
+        "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D": {
+          "amount": "0.37",
+          "token": "USDC"
+        },
+        "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8": {
+          "amount": "0.79",
+          "token": "USDC"
+        },
+        "0x350Ef06F11e87731476D567b3e5E5d865dcd6657": {
+          "amount": "0.36",
+          "token": "USDC"
+        },
+        "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0": {
+          "amount": "0.50",
+          "token": "USDC"
+        },
+        "0x62e55e03f13E2640987E892b8a09A1531635b86a": {
+          "amount": "1.24",
+          "token": "AUSD"
+        },
+        "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E": {
+          "amount": "1.22",
+          "token": "AUSD"
+        }
+      }
+    }
+  },
+  "gas": {
+    "base": "0.0005",
+    "ethereum": "0.0003",
+    "polygon": "0.1",
+    "arbitrum": "0.0005",
+    "avalanche": "0.01",
+    "optimism": "0.0005",
+    "celo": "0.01",
+    "monad": "0.01"
+  },
+  "bridge_plan": {
+    "source": "avalanche",
+    "targets": {
+      "base": "28.00",
+      "ethereum": "24.00",
+      "polygon": "24.00",
+      "arbitrum": "24.00",
+      "optimism": "24.00",
+      "celo": "20.00",
+      "monad": "20.00"
+    }
+  },
+  "summary": {
+    "total_stablecoins_usd": 192,
+    "total_gas_usd": 145.56,
+    "bridge_fees_est_usd": 5.9,
+    "agents": 24,
+    "chains": 8,
+    "min_per_agent_per_chain": "0.30",
+    "max_per_agent_per_chain": "2.16",
+    "avg_per_agent_total": "8.00"
+  }
+}
