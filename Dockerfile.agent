@@ -1,5 +1,5 @@
-# Base Dockerfile for Python agents
-# Used by all Karmacadabra agents (karma-hello, abracadabra, skill-extractor, voice-extractor, validator)
+# Base Dockerfile for Python agents (v1 + v2)
+# Used by all Karmacadabra agents including coordinator and community agents
 
 FROM python:3.11-slim
 
@@ -19,6 +19,12 @@ ENV PYTHONPATH=/app
 
 # Copy shared library first (for caching)
 COPY shared/ /app/shared/
+
+# Copy v2 libraries and services
+COPY lib/ /app/lib/
+COPY services/ /app/services/
+COPY cron/ /app/cron/
+COPY monitoring/ /app/monitoring/
 
 # Install shared dependencies
 RUN pip install --no-cache-dir \
