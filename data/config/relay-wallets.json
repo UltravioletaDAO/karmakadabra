@@ -1,0 +1,202 @@
+{
+  "version": "1.0",
+  "generated": "2026-02-22T02:09:09.801Z",
+  "derivationPathMain": "m/44'/60'/0'/0/{index}",
+  "derivationPathRelay": "m/44'/60'/0'/0/{index + 100}",
+  "relayIndexOffset": 100,
+  "count": 24,
+  "wallets": [
+    {
+      "index": 0,
+      "name": "kk-coordinator",
+      "mainAddress": "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48",
+      "relayAddress": "0xd2b5fC0272C2ecFC3B278D4653FDbd1c86285DF5",
+      "relayIndex": 100,
+      "type": "system"
+    },
+    {
+      "index": 1,
+      "name": "kk-karma-hello",
+      "mainAddress": "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A",
+      "relayAddress": "0x8AC365BEb48d21dE1A7761A662aA61E28F6A2588",
+      "relayIndex": 101,
+      "type": "system"
+    },
+    {
+      "index": 2,
+      "name": "kk-skill-extractor",
+      "mainAddress": "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC",
+      "relayAddress": "0x9Ba52D45a50DD5AE4abBD92482a0fd8dae3aFDc3",
+      "relayIndex": 102,
+      "type": "system"
+    },
+    {
+      "index": 3,
+      "name": "kk-voice-extractor",
+      "mainAddress": "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC",
+      "relayAddress": "0x692a5D04C559A6b6DDBC7a06b66418A719b6F7e4",
+      "relayIndex": 103,
+      "type": "system"
+    },
+    {
+      "index": 4,
+      "name": "kk-validator",
+      "mainAddress": "0x7a729393D3854a6B85F84a86F62e19f74f4234F7",
+      "relayAddress": "0xd33911DcDeabB17bc2a95200a451748e3683aA4b",
+      "relayIndex": 104,
+      "type": "system"
+    },
+    {
+      "index": 5,
+      "name": "kk-soul-extractor",
+      "mainAddress": "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA",
+      "relayAddress": "0x3ac55FCF8C1084C49E21F1D8874C316e33d06341",
+      "relayIndex": 105,
+      "type": "system"
+    },
+    {
+      "index": 6,
+      "name": "kk-juanjumagalp",
+      "mainAddress": "0x3aebb73a33377F0d6FC2195F83559635aDeE8408",
+      "relayAddress": "0x26fDDD3f878Cba4e8EdE5B7c577083678cC2c26B",
+      "relayIndex": 106,
+      "type": "user"
+    },
+    {
+      "index": 7,
+      "name": "kk-elboorja",
+      "mainAddress": "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1",
+      "relayAddress": "0x751C3a2Fa5c04B108A81faa905DfB16e4F9c44F4",
+      "relayIndex": 107,
+      "type": "user"
+    },
+    {
+      "index": 8,
+      "name": "kk-stovedove",
+      "mainAddress": "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99",
+      "relayAddress": "0x2D2828dA1d825AC2A3A9E7904f75110Eaf675C7e",
+      "relayIndex": 108,
+      "type": "user"
+    },
+    {
+      "index": 9,
+      "name": "kk-0xroypi",
+      "mainAddress": "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD",
+      "relayAddress": "0x44a68b0050beaACC6dAdAAC2D1Ff4c1F291DEa39",
+      "relayIndex": 109,
+      "type": "user"
+    },
+    {
+      "index": 10,
+      "name": "kk-sanvalencia2",
+      "mainAddress": "0x64dbE996E626260F21F5c4FaD3C9bA209978c368",
+      "relayAddress": "0x5008fEE7eEC504273e8F00e11E183670296eccda",
+      "relayIndex": 110,
+      "type": "user"
+    },
+    {
+      "index": 11,
+      "name": "kk-0xjokker",
+      "mainAddress": "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d",
+      "relayAddress": "0xF7EF13Be4eEECA551a0a0Dd334739D581598ECf8",
+      "relayIndex": 111,
+      "type": "user"
+    },
+    {
+      "index": 12,
+      "name": "kk-cyberpaisa",
+      "mainAddress": "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a",
+      "relayAddress": "0x98848eEE796a8a08c6FDf24F982bE21a23647b97",
+      "relayIndex": 112,
+      "type": "user"
+    },
+    {
+      "index": 13,
+      "name": "kk-cymatix",
+      "mainAddress": "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D",
+      "relayAddress": "0xB26771895D7F79a575262eB0986509E331502750",
+      "relayIndex": 113,
+      "type": "user"
+    },
+    {
+      "index": 14,
+      "name": "kk-eljuyan",
+      "mainAddress": "0x914c38fC1AEc27912B90609cA82383630d64B5e4",
+      "relayAddress": "0x17F264eE602afB6869827B82bC5337306fF67114",
+      "relayIndex": 114,
+      "type": "user"
+    },
+    {
+      "index": 15,
+      "name": "kk-1nocty",
+      "mainAddress": "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7",
+      "relayAddress": "0x65897604a00cCEA42dC4Fe8157d1077037d5D311",
+      "relayIndex": 115,
+      "type": "user"
+    },
+    {
+      "index": 16,
+      "name": "kk-elbitterx",
+      "mainAddress": "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529",
+      "relayAddress": "0xa4C230575C3Dc2a6245db80E5eD2302e82bb50E3",
+      "relayIndex": 116,
+      "type": "user"
+    },
+    {
+      "index": 17,
+      "name": "kk-acpm444",
+      "mainAddress": "0x724159D6F1060B160Ae3408B76787D082987C749",
+      "relayAddress": "0x056D20E26EFaddeA24F2be342D50CA5650cffEDb",
+      "relayIndex": 117,
+      "type": "user"
+    },
+    {
+      "index": 18,
+      "name": "kk-davidtherich",
+      "mainAddress": "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D",
+      "relayAddress": "0x18C2487c5f1a8851ED13EaD922c7Db792E17b704",
+      "relayIndex": 118,
+      "type": "user"
+    },
+    {
+      "index": 19,
+      "name": "kk-karenngo",
+      "mainAddress": "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8",
+      "relayAddress": "0xa637f539baE6503221978f5C1d4b3C1331FA3907",
+      "relayIndex": 119,
+      "type": "user"
+    },
+    {
+      "index": 20,
+      "name": "kk-datbo0i_lp",
+      "mainAddress": "0x350Ef06F11e87731476D567b3e5E5d865dcd6657",
+      "relayAddress": "0xC16778e2948b54E2FB76d3f2017C736b46a98AF3",
+      "relayIndex": 120,
+      "type": "user"
+    },
+    {
+      "index": 21,
+      "name": "kk-psilocibin3",
+      "mainAddress": "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0",
+      "relayAddress": "0xF482304d3E536BDEf28ba922c28AfCcDd09C699d",
+      "relayIndex": 121,
+      "type": "user"
+    },
+    {
+      "index": 22,
+      "name": "kk-0xsoulavax",
+      "mainAddress": "0x62e55e03f13E2640987E892b8a09A1531635b86a",
+      "relayAddress": "0x40eD285f0bc3625DdED7a567dD2F762f7993741e",
+      "relayIndex": 122,
+      "type": "user"
+    },
+    {
+      "index": 23,
+      "name": "kk-painbrayan",
+      "mainAddress": "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E",
+      "relayAddress": "0xbfaC58267d3809e3B5976022D1c2B276b141b2F3",
+      "relayIndex": 123,
+      "type": "user"
+    }
+  ]
+}

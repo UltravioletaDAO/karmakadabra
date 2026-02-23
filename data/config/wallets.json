@@ -1,0 +1,154 @@
+{
+  "version": "1.0",
+  "generated": "2026-02-20T02:41:35.070Z",
+  "derivationPath": "m/44'/60'/0'/0/{index}",
+  "count": 24,
+  "systemAgents": 6,
+  "userAgents": 18,
+  "wallets": [
+    {
+      "index": 0,
+      "name": "kk-coordinator",
+      "address": "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48",
+      "type": "system"
+    },
+    {
+      "index": 1,
+      "name": "kk-karma-hello",
+      "address": "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A",
+      "type": "system"
+    },
+    {
+      "index": 2,
+      "name": "kk-skill-extractor",
+      "address": "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC",
+      "type": "system"
+    },
+    {
+      "index": 3,
+      "name": "kk-voice-extractor",
+      "address": "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC",
+      "type": "system"
+    },
+    {
+      "index": 4,
+      "name": "kk-validator",
+      "address": "0x7a729393D3854a6B85F84a86F62e19f74f4234F7",
+      "type": "system"
+    },
+    {
+      "index": 5,
+      "name": "kk-soul-extractor",
+      "address": "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA",
+      "type": "system"
+    },
+    {
+      "index": 6,
+      "name": "kk-juanjumagalp",
+      "address": "0x3aebb73a33377F0d6FC2195F83559635aDeE8408",
+      "type": "user"
+    },
+    {
+      "index": 7,
+      "name": "kk-elboorja",
+      "address": "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1",
+      "type": "user"
+    },
+    {
+      "index": 8,
+      "name": "kk-stovedove",
+      "address": "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99",
+      "type": "user"
+    },
+    {
+      "index": 9,
+      "name": "kk-0xroypi",
+      "address": "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD",
+      "type": "user"
+    },
+    {
+      "index": 10,
+      "name": "kk-sanvalencia2",
+      "address": "0x64dbE996E626260F21F5c4FaD3C9bA209978c368",
+      "type": "user"
+    },
+    {
+      "index": 11,
+      "name": "kk-0xjokker",
+      "address": "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d",
+      "type": "user"
+    },
+    {
+      "index": 12,
+      "name": "kk-cyberpaisa",
+      "address": "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a",
+      "type": "user"
+    },
+    {
+      "index": 13,
+      "name": "kk-cymatix",
+      "address": "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D",
+      "type": "user"
+    },
+    {
+      "index": 14,
+      "name": "kk-eljuyan",
+      "address": "0x914c38fC1AEc27912B90609cA82383630d64B5e4",
+      "type": "user"
+    },
+    {
+      "index": 15,
+      "name": "kk-1nocty",
+      "address": "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7",
+      "type": "user"
+    },
+    {
+      "index": 16,
+      "name": "kk-elbitterx",
+      "address": "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529",
+      "type": "user"
+    },
+    {
+      "index": 17,
+      "name": "kk-acpm444",
+      "address": "0x724159D6F1060B160Ae3408B76787D082987C749",
+      "type": "user"
+    },
+    {
+      "index": 18,
+      "name": "kk-davidtherich",
+      "address": "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D",
+      "type": "user"
+    },
+    {
+      "index": 19,
+      "name": "kk-karenngo",
+      "address": "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8",
+      "type": "user"
+    },
+    {
+      "index": 20,
+      "name": "kk-datbo0i_lp",
+      "address": "0x350Ef06F11e87731476D567b3e5E5d865dcd6657",
+      "type": "user"
+    },
+    {
+      "index": 21,
+      "name": "kk-psilocibin3",
+      "address": "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0",
+      "type": "user"
+    },
+    {
+      "index": 22,
+      "name": "kk-0xsoulavax",
+      "address": "0x62e55e03f13E2640987E892b8a09A1531635b86a",
+      "type": "user"
+    },
+    {
+      "index": 23,
+      "name": "kk-painbrayan",
+      "address": "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E",
+      "type": "user"
+    }
+  ]
+}

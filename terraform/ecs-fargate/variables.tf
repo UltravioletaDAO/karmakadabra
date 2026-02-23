@@ -220,6 +220,11 @@ variable "agents" {
       health_check_path = "/health"
       priority          = 600
     }
+    coordinator = {
+      port              = 9006
+      health_check_path = "/health"
+      priority          = 650
+    }
     test-seller = {
       port              = 8080
       health_check_path = "/health"

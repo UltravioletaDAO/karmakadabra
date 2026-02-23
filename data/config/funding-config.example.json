@@ -1,0 +1,24 @@
+{
+  "version": "2.0",
+  "sourceChain": "base",
+  "wallets": "config/wallets.json",
+  "perAgent": {
+    "defaultAmount": "1.00",
+    "chains": ["base", "polygon", "arbitrum"],
+    "tokens": {
+      "base": ["USDC"],
+      "polygon": ["USDC", "AUSD"],
+      "arbitrum": ["USDC", "USDT", "AUSD"]
+    }
+  },
+  "gasAmounts": {
+    "base": "0.0005",
+    "ethereum": "0.001",
+    "polygon": "0.1",
+    "arbitrum": "0.0005",
+    "avalanche": "0.01",
+    "optimism": "0.0005",
+    "celo": "0.01",
+    "monad": "0.01"
+  }
+}

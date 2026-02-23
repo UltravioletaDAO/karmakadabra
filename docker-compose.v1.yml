@@ -1,6 +1,6 @@
 version: '3.8'
 
-# Karmacadabra Agent Stack (v1 + v2)
+# Karmacadabra Agent Stack
 # Complete agent-to-agent economy for buying/selling AI services
 #
 # Services:
@@ -10,12 +10,11 @@ version: '3.8'
 #   - abracadabra: Transcription seller (9003)
 #   - skill-extractor: Skill profiling seller (9004)
 #   - voice-extractor: Personality profiling seller (9005)
-#   - coordinator: v2 swarm coordinator (9006)  [NEW]
 #
 # Usage:
 #   docker-compose up -d                    # Start all services
 #   docker-compose up facilitator           # Start facilitator only
-#   docker-compose up coordinator           # Start coordinator only
+#   docker-compose up karma-hello           # Start single agent
 #   docker-compose logs -f facilitator      # View logs
 #   docker-compose down                     # Stop all services
 
@@ -31,7 +30,6 @@ volumes:
   voice-extractor-cache:
   validator-cache:
   facilitator-data:
-  coordinator-data:
 
 services:
   # ===========================================================================
@@ -276,47 +274,6 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
-    restart: unless-stopped
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "10m"
-        max-file: "3"
-
-  # ===========================================================================
-  # COORDINATOR AGENT (Port 9006) [v2]
-  # ===========================================================================
-  # Swarm coordinator: routes tasks, monitors health, 6-factor matching
-  coordinator:
-    build:
-      context: .
-      dockerfile: Dockerfile.agent
-      args:
-        AGENT_NAME: coordinator
-    container_name: karmacadabra-coordinator
-    ports:
-      - "9006:9006"
-    environment:
-      - PYTHONPATH=/app
-      - PORT=9006
-      - WORKSPACES_DIR=/app/data/workspaces
-    volumes:
-      - ./agents/coordinator:/app/agent:ro
-      - ./shared:/app/shared:ro
-      - ./lib:/app/lib:ro
-      - ./services:/app/services:ro
-      - coordinator-data:/app/data
-      - ~/.aws:/root/.aws:ro
-    working_dir: /app/agent
-    command: python main.py
-    networks:
-      - karmacadabra
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9006/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
     restart: unless-stopped
     logging:
       driver: "json-file"

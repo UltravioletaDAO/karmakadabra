@@ -1,0 +1,5 @@
+# Karma Kadabra V2 — Python dependencies
+# Install: pip install -r requirements.txt
+
+httpx>=0.27.0
+python-dotenv>=1.0.0

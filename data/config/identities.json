@@ -1,0 +1,368 @@
+{
+  "version": "1.0",
+  "updated_at": "2026-02-22T18:54:21.334736+00:00",
+  "api_url": "https://api.execution.market",
+  "agents": [
+    {
+      "address": "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48",
+      "name": "kk-coordinator",
+      "index": 0,
+      "type": "system",
+      "executor_id": "b210bb0b-da62-4613-a0f5-2dee04a4f2f8",
+      "registrations": {
+        "base": {
+          "agent_id": 18775,
+          "transaction": "0xc0535b4ba5397e4cc7a61b697cc40aa4c2fb55505a853ccfd77ea85498c44e19",
+          "registered_at": "2026-02-22T02:11:40.850Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A",
+      "name": "kk-karma-hello",
+      "index": 1,
+      "type": "system",
+      "executor_id": "001f9c30-6ec4-4bff-8e0b-853e20cb8349",
+      "registrations": {
+        "base": {
+          "agent_id": 18776,
+          "transaction": "0x12576134d1978376c0eba5d8a4dd6a42118c8100c21583010bc9134c689e7d7e",
+          "registered_at": "2026-02-22T02:12:06.008Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC",
+      "name": "kk-skill-extractor",
+      "index": 2,
+      "type": "system",
+      "executor_id": "2c2fc29d-3dbf-4a53-86e4-ca696022b24e",
+      "registrations": {
+        "base": {
+          "agent_id": 18777,
+          "transaction": "0xe8cc2bf03d2d89314918e543e688aaaacdfe6782b8e0fcfb0ca61acd490473f7",
+          "registered_at": "2026-02-22T02:12:22.579Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC",
+      "name": "kk-voice-extractor",
+      "index": 3,
+      "type": "system",
+      "executor_id": "2a67a5d5-ac7f-4434-8c01-a15774f8696d",
+      "registrations": {
+        "base": {
+          "agent_id": 18778,
+          "transaction": "0xe79c998764a1a6a5a7c75c0f8fd451244030175a4481705e98ecaf8d0a5c7428",
+          "registered_at": "2026-02-22T02:12:30.042Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x7a729393D3854a6B85F84a86F62e19f74f4234F7",
+      "name": "kk-validator",
+      "index": 4,
+      "type": "system",
+      "executor_id": "25080200-4848-4e8f-8fa9-12b63f709b8b",
+      "registrations": {
+        "base": {
+          "agent_id": 18779,
+          "transaction": "0x78a9f0ad641c582a8f98782e1d3eae8aeb8ed1ac8fc26705707d5d62714d7fcb",
+          "registered_at": "2026-02-22T02:12:44.089Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA",
+      "name": "kk-soul-extractor",
+      "index": 5,
+      "type": "system",
+      "executor_id": "bf73c86e-d0e7-4093-9ec4-57dec152bb99",
+      "registrations": {
+        "base": {
+          "agent_id": 18895,
+          "transaction": null,
+          "registered_at": "2026-02-22T03:00:50.303Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x3aebb73a33377F0d6FC2195F83559635aDeE8408",
+      "name": "kk-juanjumagalp",
+      "index": 6,
+      "type": "user",
+      "executor_id": "44ccf13e-61b1-40d5-9a0c-456f8a5dd9e8",
+      "registrations": {
+        "base": {
+          "agent_id": 18896,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:13:22.615Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1",
+      "name": "kk-elboorja",
+      "index": 7,
+      "type": "user",
+      "executor_id": "547e68ae-27fd-4e44-a78e-8f9668cc2a60",
+      "registrations": {
+        "base": {
+          "agent_id": 18897,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:13:54.714Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x6F2b09b31125C25B8caf4Bf68bfB10945deE0A99",
+      "name": "kk-stovedove",
+      "index": 8,
+      "type": "user",
+      "executor_id": "2a43a7b5-8bf4-4769-9381-410feeb81892",
+      "registrations": {
+        "base": {
+          "agent_id": 18898,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:14:39.220Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x46BdfD8256ceEB3325725cb3B81701C3E2e32eBD",
+      "name": "kk-0xroypi",
+      "index": 9,
+      "type": "user",
+      "executor_id": "a2221680-0f6e-467b-9783-6475bfb4735c",
+      "registrations": {
+        "base": {
+          "agent_id": 18934,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:15:11.291Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x64dbE996E626260F21F5c4FaD3C9bA209978c368",
+      "name": "kk-sanvalencia2",
+      "index": 10,
+      "type": "user",
+      "executor_id": "b7a5a3ee-926a-4c13-9c47-ef30e29fe12c",
+      "registrations": {
+        "base": {
+          "agent_id": 18814,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:15:54.588Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d",
+      "name": "kk-0xjokker",
+      "index": 11,
+      "type": "user",
+      "executor_id": "e4e79c4f-7a16-4e00-a263-19eaa0ae8814",
+      "registrations": {
+        "base": {
+          "agent_id": 18815,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:16:26.644Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x3a42417C9723A6Ae44bA9649f787745bB7e16F8a",
+      "name": "kk-cyberpaisa",
+      "index": 12,
+      "type": "user",
+      "executor_id": "6232e61f-dc8c-451b-9b9c-a42f0e654623",
+      "registrations": {
+        "base": {
+          "agent_id": 18816,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:17:10.411Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x812d9Aa3d9AA3E5018E7BDf7330D16694Ad6757D",
+      "name": "kk-cymatix",
+      "index": 13,
+      "type": "user",
+      "executor_id": "7ad936a6-29e3-4e5d-9536-34cc8edebadf",
+      "registrations": {
+        "base": {
+          "agent_id": 18817,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:17:42.465Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x914c38fC1AEc27912B90609cA82383630d64B5e4",
+      "name": "kk-eljuyan",
+      "index": 14,
+      "type": "user",
+      "executor_id": "c94a61e9-584d-4e91-a7b7-a8334eebf9a5",
+      "registrations": {
+        "base": {
+          "agent_id": 18818,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:18:27.010Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x3a3f992d926da3272E681DC59D23ad63FA77F3A7",
+      "name": "kk-1nocty",
+      "index": 15,
+      "type": "user",
+      "executor_id": "f7a5f9d7-449f-4105-ab2a-28f4d907838f",
+      "registrations": {
+        "base": {
+          "agent_id": 18843,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:18:59.066Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x7Fd9F9E51C9a94B3bcA2082C8332cBF708B0B529",
+      "name": "kk-elbitterx",
+      "index": 16,
+      "type": "user",
+      "executor_id": "0fbb6ed2-15ee-4aa1-92da-e2956e242353",
+      "registrations": {
+        "base": {
+          "agent_id": 18844,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:19:42.083Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x724159D6F1060B160Ae3408B76787D082987C749",
+      "name": "kk-acpm444",
+      "index": 17,
+      "type": "user",
+      "executor_id": "e0c57097-0270-4844-9670-8e07210e8251",
+      "registrations": {
+        "base": {
+          "agent_id": 18849,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:20:14.138Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x9688385469cd5D216fD5a89eb03Ec7fD0E0Bd92D",
+      "name": "kk-davidtherich",
+      "index": 18,
+      "type": "user",
+      "executor_id": "b8ae2555-690a-47e4-b391-1800231b4d29",
+      "registrations": {
+        "base": {
+          "agent_id": 18850,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:20:59.614Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x0ad9a1362775768f4c97845424b7b6dbf38FEAa8",
+      "name": "kk-karenngo",
+      "index": 19,
+      "type": "user",
+      "executor_id": "582c1d08-21ca-4ab4-ae42-033cb8a7bebf",
+      "registrations": {
+        "base": {
+          "agent_id": 18894,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:21:31.753Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x350Ef06F11e87731476D567b3e5E5d865dcd6657",
+      "name": "kk-datbo0i_lp",
+      "index": 20,
+      "type": "user",
+      "executor_id": "b47e0555-eee4-4e95-92f2-ff60354caa8d",
+      "registrations": {
+        "base": {
+          "agent_id": 18904,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:22:15.987Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0xEDc637d4b1bB9069753Cc9335942Be932083d2D0",
+      "name": "kk-psilocibin3",
+      "index": 21,
+      "type": "user",
+      "executor_id": "95703634-439b-4f69-9d4e-299ca42f0155",
+      "registrations": {
+        "base": {
+          "agent_id": 18905,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:22:48.046Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0x62e55e03f13E2640987E892b8a09A1531635b86a",
+      "name": "kk-0xsoulavax",
+      "index": 22,
+      "type": "user",
+      "executor_id": "b6580f1a-ef55-4955-a2fc-56f0169770fc",
+      "registrations": {
+        "base": {
+          "agent_id": 18906,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:23:32.418Z",
+          "status": "success"
+        }
+      }
+    },
+    {
+      "address": "0xc059B9cd5B7421a28f9259AdB4511418fd548b5E",
+      "name": "kk-painbrayan",
+      "index": 23,
+      "type": "user",
+      "executor_id": "5c554e0d-1646-4ea6-b888-38ee5c4dfdc0",
+      "registrations": {
+        "base": {
+          "agent_id": 18907,
+          "transaction": null,
+          "registered_at": "2026-02-22T02:24:04.477Z",
+          "status": "success"
+        }
+      }
+    }
+  ],
+  "verification_note": "On-chain verified 2026-02-22: 24/24 have ERC-8004 NFTs on Base. All wallets confirmed via balanceOf + ownerOf."
+}
