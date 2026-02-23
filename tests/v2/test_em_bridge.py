@@ -16,7 +16,7 @@ import pytest
 import sys
 
 # Add parent paths so imports work
-_kk_root = Path(__file__).parent.parent
+_kk_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(_kk_root / "irc"))
 sys.path.insert(0, str(_kk_root / "services"))
 sys.path.insert(0, str(_kk_root / "lib"))

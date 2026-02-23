@@ -12,7 +12,7 @@ from unittest.mock import AsyncMock, patch
 import pytest
 import sys
 
-_kk_root = Path(__file__).parent.parent
+_kk_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(_kk_root / "irc"))
 sys.path.insert(0, str(_kk_root / "lib"))
 
