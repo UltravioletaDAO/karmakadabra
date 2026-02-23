@@ -1036,3 +1036,4 @@ aws logs filter-log-events \
   --filter-pattern "[SETTLEMENT]" \
   --region us-east-2
 ```
+- dont proceed with the facilitator implementation the facilitator with testnet functionality is already live at facilitator.ultravioletadao.xyz

@@ -130,7 +130,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
                 }
             ],
             "blockchain": {
-                "network": "avalanche-fuji",
+                "network": self.config["network"],
                 "chain_id": self.config["chain_id"],
                 "contracts": {
                     "identity_registry": self.config["identity_registry"],
@@ -430,6 +430,7 @@ class VoiceExtractorAgent(ERC8004BaseAgent):
 # Initialize agent
 config = {
     "private_key": os.getenv("PRIVATE_KEY", "").strip() or None,
+    "network": os.getenv("NETWORK", "base-sepolia"),
     "rpc_url_fuji": os.getenv("RPC_URL_FUJI"),
     "chain_id": int(os.getenv("CHAIN_ID", 43113)),
     "identity_registry": os.getenv("IDENTITY_REGISTRY"),
