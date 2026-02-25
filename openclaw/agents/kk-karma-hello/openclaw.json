@@ -1,0 +1,9 @@
+{
+  "agent": {
+    "model": "anthropic/claude-sonnet-4-6",
+    "name": "kk-karma-hello"
+  },
+  "tools": {
+    "deny": ["browser"]
+  }
+}

@@ -371,8 +371,8 @@ NETWORKS: Dict[str, Dict[str, Any]] = {
     "monad": MONAD_CONFIG,
 }
 
-# Default network - stays on testnet until mainnet cutover
-DEFAULT_NETWORK = "base-sepolia"
+# Default network - Base mainnet (switched from base-sepolia for OpenClaw launch)
+DEFAULT_NETWORK = "base"
 
 # Mainnet networks list (for batch operations)
 MAINNET_NETWORKS = ["base", "ethereum", "polygon", "arbitrum", "celo", "avalanche", "optimism", "monad"]

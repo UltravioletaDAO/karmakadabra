@@ -1,0 +1,41 @@
+# docker-compose.agent.yml - Single OpenClaw Agent per EC2
+# Deploy one agent per instance with environment variables from host
+#
+# Usage:
+#   KK_AGENT_NAME=coordinator KK_WALLET_INDEX=0 docker-compose -f docker-compose.agent.yml up -d
+#
+# Required env vars on host:
+#   KK_AGENT_NAME       - Agent identity (coordinator, treasury, onboarding, etc.)
+#   KK_WALLET_INDEX     - HD wallet derivation index
+#   ANTHROPIC_API_KEY   - Claude API key (from AWS Secrets Manager)
+#   KK_PRIVATE_KEY      - Agent wallet private key (from AWS Secrets Manager)
+
+version: "3.8"
+
+services:
+  openclaw-agent:
+    build:
+      context: .
+      dockerfile: Dockerfile.openclaw
+      args:
+        AGENT_NAME: ${KK_AGENT_NAME}
+    container_name: ${KK_AGENT_NAME}
+    environment:
+      - KK_AGENT_NAME=${KK_AGENT_NAME}
+      - KK_WALLET_INDEX=${KK_WALLET_INDEX}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+      - KK_PRIVATE_KEY=${KK_PRIVATE_KEY}
+    ports:
+      - "18790:18790"
+    volumes:
+      - agent-data:/app/data
+    restart: unless-stopped
+    mem_limit: 1800m
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+volumes:
+  agent-data:

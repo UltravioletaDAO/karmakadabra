@@ -1,0 +1,64 @@
+# Dockerfile.openclaw - OpenClaw Agent Image
+# Lightweight build for sovereign EC2 agents (no Playwright, no CrewAI, no FastAPI)
+# Each agent runs on its own t3.small instance with 2GB RAM
+
+FROM python:3.11-slim
+
+# Install system dependencies
+RUN apt-get update && apt-get install -y \
+    gcc \
+    g++ \
+    git \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set working directory
+WORKDIR /app
+
+# Set Python path to include /app for shared module imports
+ENV PYTHONPATH=/app
+
+# Copy shared library first (for caching)
+COPY shared/ /app/shared/
+
+# Copy v2 libraries and services
+COPY lib/ /app/lib/
+COPY services/ /app/services/
+COPY cron/ /app/cron/
+
+# Copy IRC modules (agent communication via MeshRelay)
+COPY irc/ /app/irc/
+
+# Copy CLI scripts
+COPY scripts/kk/ /app/scripts/kk/
+
+# Copy OpenClaw skills (shared across all agents)
+COPY openclaw/skills/ /app/openclaw/skills/
+
+# Install Python dependencies (minimal - no Playwright, no CrewAI, no FastAPI)
+RUN pip install --no-cache-dir \
+    "web3>=6.0.0" \
+    "python-dotenv>=1.0.0" \
+    "boto3>=1.28.0" \
+    "requests>=2.31.0" \
+    "httpx>=0.25.0" \
+    "pydantic>=2.0.0"
+
+# Accept agent name as build arg
+ARG AGENT_NAME
+
+# Copy agent-specific files (SOUL.md, HEARTBEAT.md, openclaw.json)
+COPY openclaw/agents/${AGENT_NAME}/ /app/openclaw/agents/${AGENT_NAME}/
+
+# Copy entrypoint script
+COPY openclaw/entrypoint.sh /app/openclaw/entrypoint.sh
+RUN chmod +x /app/openclaw/entrypoint.sh
+
+# Create data directories
+RUN mkdir -p /app/data /app/workspace/memory
+
+# Health check via curl on gateway port
+HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
+    CMD curl -f http://localhost:18790/health || exit 1
+
+ENTRYPOINT ["bash", "/app/openclaw/entrypoint.sh"]
