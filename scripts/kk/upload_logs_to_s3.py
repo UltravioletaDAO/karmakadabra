@@ -22,9 +22,9 @@ from pathlib import Path
 S3_BUCKET = "karmacadabra-agent-data"
 S3_REGION = "us-east-1"
 
-# [MM/DD/YYYY HH:MM:SS AM/PM] username: message
+# [M/DD/YYYY HH:MM:SS AM/PM] username: message (month/day can be 1 or 2 digits)
 LOG_LINE_RE = re.compile(
-    r"^\[(\d{2}/\d{2}/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s+[AP]M)\]\s+(\S+?):\s+(.*)$"
+    r"^\[(\d{1,2}/\d{1,2}/\d{4}\s+\d{1,2}:\d{2}:\d{2}\s+[AP]M)\]\s+(\S+?):\s+(.*)$"
 )
 
 
@@ -45,7 +45,8 @@ def parse_text_log(text: str, date_str: str) -> dict:
         if user == "unknown" and "PRIVMSG" in message:
             continue
         try:
-            ts = datetime.strptime(timestamp_raw, "%m/%d/%Y %I:%M:%S %p")
+            # Handle both 1-digit and 2-digit month/day
+            ts = datetime.strptime(timestamp_raw.strip(), "%m/%d/%Y %I:%M:%S %p")
             iso_ts = ts.strftime("%Y-%m-%dT%H:%M:%SZ")
         except ValueError:
             iso_ts = timestamp_raw
@@ -100,6 +101,34 @@ def parse_text_log(text: str, date_str: str) -> dict:
     }
 
 
+def split_monolithic_full_txt(filepath: Path) -> list[tuple[str, str]]:
+    """Split a single large full.txt into per-date chunks.
+
+    Returns list of (date_str_YYYYMMDD, text_for_that_date).
+    """
+    date_buckets: dict[str, list[str]] = {}
+    date_re = re.compile(r"^\[(\d{1,2}/\d{1,2}/\d{4})\s")
+
+    with open(filepath, encoding="utf-8", errors="replace") as f:
+        for line in f:
+            m = date_re.match(line)
+            if not m:
+                continue
+            raw_date = m.group(1)  # e.g. 6/19/2024
+            try:
+                dt = datetime.strptime(raw_date, "%m/%d/%Y")
+                key = dt.strftime("%Y%m%d")
+            except ValueError:
+                continue
+            date_buckets.setdefault(key, []).append(line)
+
+    results = []
+    for date_str in sorted(date_buckets):
+        text = "".join(date_buckets[date_str])
+        results.append((date_str, text))
+    return results
+
+
 def find_text_logs(source: Path) -> list[tuple[str, Path]]:
     """Find all full.txt files organized by YYYYMMDD folders."""
     results = []
@@ -125,19 +154,46 @@ def process_source(source: Path, fmt: str) -> list[tuple[str, dict]]:
     output = []
 
     if fmt == "text":
-        logs = find_text_logs(source)
-        if not logs:
-            print(f"[WARN] No YYYYMMDD/full.txt logs found in {source}")
-            return output
-        for date_str, log_path in logs:
-            text = log_path.read_text(encoding="utf-8", errors="replace")
-            data = parse_text_log(text, date_str)
-            if data:
-                key = f"logs/chat_logs_{date_str}.json"
-                output.append((key, data))
-                print(f"  [OK] {date_str}: {data['total_messages']} msgs, {data['unique_users']} users")
+        # Check for monolithic full.txt first (single file with all dates)
+        mono_full = source / "full.txt"
+        if mono_full.exists() and mono_full.stat().st_size > 100_000:
+            print(f"  [MONO] Found monolithic full.txt ({mono_full.stat().st_size:,} bytes), splitting by date...")
+            chunks = split_monolithic_full_txt(mono_full)
+            print(f"  [MONO] Split into {len(chunks)} dates")
+            for date_str, text in chunks:
+                data = parse_text_log(text, date_str)
+                if data:
+                    key = f"logs/chat_logs_{date_str}.json"
+                    output.append((key, data))
+                    print(f"  [OK] {date_str}: {data['total_messages']} msgs, {data['unique_users']} users")
+                else:
+                    print(f"  [SKIP] {date_str}: no parseable messages")
+        else:
+            # Look for YYYYMMDD/full.txt folder structure
+            logs = find_text_logs(source)
+            if not logs:
+                # Last resort: try monolithic full.txt even if small
+                if mono_full.exists():
+                    chunks = split_monolithic_full_txt(mono_full)
+                    for date_str, text in chunks:
+                        data = parse_text_log(text, date_str)
+                        if data:
+                            key = f"logs/chat_logs_{date_str}.json"
+                            output.append((key, data))
+                            print(f"  [OK] {date_str}: {data['total_messages']} msgs, {data['unique_users']} users")
+                else:
+                    print(f"[WARN] No YYYYMMDD/full.txt logs found in {source}")
+                    return output
             else:
-                print(f"  [SKIP] {date_str}: no parseable messages")
+                for date_str, log_path in logs:
+                    text = log_path.read_text(encoding="utf-8", errors="replace")
+                    data = parse_text_log(text, date_str)
+                    if data:
+                        key = f"logs/chat_logs_{date_str}.json"
+                        output.append((key, data))
+                        print(f"  [OK] {date_str}: {data['total_messages']} msgs, {data['unique_users']} users")
+                    else:
+                        print(f"  [SKIP] {date_str}: no parseable messages")
     elif fmt == "json":
         json_files = find_json_logs(source)
         if not json_files:

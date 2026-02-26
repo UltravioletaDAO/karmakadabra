@@ -48,9 +48,9 @@ RUN pip install --no-cache-dir \
 # Each agent picks its own directory at runtime via KK_AGENT_NAME env var
 COPY openclaw/agents/ /app/openclaw/agents/
 
-# Copy entrypoint script
+# Copy entrypoint script and fix Windows line endings
 COPY openclaw/entrypoint.sh /app/openclaw/entrypoint.sh
-RUN chmod +x /app/openclaw/entrypoint.sh
+RUN sed -i 's/\r$//' /app/openclaw/entrypoint.sh && chmod +x /app/openclaw/entrypoint.sh
 
 # Create data directories
 RUN mkdir -p /app/data /app/workspace/memory
