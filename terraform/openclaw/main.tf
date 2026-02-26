@@ -154,6 +154,17 @@ resource "aws_iam_role_policy" "openclaw_agent" {
           "logs:CreateLogGroup"
         ]
         Resource = "*"
+      },
+      {
+        Effect = "Allow"
+        Action = [
+          "s3:GetObject",
+          "s3:ListBucket"
+        ]
+        Resource = [
+          "arn:aws:s3:::karmacadabra-agent-data",
+          "arn:aws:s3:::karmacadabra-agent-data/*"
+        ]
       }
     ]
   })

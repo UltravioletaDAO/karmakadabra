@@ -34,6 +34,10 @@ ANTHROPIC_KEY=$(aws secretsmanager get-secret-value \
 # Create persistent data directory
 mkdir -p /data/${agent_name}
 
+# Download agent-specific data from S3 (if exists)
+aws s3 sync s3://karmacadabra-agent-data/${agent_name}/ /data/${agent_name}/ \
+  --region ${region} || echo "No S3 data for ${agent_name}"
+
 # Run agent container
 docker run -d \
   --name ${agent_name} \
