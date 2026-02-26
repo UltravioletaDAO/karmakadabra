@@ -199,7 +199,7 @@ resource "aws_instance" "agent" {
   subnet_id              = data.aws_subnets.default.ids[0]
 
   root_block_device {
-    volume_size = 20
+    volume_size = 30
     volume_type = "gp3"
   }
 

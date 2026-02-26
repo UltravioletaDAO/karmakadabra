@@ -44,11 +44,9 @@ RUN pip install --no-cache-dir \
     "httpx>=0.25.0" \
     "pydantic>=2.0.0"
 
-# Accept agent name as build arg
-ARG AGENT_NAME
-
-# Copy agent-specific files (SOUL.md, HEARTBEAT.md, openclaw.json)
-COPY openclaw/agents/${AGENT_NAME}/ /app/openclaw/agents/${AGENT_NAME}/
+# Copy all agent identity files (SOUL.md, HEARTBEAT.md, openclaw.json)
+# Each agent picks its own directory at runtime via KK_AGENT_NAME env var
+COPY openclaw/agents/ /app/openclaw/agents/
 
 # Copy entrypoint script
 COPY openclaw/entrypoint.sh /app/openclaw/entrypoint.sh

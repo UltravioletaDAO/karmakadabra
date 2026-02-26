@@ -31,6 +31,7 @@ logs/
 docs/
 *.md
 !README.md
+!openclaw/**/*.md
 
 # Tests
 tests/
@@ -75,9 +76,10 @@ x402-rs/
 target/
 Cargo.lock
 
-# Scripts (exclude most but allow conversion script)
+# Scripts (exclude most but allow conversion and kk scripts)
 scripts/
 !scripts/convert_txt_logs_to_json.py
+!scripts/kk/
 
 # Credentials
 .env

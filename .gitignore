@@ -3,6 +3,10 @@
 .env.*
 *.env
 *.env.*
+
+# Terraform variables (contains IP addresses and keys)
+terraform.tfvars
+*.auto.tfvars
 # But allow example files (they're safe templates)
 !**/.env.example
 !**/.env.fuji.example
