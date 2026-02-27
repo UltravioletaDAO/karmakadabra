@@ -2,12 +2,13 @@
 set -e
 
 AGENT_NAME="${KK_AGENT_NAME:-unknown}"
-WORKSPACE="/app/workspace"
+WORKSPACES_ROOT="/app/workspaces"
+WORKSPACE="$WORKSPACES_ROOT/$AGENT_NAME"
 SKILLS_DIR="/app/skills"
 
 echo "[entrypoint] Setting up agent: $AGENT_NAME"
 
-# Create workspace structure
+# Create workspace structure (heartbeat expects workspaces_root/agent_name/)
 mkdir -p "$WORKSPACE/memory"
 mkdir -p "$SKILLS_DIR"
 
@@ -67,7 +68,7 @@ if command -v openclaw &> /dev/null; then
 else
     echo "[entrypoint] OpenClaw not found, running heartbeat loop"
     while true; do
-        python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACE/.." --data-dir /app/data
+        python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACES_ROOT" --data-dir /app/data
         sleep 1800
     done
 fi

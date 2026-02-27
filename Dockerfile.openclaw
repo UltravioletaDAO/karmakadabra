@@ -56,7 +56,7 @@ COPY openclaw/entrypoint.sh /app/openclaw/entrypoint.sh
 RUN sed -i 's/\r$//' /app/openclaw/entrypoint.sh && chmod +x /app/openclaw/entrypoint.sh
 
 # Create data directories
-RUN mkdir -p /app/data /app/workspace/memory
+RUN mkdir -p /app/data /app/workspaces
 
 # Health check via curl on gateway port
 HEALTHCHECK --interval=60s --timeout=10s --start-period=30s --retries=3 \
