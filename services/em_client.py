@@ -149,7 +149,12 @@ class EMClient:
                       simple_action, digital_physical.
             bounty_usd: Bounty in USD (float, e.g. 0.10).
             deadline_hours: Hours until deadline (1-720).
-            evidence_required: List of evidence type strings, e.g. ["text", "photo"].
+            evidence_required: List of evidence type strings. Valid values:
+                photo, photo_geo, video, document, receipt, signature,
+                notarized, timestamp_proof, text_response, measurement,
+                screenshot, json_response, api_response, code_output,
+                file_artifact, url_reference, structured_data, text_report.
+                Defaults to ["json_response"].
             payment_network: Chain name (default "base").
         """
         payload: dict[str, Any] = {
@@ -159,9 +164,8 @@ class EMClient:
             "bounty_usd": bounty_usd,
             "deadline_hours": deadline_hours,
             "payment_network": payment_network,
+            "evidence_required": evidence_required or ["json_response"],
         }
-        if evidence_required:
-            payload["evidence_required"] = evidence_required
 
         body_str = json.dumps(payload)
         url = f"{API_V1}/tasks"

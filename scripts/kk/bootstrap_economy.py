@@ -74,7 +74,7 @@ COORDINATOR_TASKS = [
         "title": "Validate data product quality",
         "instructions": "Review a submitted data product for quality, completeness, and accuracy. Provide a quality score (0-100) and detailed feedback.",
         "category": "knowledge_access",
-        "bounty_usd": 0.001,
+        "bounty_usd": 0.01,
     },
     {
         "title": "Generate SOUL.md identity document",
