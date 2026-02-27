@@ -211,10 +211,15 @@ class EMClient:
         status: str | None = None,
         limit: int = 50,
     ) -> list[dict[str, Any]]:
-        """List tasks with filters."""
+        """List tasks belonging to the authenticated agent.
+
+        NOTE: The /tasks endpoint auto-filters by the agent identity
+        from the ERC-8128 signature. The ``agent_wallet`` parameter is
+        accepted for backward-compat but ignored (EM API does not use it).
+        """
         params: dict[str, Any] = {"limit": limit}
-        if agent_wallet:
-            params["agent_wallet"] = agent_wallet
+        # agent_wallet is NOT a valid query param on /tasks —
+        # the server auto-filters by the authenticated wallet
         if status:
             params["status"] = status
         url = f"{API_V1}/tasks"
