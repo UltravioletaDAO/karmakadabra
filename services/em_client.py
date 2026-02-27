@@ -101,11 +101,11 @@ class EMClient:
                 )
 
         headers: dict[str, str] = {"Content-Type": "application/json"}
-        if not self._signer:
-            # Fallback: static headers
-            headers["X-Agent-Wallet"] = agent.wallet_address
-            if agent.api_key:
-                headers["X-API-Key"] = agent.api_key
+        # Always send X-Agent-Wallet — some EM endpoints require it
+        # even when EIP-8128 signature is present
+        headers["X-Agent-Wallet"] = agent.wallet_address
+        if agent.api_key:
+            headers["X-API-Key"] = agent.api_key
 
         self._client = httpx.AsyncClient(
             base_url=API_V1,
