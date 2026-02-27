@@ -40,10 +40,10 @@ CHAIN_ID="${KK_CHAIN_ID:-8453}"
 
 # Get executor_id from identities.json
 EXECUTOR_ID=""
-if [ -f /app/data/config/identities.json ]; then
+if [ -f /app/config/identities.json ]; then
   EXECUTOR_ID=$(python3 -c "
 import json
-data = json.load(open('/app/data/config/identities.json'))
+data = json.load(open('/app/config/identities.json'))
 for a in data.get('agents', []):
     if a.get('name') == '${AGENT_NAME}':
         print(a.get('executor_id', ''))

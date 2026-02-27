@@ -49,7 +49,9 @@ RUN pip install --no-cache-dir \
 COPY openclaw/agents/ /app/openclaw/agents/
 
 # Copy agent identity data (wallets, identities, allocation)
-COPY data/config/ /app/data/config/
+# NOTE: Must be at /app/config/ (NOT /app/data/config/) because
+# docker run mounts -v /data/$NAME:/app/data which hides /app/data/*
+COPY data/config/ /app/config/
 
 # Copy entrypoint script and fix Windows line endings
 COPY openclaw/entrypoint.sh /app/openclaw/entrypoint.sh

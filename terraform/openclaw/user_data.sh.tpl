@@ -24,12 +24,26 @@ PRIVATE_KEY=$(aws secretsmanager get-secret-value \
   --query SecretString \
   --output text | python3 -c "import sys,json; print(json.load(sys.stdin).get('private_key',''))")
 
-# Get Anthropic API key from Secrets Manager
-ANTHROPIC_KEY=$(aws secretsmanager get-secret-value \
+# Get Anthropic API key from Secrets Manager (may be JSON or raw string)
+ANTHROPIC_RAW=$(aws secretsmanager get-secret-value \
   --secret-id kk/anthropic \
   --region ${region} \
   --query SecretString \
   --output text)
+ANTHROPIC_KEY=$(echo "$ANTHROPIC_RAW" | python3 -c '
+import sys, json
+raw = sys.stdin.read().strip()
+try:
+    data = json.loads(raw)
+    for k in ("ANTHROPIC_API_KEY", "anthropic_api_key", "api_key", "key"):
+        if k in data:
+            print(data[k])
+            break
+    else:
+        print(raw)
+except (json.JSONDecodeError, TypeError):
+    print(raw)
+')
 
 # Create persistent data directory
 mkdir -p /data/${agent_name}
