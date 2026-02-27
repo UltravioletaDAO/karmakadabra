@@ -62,6 +62,19 @@ WALLETEOF
 
 echo "[INIT] wallet.json created for ${AGENT_NAME} (executor: ${EXECUTOR_ID})"
 
+# Start IRC daemon in background (connects to MeshRelay)
+echo "[entrypoint] Starting IRC daemon for $AGENT_NAME"
+python3 /app/scripts/kk/irc_daemon.py \
+    --agent "$AGENT_NAME" \
+    --channel "#karmakadabra" \
+    --extra-channels "#Execution-Market" \
+    --data-dir /app/data &
+IRC_PID=$!
+echo "[entrypoint] IRC daemon started (PID: $IRC_PID)"
+
+# Cleanup IRC daemon on exit
+trap "kill $IRC_PID 2>/dev/null; wait $IRC_PID 2>/dev/null" EXIT
+
 # Start OpenClaw gateway (if installed) or run heartbeat loop
 if command -v openclaw &> /dev/null; then
     exec openclaw --config /app/openclaw/agents/$AGENT_NAME/openclaw.json

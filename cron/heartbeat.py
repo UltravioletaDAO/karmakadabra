@@ -602,6 +602,23 @@ async def heartbeat_once(
         except Exception as e:
             logger.debug(f"  [{name}] Swarm state report failed (non-fatal): {e}")
 
+    # 7. IRC check: read inbox, respond to mentions, announce offerings
+    if not dry_run:
+        try:
+            from services.irc_integration import check_irc_and_respond
+            irc_result = await check_irc_and_respond(
+                data_dir=data_dir,
+                agent_name=name,
+                action=action,
+                action_result=result,
+            )
+            if irc_result:
+                result += f"; irc: {irc_result}"
+        except ImportError:
+            pass  # irc_integration not yet available
+        except Exception as e:
+            logger.debug(f"  [{name}] IRC check failed (non-fatal): {e}")
+
     logger.info(f"  [{name}] {action} -> {result}")
 
     return {"agent": name, "action": action, "result": result}

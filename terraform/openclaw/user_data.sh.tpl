@@ -65,5 +65,8 @@ docker run -d \
   -v /data/${agent_name}:/app/data \
   ${ecr_repo}:latest
 
+# Cron: sync S3 data every 15 minutes
+(crontab -l 2>/dev/null; echo "*/15 * * * * aws s3 sync s3://karmacadabra-agent-data/${agent_name}/ /data/${agent_name}/ --region ${region} >> /var/log/s3-sync.log 2>&1") | crontab -
+
 # Cron: restart container every 12 hours (memory leak mitigation)
-echo "0 */12 * * * docker restart ${agent_name}" | crontab -
+(crontab -l 2>/dev/null; echo "0 */12 * * * docker restart ${agent_name}") | crontab -
