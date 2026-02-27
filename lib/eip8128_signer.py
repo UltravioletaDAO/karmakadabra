@@ -103,6 +103,7 @@ class EIP8128Signer:
         parsed = urlparse(url)
         authority = parsed.netloc  # e.g. "api.execution.market"
         path = parsed.path or "/"
+        query = parsed.query  # e.g. "limit=50&status=submitted" (empty if none)
 
         # --- 1. Content-Digest (only for methods with a body) ----------------
         has_body = method_upper in _BODY_METHODS and len(body) > 0
@@ -112,6 +113,8 @@ class EIP8128Signer:
 
         # --- 2. Covered components -------------------------------------------
         covered: list[str] = ["@method", "@authority", "@path"]
+        if query:
+            covered.append("@query")
         if has_body:
             covered.append("content-digest")
 
@@ -136,6 +139,7 @@ class EIP8128Signer:
             method=method_upper,
             authority=authority,
             path=path,
+            query=query,
             content_digest_value=content_digest_value,
             covered=covered,
             sig_params_str=sig_params_str,
@@ -189,6 +193,7 @@ class EIP8128Signer:
         method: str,
         authority: str,
         path: str,
+        query: str,
         content_digest_value: str | None,
         covered: list[str],
         sig_params_str: str,
@@ -203,6 +208,7 @@ class EIP8128Signer:
             "@method": POST
             "@authority": api.execution.market
             "@path": /api/v1/tasks
+            "@query": ?limit=50&status=submitted
             "content-digest": sha-256=:base64hash:
             "@signature-params": ("@method" ...);created=...;...
 
@@ -210,6 +216,7 @@ class EIP8128Signer:
             method: HTTP method (uppercase).
             authority: Request authority (host[:port]).
             path: Request path.
+            query: Query string (without leading ``?``), or empty string.
             content_digest_value: Full Content-Digest header value, or None.
             covered: List of covered component identifiers.
             sig_params_str: Pre-built @signature-params value string.
@@ -221,7 +228,7 @@ class EIP8128Signer:
 
         for component in covered:
             value = self._resolve_component(
-                component, method, authority, path, content_digest_value
+                component, method, authority, path, query, content_digest_value
             )
             lines.append(f'"{component}": {value}')
 
@@ -235,6 +242,7 @@ class EIP8128Signer:
         method: str,
         authority: str,
         path: str,
+        query: str,
         content_digest_value: str | None,
     ) -> str:
         """Resolve a single covered component's value.
@@ -247,6 +255,8 @@ class EIP8128Signer:
             return authority
         if component == "@path":
             return path
+        if component == "@query":
+            return f"?{query}" if query else "?"
         if component == "content-digest":
             return content_digest_value or ""
         # Unknown component -- return empty string for forward compatibility

@@ -20,6 +20,7 @@ import sys
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlencode
 
 import httpx
 from dotenv import load_dotenv
@@ -194,7 +195,8 @@ class EMClient:
         params: dict[str, Any] = {"status": status, "limit": limit}
         if category:
             params["category"] = category
-        url = f"{API_V1}/tasks/available"
+        qs = urlencode(params)
+        url = f"{API_V1}/tasks/available?{qs}"
         sig_headers = self._sign_headers("GET", url)
         resp = await self._client.get(
             "/tasks/available", params=params, headers=sig_headers
@@ -222,7 +224,8 @@ class EMClient:
         # the server auto-filters by the authenticated wallet
         if status:
             params["status"] = status
-        url = f"{API_V1}/tasks"
+        qs = urlencode(params)
+        url = f"{API_V1}/tasks?{qs}"
         sig_headers = self._sign_headers("GET", url)
         resp = await self._client.get("/tasks", params=params, headers=sig_headers)
         resp.raise_for_status()
