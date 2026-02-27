@@ -394,4 +394,5 @@ def load_agent_context(workspace_dir: Path) -> AgentContext:
         api_key=os.environ.get("EM_API_KEY", ""),
         private_key=wallet_data.get("private_key", ""),
         chain_id=int(wallet_data.get("chain_id", 8453)),
+        executor_id=wallet_data.get("executor_id"),
     )

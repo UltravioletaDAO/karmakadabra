@@ -184,7 +184,7 @@ async def phase_publish(client: EMClient, skills: dict, dry_run: bool) -> dict:
             category="knowledge_access",
             bounty_usd=bounty,
             deadline_hours=12,
-            evidence_required=["text"],
+            evidence_required=["json_response"],
         )
         agent.record_spend(bounty)
         published = 1

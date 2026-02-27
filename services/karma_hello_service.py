@@ -202,7 +202,7 @@ async def publish_offerings(
                 category=product["category"],
                 bounty_usd=bounty,
                 deadline_hours=24,
-                evidence_required=["text"],
+                evidence_required=["json_response"],
             )
             task_id = resp.get("task", {}).get("id") or resp.get("id", "unknown")
             logger.info(f"Published {key}: task_id={task_id} (${bounty})")

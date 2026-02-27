@@ -44,6 +44,7 @@ docker run -d \
   --restart unless-stopped \
   -e KK_AGENT_NAME=${agent_name} \
   -e KK_WALLET_INDEX=${wallet_index} \
+  -e KK_WALLET_ADDRESS=${wallet_address} \
   -e KK_PRIVATE_KEY="$PRIVATE_KEY" \
   -e ANTHROPIC_API_KEY="$ANTHROPIC_KEY" \
   -p 18790:18790 \

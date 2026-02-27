@@ -204,11 +204,12 @@ resource "aws_instance" "agent" {
   }
 
   user_data = templatefile("${path.module}/user_data.sh.tpl", {
-    agent_name   = each.key
-    wallet_index = each.value.index
-    ecr_repo     = var.ecr_repository
-    region       = var.region
-    account_id   = data.aws_caller_identity.current.account_id
+    agent_name     = each.key
+    wallet_index   = each.value.index
+    wallet_address = each.value.wallet_address
+    ecr_repo       = var.ecr_repository
+    region         = var.region
+    account_id     = data.aws_caller_identity.current.account_id
   })
 
   tags = {

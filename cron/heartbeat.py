@@ -66,6 +66,26 @@ from services.abracadabra_service import (
     sell_content as ab_sell,
 )
 from services.karma_hello_service import run_service as run_karma_hello_service
+from services.skill_extractor_service import (
+    discover_data_offerings as sk_discover,
+    buy_data as sk_buy,
+    process_skills as sk_process,
+    publish_enriched_profiles as sk_publish,
+)
+from services.voice_extractor_service import (
+    discover_data_offerings as ve_discover,
+    buy_data as ve_buy,
+    process_voices as ve_process,
+    publish_personality_profiles as ve_publish,
+)
+from services.soul_extractor_service import (
+    discover_data_offerings as so_discover,
+    buy_data as so_buy,
+    process_souls as so_process,
+    publish_soul_profiles as so_publish,
+    publish_profile_updates as so_publish_updates,
+)
+from services.coordinator_service import coordination_cycle as run_coordinator_cycle
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.heartbeat")
@@ -80,6 +100,7 @@ SYSTEM_AGENT_OFFSETS = {
     "kk-voice-extractor": 8,
     "kk-soul-extractor": 9,
     "kk-validator": 10,
+    "kk-juanjumagalp": 12,
 }
 COMMUNITY_BASE_OFFSET = 10  # seconds after the minute
 
@@ -392,6 +413,144 @@ async def heartbeat_once(
                 result = "; ".join(parts)
             except Exception as e:
                 result = f"abracadabra_service error: {e}"
+
+        # -- Special heartbeat for kk-skill-extractor: data refinery cycle
+        elif name == "kk-skill-extractor":
+            action = "skill_extractor_service"
+            try:
+                parts = []
+                offerings = await sk_discover(client)
+                parts.append(f"{len(offerings)} raw data offerings")
+
+                if offerings and not dry_run:
+                    for offering in offerings[:1]:
+                        await sk_buy(client, offering, dry_run=dry_run)
+                    parts.append("bought 1")
+
+                stats = await sk_process(data_dir)
+                if stats:
+                    parts.append(f"{stats['total_profiles']} profiles processed")
+                    await sk_publish(client, data_dir, stats, dry_run=dry_run)
+                    parts.append("published")
+
+                result = "; ".join(parts)
+            except Exception as e:
+                result = f"skill_extractor_service error: {e}"
+
+        # -- Special heartbeat for kk-voice-extractor: personality refinery cycle
+        elif name == "kk-voice-extractor":
+            action = "voice_extractor_service"
+            try:
+                parts = []
+                offerings = await ve_discover(client)
+                parts.append(f"{len(offerings)} raw data offerings")
+
+                if offerings and not dry_run:
+                    for offering in offerings[:1]:
+                        await ve_buy(client, offering, dry_run=dry_run)
+                    parts.append("bought 1")
+
+                stats = await ve_process(data_dir)
+                if stats:
+                    parts.append(f"{stats['total_profiles']} profiles processed")
+                    await ve_publish(client, stats, dry_run=dry_run)
+                    parts.append("published")
+
+                result = "; ".join(parts)
+            except Exception as e:
+                result = f"voice_extractor_service error: {e}"
+
+        # -- Special heartbeat for kk-soul-extractor: SOUL.md synthesis cycle
+        elif name == "kk-soul-extractor":
+            action = "soul_extractor_service"
+            try:
+                parts = []
+                # Discover enriched data from skill + voice extractors
+                offerings = await so_discover(client)
+                skill_offerings = offerings.get("skills", [])
+                voice_offerings = offerings.get("voices", [])
+                parts.append(f"{len(skill_offerings)} skill + {len(voice_offerings)} voice offerings")
+
+                # Buy one of each if available
+                if skill_offerings and not dry_run:
+                    await so_buy(client, skill_offerings[0], "skill", dry_run=dry_run)
+                    parts.append("bought skill data")
+                if voice_offerings and not dry_run:
+                    await so_buy(client, voice_offerings[0], "voice", dry_run=dry_run)
+                    parts.append("bought voice data")
+
+                # Process and publish
+                stats = await so_process(data_dir)
+                if stats:
+                    parts.append(f"{stats.get('total_profiles', 0)} souls merged")
+                    await so_publish(client, data_dir, stats, dry_run=dry_run)
+                    await so_publish_updates(client, stats, dry_run=dry_run)
+                    parts.append("published")
+
+                result = "; ".join(parts)
+            except Exception as e:
+                result = f"soul_extractor_service error: {e}"
+
+        # -- Special heartbeat for kk-coordinator: orchestration cycle
+        elif name == "kk-coordinator":
+            action = "coordinator_service"
+            try:
+                workspaces_dir = workspace_dir.parent
+                cycle_result = await run_coordinator_cycle(
+                    workspaces_dir=workspaces_dir,
+                    client=client,
+                    dry_run=dry_run,
+                )
+                assignments = cycle_result.get("assignments", [])
+                summary = cycle_result.get("summary", {})
+                result = (
+                    f"{len(assignments)} assignments; "
+                    f"{summary.get('total_agents', 0)} agents monitored"
+                )
+            except Exception as e:
+                result = f"coordinator_service error: {e}"
+
+        # -- Special heartbeat for kk-validator: browse and validate submissions
+        elif name == "kk-validator":
+            action = "validator_service"
+            try:
+                parts = []
+                # Check own published tasks for submissions to review
+                own_result = await action_check_own_tasks(client, state, dry_run)
+                parts.append(own_result)
+
+                # If no own tasks to review, browse for validation tasks
+                if not state.has_active_task and own_result == "no submissions to review":
+                    browse_result = await action_browse_and_apply(client, state, skills, dry_run)
+                    parts.append(browse_result)
+
+                result = "; ".join(parts)
+            except Exception as e:
+                result = f"validator_service error: {e}"
+
+        # -- Community buyer agents (kk-juanjumagalp, etc.)
+        elif name.startswith("kk-") and name.replace("kk-", "") not in (
+            "coordinator", "karma-hello", "abracadabra",
+            "skill-extractor", "voice-extractor", "soul-extractor", "validator",
+        ):
+            action = "community_buyer"
+            try:
+                from services.community_buyer_service import run_cycle as run_buyer_cycle
+                buyer_result = await run_buyer_cycle(
+                    data_dir=data_dir,
+                    workspace_dir=workspace_dir,
+                    dry_run=dry_run,
+                )
+                discovered = buyer_result.get("discovered", 0)
+                purchased = buyer_result.get("purchased", 0)
+                spent = buyer_result.get("spent", 0.0)
+                result = f"{discovered} discovered, {purchased} purchased, ${spent:.2f} spent"
+            except ImportError:
+                # Fallback to generic browse+apply if community_buyer_service not available
+                action = "browse"
+                result = await action_browse_and_apply(client, state, skills, dry_run)
+            except Exception as e:
+                result = f"community_buyer error: {e}"
 
         elif state.has_active_task:
             action = f"resume:{state.active_task.status}"

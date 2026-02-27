@@ -69,5 +69,9 @@ variable "agents" {
       index          = 5
       wallet_address = "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA"
     }
+    kk-juanjumagalp = {
+      index          = 6
+      wallet_address = "0x3aebb73a33377F0d6FC2195F83559635aDeE8408"
+    }
   }
 }

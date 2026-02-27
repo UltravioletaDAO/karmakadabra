@@ -32,6 +32,35 @@ fi
 
 echo "[entrypoint] Agent $AGENT_NAME ready"
 
+# Create wallet.json for EMClient auth (EIP-8128 signing)
+mkdir -p "$WORKSPACE/data"
+WALLET_ADDRESS="${KK_WALLET_ADDRESS:-}"
+CHAIN_ID="${KK_CHAIN_ID:-8453}"
+
+# Get executor_id from identities.json
+EXECUTOR_ID=""
+if [ -f /app/data/config/identities.json ]; then
+  EXECUTOR_ID=$(python3 -c "
+import json
+data = json.load(open('/app/data/config/identities.json'))
+for a in data.get('agents', []):
+    if a.get('name') == '${AGENT_NAME}':
+        print(a.get('executor_id', ''))
+        break
+")
+fi
+
+cat > "$WORKSPACE/data/wallet.json" <<WALLETEOF
+{
+  "address": "${WALLET_ADDRESS}",
+  "private_key": "${KK_PRIVATE_KEY}",
+  "chain_id": ${CHAIN_ID},
+  "executor_id": "${EXECUTOR_ID}"
+}
+WALLETEOF
+
+echo "[INIT] wallet.json created for ${AGENT_NAME} (executor: ${EXECUTOR_ID})"
+
 # Start OpenClaw gateway (if installed) or run heartbeat loop
 if command -v openclaw &> /dev/null; then
     exec openclaw --config /app/openclaw/agents/$AGENT_NAME/openclaw.json

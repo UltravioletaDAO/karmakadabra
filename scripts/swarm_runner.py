@@ -187,7 +187,7 @@ async def agent_publish_tasks(
             category=template["category"],
             bounty_usd=bounty,
             deadline_hours=12,
-            evidence_required=["text"],
+            evidence_required=["json_response"],
         )
         task_id = result.get("task", {}).get("id") or result.get("id", "unknown")
         logger.info(f"  [{agent.name}] Published: {title} → {task_id}")

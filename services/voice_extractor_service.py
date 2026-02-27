@@ -155,7 +155,7 @@ async def publish_personality_profiles(
         category="knowledge_access",
         bounty_usd=bounty,
         deadline_hours=24,
-        evidence_required=["text"],
+        evidence_required=["json_response"],
     )
 
     task_id = result.get("task", {}).get("id") or result.get("id", "unknown")
