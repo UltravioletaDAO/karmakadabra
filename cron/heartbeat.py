@@ -86,6 +86,7 @@ from services.soul_extractor_service import (
     publish_profile_updates as so_publish_updates,
 )
 from services.coordinator_service import coordination_cycle as run_coordinator_cycle
+from services.data_retrieval import check_and_retrieve_all
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.heartbeat")
@@ -426,12 +427,31 @@ async def heartbeat_once(
                     for offering in offerings[:1]:
                         await sk_buy(client, offering, dry_run=dry_run)
                     parts.append("bought 1")
+                    # Submit evidence after successful apply
+                    if client.agent.executor_id:
+                        try:
+                            await client.submit_evidence(
+                                task_id=offering.get("id", ""),
+                                executor_id=client.agent.executor_id,
+                                evidence={"type": "json_response", "notes": "Ready for data delivery"},
+                            )
+                            parts.append("evidence submitted")
+                        except Exception as e:
+                            logger.debug(f"  [{name}] Evidence submit (non-fatal): {e}")
 
                 stats = await sk_process(data_dir)
                 if stats:
                     parts.append(f"{stats['total_profiles']} profiles processed")
                     await sk_publish(client, data_dir, stats, dry_run=dry_run)
                     parts.append("published")
+
+                # Retrieve purchased data
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
+                    if retrieved:
+                        parts.append(f"{len(retrieved)} files retrieved")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Retrieval check (non-fatal): {e}")
 
                 result = "; ".join(parts)
             except Exception as e:
@@ -449,12 +469,31 @@ async def heartbeat_once(
                     for offering in offerings[:1]:
                         await ve_buy(client, offering, dry_run=dry_run)
                     parts.append("bought 1")
+                    # Submit evidence after successful apply
+                    if client.agent.executor_id:
+                        try:
+                            await client.submit_evidence(
+                                task_id=offering.get("id", ""),
+                                executor_id=client.agent.executor_id,
+                                evidence={"type": "json_response", "notes": "Ready for data delivery"},
+                            )
+                            parts.append("evidence submitted")
+                        except Exception as e:
+                            logger.debug(f"  [{name}] Evidence submit (non-fatal): {e}")
 
                 stats = await ve_process(data_dir)
                 if stats:
                     parts.append(f"{stats['total_profiles']} profiles processed")
                     await ve_publish(client, stats, dry_run=dry_run)
                     parts.append("published")
+
+                # Retrieve purchased data
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
+                    if retrieved:
+                        parts.append(f"{len(retrieved)} files retrieved")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Retrieval check (non-fatal): {e}")
 
                 result = "; ".join(parts)
             except Exception as e:
@@ -475,9 +514,27 @@ async def heartbeat_once(
                 if skill_offerings and not dry_run:
                     await so_buy(client, skill_offerings[0], "skill", dry_run=dry_run)
                     parts.append("bought skill data")
+                    if client.agent.executor_id:
+                        try:
+                            await client.submit_evidence(
+                                task_id=skill_offerings[0].get("id", ""),
+                                executor_id=client.agent.executor_id,
+                                evidence={"type": "json_response", "notes": "Ready for skill data delivery"},
+                            )
+                        except Exception:
+                            pass
                 if voice_offerings and not dry_run:
                     await so_buy(client, voice_offerings[0], "voice", dry_run=dry_run)
                     parts.append("bought voice data")
+                    if client.agent.executor_id:
+                        try:
+                            await client.submit_evidence(
+                                task_id=voice_offerings[0].get("id", ""),
+                                executor_id=client.agent.executor_id,
+                                evidence={"type": "json_response", "notes": "Ready for voice data delivery"},
+                            )
+                        except Exception:
+                            pass
 
                 # Process and publish
                 stats = await so_process(data_dir)
@@ -486,6 +543,14 @@ async def heartbeat_once(
                     await so_publish(client, data_dir, stats, dry_run=dry_run)
                     await so_publish_updates(client, stats, dry_run=dry_run)
                     parts.append("published")
+
+                # Retrieve purchased data
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
+                    if retrieved:
+                        parts.append(f"{len(retrieved)} files retrieved")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Retrieval check (non-fatal): {e}")
 
                 result = "; ".join(parts)
             except Exception as e:
@@ -545,6 +610,13 @@ async def heartbeat_once(
                 purchased = buyer_result.get("purchased", 0)
                 spent = buyer_result.get("spent", 0.0)
                 result = f"{discovered} discovered, {purchased} purchased, ${spent:.2f} spent"
+                # Retrieve purchased data
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
+                    if retrieved:
+                        result += f", {len(retrieved)} retrieved"
+                except Exception:
+                    pass
             except ImportError:
                 # Fallback to generic browse+apply if community_buyer_service not available
                 action = "browse"
@@ -601,23 +673,6 @@ async def heartbeat_once(
             )
         except Exception as e:
             logger.debug(f"  [{name}] Swarm state report failed (non-fatal): {e}")
-
-    # 7. IRC check: read inbox, respond to mentions, announce offerings
-    if not dry_run:
-        try:
-            from services.irc_integration import check_irc_and_respond
-            irc_result = await check_irc_and_respond(
-                data_dir=data_dir,
-                agent_name=name,
-                action=action,
-                action_result=result,
-            )
-            if irc_result:
-                result += f"; irc: {irc_result}"
-        except ImportError:
-            pass  # irc_integration not yet available
-        except Exception as e:
-            logger.debug(f"  [{name}] IRC check failed (non-fatal): {e}")
 
     logger.info(f"  [{name}] {action} -> {result}")
 

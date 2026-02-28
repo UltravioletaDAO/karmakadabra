@@ -167,17 +167,11 @@ async def buy_offering(
         return None
 
     logger.info(f"  Buying [{category_label}]: {title} (${bounty})")
-    try:
-        result = await client.apply_to_task(
-            task_id=task_id,
-            executor_id=client.agent.executor_id,
-            message=f"Community buyer agent -- purchasing {category_label.lower()} for research and analysis",
-        )
-    except Exception as exc:
-        if "409" in str(exc):
-            logger.info(f"  Already applied to {title}, skipping")
-            return None
-        raise
+    result = await client.apply_to_task(
+        task_id=task_id,
+        executor_id=client.agent.executor_id,
+        message=f"Community buyer agent -- purchasing {category_label.lower()} for research and analysis",
+    )
     client.agent.record_spend(bounty)
     return result
 
@@ -252,6 +246,63 @@ def save_purchase_log(workspace_dir: Path, stats: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Supply chain state machine — one step per heartbeat
+# ---------------------------------------------------------------------------
+
+SUPPLY_CHAIN_STEPS = ["raw_logs", "skill_profiles", "voice_profiles", "soul_profiles", "complete"]
+
+
+def _load_supply_chain_state(data_dir: Path) -> dict:
+    """Load persistent supply chain state."""
+    state_path = data_dir / "purchases" / "supply_chain_state.json"
+    if state_path.exists():
+        try:
+            return json.loads(state_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+    return {
+        "step": "raw_logs",
+        "completed": [],
+        "pending_delivery": {},
+        "downloaded": {},
+        "cycle_count": 0,
+    }
+
+
+def _save_supply_chain_state(data_dir: Path, state: dict) -> None:
+    """Persist supply chain state."""
+    purchases_dir = data_dir / "purchases"
+    purchases_dir.mkdir(parents=True, exist_ok=True)
+    state_path = purchases_dir / "supply_chain_state.json"
+    try:
+        state_path.write_text(
+            json.dumps(state, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+    except OSError:
+        pass
+
+
+def _advance_step(state: dict) -> None:
+    """Advance to the next step in the supply chain."""
+    current = state["step"]
+    if current in SUPPLY_CHAIN_STEPS:
+        idx = SUPPLY_CHAIN_STEPS.index(current)
+        if idx < len(SUPPLY_CHAIN_STEPS) - 1:
+            state["completed"].append(current)
+            state["step"] = SUPPLY_CHAIN_STEPS[idx + 1]
+
+    # Reset when complete
+    if state["step"] == "complete":
+        state["cycle_count"] = state.get("cycle_count", 0) + 1
+        logger.info(f"  Supply chain cycle #{state['cycle_count']} COMPLETE!")
+        state["step"] = "raw_logs"
+        state["completed"] = []
+        state["pending_delivery"] = {}
+        state["downloaded"] = {}
+
+
+# ---------------------------------------------------------------------------
 # run_cycle() — callable from heartbeat.py
 # ---------------------------------------------------------------------------
 
@@ -261,15 +312,12 @@ async def run_cycle(
     workspace_dir: Path,
     dry_run: bool = False,
 ) -> dict:
-    """Execute a full discover-and-buy cycle.
+    """Execute one step of the sequential supply chain buy cycle.
 
-    Called from heartbeat.py or standalone. Returns a stats dict:
-      {
-        "discovered": int,
-        "purchased": int,
-        "spent": float,
-        "errors": [str, ...],
-      }
+    Each heartbeat advances ONE step:
+      raw_logs -> skill_profiles -> voice_profiles -> soul_profiles -> complete -> reset
+
+    With 5-min heartbeats, a full cycle completes in ~25 minutes.
     """
     if workspace_dir.exists():
         agent = load_agent_context(workspace_dir)
@@ -281,41 +329,90 @@ async def run_cycle(
         )
 
     client = EMClient(agent)
+    chain_state = _load_supply_chain_state(data_dir)
+    current_step = chain_state["step"]
+
     stats: dict = {
         "discovered": 0,
         "purchased": 0,
         "spent": 0.0,
         "errors": [],
+        "step": current_step,
+        "cycle_count": chain_state.get("cycle_count", 0),
     }
 
     try:
-        logger.info("Phase: Discover data offerings")
-        categorized = await discover_offerings(client)
+        logger.info(f"  Supply chain step: {current_step} (cycle #{chain_state.get('cycle_count', 0)})")
 
+        # Discover offerings
+        categorized = await discover_offerings(client)
         total_offerings = sum(len(v) for v in categorized.values())
         stats["discovered"] = total_offerings
 
-        if total_offerings == 0:
-            logger.info("  No [KK Data] offerings available -- nothing to buy")
+        # Map step to category
+        step_to_category = {
+            "raw_logs": "raw_logs",
+            "skill_profiles": "skill_profiles",
+            "voice_profiles": "voice_profiles",
+            "soul_profiles": "soul_profiles",
+        }
+
+        target_category = step_to_category.get(current_step)
+        if not target_category:
+            # Already complete or unknown step -- reset
+            _advance_step(chain_state)
+            _save_supply_chain_state(data_dir, chain_state)
             return stats
 
-        logger.info("Phase: Buy data (one per category, cheapest first)")
-        buy_stats = await buy_cycle(client, categorized, dry_run=dry_run)
-        stats["purchased"] = buy_stats["purchased"]
-        stats["spent"] = buy_stats["spent"]
-        stats["errors"] = buy_stats["errors"]
+        offerings = categorized.get(target_category, [])
+        cat_info = CATEGORIES[target_category]
 
-        if not dry_run and buy_stats["purchased"] > 0:
+        if not offerings:
+            logger.info(f"  No {cat_info['label']} offerings available -- waiting")
+            stats["errors"].append(f"No {cat_info['label']} available")
+            return stats
+
+        # Buy the cheapest offering in the target category
+        best = offerings[0]
+        bounty = best.get("bounty_usdc", 0)
+
+        if bounty > cat_info["max_price"]:
+            logger.info(f"  {cat_info['label']} too expensive: ${bounty} > max ${cat_info['max_price']}")
+            return stats
+
+        try:
+            result = await buy_offering(client, best, cat_info["label"], dry_run=dry_run)
+            if result is not None:
+                stats["purchased"] = 1
+                stats["spent"] = bounty
+
+                # Submit evidence immediately
+                if client.agent.executor_id and not dry_run:
+                    try:
+                        await client.submit_evidence(
+                            task_id=best.get("id", ""),
+                            executor_id=client.agent.executor_id,
+                            evidence={"type": "json_response", "notes": f"Ready for {cat_info['label']} delivery"},
+                        )
+                    except Exception:
+                        pass
+
+                # Advance to next step
+                _advance_step(chain_state)
+                logger.info(f"  Advanced to step: {chain_state['step']}")
+        except Exception as exc:
+            stats["errors"].append(str(exc))
+
+        if not dry_run:
             save_purchase_log(workspace_dir, stats)
 
         logger.info(
-            f"  Cycle complete: {stats['purchased']} purchased, "
-            f"${stats['spent']:.2f} spent, {len(stats['errors'])} errors"
-        )
-        logger.info(
-            f"  Daily spent: ${agent.daily_spent_usd:.2f} / ${agent.daily_budget_usd:.2f}"
+            f"  Step {current_step}: {stats['purchased']} purchased, "
+            f"${stats['spent']:.2f} spent"
         )
     finally:
+        if not dry_run:
+            _save_supply_chain_state(data_dir, chain_state)
         await client.close()
 
     return stats

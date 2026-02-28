@@ -24,6 +24,7 @@ import asyncio
 import json
 import logging
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 # Ensure services package is importable
@@ -87,22 +88,57 @@ async def buy_data(
 
 
 async def process_skills(data_dir: Path) -> dict | None:
-    """Run skill extraction on local data (already processed by pipeline)."""
+    """Extract skill profiles from purchased data or existing pipeline output.
+
+    Priority:
+      1. data/purchases/*.json (freshly bought from Karma Hello)
+      2. data/skills/*.json (already processed)
+
+    Memory-safe: processes one file at a time, streaming by lines.
+    """
     skills_dir = data_dir / "skills"
-    if not skills_dir.exists():
-        logger.warning(f"  No skills directory at {skills_dir}")
+    skills_dir.mkdir(parents=True, exist_ok=True)
+    purchases_dir = data_dir / "purchases"
+
+    # Check for purchased data to process
+    purchase_files = sorted(purchases_dir.glob("*.json")) if purchases_dir.exists() else []
+    raw_messages = []
+
+    for pf in purchase_files:
+        try:
+            content = pf.read_text(encoding="utf-8")
+            data = json.loads(content)
+            # Handle both array format and {messages: [...]} format
+            if isinstance(data, list):
+                raw_messages.extend(data)
+            elif isinstance(data, dict):
+                raw_messages.extend(data.get("messages", []))
+        except (json.JSONDecodeError, OSError) as e:
+            logger.debug(f"  Skipping {pf.name}: {e}")
+            continue
+
+    if raw_messages:
+        logger.info(f"  Processing {len(raw_messages)} messages from {len(purchase_files)} purchased files")
+        _extract_skills_from_messages(raw_messages, skills_dir)
+
+    # Now read all skill profiles (newly generated + any existing)
+    profiles = list(skills_dir.glob("*.json"))
+    if not profiles:
+        logger.warning(f"  No skill profiles found (no purchases or data)")
         return None
 
-    profiles = list(skills_dir.glob("*.json"))
-    logger.info(f"  Processing {len(profiles)} skill profiles")
+    logger.info(f"  Found {len(profiles)} skill profiles")
 
     # Aggregate stats
     all_skills: dict[str, int] = {}
     for profile_path in profiles:
-        profile = json.loads(profile_path.read_text(encoding="utf-8"))
-        for skill in profile.get("top_skills", []):
-            name = skill.get("skill", "unknown")
-            all_skills[name] = all_skills.get(name, 0) + 1
+        try:
+            profile = json.loads(profile_path.read_text(encoding="utf-8"))
+            for skill in profile.get("top_skills", []):
+                name = skill.get("skill", "unknown")
+                all_skills[name] = all_skills.get(name, 0) + 1
+        except (json.JSONDecodeError, OSError):
+            continue
 
     top_skills = sorted(all_skills.items(), key=lambda x: -x[1])[:10]
     logger.info(f"  Top community skills: {', '.join(s[0] for s in top_skills[:5])}")
@@ -112,6 +148,85 @@ async def process_skills(data_dir: Path) -> dict | None:
         "unique_skills": len(all_skills),
         "top_skills": [{"skill": s, "count": c} for s, c in top_skills],
     }
+
+
+# Keyword categories for skill extraction (no LLM needed)
+SKILL_KEYWORDS = {
+    "Python": ["python", "django", "flask", "fastapi", "pip", "pandas", "numpy"],
+    "JavaScript": ["javascript", "js", "react", "node", "npm", "typescript", "ts", "vue", "angular"],
+    "Solidity": ["solidity", "smart contract", "hardhat", "foundry", "remix", "evm"],
+    "DeFi": ["defi", "yield", "liquidity", "amm", "swap", "lending", "borrow", "apy", "tvl"],
+    "Trading": ["trading", "trade", "chart", "ta", "rsi", "macd", "bullish", "bearish", "long", "short"],
+    "NFTs": ["nft", "mint", "collection", "opensea", "blur", "pfp"],
+    "AI/ML": ["ai", "llm", "gpt", "claude", "model", "training", "inference", "ml", "machine learning"],
+    "Agents": ["agent", "autonomous", "crew", "crewai", "autogpt", "langchain"],
+    "Design": ["design", "figma", "ui", "ux", "css", "tailwind", "frontend"],
+    "DevOps": ["docker", "kubernetes", "k8s", "aws", "terraform", "ci/cd", "deploy"],
+    "Blockchain": ["blockchain", "web3", "crypto", "wallet", "token", "chain", "mainnet", "testnet"],
+    "Community": ["community", "dao", "governance", "vote", "proposal", "discord"],
+}
+
+
+def _extract_skills_from_messages(messages: list[dict], skills_dir: Path) -> None:
+    """Extract skill profiles per user from raw chat messages.
+
+    Uses keyword matching -- fast, deterministic, no API calls.
+    """
+    user_messages: dict[str, list[str]] = {}
+
+    for msg in messages:
+        user = msg.get("user", "") or msg.get("sender", "")
+        text = msg.get("message", "") or msg.get("text", "")
+        if user and text:
+            user_messages.setdefault(user, []).append(text)
+
+    logger.info(f"  Analyzing {len(user_messages)} unique users")
+
+    for username, msgs in user_messages.items():
+        if len(msgs) < 3:  # Skip users with too few messages
+            continue
+
+        all_text = " ".join(msgs).lower()
+        skill_scores: dict[str, float] = {}
+
+        for skill, keywords in SKILL_KEYWORDS.items():
+            count = sum(1 for kw in keywords if kw in all_text)
+            if count > 0:
+                # Normalize by number of keywords (0.0-1.0 scale)
+                skill_scores[skill] = min(count / len(keywords), 1.0)
+
+        if not skill_scores:
+            continue
+
+        # Detect primary language
+        spanish_markers = ["hola", "buenas", "gracias", "que", "como", "pero", "porque", "esta", "muy"]
+        english_markers = ["the", "and", "is", "that", "this", "have", "with", "for", "but", "from"]
+        es_count = sum(1 for m in spanish_markers if m in all_text)
+        en_count = sum(1 for m in english_markers if m in all_text)
+        primary_lang = "spanish" if es_count >= en_count else "english"
+
+        top_skills = sorted(skill_scores.items(), key=lambda x: -x[1])[:5]
+
+        profile = {
+            "username": username,
+            "total_messages": len(msgs),
+            "primary_language": primary_lang,
+            "languages": {"spanish": es_count, "english": en_count},
+            "top_skills": [{"skill": s, "score": round(sc, 2)} for s, sc in top_skills],
+            "skills": {
+                s: {"sub_skills": [{"name": s, "score": round(sc, 2)}]}
+                for s, sc in top_skills
+            },
+            "extracted_at": datetime.now(timezone.utc).isoformat(),
+        }
+
+        profile_path = skills_dir / f"{username}.json"
+        profile_path.write_text(
+            json.dumps(profile, ensure_ascii=False, indent=2),
+            encoding="utf-8",
+        )
+
+    logger.info(f"  Saved skill profiles for {len([f for f in skills_dir.glob('*.json')])} users")
 
 
 async def publish_enriched_profiles(

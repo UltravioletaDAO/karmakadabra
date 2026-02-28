@@ -371,11 +371,10 @@ async def process_souls(data_dir: Path) -> dict | None:
         logger.warning(f"  No voices directory at {voices_dir}")
         return None
     if not stats_file.exists():
-        logger.warning(f"  No user stats at {stats_file}")
-        return None
-
-    # Load user stats for ranking/engagement data
-    stats_data = json.loads(stats_file.read_text(encoding="utf-8"))
+        logger.info(f"  No user-stats.json found, generating basic stats from profiles")
+        stats_data = {"ranking": []}
+    else:
+        stats_data = json.loads(stats_file.read_text(encoding="utf-8"))
     ranked = stats_data.get("ranking", [])
     stats_by_user = {u["username"]: u for u in ranked}
 

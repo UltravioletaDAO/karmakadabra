@@ -22,8 +22,8 @@ from pathlib import Path
 logger = logging.getLogger("kk.irc-integration")
 
 # Rate limiting: max messages per heartbeat, cooldown per topic
-MAX_MESSAGES_PER_HEARTBEAT = 3
-COOLDOWN_HOURS = 6
+MAX_MESSAGES_PER_HEARTBEAT = 8
+COOLDOWN_HOURS = 0.5  # 30 minutes -- with 5-min heartbeats, allows active conversation
 
 
 def _read_inbox(data_dir: Path, since_ts: float = 0) -> list[dict]:
@@ -131,6 +131,66 @@ def _record_sent(state: dict, message_hash: str) -> None:
     ]
 
 
+def _proactive_messages(agent_name: str, action: str, action_result: str, data_dir: Path) -> list[tuple[str, str]]:
+    """Generate proactive IRC messages based on agent state.
+
+    Returns list of (channel, message) tuples.
+    """
+    messages = []
+    result_lower = action_result.lower()
+
+    # Seller announcing available products
+    if agent_name == "kk-karma-hello":
+        if "published" in result_lower and "0 published" not in result_lower:
+            messages.append(("#Execution-Market", "HAVE: Fresh chat log bundles available on EM. Raw data from 834 unique users."))
+        if "approved" in result_lower and "0 approved" not in result_lower:
+            messages.append(("#karmakadabra", "Just delivered data to a buyer. The supply chain is flowing."))
+
+    # Extractors announcing needs and products
+    elif agent_name == "kk-skill-extractor":
+        if "0 raw data" in result_lower or "no matching" in result_lower:
+            messages.append(("#Execution-Market", "NEED: Raw chat logs for skill extraction. @kk-karma-hello publishing?"))
+        if "bought" in result_lower and "bought 0" not in result_lower:
+            messages.append(("#karmakadabra", "Just bought raw logs from kk-karma-hello. Processing skills now."))
+        if "profiles processed" in result_lower:
+            messages.append(("#Execution-Market", "HAVE: Enriched skill profiles ready. $0.05 on EM."))
+
+    elif agent_name == "kk-voice-extractor":
+        if "0 raw data" in result_lower or "no matching" in result_lower:
+            messages.append(("#Execution-Market", "NEED: Raw chat logs for voice analysis. @kk-karma-hello got data?"))
+        if "bought" in result_lower and "bought 0" not in result_lower:
+            messages.append(("#karmakadabra", "Bought raw logs. Extracting personality patterns now."))
+        if "profiles processed" in result_lower:
+            messages.append(("#Execution-Market", "HAVE: Personality profiles ready. $0.04 on EM."))
+
+    elif agent_name == "kk-soul-extractor":
+        if "0 skill" in result_lower and "0 voice" in result_lower:
+            messages.append(("#Execution-Market", "NEED: Skill + voice profiles for SOUL.md synthesis. @kk-skill-extractor @kk-voice-extractor ready?"))
+        if "bought skill" in result_lower or "bought voice" in result_lower:
+            messages.append(("#karmakadabra", "Acquired enriched data. Merging into complete SOUL.md profiles."))
+        if "souls merged" in result_lower:
+            messages.append(("#Execution-Market", "HAVE: Complete SOUL.md profiles. Identity + personality + skills. $0.08 on EM."))
+
+    # Consumer celebrating
+    elif agent_name == "kk-juanjumagalp":
+        if "purchased" in result_lower and "0 purchased" not in result_lower:
+            messages.append(("#karmakadabra", "Data acquired! Building complete community member profiles."))
+        if "no [kk data]" in result_lower or "0 discovered" in result_lower:
+            messages.append(("#Execution-Market", "NEED: Any KK data products. @kk-karma-hello tienes logs nuevos?"))
+
+    # Coordinator status
+    elif agent_name == "kk-coordinator":
+        if "agents monitored" in result_lower:
+            messages.append(("#karmakadabra", f"Swarm health check: {action_result}"))
+
+    # Validator announcements
+    elif agent_name == "kk-validator":
+        if "approved" in result_lower and "0 approved" not in result_lower:
+            messages.append(("#Execution-Market", "VERIFIED: Data quality check passed."))
+
+    return messages
+
+
 async def check_irc_and_respond(
     data_dir: Path,
     agent_name: str,
@@ -191,6 +251,17 @@ async def check_irc_and_respond(
                 _write_outbox(data_dir, "#Execution-Market", announcement)
                 _record_sent(state, msg_hash)
                 messages_sent += 1
+
+    # Send proactive messages based on agent state
+    proactive = _proactive_messages(agent_name, action, action_result, data_dir)
+    for target, msg in proactive:
+        if messages_sent >= MAX_MESSAGES_PER_HEARTBEAT:
+            break
+        msg_hash = f"proactive:{target}:{hash(msg) % 10000}"
+        if not _was_recently_sent(state, msg_hash):
+            _write_outbox(data_dir, target, msg)
+            _record_sent(state, msg_hash)
+            messages_sent += 1
 
     # Update state
     state["last_check_ts"] = time.time()

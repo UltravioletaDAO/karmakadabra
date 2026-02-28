@@ -38,12 +38,6 @@ mkdir -p "$WORKSPACE/data"
 WALLET_ADDRESS="${KK_WALLET_ADDRESS:-}"
 CHAIN_ID="${KK_CHAIN_ID:-8453}"
 
-# Parse private key from JSON secret if needed
-# AWS Secrets Manager stores as {"private_key": "0x..."} not raw string
-if echo "$KK_PRIVATE_KEY" | python3 -c "import sys,json; json.loads(sys.stdin.read())" 2>/dev/null; then
-  KK_PRIVATE_KEY=$(echo "$KK_PRIVATE_KEY" | python3 -c "import sys,json; print(json.loads(sys.stdin.read()).get('private_key',''))")
-fi
-
 # Get executor_id from identities.json
 EXECUTOR_ID=""
 if [ -f /app/config/identities.json ]; then
@@ -68,29 +62,13 @@ WALLETEOF
 
 echo "[INIT] wallet.json created for ${AGENT_NAME} (executor: ${EXECUTOR_ID})"
 
-# Start IRC daemon in background (connects to MeshRelay)
-echo "[entrypoint] Starting IRC daemon for $AGENT_NAME"
-python3 /app/scripts/kk/irc_daemon.py \
-    --agent "$AGENT_NAME" \
-    --channel "#karmakadabra" \
-    --extra-channels "#Execution-Market" \
-    --data-dir /app/data &
-IRC_PID=$!
-echo "[entrypoint] IRC daemon started (PID: $IRC_PID)"
-
-# Cleanup IRC daemon on exit
-trap "kill $IRC_PID 2>/dev/null; wait $IRC_PID 2>/dev/null" EXIT
-
 # Start OpenClaw gateway (if installed) or run heartbeat loop
 if command -v openclaw &> /dev/null; then
     exec openclaw --config /app/openclaw/agents/$AGENT_NAME/openclaw.json
 else
     echo "[entrypoint] OpenClaw not found, running heartbeat loop"
     while true; do
-        python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACES_ROOT" --data-dir /app/data || {
-            echo "[entrypoint] Heartbeat exited with code $? — restarting after cooldown"
-            sleep 60
-        }
-        sleep 1800
+        python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACES_ROOT" --data-dir /app/data
+        sleep ${KK_HEARTBEAT_INTERVAL:-300}
     done
 fi
