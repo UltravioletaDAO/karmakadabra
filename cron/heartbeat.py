@@ -66,6 +66,7 @@ from services.abracadabra_service import (
     sell_content as ab_sell,
 )
 from services.karma_hello_service import run_service as run_karma_hello_service
+from services.karma_hello_service import seller_flow as karma_hello_seller_flow
 from services.skill_extractor_service import (
     discover_data_offerings as sk_discover,
     buy_data as sk_buy,
@@ -373,6 +374,7 @@ async def heartbeat_once(
                     run_collect=True,
                     run_publish=True,
                     run_fulfill=True,
+                    run_seller=True,
                     dry_run=dry_run,
                 )
                 cycles = ", ".join(svc_result.get("cycles_run", []))
@@ -383,6 +385,13 @@ async def heartbeat_once(
                     parts.append(f"{svc_result['publish']['published']} published")
                 if "fulfill" in svc_result:
                     parts.append(f"{svc_result['fulfill']['approved']} approved")
+                if "seller" in svc_result:
+                    sr = svc_result["seller"]
+                    parts.append(
+                        f"seller: {sr.get('bounties_found', 0)} found, "
+                        f"{sr.get('applied', 0)} applied, "
+                        f"{sr.get('submitted', 0)} submitted"
+                    )
                 result = f"cycles=[{cycles}] {'; '.join(parts)}"
             except Exception as e:
                 result = f"karma_hello_service error: {e}"
@@ -634,17 +643,17 @@ async def heartbeat_once(
                     workspace_dir=workspace_dir,
                     dry_run=dry_run,
                 )
-                discovered = buyer_result.get("discovered", 0)
-                purchased = buyer_result.get("purchased", 0)
-                spent = buyer_result.get("spent", 0.0)
-                result = f"{discovered} discovered, {purchased} purchased, ${spent:.2f} spent"
-                # Retrieve purchased data
-                try:
-                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
-                    if retrieved:
-                        result += f", {len(retrieved)} retrieved"
-                except Exception:
-                    pass
+                step = buyer_result.get("step", "?")
+                published = buyer_result.get("published", 0)
+                assigned = buyer_result.get("assigned", 0)
+                approved = buyer_result.get("approved", 0)
+                completed = buyer_result.get("completed", 0)
+                cycle_count = buyer_result.get("cycle_count", 0)
+                result = (
+                    f"step={step}, cycle#{cycle_count}, "
+                    f"published={published}, assigned={assigned}, "
+                    f"approved={approved}, completed={completed}"
+                )
             except ImportError:
                 # Fallback to generic browse+apply if community_buyer_service not available
                 action = "browse"

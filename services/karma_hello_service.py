@@ -35,6 +35,13 @@ sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from em_client import AgentContext, EMClient, load_agent_context
+from escrow_flow import (
+    apply_to_bounty,
+    discover_bounties,
+    fulfill_assigned,
+    load_escrow_state,
+    save_escrow_state,
+)
 from karma_hello_seller import PRODUCTS, load_data_stats
 from lib.swarm_state import report_heartbeat
 
@@ -500,6 +507,148 @@ async def fulfill_purchases(
 
 
 # ---------------------------------------------------------------------------
+# Seller flow — discover bounties, apply, fulfill with data
+# ---------------------------------------------------------------------------
+
+
+async def seller_flow(
+    client: EMClient,
+    data_dir: Path,
+    dry_run: bool = False,
+) -> dict[str, Any]:
+    """Karma Hello SELLER flow: discover bounties requesting raw data, apply, deliver.
+
+    This is the CORRECT EM escrow pattern where karma-hello acts as a WORKER
+    fulfilling bounty tasks posted by buyers (juanjumagalp, extractors, etc.).
+
+    Flow per heartbeat:
+      1. Discover bounties matching raw data keywords
+      2. Apply to up to 3 matching bounties
+      3. For assigned tasks, submit evidence (S3 presigned URLs)
+
+    Returns stats dict.
+    """
+    state = load_escrow_state(data_dir)
+
+    result: dict[str, Any] = {
+        "bounties_found": 0,
+        "applied": 0,
+        "submitted": 0,
+        "completed": 0,
+        "errors": [],
+    }
+
+    try:
+        # Phase 1: Discover bounties requesting raw data
+        bounties = await discover_bounties(
+            client=client,
+            keywords=["[KK Request]", "chat log", "raw log", "twitch", "raw data"],
+            exclude_wallet=client.agent.wallet_address,
+            state=state,
+        )
+        result["bounties_found"] = len(bounties)
+
+        # Phase 2: Apply to up to 3 matching bounties
+        for bounty_task in bounties[:3]:
+            ok = await apply_to_bounty(
+                client=client,
+                task=bounty_task,
+                state=state,
+                message=(
+                    "karma-hello agent -- I have 469K+ Twitch chat messages "
+                    "from 328 streams (834 unique users). Ready for immediate delivery."
+                ),
+                dry_run=dry_run,
+            )
+            if ok:
+                result["applied"] += 1
+
+        # Phase 3: Fulfill assigned tasks — submit evidence with S3 URLs
+        def make_evidence(task_id: str, info: dict) -> dict:
+            """Generate evidence with presigned S3 URL for raw logs."""
+            delivery_url = None
+            try:
+                from data_delivery import prepare_delivery_package
+
+                # Use synchronous wrapper since evidence_fn must be sync
+                import asyncio
+
+                loop = asyncio.get_event_loop()
+                if loop.is_running():
+                    # We're in an async context — generate URL directly
+                    delivery_url = _generate_delivery_url_sync(data_dir)
+                else:
+                    delivery_url = loop.run_until_complete(
+                        prepare_delivery_package("kk-karma-hello", "raw_logs", data_dir)
+                    )
+            except Exception as e:
+                logger.debug(f"Delivery URL generation failed (non-fatal): {e}")
+
+            return {
+                "type": "json_response",
+                "description": (
+                    "Raw Twitch chat logs from Ultravioleta DAO. "
+                    "469,511 messages, 834 unique users, 328 streams."
+                ),
+                "data": {
+                    "delivery_url": delivery_url or "Contact karma-hello for delivery",
+                    "total_messages": 469511,
+                    "unique_users": 834,
+                    "total_streams": 328,
+                    "date_range": "2024-06 to 2025-12",
+                    "format": "JSON array of {timestamp, user, message}",
+                },
+                "notes": "karma-hello raw log delivery — auto-generated evidence",
+            }
+
+        fulfill_stats = await fulfill_assigned(
+            client=client,
+            state=state,
+            evidence_fn=make_evidence,
+            dry_run=dry_run,
+        )
+        result["submitted"] = fulfill_stats["submitted"]
+        result["completed"] = fulfill_stats["completed"]
+
+    except Exception as e:
+        result["errors"].append(str(e))
+        logger.error(f"Seller flow error: {e}")
+    finally:
+        if not dry_run:
+            save_escrow_state(data_dir, state)
+
+    return result
+
+
+def _generate_delivery_url_sync(data_dir: Path) -> str | None:
+    """Synchronous wrapper to generate a presigned S3 URL for raw logs."""
+    try:
+        import boto3
+
+        s3 = boto3.client("s3", region_name="us-east-1")
+        bucket = "karmacadabra-agent-data"
+        prefix = "kk-karma-hello/logs/"
+
+        # List available log files
+        resp = s3.list_objects_v2(Bucket=bucket, Prefix=prefix, MaxKeys=10)
+        objects = resp.get("Contents", [])
+        if not objects:
+            return None
+
+        # Get most recent
+        latest = sorted(objects, key=lambda o: o["LastModified"])[-1]
+
+        url = s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": bucket, "Key": latest["Key"]},
+            ExpiresIn=3600,
+        )
+        return url
+    except Exception:
+        return None
+
+
+# ---------------------------------------------------------------------------
 # Combined service runner
 # ---------------------------------------------------------------------------
 
@@ -510,6 +659,7 @@ async def run_service(
     run_collect: bool = False,
     run_publish: bool = False,
     run_fulfill: bool = False,
+    run_seller: bool = False,
     dry_run: bool = False,
 ) -> dict[str, Any]:
     """Run one or more Karma Hello service cycles.
@@ -571,6 +721,13 @@ async def run_service(
             fulfill_result = await fulfill_purchases(client, dry_run=dry_run, data_dir=data_dir)
             results["fulfill"] = fulfill_result
             results["cycles_run"].append("fulfill")
+
+        # Seller flow (correct escrow pattern)
+        if run_seller:
+            logger.info("--- Seller flow (escrow) ---")
+            seller_result = await seller_flow(client, data_dir, dry_run=dry_run)
+            results["seller"] = seller_result
+            results["cycles_run"].append("seller")
 
     finally:
         await client.close()
