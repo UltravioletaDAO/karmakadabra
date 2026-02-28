@@ -53,6 +53,11 @@ MAX_DAILY_SPEND_USD = 0.50
 def collect_all_logs(data_dir: Path, dry_run: bool = False) -> dict[str, Any]:
     """Scan irc-logs/ AND S3-synced logs/ for data and aggregate into aggregated.json.
 
+    Memory-optimized: tracks processed files in .collect_state.json so that
+    subsequent heartbeats skip re-reading the entire aggregated.json (~76 MB)
+    when no new source files have appeared.  This prevents OOM kills on
+    t3.small instances (1.8 GB RAM).
+
     Sources:
       1. data/irc-logs/*.json  — JSONL daily logs from live IRC collection
       2. data/logs/chat_logs_*.json — S3-synced Twitch logs (array format)
@@ -63,6 +68,7 @@ def collect_all_logs(data_dir: Path, dry_run: bool = False) -> dict[str, Any]:
     irc_logs_dir = data_dir / "irc-logs"
     s3_logs_dir = data_dir / "logs"
     agg_file = data_dir / "aggregated.json"
+    state_file = data_dir / ".collect_state.json"
 
     result: dict[str, Any] = {
         "files_found": 0,
@@ -72,13 +78,53 @@ def collect_all_logs(data_dir: Path, dry_run: bool = False) -> dict[str, Any]:
         "sources": {"irc_logs": 0, "s3_logs": 0},
     }
 
-    # Load existing aggregated data
+    # Load collection state (lightweight — just file paths and counts)
+    state: dict[str, Any] = {}
+    if state_file.exists():
+        try:
+            state = json.loads(state_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            state = {}
+
+    processed_files: set[str] = set(state.get("processed_files", []))
+
+    # Discover all source files
+    irc_files: list[Path] = []
+    s3_files: list[Path] = []
+    if irc_logs_dir.exists():
+        irc_files = sorted(irc_logs_dir.glob("*.json"))
+    if s3_logs_dir.exists():
+        s3_files = sorted(s3_logs_dir.glob("chat_logs_*.json"))
+
+    all_source_paths = {str(f) for f in irc_files} | {str(f) for f in s3_files}
+    new_file_paths = all_source_paths - processed_files
+
+    result["files_found"] = len(all_source_paths)
+    result["sources"]["irc_logs"] = len(irc_files)
+    result["sources"]["s3_logs"] = len(s3_files)
+
+    # Fast path: no new files → return cached stats without touching aggregated.json
+    if not new_file_paths:
+        result["total_messages"] = state.get("total_messages", 0)
+        result["dates"] = state.get("dates", [])
+        logger.info(
+            f"No new files to process ({len(all_source_paths)} already processed, "
+            f"{result['total_messages']} messages cached)"
+        )
+        return result
+
+    if not irc_logs_dir.exists() and not s3_logs_dir.exists():
+        logger.info("No log directories found (irc-logs/ or logs/) — nothing to collect")
+        return result
+
+    # --- Slow path: new files detected — load existing data and merge ---
+    logger.info(f"{len(new_file_paths)} new source files detected — running full collect")
+
     existing: dict[str, Any] = {"messages": [], "stats": {}}
     existing_keys: set[str] = set()
     if agg_file.exists():
         try:
             existing = json.loads(agg_file.read_text(encoding="utf-8"))
-            # Build dedup keys from existing messages (ts or timestamp+user)
             for m in existing.get("messages", []):
                 key = m.get("ts") or f"{m.get('timestamp', '')}|{m.get('user', '')}"
                 if key:
@@ -89,111 +135,102 @@ def collect_all_logs(data_dir: Path, dry_run: bool = False) -> dict[str, Any]:
     all_messages: list[dict] = list(existing.get("messages", []))
     new_count = 0
     dates: set[str] = set()
-    files_found = 0
 
     # --- Source 1: irc-logs/ (JSONL daily files) ---
-    if irc_logs_dir.exists():
-        log_files = sorted(irc_logs_dir.glob("*.json"))
-        files_found += len(log_files)
-        result["sources"]["irc_logs"] = len(log_files)
-
-        for log_file in log_files:
-            date_str = log_file.stem
-            dates.add(date_str)
-
-            for line in log_file.read_text(encoding="utf-8").splitlines():
-                line = line.strip()
-                if not line:
-                    continue
-                try:
-                    entry = json.loads(line)
-                    ts = entry.get("ts", "")
-                    if ts and ts not in existing_keys:
-                        all_messages.append(entry)
-                        existing_keys.add(ts)
-                        new_count += 1
-                except json.JSONDecodeError:
-                    continue
-
-    # --- Source 2: logs/ (S3-synced Twitch chat logs) ---
-    if s3_logs_dir.exists():
-        s3_files = sorted(s3_logs_dir.glob("chat_logs_*.json"))
-        files_found += len(s3_files)
-        result["sources"]["s3_logs"] = len(s3_files)
-
-        for s3_file in s3_files:
+    for log_file in irc_files:
+        if str(log_file) in processed_files:
+            dates.add(log_file.stem)
+            continue
+        date_str = log_file.stem
+        dates.add(date_str)
+        for line in log_file.read_text(encoding="utf-8").splitlines():
+            line = line.strip()
+            if not line:
+                continue
             try:
-                data = json.loads(s3_file.read_text(encoding="utf-8"))
-            except (json.JSONDecodeError, OSError):
+                entry = json.loads(line)
+                ts = entry.get("ts", "")
+                if ts and ts not in existing_keys:
+                    all_messages.append(entry)
+                    existing_keys.add(ts)
+                    new_count += 1
+            except json.JSONDecodeError:
                 continue
 
-            # Extract date from filename: chat_logs_YYYYMMDD.json
-            date_str = s3_file.stem.replace("chat_logs_", "")
-            if len(date_str) == 8:
-                date_str = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
-            dates.add(date_str)
+    # --- Source 2: logs/ (S3-synced Twitch chat logs) ---
+    for s3_file in s3_files:
+        date_str = s3_file.stem.replace("chat_logs_", "")
+        if len(date_str) == 8:
+            date_str = f"{date_str[:4]}-{date_str[4:6]}-{date_str[6:8]}"
+        dates.add(date_str)
+        if str(s3_file) in processed_files:
+            continue
+        try:
+            data = json.loads(s3_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            continue
+        messages = data.get("messages", [])
+        for msg in messages:
+            ts = msg.get("timestamp", "")
+            user = msg.get("user", "")
+            dedup_key = f"{ts}|{user}"
+            if dedup_key in existing_keys:
+                continue
+            unified = {
+                "ts": ts,
+                "user": user,
+                "message": msg.get("message", ""),
+                "source": "s3_twitch",
+                "date": date_str,
+            }
+            all_messages.append(unified)
+            existing_keys.add(dedup_key)
+            new_count += 1
 
-            # S3 logs format: {"messages": [...], "stream_date": "...", ...}
-            messages = data.get("messages", [])
-            for msg in messages:
-                ts = msg.get("timestamp", "")
-                user = msg.get("user", "")
-                dedup_key = f"{ts}|{user}"
-
-                if dedup_key in existing_keys:
-                    continue
-
-                # Convert to unified format
-                unified = {
-                    "ts": ts,
-                    "user": user,
-                    "message": msg.get("message", ""),
-                    "source": "s3_twitch",
-                    "date": date_str,
-                }
-                all_messages.append(unified)
-                existing_keys.add(dedup_key)
-                new_count += 1
-
-    if not irc_logs_dir.exists() and not s3_logs_dir.exists():
-        logger.info("No log directories found (irc-logs/ or logs/) — nothing to collect")
-        return result
-
-    result["files_found"] = files_found
     result["new_messages"] = new_count
     result["total_messages"] = len(all_messages)
     result["dates"] = sorted(dates)
 
     if new_count == 0:
         logger.info("No new messages to aggregate")
-        return result
+    else:
+        logger.info(
+            f"Collected {new_count} new messages from {len(new_file_paths)} new files "
+            f"(irc: {result['sources']['irc_logs']}, s3: {result['sources']['s3_logs']})"
+        )
 
-    logger.info(
-        f"Collected {new_count} new messages from {files_found} files "
-        f"(irc: {result['sources']['irc_logs']}, s3: {result['sources']['s3_logs']})"
-    )
+    if not dry_run and new_count > 0:
+        agg_data = {
+            "messages": all_messages,
+            "stats": {
+                "total_messages": len(all_messages),
+                "date_count": len(dates),
+                "dates": sorted(dates),
+                "last_updated": datetime.now(timezone.utc).isoformat(),
+            },
+        }
+        data_dir.mkdir(parents=True, exist_ok=True)
+        agg_file.write_text(
+            json.dumps(agg_data, ensure_ascii=False),
+            encoding="utf-8",
+        )
+        logger.info(f"Aggregated {len(all_messages)} messages -> {agg_file}")
 
-    if dry_run:
-        logger.info(f"[DRY RUN] Would write {len(all_messages)} messages to {agg_file}")
-        return result
-
-    # Write aggregated file
-    agg_data = {
-        "messages": all_messages,
-        "stats": {
-            "total_messages": len(all_messages),
-            "date_count": len(dates),
-            "dates": sorted(dates),
+    # Persist collection state (always, even if no new messages)
+    if not dry_run:
+        new_state = {
+            "processed_files": sorted(all_source_paths),
+            "total_messages": len(all_messages) if all_messages else state.get("total_messages", 0),
+            "dates": sorted(dates) if dates else state.get("dates", []),
+            "sources": result["sources"],
             "last_updated": datetime.now(timezone.utc).isoformat(),
-        },
-    }
-
-    data_dir.mkdir(parents=True, exist_ok=True)
-    agg_file.write_text(
-        json.dumps(agg_data, ensure_ascii=False, indent=2),
-        encoding="utf-8",
-    )
-    logger.info(f"Aggregated {len(all_messages)} messages -> {agg_file}")
+        }
+        try:
+            state_file.write_text(
+                json.dumps(new_state, indent=2), encoding="utf-8",
+            )
+        except OSError:
+            pass
 
     return result
 

@@ -239,20 +239,68 @@ def _generate_mention_response(
 
 
 def _build_announcement(agent_name: str, action: str, result: str) -> str | None:
-    """Build an IRC announcement for significant heartbeat events."""
-    # Only announce significant events
-    if action == "karma_hello_service" and "published" in result:
-        # karma-hello published new offerings
-        return f"HAVE: New data offerings published. Browse at execution.market"
+    """Build an IRC announcement for significant heartbeat events.
 
-    if action == "community_buyer" and "purchased" in result and "0 purchased" not in result:
-        return f"DEAL: {agent_name} completed a purchase on execution.market"
+    Each agent type gets announcement conditions based on its service output.
+    """
+    result_lower = result.lower()
 
-    if "applied to" in result:
+    # --- karma-hello: seller of raw data ---
+    if action == "karma_hello_service":
+        if "published" in result and "0 published" not in result:
+            return "HAVE: New data offerings published. Browse at execution.market"
+        if "approved" in result and "0 approved" not in result:
+            return f"DEAL: {agent_name} approved a data delivery"
+        return None
+
+    # --- community buyer (juanjumagalp): end consumer ---
+    if action == "community_buyer":
+        if ("purchased" in result and "0 purchased" not in result) or \
+           ("bought" in result_lower and "bought 0" not in result_lower):
+            return f"DEAL: {agent_name} purchased data on execution.market"
+        return None
+
+    # --- skill-extractor: buys raw logs, sells skill profiles ---
+    if action == "skill_extractor_service":
+        if "bought" in result_lower and "bought 0" not in result_lower:
+            return f"WANT: {agent_name} bought raw data for skill extraction"
+        if "published" in result_lower and "0 published" not in result_lower:
+            return f"HAVE: {agent_name} published skill profiles on execution.market"
+        return None
+
+    # --- voice-extractor: buys raw logs, sells voice profiles ---
+    if action == "voice_extractor_service":
+        if "bought" in result_lower and "bought 0" not in result_lower:
+            return f"WANT: {agent_name} bought raw data for voice analysis"
+        if "published" in result_lower and "0 published" not in result_lower:
+            return f"HAVE: {agent_name} published voice profiles on execution.market"
+        return None
+
+    # --- soul-extractor: buys skill+voice, sells SOUL.md ---
+    if action == "soul_extractor_service":
+        if "bought" in result_lower:
+            return f"WANT: {agent_name} acquired data for SOUL.md synthesis"
+        if "published" in result_lower or "generated" in result_lower:
+            return f"HAVE: {agent_name} generated SOUL.md profiles on execution.market"
+        return None
+
+    # --- validator: reviews submissions ---
+    if action == "validator_service":
+        if "applied to" in result_lower:
+            return f"AUDIT: {agent_name} applied to validate data on execution.market"
+        if "approved" in result and "0 approved" not in result:
+            return f"VERIFIED: {agent_name} validated a data submission"
+        return None
+
+    # --- coordinator: orchestrates swarm ---
+    if action == "coordinator_service":
+        if "assignments" in result_lower and "0 assignments" not in result_lower:
+            return f"COORD: {agent_name} assigned tasks to swarm agents"
+        return None
+
+    # Fallback: check for generic significant events
+    if "applied to" in result_lower:
         return f"WANT: {agent_name} is looking for data on execution.market"
-
-    if "approved" in result and "0 approved" not in result:
-        return f"DEAL: {agent_name} approved a delivery on execution.market"
 
     return None
 

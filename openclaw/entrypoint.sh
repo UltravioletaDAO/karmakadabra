@@ -81,7 +81,10 @@ if command -v openclaw &> /dev/null; then
 else
     echo "[entrypoint] OpenClaw not found, running heartbeat loop"
     while true; do
-        python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACES_ROOT" --data-dir /app/data
+        python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACES_ROOT" --data-dir /app/data || {
+            echo "[entrypoint] Heartbeat exited with code $? — restarting after cooldown"
+            sleep 60
+        }
         sleep 1800
     done
 fi

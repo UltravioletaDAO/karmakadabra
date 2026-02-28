@@ -150,10 +150,16 @@ class IRCDaemon:
             return ""
         try:
             data = await asyncio.wait_for(self._reader.readline(), timeout=timeout)
+            if not data:
+                # Empty bytes = EOF, server closed connection
+                logger.warning("Server closed connection (EOF)")
+                self._connected = False
+                return ""
             return data.decode("utf-8", errors="replace").strip()
         except asyncio.TimeoutError:
             return ""
-        except Exception:
+        except Exception as e:
+            logger.warning(f"Recv error: {e}")
             self._connected = False
             return ""
 

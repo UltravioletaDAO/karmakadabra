@@ -166,6 +166,7 @@ class EMClient:
             "deadline_hours": deadline_hours,
             "payment_network": payment_network,
             "evidence_required": evidence_required or ["json_response"],
+            "agent_name": self.agent.name,
         }
 
         body_str = json.dumps(payload)
