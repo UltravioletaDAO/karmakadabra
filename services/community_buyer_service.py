@@ -167,11 +167,17 @@ async def buy_offering(
         return None
 
     logger.info(f"  Buying [{category_label}]: {title} (${bounty})")
-    result = await client.apply_to_task(
-        task_id=task_id,
-        executor_id=client.agent.executor_id,
-        message=f"Community buyer agent -- purchasing {category_label.lower()} for research and analysis",
-    )
+    try:
+        result = await client.apply_to_task(
+            task_id=task_id,
+            executor_id=client.agent.executor_id,
+            message=f"Community buyer agent -- purchasing {category_label.lower()} for research and analysis",
+        )
+    except Exception as exc:
+        if "409" in str(exc):
+            logger.info(f"  Already applied to {title}, skipping")
+            return None
+        raise
     client.agent.record_spend(bounty)
     return result
 
