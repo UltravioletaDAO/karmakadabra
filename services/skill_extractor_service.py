@@ -31,6 +31,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from em_client import AgentContext, EMClient, load_agent_context
+from escrow_flow import (
+    apply_to_bounty,
+    discover_bounties,
+    fulfill_assigned,
+    load_escrow_state,
+    save_escrow_state,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.skill-extractor")
@@ -273,6 +280,102 @@ async def publish_enriched_profiles(
     task_id = result.get("task", {}).get("id") or result.get("id", "unknown")
     logger.info(f"  Published enriched profiles: task_id={task_id}")
     client.agent.record_spend(bounty)
+    return result
+
+
+async def seller_flow(
+    client: EMClient,
+    data_dir: Path,
+    dry_run: bool = False,
+) -> dict:
+    """Skill Extractor SELLER flow: discover bounties requesting skill profiles, apply, deliver.
+
+    Uses the escrow_flow pattern:
+      1. Discover [KK Request] bounties matching "skill" keywords
+      2. Apply to matching bounties
+      3. For assigned tasks, submit evidence with skill profiles data
+
+    Returns stats dict.
+    """
+    state = load_escrow_state(data_dir)
+
+    result: dict = {
+        "bounties_found": 0,
+        "applied": 0,
+        "submitted": 0,
+        "completed": 0,
+        "errors": [],
+    }
+
+    try:
+        # Phase 1: Discover bounties requesting skill data
+        bounties = await discover_bounties(
+            client=client,
+            keywords=["[KK Request]"],
+            exclude_wallet=client.agent.wallet_address,
+            state=state,
+        )
+        # Filter to skill-related bounties only
+        skill_bounties = [
+            b for b in bounties
+            if any(kw in b.get("title", "").lower() for kw in ["skill", "profile"])
+        ]
+        result["bounties_found"] = len(skill_bounties)
+
+        # Phase 2: Apply to up to 3 matching bounties
+        for bounty_task in skill_bounties[:3]:
+            ok = await apply_to_bounty(
+                client=client,
+                task=bounty_task,
+                state=state,
+                message=(
+                    "Skill Extractor agent -- I extract skill profiles from chat logs. "
+                    "Keyword-based analysis of 12 skill categories. Ready to deliver."
+                ),
+                dry_run=dry_run,
+            )
+            if ok:
+                result["applied"] += 1
+
+        # Phase 3: Fulfill assigned tasks
+        def make_evidence(task_id: str, info: dict) -> dict:
+            """Generate evidence with skill profile data summary."""
+            skills_dir = data_dir / "skills"
+            profiles = list(skills_dir.glob("*.json")) if skills_dir.exists() else []
+            total = len(profiles)
+
+            return {
+                "json_response": {
+                    "agent": client.agent.name,
+                    "product": "enriched_skill_profiles",
+                    "total_profiles": total,
+                    "skill_categories": list(SKILL_KEYWORDS.keys()),
+                    "extraction_method": "keyword-based analysis (12 categories)",
+                    "format": "JSON per-user profiles with top_skills, confidence scores",
+                    "status": "delivered",
+                },
+            }
+
+        fulfill_stats = await fulfill_assigned(
+            client=client,
+            state=state,
+            evidence_fn=make_evidence,
+            dry_run=dry_run,
+        )
+        result["submitted"] = fulfill_stats["submitted"]
+        result["completed"] = fulfill_stats["completed"]
+
+    except Exception as e:
+        result["errors"].append(str(e))
+        logger.error(f"Seller flow error: {e}")
+    finally:
+        if not dry_run:
+            save_escrow_state(data_dir, state)
+
+    logger.info(
+        f"Seller flow: found={result['bounties_found']}, "
+        f"applied={result['applied']}, submitted={result['submitted']}"
+    )
     return result
 
 

@@ -31,6 +31,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from em_client import AgentContext, EMClient, load_agent_context
+from escrow_flow import (
+    apply_to_bounty,
+    discover_bounties,
+    fulfill_assigned,
+    load_escrow_state,
+    save_escrow_state,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.voice-extractor")
@@ -332,6 +339,105 @@ async def publish_personality_profiles(
     task_id = result.get("task", {}).get("id") or result.get("id", "unknown")
     logger.info(f"  Published personality profiles: task_id={task_id}")
     client.agent.record_spend(bounty)
+    return result
+
+
+async def seller_flow(
+    client: EMClient,
+    data_dir: Path,
+    dry_run: bool = False,
+) -> dict:
+    """Voice Extractor SELLER flow: discover bounties requesting voice/personality profiles.
+
+    Uses the escrow_flow pattern:
+      1. Discover [KK Request] bounties matching "voice"/"personality" keywords
+      2. Apply to matching bounties
+      3. For assigned tasks, submit evidence with voice profiles data
+
+    Returns stats dict.
+    """
+    state = load_escrow_state(data_dir)
+
+    result: dict = {
+        "bounties_found": 0,
+        "applied": 0,
+        "submitted": 0,
+        "completed": 0,
+        "errors": [],
+    }
+
+    try:
+        # Phase 1: Discover bounties requesting voice/personality data
+        bounties = await discover_bounties(
+            client=client,
+            keywords=["[KK Request]"],
+            exclude_wallet=client.agent.wallet_address,
+            state=state,
+        )
+        # Filter to voice/personality-related bounties
+        voice_bounties = [
+            b for b in bounties
+            if any(kw in b.get("title", "").lower() for kw in ["voice", "personality"])
+        ]
+        result["bounties_found"] = len(voice_bounties)
+
+        # Phase 2: Apply to up to 3 matching bounties
+        for bounty_task in voice_bounties[:3]:
+            ok = await apply_to_bounty(
+                client=client,
+                task=bounty_task,
+                state=state,
+                message=(
+                    "Voice Extractor agent -- I analyze communication patterns, "
+                    "tone, formality, greeting style, slang usage. Ready to deliver."
+                ),
+                dry_run=dry_run,
+            )
+            if ok:
+                result["applied"] += 1
+
+        # Phase 3: Fulfill assigned tasks
+        def make_evidence(task_id: str, info: dict) -> dict:
+            """Generate evidence with voice profile data summary."""
+            voices_dir = data_dir / "voices"
+            profiles = list(voices_dir.glob("*.json")) if voices_dir.exists() else []
+            total = len(profiles)
+
+            return {
+                "json_response": {
+                    "agent": client.agent.name,
+                    "product": "personality_voice_profiles",
+                    "total_profiles": total,
+                    "analysis_types": [
+                        "tone", "formality", "greeting_style",
+                        "social_role", "slang_profile", "risk_tolerance",
+                    ],
+                    "extraction_method": "heuristic analysis (no LLM)",
+                    "format": "JSON per-user profiles with personality indicators",
+                    "status": "delivered",
+                },
+            }
+
+        fulfill_stats = await fulfill_assigned(
+            client=client,
+            state=state,
+            evidence_fn=make_evidence,
+            dry_run=dry_run,
+        )
+        result["submitted"] = fulfill_stats["submitted"]
+        result["completed"] = fulfill_stats["completed"]
+
+    except Exception as e:
+        result["errors"].append(str(e))
+        logger.error(f"Seller flow error: {e}")
+    finally:
+        if not dry_run:
+            save_escrow_state(data_dir, state)
+
+    logger.info(
+        f"Seller flow: found={result['bounties_found']}, "
+        f"applied={result['applied']}, submitted={result['submitted']}"
+    )
     return result
 
 

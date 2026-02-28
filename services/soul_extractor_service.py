@@ -42,6 +42,13 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 
 from em_client import AgentContext, EMClient, load_agent_context
+from escrow_flow import (
+    apply_to_bounty,
+    discover_bounties,
+    fulfill_assigned,
+    load_escrow_state,
+    save_escrow_state,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.soul-extractor")
@@ -632,6 +639,106 @@ async def publish_profile_updates(
 # ---------------------------------------------------------------------------
 # Main
 # ---------------------------------------------------------------------------
+
+
+async def seller_flow(
+    client: EMClient,
+    data_dir: Path,
+    dry_run: bool = False,
+) -> dict:
+    """Soul Extractor SELLER flow: discover bounties requesting SOUL.md profiles.
+
+    Uses the escrow_flow pattern:
+      1. Discover [KK Request] bounties matching "SOUL" keywords
+      2. Apply to matching bounties
+      3. For assigned tasks, submit evidence with SOUL.md profile data
+
+    Returns stats dict.
+    """
+    state = load_escrow_state(data_dir)
+
+    result: dict = {
+        "bounties_found": 0,
+        "applied": 0,
+        "submitted": 0,
+        "completed": 0,
+        "errors": [],
+    }
+
+    try:
+        # Phase 1: Discover bounties requesting SOUL.md data
+        bounties = await discover_bounties(
+            client=client,
+            keywords=["[KK Request]"],
+            exclude_wallet=client.agent.wallet_address,
+            state=state,
+        )
+        # Filter to SOUL-related bounties
+        soul_bounties = [
+            b for b in bounties
+            if any(kw in b.get("title", "").lower() for kw in ["soul", "complete profile"])
+        ]
+        result["bounties_found"] = len(soul_bounties)
+
+        # Phase 2: Apply to up to 3 matching bounties
+        for bounty_task in soul_bounties[:3]:
+            ok = await apply_to_bounty(
+                client=client,
+                task=bounty_task,
+                state=state,
+                message=(
+                    "Soul Extractor agent -- I merge skill + voice profiles into "
+                    "OpenClaw-compatible SOUL.md complete personality profiles. Ready to deliver."
+                ),
+                dry_run=dry_run,
+            )
+            if ok:
+                result["applied"] += 1
+
+        # Phase 3: Fulfill assigned tasks
+        def make_evidence(task_id: str, info: dict) -> dict:
+            """Generate evidence with SOUL.md profile data summary."""
+            souls_dir = data_dir / "souls"
+            md_profiles = list(souls_dir.glob("*.md")) if souls_dir.exists() else []
+            json_profiles = list(souls_dir.glob("*.json")) if souls_dir.exists() else []
+
+            return {
+                "json_response": {
+                    "agent": client.agent.name,
+                    "product": "soul_md_complete_profiles",
+                    "total_md_profiles": len(md_profiles),
+                    "total_json_profiles": len(json_profiles),
+                    "profile_sections": [
+                        "identity", "personality", "communication_guidelines",
+                        "skills", "task_categories", "economic_behavior",
+                        "pricing", "monetizable_capabilities", "trusted_agents",
+                    ],
+                    "format": "Markdown (SOUL.md) + JSON (structured)",
+                    "status": "delivered",
+                },
+            }
+
+        fulfill_stats = await fulfill_assigned(
+            client=client,
+            state=state,
+            evidence_fn=make_evidence,
+            dry_run=dry_run,
+        )
+        result["submitted"] = fulfill_stats["submitted"]
+        result["completed"] = fulfill_stats["completed"]
+
+    except Exception as e:
+        result["errors"].append(str(e))
+        logger.error(f"Seller flow error: {e}")
+    finally:
+        if not dry_run:
+            save_escrow_state(data_dir, state)
+
+    logger.info(
+        f"Seller flow: found={result['bounties_found']}, "
+        f"applied={result['applied']}, submitted={result['submitted']}"
+    )
+    return result
 
 
 async def main():

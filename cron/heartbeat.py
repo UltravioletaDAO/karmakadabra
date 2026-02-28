@@ -72,12 +72,14 @@ from services.skill_extractor_service import (
     buy_data as sk_buy,
     process_skills as sk_process,
     publish_enriched_profiles as sk_publish,
+    seller_flow as sk_seller_flow,
 )
 from services.voice_extractor_service import (
     discover_data_offerings as ve_discover,
     buy_data as ve_buy,
     process_voices as ve_process,
     publish_personality_profiles as ve_publish,
+    seller_flow as ve_seller_flow,
 )
 from services.soul_extractor_service import (
     discover_data_offerings as so_discover,
@@ -85,6 +87,7 @@ from services.soul_extractor_service import (
     process_souls as so_process,
     publish_soul_profiles as so_publish,
     publish_profile_updates as so_publish_updates,
+    seller_flow as so_seller_flow,
 )
 from services.coordinator_service import coordination_cycle as run_coordinator_cycle
 from services.data_retrieval import check_and_retrieve_all
@@ -424,170 +427,82 @@ async def heartbeat_once(
             except Exception as e:
                 result = f"abracadabra_service error: {e}"
 
-        # -- Special heartbeat for kk-skill-extractor: data refinery cycle
+        # -- Special heartbeat for kk-skill-extractor: seller flow (escrow)
         elif name == "kk-skill-extractor":
-            action = "skill_extractor_service"
+            action = "skill_extractor_seller"
             try:
                 parts = []
-                offerings = await sk_discover(client)
-                parts.append(f"{len(offerings)} raw data offerings")
 
-                if offerings and not dry_run:
-                    bought_task_id = None
-                    for offering in offerings:
-                        try:
-                            await sk_buy(client, offering, dry_run=dry_run)
-                            bought_task_id = offering.get("id", "")
-                            parts.append("bought 1")
-                            break
-                        except Exception as buy_err:
-                            if "409" in str(buy_err):
-                                continue
-                            raise
-                    if bought_task_id and client.agent.executor_id:
-                        try:
-                            await client.submit_evidence(
-                                task_id=bought_task_id,
-                                executor_id=client.agent.executor_id,
-                                evidence={"type": "json_response", "notes": "Ready for data delivery"},
-                            )
-                            parts.append("evidence submitted")
-                        except Exception as e:
-                            logger.debug(f"  [{name}] Evidence submit (non-fatal): {e}")
+                # Seller flow: discover [KK Request] bounties, apply, fulfill
+                seller_result = await sk_seller_flow(client, data_dir, dry_run=dry_run)
+                sr = seller_result
+                parts.append(
+                    f"seller: {sr.get('bounties_found', 0)} found, "
+                    f"{sr.get('applied', 0)} applied, "
+                    f"{sr.get('submitted', 0)} submitted"
+                )
 
-                stats = await sk_process(data_dir)
-                if stats:
-                    parts.append(f"{stats['total_profiles']} profiles processed")
-                    await sk_publish(client, data_dir, stats, dry_run=dry_run)
-                    parts.append("published")
-
-                # Retrieve purchased data
+                # Also process local data if available (enriches evidence quality)
                 try:
-                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
-                    if retrieved:
-                        parts.append(f"{len(retrieved)} files retrieved")
+                    stats = await sk_process(data_dir)
+                    if stats:
+                        parts.append(f"{stats['total_profiles']} profiles processed")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Retrieval check (non-fatal): {e}")
+                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
 
                 result = "; ".join(parts)
             except Exception as e:
                 result = f"skill_extractor_service error: {e}"
 
-        # -- Special heartbeat for kk-voice-extractor: personality refinery cycle
+        # -- Special heartbeat for kk-voice-extractor: seller flow (escrow)
         elif name == "kk-voice-extractor":
-            action = "voice_extractor_service"
+            action = "voice_extractor_seller"
             try:
                 parts = []
-                offerings = await ve_discover(client)
-                parts.append(f"{len(offerings)} raw data offerings")
 
-                if offerings and not dry_run:
-                    bought_task_id = None
-                    for offering in offerings:
-                        try:
-                            await ve_buy(client, offering, dry_run=dry_run)
-                            bought_task_id = offering.get("id", "")
-                            parts.append("bought 1")
-                            break
-                        except Exception as buy_err:
-                            if "409" in str(buy_err):
-                                continue
-                            raise
-                    if bought_task_id and client.agent.executor_id:
-                        try:
-                            await client.submit_evidence(
-                                task_id=bought_task_id,
-                                executor_id=client.agent.executor_id,
-                                evidence={"type": "json_response", "notes": "Ready for data delivery"},
-                            )
-                            parts.append("evidence submitted")
-                        except Exception as e:
-                            logger.debug(f"  [{name}] Evidence submit (non-fatal): {e}")
+                # Seller flow: discover [KK Request] bounties, apply, fulfill
+                seller_result = await ve_seller_flow(client, data_dir, dry_run=dry_run)
+                sr = seller_result
+                parts.append(
+                    f"seller: {sr.get('bounties_found', 0)} found, "
+                    f"{sr.get('applied', 0)} applied, "
+                    f"{sr.get('submitted', 0)} submitted"
+                )
 
-                stats = await ve_process(data_dir)
-                if stats:
-                    parts.append(f"{stats['total_profiles']} profiles processed")
-                    await ve_publish(client, stats, dry_run=dry_run)
-                    parts.append("published")
-
-                # Retrieve purchased data
+                # Also process local data if available
                 try:
-                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
-                    if retrieved:
-                        parts.append(f"{len(retrieved)} files retrieved")
+                    stats = await ve_process(data_dir)
+                    if stats:
+                        parts.append(f"{stats['total_profiles']} profiles processed")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Retrieval check (non-fatal): {e}")
+                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
 
                 result = "; ".join(parts)
             except Exception as e:
                 result = f"voice_extractor_service error: {e}"
 
-        # -- Special heartbeat for kk-soul-extractor: SOUL.md synthesis cycle
+        # -- Special heartbeat for kk-soul-extractor: seller flow (escrow)
         elif name == "kk-soul-extractor":
-            action = "soul_extractor_service"
+            action = "soul_extractor_seller"
             try:
                 parts = []
-                # Discover enriched data from skill + voice extractors
-                offerings = await so_discover(client)
-                skill_offerings = offerings.get("skills", [])
-                voice_offerings = offerings.get("voices", [])
-                parts.append(f"{len(skill_offerings)} skill + {len(voice_offerings)} voice offerings")
 
-                # Buy one of each if available (skip 409 conflicts)
-                if skill_offerings and not dry_run:
-                    for sk_off in skill_offerings:
-                        try:
-                            await so_buy(client, sk_off, "skill", dry_run=dry_run)
-                            parts.append("bought skill data")
-                            if client.agent.executor_id:
-                                try:
-                                    await client.submit_evidence(
-                                        task_id=sk_off.get("id", ""),
-                                        executor_id=client.agent.executor_id,
-                                        evidence={"type": "json_response", "notes": "Ready for skill data delivery"},
-                                    )
-                                except Exception:
-                                    pass
-                            break
-                        except Exception as buy_err:
-                            if "409" in str(buy_err):
-                                continue
-                            raise
-                if voice_offerings and not dry_run:
-                    for vo_off in voice_offerings:
-                        try:
-                            await so_buy(client, vo_off, "voice", dry_run=dry_run)
-                            parts.append("bought voice data")
-                            if client.agent.executor_id:
-                                try:
-                                    await client.submit_evidence(
-                                        task_id=vo_off.get("id", ""),
-                                        executor_id=client.agent.executor_id,
-                                        evidence={"type": "json_response", "notes": "Ready for voice data delivery"},
-                                    )
-                                except Exception:
-                                    pass
-                            break
-                        except Exception as buy_err:
-                            if "409" in str(buy_err):
-                                continue
-                            raise
+                # Seller flow: discover [KK Request] bounties, apply, fulfill
+                seller_result = await so_seller_flow(client, data_dir, dry_run=dry_run)
+                sr = seller_result
+                parts.append(
+                    f"seller: {sr.get('bounties_found', 0)} found, "
+                    f"{sr.get('applied', 0)} applied, "
+                    f"{sr.get('submitted', 0)} submitted"
+                )
 
-                # Process and publish
-                stats = await so_process(data_dir)
-                if stats:
-                    parts.append(f"{stats.get('total_profiles', 0)} souls merged")
-                    await so_publish(client, data_dir, stats, dry_run=dry_run)
-                    await so_publish_updates(client, stats, dry_run=dry_run)
-                    parts.append("published")
-
-                # Retrieve purchased data
+                # Also process local data if available (merges skill+voice into SOUL.md)
                 try:
-                    retrieved = await check_and_retrieve_all(client, data_dir, client.agent.wallet_address)
-                    if retrieved:
-                        parts.append(f"{len(retrieved)} files retrieved")
+                    stats = await so_process(data_dir)
+                    if stats:
+                        parts.append(f"{stats.get('total_profiles', 0)} souls merged")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Retrieval check (non-fatal): {e}")
+                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
 
                 result = "; ".join(parts)
             except Exception as e:
