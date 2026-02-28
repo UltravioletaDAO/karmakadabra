@@ -38,6 +38,12 @@ mkdir -p "$WORKSPACE/data"
 WALLET_ADDRESS="${KK_WALLET_ADDRESS:-}"
 CHAIN_ID="${KK_CHAIN_ID:-8453}"
 
+# Parse private key from JSON secret if needed
+# AWS Secrets Manager stores as {"private_key": "0x..."} not raw string
+if echo "$KK_PRIVATE_KEY" | python3 -c "import sys,json; json.loads(sys.stdin.read())" 2>/dev/null; then
+  KK_PRIVATE_KEY=$(echo "$KK_PRIVATE_KEY" | python3 -c "import sys,json; print(json.loads(sys.stdin.read()).get('private_key',''))")
+fi
+
 # Get executor_id from identities.json
 EXECUTOR_ID=""
 if [ -f /app/config/identities.json ]; then
