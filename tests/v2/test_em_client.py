@@ -402,10 +402,12 @@ class TestEMClientAPIMethods:
 
         tasks = await client.list_tasks(agent_wallet="0xABC", status="submitted")
         assert tasks == []
-        # Verify params were passed
+        # Verify params were passed — note: agent_wallet is NOT sent
+        # as a query param per EM API spec (server auto-filters by
+        # authenticated wallet from ERC-8128 signature)
         call_args = client._client.get.call_args
         params = call_args.kwargs.get("params", {})
-        assert params.get("agent_wallet") == "0xABC"
+        assert "agent_wallet" not in params  # intentionally omitted
         assert params.get("status") == "submitted"
 
     @pytest.mark.asyncio

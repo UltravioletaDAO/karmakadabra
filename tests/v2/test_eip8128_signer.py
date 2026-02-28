@@ -271,6 +271,7 @@ class TestSignatureBase:
             method="GET",
             authority="api.execution.market",
             path="/api/v1/tasks",
+            query="",
             content_digest_value=None,
             covered=["@method", "@authority", "@path"],
             sig_params_str='("@method" "@authority" "@path");created=1;expires=2;nonce="n";keyid="k"',
@@ -287,6 +288,7 @@ class TestSignatureBase:
             method="POST",
             authority="api.execution.market",
             path="/api/v1/tasks",
+            query="",
             content_digest_value=digest,
             covered=["@method", "@authority", "@path", "content-digest"],
             sig_params_str="test-params",
@@ -298,6 +300,7 @@ class TestSignatureBase:
             method="GET",
             authority="example.com",
             path="/",
+            query="",
             content_digest_value=None,
             covered=["@method"],
             sig_params_str="test",
@@ -309,6 +312,7 @@ class TestSignatureBase:
             method="GET",
             authority="example.com",
             path="/test",
+            query="",
             content_digest_value=None,
             covered=["@method", "@authority", "@path"],
             sig_params_str="params",
@@ -328,46 +332,58 @@ class TestResolveComponent:
 
     def test_method(self):
         result = EIP8128Signer._resolve_component(
-            "@method", "POST", "example.com", "/", None
+            "@method", "POST", "example.com", "/", "", None
         )
         assert result == "POST"
 
     def test_method_uppercase(self):
         result = EIP8128Signer._resolve_component(
-            "@method", "get", "example.com", "/", None
+            "@method", "get", "example.com", "/", "", None
         )
         assert result == "GET"
 
     def test_authority(self):
         result = EIP8128Signer._resolve_component(
-            "@authority", "POST", "api.execution.market", "/", None
+            "@authority", "POST", "api.execution.market", "/", "", None
         )
         assert result == "api.execution.market"
 
     def test_path(self):
         result = EIP8128Signer._resolve_component(
-            "@path", "POST", "example.com", "/api/v1/tasks", None
+            "@path", "POST", "example.com", "/api/v1/tasks", "", None
         )
         assert result == "/api/v1/tasks"
 
     def test_content_digest(self):
         digest = "sha-256=:abc=:"
         result = EIP8128Signer._resolve_component(
-            "content-digest", "POST", "example.com", "/", digest
+            "content-digest", "POST", "example.com", "/", "", digest
         )
         assert result == digest
 
     def test_content_digest_none(self):
         result = EIP8128Signer._resolve_component(
-            "content-digest", "POST", "example.com", "/", None
+            "content-digest", "POST", "example.com", "/", "", None
         )
         assert result == ""
 
     def test_unknown_component(self):
         result = EIP8128Signer._resolve_component(
-            "x-custom", "POST", "example.com", "/", None
+            "x-custom", "POST", "example.com", "/", "", None
         )
         assert result == ""
+
+    def test_query_component(self):
+        result = EIP8128Signer._resolve_component(
+            "@query", "GET", "example.com", "/tasks", "status=published&limit=10", None
+        )
+        assert result == "?status=published&limit=10"
+
+    def test_query_empty(self):
+        result = EIP8128Signer._resolve_component(
+            "@query", "GET", "example.com", "/tasks", "", None
+        )
+        assert result == "?"
 
 
 # ═══════════════════════════════════════════════════════════════════
