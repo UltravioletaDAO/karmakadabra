@@ -102,6 +102,7 @@ async def discover_offerings(client: EMClient) -> dict[str, list[dict]]:
     tasks = await client.browse_tasks(
         status="published",
         category="knowledge_access",
+        limit=50,
     )
 
     kk_tasks = [t for t in tasks if "[KK Data]" in t.get("title", "")]

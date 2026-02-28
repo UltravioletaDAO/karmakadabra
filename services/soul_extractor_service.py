@@ -283,6 +283,7 @@ async def discover_data_offerings(client: EMClient) -> dict[str, list[dict]]:
     tasks = await client.browse_tasks(
         status="published",
         category="knowledge_access",
+        limit=50,
     )
 
     skill_offerings = [

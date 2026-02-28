@@ -262,10 +262,24 @@ async def publish_offerings(
         result["skipped"] = len(PRODUCTS)
         return result
 
+    # Check existing published tasks to avoid duplicates
+    existing_titles: set[str] = set()
+    try:
+        existing = await client.browse_tasks(status="published", category="knowledge_access", limit=50)
+        existing_titles = {t.get("title", "") for t in existing}
+    except Exception:
+        pass  # If listing fails, publish anyway
+
     for key, product in PRODUCTS.items():
         title = product["title"].format(**stats)
         description = product["description"].format(**stats)
         bounty = product["bounty"]
+
+        # Skip if already published with same title
+        if title in existing_titles:
+            logger.info(f"Already published: {key} — skipping duplicate")
+            result["skipped"] += 1
+            continue
 
         # Budget check
         if not client.agent.can_spend(bounty):
