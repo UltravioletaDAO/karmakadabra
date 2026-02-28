@@ -65,7 +65,7 @@ except:
 ")
 
 # Get wallet address from image config
-WALLET_ADDRESS=$(docker run --rm $ECR_IMAGE python3 -c "
+WALLET_ADDRESS=$(docker run --rm --entrypoint python3 $ECR_IMAGE -c "
 import json
 data = json.load(open('/app/config/identities.json'))
 for a in data.get('agents', []):
