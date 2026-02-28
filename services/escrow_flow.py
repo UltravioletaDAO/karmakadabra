@@ -165,7 +165,12 @@ async def manage_bounties(
 
         # Phase A: ASSIGN first applicant
         if em_status == "published":
-            applications = task_data.get("applications", [])
+            try:
+                applications = await client.get_applications(task_id)
+            except Exception as e:
+                logger.debug(f"Get applications for {task_id[:8]} failed: {e}")
+                applications = []
+
             if applications:
                 applicant = applications[0]
                 executor_id = applicant.get("executor_id", "")

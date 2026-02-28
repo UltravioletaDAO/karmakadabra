@@ -294,6 +294,17 @@ class EMClient:
         resp.raise_for_status()
         return resp.json()
 
+    async def get_applications(self, task_id: str) -> list[dict[str, Any]]:
+        """Get applications for a task (only the task publisher can call this)."""
+        url = f"{API_V1}/tasks/{task_id}/applications"
+        sig_headers = self._sign_headers("GET", url)
+        resp = await self._client.get(
+            f"/tasks/{task_id}/applications", headers=sig_headers
+        )
+        resp.raise_for_status()
+        data = resp.json()
+        return data.get("applications", data if isinstance(data, list) else [])
+
     # -- Agent review actions --------------------------------------------------
 
     async def assign_task(self, task_id: str, executor_id: str) -> dict[str, Any]:
