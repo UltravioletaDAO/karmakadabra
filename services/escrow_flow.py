@@ -412,7 +412,7 @@ async def fulfill_assigned(
             if not client.agent.executor_id:
                 continue
 
-            ev = {"type": "json_response", "notes": f"Delivered by {client.agent.name}"}
+            ev = {"json_response": {"agent": client.agent.name, "status": "delivered"}}
             if evidence_fn:
                 try:
                     ev = evidence_fn(task_id, info)

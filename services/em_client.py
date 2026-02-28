@@ -273,18 +273,24 @@ class EMClient:
         task_id: str,
         executor_id: str,
         evidence: dict[str, Any] | None = None,
+        notes: str = "",
     ) -> dict[str, Any]:
         """Submit evidence for a task.
 
         Args:
             task_id: The task UUID.
             executor_id: The executor UUID (not wallet address).
-            evidence: Evidence dict, e.g. {"url": "...", "type": "text", "notes": "..."}.
+            evidence: Evidence dict keyed by evidence type, e.g.
+                      {"json_response": {"data": "..."}, "url_reference": "https://..."}.
+                      Keys must match the task's evidence_required list.
+            notes: Optional notes about the submission.
         """
         payload: dict[str, Any] = {
             "executor_id": executor_id,
             "evidence": evidence or {},
         }
+        if notes:
+            payload["notes"] = notes
         body_str = json.dumps(payload)
         url = f"{API_V1}/tasks/{task_id}/submit"
         sig_headers = self._sign_headers("POST", url, body_str)

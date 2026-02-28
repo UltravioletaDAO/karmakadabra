@@ -587,20 +587,18 @@ async def seller_flow(
                 logger.debug(f"Delivery URL generation failed (non-fatal): {e}")
 
             return {
-                "type": "json_response",
-                "description": (
-                    "Raw Twitch chat logs from Ultravioleta DAO. "
-                    "469,511 messages, 834 unique users, 328 streams."
-                ),
-                "data": {
+                "json_response": {
                     "delivery_url": delivery_url or "Contact karma-hello for delivery",
                     "total_messages": 469511,
                     "unique_users": 834,
                     "total_streams": 328,
                     "date_range": "2024-06 to 2025-12",
                     "format": "JSON array of {timestamp, user, message}",
+                    "description": (
+                        "Raw Twitch chat logs from Ultravioleta DAO. "
+                        "469,511 messages, 834 unique users, 328 streams."
+                    ),
                 },
-                "notes": "karma-hello raw log delivery — auto-generated evidence",
             }
 
         fulfill_stats = await fulfill_assigned(
