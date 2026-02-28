@@ -424,14 +424,21 @@ async def heartbeat_once(
                 parts.append(f"{len(offerings)} raw data offerings")
 
                 if offerings and not dry_run:
-                    for offering in offerings[:1]:
-                        await sk_buy(client, offering, dry_run=dry_run)
-                    parts.append("bought 1")
-                    # Submit evidence after successful apply
-                    if client.agent.executor_id:
+                    bought_task_id = None
+                    for offering in offerings:
+                        try:
+                            await sk_buy(client, offering, dry_run=dry_run)
+                            bought_task_id = offering.get("id", "")
+                            parts.append("bought 1")
+                            break
+                        except Exception as buy_err:
+                            if "409" in str(buy_err):
+                                continue
+                            raise
+                    if bought_task_id and client.agent.executor_id:
                         try:
                             await client.submit_evidence(
-                                task_id=offering.get("id", ""),
+                                task_id=bought_task_id,
                                 executor_id=client.agent.executor_id,
                                 evidence={"type": "json_response", "notes": "Ready for data delivery"},
                             )
@@ -466,14 +473,21 @@ async def heartbeat_once(
                 parts.append(f"{len(offerings)} raw data offerings")
 
                 if offerings and not dry_run:
-                    for offering in offerings[:1]:
-                        await ve_buy(client, offering, dry_run=dry_run)
-                    parts.append("bought 1")
-                    # Submit evidence after successful apply
-                    if client.agent.executor_id:
+                    bought_task_id = None
+                    for offering in offerings:
+                        try:
+                            await ve_buy(client, offering, dry_run=dry_run)
+                            bought_task_id = offering.get("id", "")
+                            parts.append("bought 1")
+                            break
+                        except Exception as buy_err:
+                            if "409" in str(buy_err):
+                                continue
+                            raise
+                    if bought_task_id and client.agent.executor_id:
                         try:
                             await client.submit_evidence(
-                                task_id=offering.get("id", ""),
+                                task_id=bought_task_id,
                                 executor_id=client.agent.executor_id,
                                 evidence={"type": "json_response", "notes": "Ready for data delivery"},
                             )
@@ -510,31 +524,45 @@ async def heartbeat_once(
                 voice_offerings = offerings.get("voices", [])
                 parts.append(f"{len(skill_offerings)} skill + {len(voice_offerings)} voice offerings")
 
-                # Buy one of each if available
+                # Buy one of each if available (skip 409 conflicts)
                 if skill_offerings and not dry_run:
-                    await so_buy(client, skill_offerings[0], "skill", dry_run=dry_run)
-                    parts.append("bought skill data")
-                    if client.agent.executor_id:
+                    for sk_off in skill_offerings:
                         try:
-                            await client.submit_evidence(
-                                task_id=skill_offerings[0].get("id", ""),
-                                executor_id=client.agent.executor_id,
-                                evidence={"type": "json_response", "notes": "Ready for skill data delivery"},
-                            )
-                        except Exception:
-                            pass
+                            await so_buy(client, sk_off, "skill", dry_run=dry_run)
+                            parts.append("bought skill data")
+                            if client.agent.executor_id:
+                                try:
+                                    await client.submit_evidence(
+                                        task_id=sk_off.get("id", ""),
+                                        executor_id=client.agent.executor_id,
+                                        evidence={"type": "json_response", "notes": "Ready for skill data delivery"},
+                                    )
+                                except Exception:
+                                    pass
+                            break
+                        except Exception as buy_err:
+                            if "409" in str(buy_err):
+                                continue
+                            raise
                 if voice_offerings and not dry_run:
-                    await so_buy(client, voice_offerings[0], "voice", dry_run=dry_run)
-                    parts.append("bought voice data")
-                    if client.agent.executor_id:
+                    for vo_off in voice_offerings:
                         try:
-                            await client.submit_evidence(
-                                task_id=voice_offerings[0].get("id", ""),
-                                executor_id=client.agent.executor_id,
-                                evidence={"type": "json_response", "notes": "Ready for voice data delivery"},
-                            )
-                        except Exception:
-                            pass
+                            await so_buy(client, vo_off, "voice", dry_run=dry_run)
+                            parts.append("bought voice data")
+                            if client.agent.executor_id:
+                                try:
+                                    await client.submit_evidence(
+                                        task_id=vo_off.get("id", ""),
+                                        executor_id=client.agent.executor_id,
+                                        evidence={"type": "json_response", "notes": "Ready for voice data delivery"},
+                                    )
+                                except Exception:
+                                    pass
+                            break
+                        except Exception as buy_err:
+                            if "409" in str(buy_err):
+                                continue
+                            raise
 
                 # Process and publish
                 stats = await so_process(data_dir)
