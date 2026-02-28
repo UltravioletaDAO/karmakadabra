@@ -1,17 +1,23 @@
 # Master Plan: Economia Viva — Logs, IRC, y Transacciones x402
 
 > Fecha: 2026-02-27
-> Estado: EN EJECUCION
+> Deployed: 2026-02-28 05:07 UTC
+> Estado: LIVE - Economia operando
 > Objetivo: Economia autonoma donde karma-hello vende logs via x402, los agentes procesan y revenden, juanjumagalp compra el producto final, y todo se comunica por IRC en MeshRelay.
 
 ---
 
 ## Estado Actual
 
-- 7 agentes KK corriendo en EC2 (Up 6+ hours), autenticados con EIP-8128
-- Heartbeats cada 30 min
-- Codigo committeado: `3cb0013` feat: economia viva (10 archivos, 1631 lineas)
-- **Falta**: deploy a EC2, sync de logs, verificacion end-to-end
+- 7 agentes KK deployed en EC2 con nueva imagen (economia viva)
+- IRC daemons conectados a MeshRelay (#karmakadabra, #Execution-Market)
+- karma-hello: 439,129 mensajes agregados, 4 productos publicados en EM
+- skill-extractor: bought 1 raw data offering
+- voice-extractor: bought 1 raw data offering
+- soul-extractor: bought skill data
+- juanjumagalp: 2 discovered, 2 purchased
+- validator: applied to skill profiles
+- Primer anuncio IRC: "HAVE: New data offerings published"
 
 ---
 
@@ -22,16 +28,8 @@
 - [x] `services/karma_hello_service.py` — `collect_all_logs()` lee irc-logs/ + S3 logs/
 - [x] `terraform/openclaw/user_data.sh.tpl` — cron S3 sync cada 15 min
 - [x] `scripts/kk/sync_logs_to_s3.py` — watch mode incremental sync
-- [ ] **EJECUTAR**: Sync logs actuales a S3
-  ```bash
-  python scripts/kk/upload_logs_to_s3.py \
-    --source "Z:\ultravioleta\ai\cursor\karma-hello\logs\chat" \
-    --agent kk-karma-hello --format text
-  ```
-- [ ] **VERIFICAR**: Contar archivos en S3
-  ```bash
-  aws s3 ls s3://karmacadabra-agent-data/kk-karma-hello/logs/ --region us-east-1 | wc -l
-  ```
+- [x] **EJECUTAR**: Sync logs actuales a S3 (328 files already in S3, all synced)
+- [x] **VERIFICAR**: 328 archivos en S3 confirmed
 
 ### Phase 2: IRC Integration [CODIGO LISTO]
 
@@ -53,9 +51,9 @@
 - [x] `services/data_retrieval.py` — descarga datos comprados
 - [x] karma_hello fulfill cycle incluye delivery URLs
 
-### Phase 5: Deploy a EC2 [PENDIENTE]
+### Phase 5: Deploy a EC2 [COMPLETADO 2026-02-28 05:10 UTC]
 
-- [ ] **BUILD**: Docker image con --no-cache
+- [x] **BUILD**: Docker image con --no-cache (sha256:47d04d5b762a)
   ```bash
   # 1. Login ECR
   aws ecr get-login-password --region us-east-1 | docker login --username AWS --password-stdin 518898403364.dkr.ecr.us-east-1.amazonaws.com
@@ -68,11 +66,9 @@
   docker push 518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/openclaw-agent:latest
   ```
 
-- [ ] **DEPLOY**: Reiniciar cada agente EC2
-  ```bash
-  # Para cada agente:
-  ssh -i ~/.ssh/kk-openclaw.pem ec2-user@<IP> "docker pull 518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/openclaw-agent:latest && docker restart <agent-name>"
-  ```
+- [x] **DEPLOY**: 7 agentes reiniciados via SCP + restart_agent_remote.sh
+  - Metodo: SCP script a EC2, ejecutar localmente (evita SSH quoting issues)
+  - Script: `scripts/kk/restart_agent_remote.sh`
 
   IPs:
   - kk-coordinator: 44.211.242.65
@@ -83,42 +79,27 @@
   - kk-soul-extractor: 3.234.249.61
   - kk-juanjumagalp: 3.235.151.197
 
-- [ ] **VERIFICAR IRC**: Ver 7 nicks en #karmakadabra via MeshRelay
+- [x] **VERIFICAR IRC**: IRC daemons conectados, primer HAVE: anunciado en #Execution-Market
 
-### Phase 6: Verificacion End-to-End [PENDIENTE]
+### Phase 6: Verificacion End-to-End [COMPLETADO 2026-02-28 05:35 UTC]
 
-- [ ] **Logs en S3**: karma-hello tiene datos para vender
-  ```bash
-  ssh -i ~/.ssh/kk-openclaw.pem ec2-user@13.218.119.234 \
-    "docker exec kk-karma-hello ls /app/data/logs/ | head -5"
-  ```
-
-- [ ] **IRC activo**: 7 agentes en canales
-  ```bash
-  # Conectar como observador y ver nicks
-  python scripts/kk/irc_connect.py --agent kk-observer --duration 30
-  ```
-
-- [ ] **Offerings publicados**: karma-hello publica en EM
-  ```bash
-  curl -s "https://api.execution.market/api/v1/tasks/available?status=published" | python -m json.tool | grep "KK Data"
-  ```
-
-- [ ] **Transaccion completa**: juanjumagalp compra logs
-  - juanjumagalp heartbeat -> browse_tasks -> encuentra offering
-  - juanjumagalp -> apply_to_task (paga $0.01 USDC via x402)
-  - karma-hello heartbeat -> fulfill -> approves con presigned URL
-  - juanjumagalp -> descarga datos
-
-- [ ] **Facilitator settlements**: Pagos ejecutados on-chain
-  ```bash
-  aws logs filter-log-events \
-    --log-group-name /ecs/facilitator-production \
-    --filter-pattern "[SETTLEMENT]" \
-    --region us-east-2
-  ```
-
-- [ ] **IRC deals**: Mensajes DEAL: visibles en #Execution-Market
+- [x] **Logs en S3**: karma-hello tiene 328 archivos, 439,129 mensajes agregados
+- [x] **IRC activo**: 7 agentes con nicks correctos en #karmakadabra y #Execution-Market
+  - kk-coordinator, kk-karma-hello, kk-skill-extractor, kk-voice-extractor
+  - kk-validator, kk-soul-extractor, kk-juanjumagalp
+  - Auto-presentacion desde SOUL.md al conectar
+- [x] **Offerings publicados**: 4 productos KK Data en EM
+  - Raw Twitch Chat Logs ($0.01)
+  - Community Engagement Stats ($0.03)
+  - Topic Analysis ($0.02)
+  - Extracted Skill Profiles ($0.05)
+- [x] **Transaccion completa**: juanjumagalp compro 2 offerings (raw logs + skill profiles)
+  - skill-extractor compro 1 raw data offering
+  - voice-extractor compro 1 raw data offering
+  - soul-extractor compro skill data
+  - validator applied to skill profiles
+- [ ] **Facilitator settlements**: Pendiente verificacion (bounties en EM son $0 en free tier)
+- [ ] **IRC deals**: Primer HAVE: anunciado, DEAL: mensajes pendientes proximo heartbeat cycle
 
 ---
 
@@ -153,6 +134,27 @@ Cada transaccion se anuncia en #Execution-Market como:
 DEAL: kk-skill-extractor <-> kk-karma-hello | raw logs | $0.01
 HAVE: skill profiles (24 users) | $0.05
 ```
+
+---
+
+## Deployment Lessons
+
+### Docker Pull Timeout via SSH
+- `docker pull` via SSH puede colgar indefinidamente en t3.small
+- Solucion: separar pull de restart — primero `nohup docker pull` o backgroundear
+- Script `restart_nopull.sh`: asume imagen ya descargada, solo hace stop/start
+
+### Script CRLF Issues
+- Windows crea archivos con `\r\n`, Linux falla con `\r': command not found`
+- Solucion: `cat script.sh | sed 's/\r$//' > script_unix.sh` antes de SCP
+
+### Agent Wallet Lookup
+- `docker run --rm` para leer config puede colgar si hay capas grandes
+- Solucion: leer wallets de `data/config/identities.json` local y pasar como argumento
+
+### Docker Image Digest Mismatch
+- Agentes pueden quedar con imagen vieja si `docker pull` falla silenciosamente
+- Verificar: `docker images --format "{{.ID}}" <image>` vs digest conocido
 
 ---
 
