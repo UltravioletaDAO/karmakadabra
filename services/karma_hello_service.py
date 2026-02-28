@@ -540,9 +540,11 @@ async def seller_flow(
 
     try:
         # Phase 1: Discover bounties requesting raw data
+        # Only match [KK Request] tasks — these are buyer bounties
+        # (NOT [KK Data] tasks which are seller offerings from the old flow)
         bounties = await discover_bounties(
             client=client,
-            keywords=["[KK Request]", "chat log", "raw log", "twitch", "raw data"],
+            keywords=["[KK Request]"],
             exclude_wallet=client.agent.wallet_address,
             state=state,
         )

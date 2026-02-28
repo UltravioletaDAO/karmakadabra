@@ -264,9 +264,15 @@ async def discover_bounties(
         task_id = task.get("id", "")
         title = task.get("title", "")
 
-        # Skip own tasks
-        if exclude_wallet and task.get("agent_wallet", "") == exclude_wallet:
-            continue
+        # Skip own tasks (EM API uses agent_id or agent_wallet for poster identity)
+        if exclude_wallet:
+            task_wallet = (
+                task.get("agent_wallet", "")
+                or task.get("agent_id", "")
+                or ""
+            )
+            if task_wallet.lower() == exclude_wallet.lower():
+                continue
 
         # Skip already applied
         if task_id in applied_ids:
@@ -322,12 +328,22 @@ async def apply_to_bounty(
         logger.info(f"Applied to bounty: {title}")
         return True
     except Exception as e:
-        if "409" in str(e):
+        err_str = str(e)
+        if "409" in err_str:
             logger.info(f"Already applied to: {title}")
             # Track it anyway so we don't retry
             state.setdefault("applied", {})[task_id] = {
                 "title": title,
                 "status": "applied",
+                "applied_at": datetime.now(timezone.utc).isoformat(),
+            }
+            return False
+        if "403" in err_str:
+            logger.info(f"Cannot apply to own task: {title}")
+            # Track to avoid retrying
+            state.setdefault("applied", {})[task_id] = {
+                "title": title,
+                "status": "forbidden",
                 "applied_at": datetime.now(timezone.utc).isoformat(),
             }
             return False
