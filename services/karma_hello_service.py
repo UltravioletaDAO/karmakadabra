@@ -319,18 +319,73 @@ async def fulfill_purchases(
     dry_run: bool = False,
     data_dir: Path | None = None,
 ) -> dict[str, Any]:
-    """Check for submitted tasks (purchases) and auto-approve deliveries.
+    """Assign pending applicants and auto-approve submitted deliveries.
+
+    Two-phase fulfillment:
+      Phase A — Assign: fetch published tasks with pending applications,
+                auto-assign the first applicant so they can start work.
+      Phase B — Approve: fetch submitted tasks, review and approve
+                completed submissions with data delivery URLs.
 
     Returns:
-        Dict with approved and skipped counts.
+        Dict with assigned, approved, and error counts.
     """
     result: dict[str, Any] = {
+        "assigned": 0,
         "reviewed": 0,
         "approved": 0,
         "skipped": 0,
         "errors": [],
     }
 
+    # --- Phase A: Auto-assign pending applications ---
+    try:
+        published_tasks = await client.list_tasks(
+            agent_wallet=client.agent.wallet_address,
+            status="published",
+        )
+    except Exception as e:
+        logger.warning(f"Failed to list published tasks: {e}")
+        published_tasks = []
+
+    for task in published_tasks:
+        task_id = task.get("id", "")
+        title = task.get("title", "")
+        if not title.startswith("[KK Data]"):
+            continue
+
+        # Get full task detail (includes applications)
+        try:
+            detail = await client.get_task(task_id)
+        except Exception as e:
+            logger.warning(f"Failed to get task detail {task_id}: {e}")
+            continue
+
+        applications = detail.get("applications", [])
+        if not applications:
+            continue
+
+        # Auto-assign the first applicant
+        applicant = applications[0]
+        executor_id = applicant.get("executor_id", "")
+        if not executor_id:
+            continue
+
+        applicant_name = applicant.get("display_name", executor_id[:8])
+        if dry_run:
+            logger.info(f"[DRY RUN] Would assign {applicant_name} to {title}")
+            result["assigned"] += 1
+            continue
+
+        try:
+            await client.assign_task(task_id, executor_id)
+            logger.info(f"Assigned {applicant_name} to: {title}")
+            result["assigned"] += 1
+        except Exception as e:
+            logger.error(f"Failed to assign {task_id}: {e}")
+            result["errors"].append(f"assign({task_id}): {e}")
+
+    # --- Phase B: Auto-approve submitted deliveries ---
     try:
         my_tasks = await client.list_tasks(
             agent_wallet=client.agent.wallet_address,
@@ -559,7 +614,7 @@ async def main() -> None:
         print(f"  Publish: {p['published']} products, {p['skipped']} skipped")
     if "fulfill" in results:
         f = results["fulfill"]
-        print(f"  Fulfill: {f['approved']} approved, {f['reviewed']} reviewed")
+        print(f"  Fulfill: {f.get('assigned', 0)} assigned, {f['approved']} approved, {f['reviewed']} reviewed")
     print()
 
 
