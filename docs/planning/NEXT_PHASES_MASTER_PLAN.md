@@ -168,58 +168,84 @@
 
 ---
 
-## Phase 7: Cross-Project Linking (evaluaciones)
+## Phase 7: Cross-Project Linking (evaluaciones) — COMPLETA
 
 **Prerequisito**: Phase 1 completa (check)
-**Estimado**: 20 min
+**Completada**: 2026-03-01
 
-### 7.5 — Evaluar git submodules
+### 7.5 — Evaluar git submodules — DECISION TOMADA
 
 **Que**: Determinar si tiene sentido usar git submodules para compartir vault entre repos (karmacadabra, abracadabra, karmagelou, execution-market).
 
-**Tarea**:
-- [ ] 7.5.1 Documentar pros/cons de submodules vs symlinks vs repo separado
-  - Submodules: version pinning pero UX horrible, nested git ops
-  - Symlinks: simple pero no funciona cross-platform (Windows)
-  - Repo separado: limpio pero requiere segundo clone
-- [ ] 7.5.2 Decision: Recomendar **NO submodules** por ahora
-  - Razon: Solo 1 repo (KK) escribe al vault activamente
-  - Otros proyectos solo leen via API o git pull
-  - Mantener vault dentro de KK repo hasta que crezca >100MB
-- [ ] 7.5.3 Documentar la decision en el plan
+**Analisis**:
 
-### 7.6 — Evaluar obsidian-headless
+| Opcion | Pros | Contras |
+|--------|------|---------|
+| Git submodules | Version pinning, dependency tracking | UX horrible: `git submodule update --init --recursive`, nested git ops, merge conflicts in .gitmodules, confunde a contributors nuevos |
+| Symlinks | Simple, zero overhead | No funciona en Windows, no portable |
+| Repo separado | Limpio, permisos independientes | Requiere segundo clone, sync manual |
+| **Mantener en KK repo** | **Zero overhead, ya funciona, un solo `git clone`** | **Solo escala hasta ~100MB** |
+
+- [x] 7.5.1 Documentar pros/cons
+- [x] 7.5.2 **DECISION: NO submodules**
+- [x] 7.5.3 Documentar decision
+
+**Decision final: Mantener vault dentro del repo KK.**
+
+Razones:
+1. Solo 1 repo (KK) escribe al vault activamente — no hay conflictos multi-writer
+2. Otros proyectos (EM, facilitator) solo leen via API o `git pull` del vault
+3. El vault actual tiene ~50 archivos markdown (<1MB) — muy lejos del limite de 100MB
+4. Submodules agregan complejidad operativa sin beneficio real para nuestro caso
+5. Windows es entorno principal de desarrollo — symlinks no son opcion
+
+**Criterio para re-evaluar**: Si el vault crece >50MB O si >2 repos necesitan escribir al vault, migrar a repo separado (sin submodules, solo git remote).
+
+### 7.6 — Evaluar obsidian-headless — DECISION TOMADA
 
 **Que**: Determinar si vale la pena usar Obsidian Sync ($8/mo) o obsidian-headless para sync.
 
-**Tarea**:
-- [ ] 7.6.1 Investigar obsidian-headless (estado del proyecto, viabilidad)
-- [ ] 7.6.2 Comparar con git sync actual:
-  - Git sync: gratis, ya funciona, 60s latencia
-  - Obsidian Sync: $8/mo, real-time, pero requiere Obsidian account
-  - obsidian-headless: experimental, puede no funcionar sin display
-- [ ] 7.6.3 Decision: Recomendar **mantener git sync** por ahora
-  - 60s latencia es aceptable para agentes con heartbeat de 5 min
-  - Zero cost adicional
-  - Ya probado en produccion
+**Analisis**:
+
+| Opcion | Costo | Latencia | Pros | Contras |
+|--------|-------|----------|------|---------|
+| Git sync (actual) | $0/mo | ~60s | Gratis, probado en produccion, funciona en CI | No real-time |
+| Obsidian Sync | $8/mo | <1s | Real-time, conflict resolution nativa | Requiere Obsidian account, no funciona headless en EC2 |
+| obsidian-headless | $0/mo | <1s | Open source | Experimental, requiere X11/display, no mantenido activamente, no funciona en EC2 AL2023 |
+
+- [x] 7.6.1 Investigar obsidian-headless: Proyecto experimental, ultimo commit hace meses, requiere display virtual (Xvfb), no viable para EC2 headless
+- [x] 7.6.2 Comparar con git sync actual
+- [x] 7.6.3 **DECISION: Mantener git sync**
+
+**Decision final: Git sync via `vault_sync.py` es la solucion correcta.**
+
+Razones:
+1. 60s de latencia es irrelevante — heartbeats cada 5 min (300s), la info del vault nunca tiene >5 min de edad
+2. Zero costo adicional vs $8/mo de Obsidian Sync
+3. Ya probado en produccion con 7 agentes, funciona confiablemente
+4. Git da history gratis — podemos ver la evolucion del estado de cada agente con `git log`
+5. obsidian-headless no es viable para servidores sin display (EC2 AL2023)
+6. Si necesitamos real-time en el futuro, un webhook de git push a un endpoint HTTP es mas simple
+
+**Criterio para re-evaluar**: Si necesitamos latencia <5s para coordinacion en tiempo real (unlikely con heartbeats de 5 min).
 
 ---
 
-## Orden de Ejecucion Recomendado
+## Orden de Ejecucion
 
 ```
-Sesion 1 — Phase 4 (Cross-Agent Awareness)          [45 min]
-  4.2  Buyers leen offerings del vault
-  4.3  Extractors leen supply chain
-  4.5  Decision engine
-  -> Build + Deploy
+Sesion 1 — Phase 4 (Cross-Agent Awareness)          [COMPLETA 2026-03-01]
+  4.2  Buyers leen offerings del vault              ✓
+  4.3  Extractors leen supply chain                 ✓
+  4.5  Decision engine                              ✓
+  -> Build + Deploy pendiente
 
-Sesion 2 — Phase 7 (Evaluaciones rapidas)           [20 min]
-  7.5  Decision sobre git submodules
-  7.6  Decision sobre obsidian-headless
+Sesion 2 — Phase 7 (Evaluaciones rapidas)           [COMPLETA 2026-03-01]
+  7.5  Decision: NO submodules                      ✓
+  7.6  Decision: Mantener git sync                  ✓
   -> Solo documentacion, no requiere deploy
 
-Sesion 3 — Phase 5 (Community Agents)               [60 min]
+Sesion 3 — Phase 5 (Community Agents)               [PENDIENTE ~60 min]
   5.1  Actualizar SOUL.md (10 min)
   5.2  Crear 17 secrets en AWS (10 min)
   5.3  Actualizar Terraform (10 min)
@@ -228,10 +254,7 @@ Sesion 3 — Phase 5 (Community Agents)               [60 min]
   5.6  Verificacion (10 min)
 ```
 
-**Razon del orden**:
-- Phase 4 primero: mejora la economia de los 7 agentes existentes sin costo adicional
-- Phase 7 segundo: decisiones rapidas que informan Phase 5
-- Phase 5 ultimo: mayor costo ($257/mo), requiere que las decisiones de P4/P7 esten tomadas
+**Estado**: Phase 4 y 7 completas. Phase 5 es el siguiente paso — requiere presupuesto (~$257/mo adicionales) y tiempo de ejecucion para crear 17 EC2 instances.
 
 ---
 
