@@ -459,35 +459,30 @@ async def fulfill_assigned(
                     stats["completed"] += 1
 
                     # Bidirectional reputation: worker rates agent/buyer
+                    # agent_id is the ERC-8004 ID of the publisher (numeric)
                     if not info.get("rated_agent"):
-                        task_agent_id = task_data.get("agent_id", "")
-                        agent_wallet = (
-                            task_data.get("agent_wallet", "")
-                            or task_data.get("publisher_wallet", "")
-                            or task_data.get("wallet", "")
-                            or task_data.get("owner_wallet", "")
-                            or task_data.get("creator_wallet", "")
-                            or resolve_executor_wallet(task_agent_id)
+                        publisher_agent_id = (
+                            task_data.get("agent_id", "")
+                            or task_data.get("erc8004_agent_id", "")
                         )
-                        if not agent_wallet:
-                            logger.info(
-                                f"No agent wallet — agent_id={task_agent_id}, "
-                                f"erc8004={task_data.get('erc8004_agent_id', '?')}"
-                            )
-                        if agent_wallet:
+                        if publisher_agent_id:
                             try:
                                 await client.rate_agent(
                                     task_id=task_id,
-                                    agent_wallet=agent_wallet,
+                                    agent_id=str(publisher_agent_id),
                                     score=4,
                                     comment=f"Prompt payment for: {info.get('title', '?')}",
                                 )
                                 info["rated_agent"] = True
                                 stats.setdefault("rated", 0)
                                 stats["rated"] += 1
-                                logger.info(f"Rated agent {agent_wallet[:8]} (score=4)")
+                                logger.info(
+                                    f"Rated agent #{publisher_agent_id} (score=4)"
+                                )
                             except Exception as e:
                                 logger.info(f"Rate agent failed (non-fatal): {e}")
+                        else:
+                            logger.info("No agent_id in task for rating")
             except Exception:
                 pass
             continue

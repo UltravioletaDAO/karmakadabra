@@ -428,7 +428,7 @@ class EMClient:
     async def rate_agent(
         self,
         task_id: str,
-        agent_wallet: str,
+        agent_id: str,
         score: int = 5,
         comment: str = "",
     ) -> dict[str, Any]:
@@ -436,13 +436,13 @@ class EMClient:
 
         Args:
             task_id: The task UUID.
-            agent_wallet: Agent/buyer's wallet address.
+            agent_id: ERC-8004 agent ID of the publisher (numeric string).
             score: Rating 1-5 (5 = excellent).
             comment: Optional feedback.
         """
         payload: dict[str, Any] = {
             "task_id": task_id,
-            "agent_wallet": agent_wallet,
+            "agent_id": agent_id,
             "score": max(1, min(5, score)),
         }
         if comment:
