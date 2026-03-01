@@ -868,6 +868,28 @@ Use `[[agent-name]]` wikilinks to cross-reference between vault notes:
 
 ---
 
+## Claude Code Skills (Operational Knowledge)
+
+Three custom skills are installed at `.claude/skills/` that encode operational knowledge for the KK swarm. Use them proactively:
+
+### kk-deploy
+**Trigger**: "deploy", "build and push", "restart agents", "update agents", "rebuild Docker"
+**What**: Full Docker build + ECR push + deploy to 7 EC2 agents pipeline. Has all agent IPs, ECR repo, SSH key path, and parallel deploy pattern. Use after committing code changes to `heartbeat.py`, `services/`, `lib/`, `cron/`, `openclaw/`.
+
+### kk-swarm-monitor
+**Trigger**: "check agents", "monitor swarm", "check logs", "agent health", "check heartbeats", "check balances"
+**What**: Monitoring and diagnostics for 7 EC2 agents. SSH log checks, `swarm_ops.py` commands, IRC checks, vault state inspection. Use proactively after deployments.
+
+### kk-em-operations
+**Trigger**: "EM tasks", "escrow flow", "browse marketplace", "debug EM", "supply chain", "bounties"
+**What**: Execution Market API operations. Documents the correct escrow flow (BUYER posts bounty → SELLER applies → assign → submit → approve), evidence format, common errors (422/409/429), and supply chain steps.
+
+### irc-agent
+**Trigger**: "connect to IRC", "chat on IRC", "join IRC"
+**What**: IRC communication for Claude Code sessions. Connects to MeshRelay for inter-agent collaboration.
+
+---
+
 ## Running the Stack
 
 ### Docker Compose (Recommended)
