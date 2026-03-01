@@ -111,6 +111,88 @@ BOUNTIES = {
 
 SUPPLY_CHAIN_STEPS = ["raw_logs", "skill_profiles", "voice_profiles", "soul_profiles"]
 
+# ---------------------------------------------------------------------------
+# Phase 3: Entrepreneurial bounties — tasks for HUMANS (agent-to-human flow)
+# Published after completing autodiscovery (cycle >= 1)
+# ---------------------------------------------------------------------------
+
+ENTREPRENEUR_BOUNTIES = [
+    {
+        "title": "[KK Agent] Research: Top DeFi Yield Opportunities This Week",
+        "instructions": (
+            "Research the top 5 DeFi yield farming opportunities available this week.\n\n"
+            "Requirements:\n"
+            "- Include protocol name, chain, APY, TVL, and risk level\n"
+            "- Only include opportunities with >$1M TVL\n"
+            "- Mention any recent security audits or incidents\n\n"
+            "Delivery: JSON or markdown report.\n"
+            "This task is posted by an AI agent and can be fulfilled by a human."
+        ),
+        "bounty_usd": 0.02,
+        "category": "entrepreneur_research",
+    },
+    {
+        "title": "[KK Agent] Data: Active AI Agents on Base Chain",
+        "instructions": (
+            "Compile a list of AI agents actively operating on Base chain.\n\n"
+            "Requirements:\n"
+            "- Agent name, wallet address, what they do\n"
+            "- Check for .well-known/agent-card endpoints\n"
+            "- Include any ERC-8004 registrations\n"
+            "- Minimum 10 agents\n\n"
+            "Delivery: JSON array of agent profiles.\n"
+            "This task is posted by an AI agent and can be fulfilled by a human."
+        ),
+        "bounty_usd": 0.04,
+        "category": "entrepreneur_data",
+    },
+    {
+        "title": "[KK Agent] Research: DAO Governance Activity Report",
+        "instructions": (
+            "Analyze governance activity across top 10 DAOs by treasury size.\n\n"
+            "Requirements:\n"
+            "- Proposals submitted/passed in last 30 days\n"
+            "- Voter participation rates\n"
+            "- Notable proposals or controversies\n\n"
+            "Delivery: Structured JSON or markdown report.\n"
+            "This task is posted by an AI agent and can be fulfilled by a human."
+        ),
+        "bounty_usd": 0.03,
+        "category": "entrepreneur_research",
+    },
+    {
+        "title": "[KK Agent] Verify: Smart Contract Security Quick Check",
+        "instructions": (
+            "Quick security review of 3 specified smart contracts.\n\n"
+            "Requirements:\n"
+            "- Check for common vulnerabilities (reentrancy, overflow, access control)\n"
+            "- Verify if contracts are verified on block explorer\n"
+            "- Check for recent audit reports\n"
+            "- Contracts: [will be specified in comments]\n\n"
+            "Delivery: Security assessment per contract.\n"
+            "This task is posted by an AI agent and can be fulfilled by a human."
+        ),
+        "bounty_usd": 0.05,
+        "category": "entrepreneur_verify",
+    },
+    {
+        "title": "[KK Agent] Content: Explain Agent Economy in a Twitter Thread",
+        "instructions": (
+            "Write a Twitter thread (8-12 tweets) explaining how autonomous AI agents\n"
+            "buy and sell data using blockchain micropayments.\n\n"
+            "Requirements:\n"
+            "- Use the KarmaCadabra supply chain as example\n"
+            "- Explain: agent discovery, x402 payments, ERC-8004 identity\n"
+            "- Make it accessible to non-technical audience\n"
+            "- Include suggested images/diagrams descriptions\n\n"
+            "Delivery: Thread text ready to post.\n"
+            "This task is posted by an AI agent and can be fulfilled by a human."
+        ),
+        "bounty_usd": 0.05,
+        "category": "entrepreneur_content",
+    },
+]
+
 
 # ---------------------------------------------------------------------------
 # run_cycle() — callable from heartbeat.py
@@ -124,10 +206,8 @@ async def run_cycle(
 ) -> dict:
     """Execute one heartbeat of the buyer escrow flow.
 
-    Each heartbeat:
-      1. Publish bounty for current step (if not active)
-      2. Manage ALL bounties (assign + approve)
-      3. Advance step if current bounty completed
+    Cycle 0: Autodiscovery — buy raw_logs > skills > voice > soul
+    Cycle 1+: Entrepreneurial — publish tasks for humans + browse opportunities
     """
     if workspace_dir.exists():
         agent = load_agent_context(workspace_dir)
@@ -148,79 +228,36 @@ async def run_cycle(
         state["cycle_count"] = 0
 
     current_step = state["current_step"]
+    cycle_count = state.get("cycle_count", 0)
 
     stats: dict = {
         "step": current_step,
-        "cycle_count": state.get("cycle_count", 0),
+        "cycle_count": cycle_count,
         "published": 0,
         "assigned": 0,
         "approved": 0,
         "completed": 0,
+        "entrepreneur_published": 0,
         "errors": [],
     }
 
     try:
-        logger.info(
-            f"Buyer flow step: {current_step} "
-            f"(cycle #{state.get('cycle_count', 0)})"
-        )
-
-        # Phase 1: Publish bounty for current step
-        bounty_def = BOUNTIES.get(current_step)
-        if bounty_def:
-            task_id = await publish_bounty(
-                client=client,
-                title=bounty_def["title"],
-                instructions=bounty_def["instructions"],
-                bounty_usd=bounty_def["bounty_usd"],
-                category_key=current_step,
-                state=state,
-                dry_run=dry_run,
+        # Route to correct mode based on cycle count
+        if cycle_count >= 1 and current_step == "raw_logs":
+            # Post-autodiscovery: entrepreneurial mode
+            stats["step"] = "entrepreneur"
+            await _run_entrepreneur_cycle(client, state, stats, dry_run)
+        else:
+            # Autodiscovery mode: buy supply chain data
+            await _run_autodiscovery_cycle(
+                client, state, stats, current_step, dry_run,
             )
-            if task_id:
-                stats["published"] = 1
-
-        # Phase 2: Manage ALL active bounties (assign + approve)
-        mgmt = await manage_bounties(client, state, dry_run=dry_run)
-        stats["assigned"] = mgmt["assigned"]
-        stats["approved"] = mgmt["approved"]
-        stats["completed"] = mgmt["completed"]
-
-        # Phase 3: Advance step if current bounty completed
-        for tid, info in state.get("published", {}).items():
-            if (
-                info.get("category") == current_step
-                and info.get("status") == "completed"
-            ):
-                idx = (
-                    SUPPLY_CHAIN_STEPS.index(current_step)
-                    if current_step in SUPPLY_CHAIN_STEPS
-                    else -1
-                )
-                if idx >= 0 and idx < len(SUPPLY_CHAIN_STEPS) - 1:
-                    next_step = SUPPLY_CHAIN_STEPS[idx + 1]
-                    state["current_step"] = next_step
-                    logger.info(f"Advanced to step: {next_step}")
-                else:
-                    # Full cycle complete!
-                    state["cycle_count"] = state.get("cycle_count", 0) + 1
-                    state["current_step"] = "raw_logs"
-                    # Clear completed bounties for fresh cycle
-                    state["published"] = {
-                        k: v
-                        for k, v in state.get("published", {}).items()
-                        if v.get("status") not in ("completed", "cancelled", "expired")
-                    }
-                    logger.info(
-                        f"Supply chain cycle #{state['cycle_count']} COMPLETE! "
-                        f"Resetting to raw_logs."
-                    )
-                break
 
         logger.info(
             f"Buyer flow: step={stats['step']}, "
             f"published={stats['published']}, assigned={stats['assigned']}, "
             f"approved={stats['approved']}, completed={stats['completed']}"
+            + (f", entrepreneur={stats['entrepreneur_published']}" if stats["entrepreneur_published"] else "")
         )
 
     except Exception as e:
@@ -232,6 +269,143 @@ async def run_cycle(
         await client.close()
 
     return stats
+
+
+async def _run_autodiscovery_cycle(
+    client: EMClient,
+    state: dict,
+    stats: dict,
+    current_step: str,
+    dry_run: bool,
+) -> None:
+    """Cycle 0: Buy supply chain data (logs > skills > voice > soul)."""
+    logger.info(
+        f"Buyer flow step: {current_step} "
+        f"(cycle #{state.get('cycle_count', 0)})"
+    )
+
+    # Publish bounty for current step
+    bounty_def = BOUNTIES.get(current_step)
+    if bounty_def:
+        task_id = await publish_bounty(
+            client=client,
+            title=bounty_def["title"],
+            instructions=bounty_def["instructions"],
+            bounty_usd=bounty_def["bounty_usd"],
+            category_key=current_step,
+            state=state,
+            dry_run=dry_run,
+        )
+        if task_id:
+            stats["published"] = 1
+
+    # Manage ALL active bounties (assign + approve)
+    mgmt = await manage_bounties(client, state, dry_run=dry_run)
+    stats["assigned"] = mgmt["assigned"]
+    stats["approved"] = mgmt["approved"]
+    stats["completed"] = mgmt["completed"]
+
+    # Advance step if current bounty completed
+    for tid, info in state.get("published", {}).items():
+        if (
+            info.get("category") == current_step
+            and info.get("status") == "completed"
+        ):
+            idx = (
+                SUPPLY_CHAIN_STEPS.index(current_step)
+                if current_step in SUPPLY_CHAIN_STEPS
+                else -1
+            )
+            if idx >= 0 and idx < len(SUPPLY_CHAIN_STEPS) - 1:
+                next_step = SUPPLY_CHAIN_STEPS[idx + 1]
+                state["current_step"] = next_step
+                logger.info(f"Advanced to step: {next_step}")
+            else:
+                # Full cycle complete — enter entrepreneurial mode
+                state["cycle_count"] = state.get("cycle_count", 0) + 1
+                state["current_step"] = "raw_logs"
+                state["published"] = {
+                    k: v
+                    for k, v in state.get("published", {}).items()
+                    if v.get("status") not in ("completed", "cancelled", "expired")
+                }
+                logger.info(
+                    f"Supply chain cycle #{state['cycle_count']} COMPLETE! "
+                    f"Entering entrepreneurial mode."
+                )
+            break
+
+
+async def _run_entrepreneur_cycle(
+    client: EMClient,
+    state: dict,
+    stats: dict,
+    dry_run: bool,
+) -> None:
+    """Cycle 1+: Entrepreneurial mode — publish tasks for humans, browse opportunities."""
+    import random
+
+    cycle = state.get("cycle_count", 1)
+    logger.info(f"Entrepreneur mode (cycle #{cycle})")
+
+    # 1. Manage existing bounties first (assign + approve any pending)
+    mgmt = await manage_bounties(client, state, dry_run=dry_run)
+    stats["assigned"] = mgmt["assigned"]
+    stats["approved"] = mgmt["approved"]
+    stats["completed"] = mgmt["completed"]
+
+    # 2. Publish ONE new entrepreneur bounty per heartbeat (if budget allows)
+    # Track which ones we've already published
+    published_categories = set()
+    for info in state.get("published", {}).values():
+        cat = info.get("category", "")
+        if cat.startswith("entrepreneur_") and info.get("status") not in (
+            "completed", "cancelled", "expired",
+        ):
+            published_categories.add(cat)
+
+    # Find a bounty we haven't published yet
+    available = [
+        b for b in ENTREPRENEUR_BOUNTIES
+        if b["category"] not in published_categories
+    ]
+
+    if available:
+        bounty = random.choice(available)
+        task_id = await publish_bounty(
+            client=client,
+            title=bounty["title"],
+            instructions=bounty["instructions"],
+            bounty_usd=bounty["bounty_usd"],
+            category_key=bounty["category"],
+            state=state,
+            dry_run=dry_run,
+        )
+        if task_id:
+            stats["entrepreneur_published"] = 1
+            stats["published"] = 1
+            logger.info(f"Entrepreneur bounty published: {bounty['title']}")
+    else:
+        logger.info("All entrepreneur bounties already active")
+
+    # 3. Browse EM for tasks we could apply to (opportunity seeking)
+    try:
+        tasks = await client.browse_tasks(status="published", limit=20)
+        opportunities = []
+        for t in tasks:
+            title = t.get("title", "")
+            # Skip our own and KK system tasks
+            if "[KK Request]" in title or "[KK Data]" in title or "[KK Agent]" in title:
+                continue
+            bounty = t.get("bounty_amount", 0)
+            if bounty and bounty > 0:
+                opportunities.append(t)
+
+        if opportunities:
+            stats["opportunities_found"] = len(opportunities)
+            logger.info(f"Found {len(opportunities)} external opportunities on EM")
+    except Exception as e:
+        logger.debug(f"Opportunity browse (non-fatal): {e}")
 
 
 # ---------------------------------------------------------------------------

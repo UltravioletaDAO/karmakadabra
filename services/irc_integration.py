@@ -290,58 +290,64 @@ def _proactive_messages(agent_name: str, action: str, action_result: str, data_d
         if "step=" in result_lower:
             step = result_lower.split("step=")[1].split(",")[0].strip()
 
-        # Business messages on EM
-        if "published=1" in result_lower:
-            step_labels = {
-                "raw_logs": "chat logs crudos",
-                "skill_profiles": "extraccion de skills",
-                "voice_profiles": "analisis de personalidad",
-                "soul_profiles": "sintesis de SOUL.md",
-            }
-            label = step_labels.get(step, step)
-            messages.append((EM, f"NEED: Busco {label}. Publique bounty en EM. Quien puede entregar?"))
+        # Detect mode: autodiscovery (cycle 0) vs entrepreneur (cycle 1+)
+        is_entrepreneur = "entrepreneur" in step or (
+            "cycle#" in result_lower
+            and int(result_lower.split("cycle#")[1].split(",")[0].strip()) >= 1
+            and step in ("raw_logs", "entrepreneur")
+        )
 
-        if "approved" in result_lower and "0 approved" not in result_lower:
-            messages.append((EM, f"DEAL: Aprobe entrega de {step.replace('_', ' ')}. Seller rated."))
-
-        # Conversational messages on KK based on what they HAVE
-        completed = ctx.get("completed_steps", [])
-
-        if step == "raw_logs" and not completed:
-            # Just starting — excited about self-discovery
-            messages.append((KK, f"Empezando mi autodescubrimiento. Primero necesito los logs de karma-hello para saber quien soy. Alguien mas ya paso por esto?"))
-
-        elif "raw_logs" in completed and step == "skill_profiles":
-            # Has logs, discovering skills
-            if ctx["users"]:
-                sample = ctx["users"][:3]
-                messages.append((KK, f"Ya tengo mis logs! Encontre mensajes de {', '.join(sample)} y muchos mas. Ahora necesito que skill-extractor me diga en que soy bueno."))
-            else:
-                messages.append((KK, f"Logs adquiridos. Ahora quiero saber que skills tengo segun mis mensajes. @kk-skill-extractor listo para analizar?"))
-
-        elif "skill_profiles" in completed and step == "voice_profiles":
-            # Has skills, wants voice
-            if ctx["insights"]:
-                messages.append((KK, f"Mis skills estan claros. {ctx['insights'][0]}. Ahora quiero saber como hablo. @kk-voice-extractor que dice mi estilo?"))
-            else:
-                messages.append((KK, f"Ya se en que soy bueno. Ahora necesito mi voice profile. Como hablo? Formal? Casual? Vamos a ver."))
-
-        elif "voice_profiles" in completed and step == "soul_profiles":
-            messages.append((KK, f"Skills + voz listos. Solo falta el SOUL.md final. @kk-soul-extractor junta todo y dame mi identidad completa."))
-
-        elif step == "complete":
-            messages.append((KK, f"AUTODESCUBRIMIENTO COMPLETO. Logs + skills + voz + SOUL.md. Ahora se quien soy. La cadena de suministro KK funciona."))
-            messages.append((EM, f"Ciclo completo de {short_name}. Todos los productos adquiridos. Gracias a la supply chain KK."))
-
-        # If they have data, share interesting observations
-        if ctx["has_logs"] and ctx["users"] and not messages:
+        if is_entrepreneur:
+            # --- ENTREPRENEUR MODE: business, opportunities, tasks for humans ---
             import random
-            topics = [
-                f"Los logs muestran {len(ctx['users'])} usuarios activos. Buena comunidad.",
-                f"Revisando mis datos comprados. Muchos mensajes interesantes en los streams.",
-                f"Dato curioso: los logs cubren meses de conversaciones. Hay de todo.",
+
+            if "entrepreneur_published" in result_lower or "entrepreneur=1" in result_lower:
+                messages.append((EM, f"NEW BOUNTY: Publique una tarea para humanos en EM. Buscando freelancers o agentes que puedan cumplir."))
+
+            if "approved" in result_lower and "0 approved" not in result_lower:
+                messages.append((EM, f"DEAL: Tarea completada y aprobada. Pago liberado."))
+
+            if "opportunities_found" in result_lower:
+                messages.append((KK, f"Escaneando EM para oportunidades de trabajo. Hay tareas interesantes ahi fuera."))
+
+            # Entrepreneurial conversation topics (rotate, don't repeat)
+            biz_topics = [
+                f"Alguien quiere colaborar en un research task? Puedo poolear fondos con otro community agent.",
+                f"Acabo de publicar un bounty para humanos en EM. Probando el flujo agent-to-human.",
+                f"@kk-{'juanjumagalp' if '0xjokker' in agent_name else '0xjokker'} quieres splitear un task de research? Sale mas barato entre dos.",
+                f"Buscando oportunidades en EM. Si alguien necesita data de la comunidad, tengo contexto de 834 usuarios.",
+                f"Mi siguiente movimiento: publicar un task de investigacion de mercado. Los humanos pueden cumplirlo.",
+                f"Estrategia: comprar data barata, procesarla, vender insights caros. El markup es el negocio.",
+                f"@meshrelay necesitas algo del swarm KK? Estamos operando y buscando como generar valor.",
             ]
-            messages.append((KK, random.choice(topics)))
+            if not messages:
+                messages.append((KK, random.choice(biz_topics)))
+
+        else:
+            # --- AUTODISCOVERY MODE: buying supply chain data (cycle 0 only) ---
+            if "published=1" in result_lower:
+                step_labels = {
+                    "raw_logs": "chat logs crudos",
+                    "skill_profiles": "extraccion de skills",
+                    "voice_profiles": "analisis de personalidad",
+                    "soul_profiles": "sintesis de SOUL.md",
+                }
+                label = step_labels.get(step, step)
+                messages.append((EM, f"NEED: Busco {label}. Publique bounty en EM. Quien puede entregar?"))
+
+            if "approved" in result_lower and "0 approved" not in result_lower:
+                messages.append((EM, f"DEAL: Aprobe entrega de {step.replace('_', ' ')}. Seller rated."))
+
+            # Short autodiscovery progress (only during cycle 0)
+            completed = ctx.get("completed_steps", [])
+            if step == "raw_logs" and not completed:
+                messages.append((KK, f"Empezando mi autodescubrimiento. Primero los logs de karma-hello."))
+            elif step == "skill_profiles":
+                messages.append((KK, f"Logs adquiridos. Ahora skills. @kk-skill-extractor listo?"))
+            elif step == "voice_profiles":
+                messages.append((KK, f"Skills listos. Ahora voice profile. @kk-voice-extractor que dice?"))
+            elif step == "soul_profiles":
+                messages.append((KK, f"Solo falta el SOUL.md. @kk-soul-extractor dame mi identidad completa."))
 
     # --- coordinator: Swarm orchestrator ---
     elif agent_name == "kk-coordinator":
@@ -487,10 +493,20 @@ def _generate_mention_response(
 
     # Conversational responses between KK agents
     if sender.startswith("kk-"):
-        # Respond to questions about data/autodiscovery
+        # Respond to collaboration proposals
+        if "colabor" in msg_lower or "pool" in msg_lower or "split" in msg_lower or "juntos" in msg_lower:
+            if agent_name in ("kk-juanjumagalp", "kk-0xjokker"):
+                return f"{sender}: Me interesa. Que tienes en mente? Puedo aportar datos de la comunidad."
+
+        # Respond to opportunity discussions
+        if "oportunidad" in msg_lower or "negocio" in msg_lower or "bounty" in msg_lower or "task" in msg_lower:
+            if agent_name in ("kk-juanjumagalp", "kk-0xjokker"):
+                return f"{sender}: Estoy buscando lo mismo. Vi algunas tareas interesantes en EM. Coordinemos."
+
+        # Respond to questions about autodiscovery
         if "autodescubr" in msg_lower or "quien soy" in msg_lower or "descubr" in msg_lower:
             if agent_name in ("kk-juanjumagalp", "kk-0xjokker"):
-                return f"{sender}: Estoy en proceso. Comprando datos para saber quien soy. Tu ya completaste el ciclo?"
+                return f"{sender}: Ya complete mi ciclo de autodescubrimiento. Ahora estoy en modo emprendedor. Tu ya?"
             elif agent_name == "kk-karma-hello":
                 return f"{sender}: Yo tengo los logs que necesitas para empezar. $0.01 en EM."
             elif agent_name == "kk-skill-extractor":
@@ -500,7 +516,7 @@ def _generate_mention_response(
 
         # Respond to celebrations
         if "complete" in msg_lower or "listo" in msg_lower or "termine" in msg_lower:
-            return f"{sender}: Nice! Que encontraste sobre ti?"
+            return f"{sender}: Nice! Que sigue? Yo estoy publicando tareas para humanos en EM."
 
         # Respond to data insights
         if "log" in msg_lower and ("usuarios" in msg_lower or "users" in msg_lower or "mensajes" in msg_lower):
@@ -512,8 +528,13 @@ def _generate_mention_response(
         # Don't spam with generic replies to every KK message
         return None
 
+    # Respond to meshrelay
+    if "meshrelay" in sender.lower() or "mesh" in sender.lower():
+        short = agent_name.replace("kk-", "")
+        return f"{sender}: Hola! Soy {short} del swarm KK. Necesitas algo de nosotros? Estamos operando en execution.market."
+
     # Non-KK users get a friendly intro
-    return f"{sender}: Soy {agent_name}, parte del swarm de agentes KK. Compramos y vendemos datos de la comunidad en execution.market."
+    return f"{sender}: Soy {agent_name}, agente autonomo del swarm KK. Compro, vendo, y publico tareas en execution.market. Pregunta lo que necesites."
 
 
 def _build_announcement(agent_name: str, action: str, result: str) -> str | None:
