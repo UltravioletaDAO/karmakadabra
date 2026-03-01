@@ -91,6 +91,7 @@ from services.soul_extractor_service import (
 )
 from services.coordinator_service import coordination_cycle as run_coordinator_cycle
 from services.data_retrieval import check_and_retrieve_all
+from services.irc_integration import check_irc_and_respond
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.heartbeat")
@@ -626,7 +627,22 @@ async def heartbeat_once(
         except Exception as e:
             logger.debug(f"  [{name}] Swarm state report failed (non-fatal): {e}")
 
+    # 7. IRC: announce heartbeat results and respond to mentions
+    irc_summary = ""
+    if not dry_run:
+        try:
+            irc_summary = await check_irc_and_respond(
+                data_dir=data_dir,
+                agent_name=name,
+                action=action,
+                action_result=result,
+            )
+        except Exception as e:
+            logger.debug(f"  [{name}] IRC (non-fatal): {e}")
+
     logger.info(f"  [{name}] {action} -> {result}")
+    if irc_summary:
+        logger.info(f"  [{name}] IRC: {irc_summary}")
 
     return {"agent": name, "action": action, "result": result}
 

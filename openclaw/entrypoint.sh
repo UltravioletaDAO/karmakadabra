@@ -67,6 +67,19 @@ if command -v openclaw &> /dev/null; then
     exec openclaw --config /app/openclaw/agents/$AGENT_NAME/openclaw.json
 else
     echo "[entrypoint] OpenClaw not found, running heartbeat loop"
+
+    # Start IRC daemon as background process (connects to MeshRelay)
+    echo "[entrypoint] Starting IRC daemon for $AGENT_NAME..."
+    python3 /app/scripts/kk/irc_daemon.py \
+        --agent "$AGENT_NAME" \
+        --channel "#karmakadabra" \
+        --extra-channels "#Execution-Market" \
+        --data-dir /app/data \
+        --soul-dir "/app/openclaw/agents/$AGENT_NAME" \
+        &
+    IRC_PID=$!
+    echo "[entrypoint] IRC daemon started (PID=$IRC_PID)"
+
     while true; do
         python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACES_ROOT" --data-dir /app/data
         sleep ${KK_HEARTBEAT_INTERVAL:-300}

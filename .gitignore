@@ -7,6 +7,11 @@
 # Terraform variables (contains IP addresses and keys)
 terraform.tfvars
 *.auto.tfvars
+**/.terraform/
+*.tfstate
+*.tfstate.*
+*.tfplan
+tfplan
 # But allow example files (they're safe templates)
 !**/.env.example
 !**/.env.fuji.example

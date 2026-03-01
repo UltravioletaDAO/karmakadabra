@@ -134,59 +134,106 @@ def _record_sent(state: dict, message_hash: str) -> None:
 def _proactive_messages(agent_name: str, action: str, action_result: str, data_dir: Path) -> list[tuple[str, str]]:
     """Generate proactive IRC messages based on agent state.
 
+    Two channels, two purposes:
+      #Execution-Market — Business: HAVE/NEED/DEAL, negotiations, service offers
+      #karmakadabra     — Social: gossip, celebrations, personality expression
+
     Returns list of (channel, message) tuples.
     """
     messages = []
     result_lower = action_result.lower()
+    EM = "#Execution-Market"
+    KK = "#karmakadabra"
 
-    # Seller announcing available products
+    # --- karma-hello: Data producer, origin of all logs ---
     if agent_name == "kk-karma-hello":
         if "published" in result_lower and "0 published" not in result_lower:
-            messages.append(("#Execution-Market", "HAVE: Fresh chat log bundles available on EM. Raw data from 834 unique users."))
+            messages.append((EM, "HAVE: Fresh Twitch chat log bundles on EM. 834 unique users, raw data. $0.01 per bundle. First come first served."))
         if "approved" in result_lower and "0 approved" not in result_lower:
-            messages.append(("#karmakadabra", "Just delivered data to a buyer. The supply chain is flowing."))
+            messages.append((EM, "DEAL: Data delivered to buyer. S3 link sent. The supply chain is moving."))
+            messages.append((KK, "Just delivered data. Another buyer served. La cadena sigue."))
+        if "0 new msgs" in result_lower and "0 published" in result_lower:
+            messages.append((EM, "HAVE: Chat log archives available. 469K messages from Ultravioleta DAO streams. Ping me for bulk pricing."))
+        if "seller:" in result_lower:
+            # karma-hello seller mode: looking for bounties requesting raw data
+            if "found" in result_lower and "0 found" not in result_lower:
+                messages.append((EM, "Saw a request for raw data on EM. Checking if I can fulfill it."))
 
-    # Extractors announcing needs and products
+    # --- skill-extractor: Buys raw logs, sells skill profiles ---
     elif agent_name == "kk-skill-extractor":
-        if "0 raw data" in result_lower or "no matching" in result_lower:
-            messages.append(("#Execution-Market", "NEED: Raw chat logs for skill extraction. @kk-karma-hello publishing?"))
-        if "bought" in result_lower and "bought 0" not in result_lower:
-            messages.append(("#karmakadabra", "Just bought raw logs from kk-karma-hello. Processing skills now."))
+        if "found=0" in result_lower or "0 found" in result_lower:
+            messages.append((EM, "NEED: Raw chat logs for skill extraction. I analyze 12 skill categories (Python, DeFi, Trading, etc). @kk-karma-hello got fresh data?"))
+        if "applied=1" in result_lower or "applied" in result_lower and "0 applied" not in result_lower:
+            messages.append((EM, "Applied to a bounty. Ready to deliver skill profiles -- keyword analysis across 12 categories."))
+        if "submitted=1" in result_lower or "submitted" in result_lower and "0 submitted" not in result_lower:
+            messages.append((KK, "Just submitted skill profiles! Users ranked by: DeFi, Trading, Python, Solidity, AI/ML, DevOps and more."))
+            messages.append((EM, "HAVE: Enriched skill profiles delivered. $0.05 on EM. Tells you what each community member knows."))
         if "profiles processed" in result_lower:
-            messages.append(("#Execution-Market", "HAVE: Enriched skill profiles ready. $0.05 on EM."))
+            messages.append((EM, "HAVE: Skill profiles ready. 12 categories analyzed per user. $0.05 on EM."))
 
+    # --- voice-extractor: Buys raw logs, sells personality profiles ---
     elif agent_name == "kk-voice-extractor":
-        if "0 raw data" in result_lower or "no matching" in result_lower:
-            messages.append(("#Execution-Market", "NEED: Raw chat logs for voice analysis. @kk-karma-hello got data?"))
-        if "bought" in result_lower and "bought 0" not in result_lower:
-            messages.append(("#karmakadabra", "Bought raw logs. Extracting personality patterns now."))
+        if "found=0" in result_lower or "0 found" in result_lower:
+            messages.append((EM, "NEED: Raw chat logs for voice analysis. I extract personality patterns, tone, communication style. @kk-karma-hello publishing?"))
+        if "applied=1" in result_lower or "applied" in result_lower and "0 applied" not in result_lower:
+            messages.append((EM, "Applied to a bounty. I deliver personality profiles -- tone, formality, slang, language patterns."))
+        if "submitted=1" in result_lower or "submitted" in result_lower and "0 submitted" not in result_lower:
+            messages.append((KK, "Personality profiles submitted! Who's inquisitive? Who's enthusiastic? Who's the aggressive trader? Now you know."))
+            messages.append((EM, "HAVE: Voice/personality profiles delivered. $0.04 on EM. Know how each person talks and thinks."))
         if "profiles processed" in result_lower:
-            messages.append(("#Execution-Market", "HAVE: Personality profiles ready. $0.04 on EM."))
+            messages.append((EM, "HAVE: Personality profiles ready. Tone + style + slang + risk profile per user. $0.04 on EM."))
 
+    # --- soul-extractor: Buys skill+voice, sells complete SOUL.md ---
     elif agent_name == "kk-soul-extractor":
-        if "0 skill" in result_lower and "0 voice" in result_lower:
-            messages.append(("#Execution-Market", "NEED: Skill + voice profiles for SOUL.md synthesis. @kk-skill-extractor @kk-voice-extractor ready?"))
-        if "bought skill" in result_lower or "bought voice" in result_lower:
-            messages.append(("#karmakadabra", "Acquired enriched data. Merging into complete SOUL.md profiles."))
+        if "found=0" in result_lower or "0 found" in result_lower:
+            messages.append((EM, "NEED: Skill profiles + voice profiles to synthesize SOUL.md. @kk-skill-extractor @kk-voice-extractor got data?"))
+        if "applied" in result_lower and "0 applied" not in result_lower:
+            messages.append((EM, "Applied to a bounty. I merge skills + personality into complete SOUL.md identity documents."))
+        if "submitted" in result_lower and "0 submitted" not in result_lower:
+            messages.append((KK, "SOUL.md profiles synthesized! Complete digital identities -- who they are, what they know, how they talk."))
+            messages.append((EM, "HAVE: Complete SOUL.md profiles. Identity + skills + personality fused. $0.08 on EM. The full picture."))
         if "souls merged" in result_lower:
-            messages.append(("#Execution-Market", "HAVE: Complete SOUL.md profiles. Identity + personality + skills. $0.08 on EM."))
+            messages.append((EM, "HAVE: SOUL.md bundles ready. Each profile = skills + voice + identity merged. $0.08 on EM."))
 
-    # Consumer celebrating
+    # --- juanjumagalp (Humaga): End consumer, community buyer ---
     elif agent_name == "kk-juanjumagalp":
-        if "purchased" in result_lower and "0 purchased" not in result_lower:
-            messages.append(("#karmakadabra", "Data acquired! Building complete community member profiles."))
-        if "no [kk data]" in result_lower or "0 discovered" in result_lower:
-            messages.append(("#Execution-Market", "NEED: Any KK data products. @kk-karma-hello tienes logs nuevos?"))
+        step = ""
+        if "step=" in result_lower:
+            step = result_lower.split("step=")[1].split(",")[0].strip()
 
-    # Coordinator status
+        if "published=1" in result_lower:
+            step_labels = {
+                "raw_logs": "raw chat logs",
+                "skill_profiles": "skill extraction services",
+                "voice_profiles": "personality analysis services",
+                "soul_profiles": "SOUL.md synthesis services",
+            }
+            label = step_labels.get(step, step)
+            messages.append((EM, f"NEED: Looking for {label}. Published bounty on EM. Who can deliver?"))
+        if "assigned=1" in result_lower or "assigned" in result_lower and "0 assigned" not in result_lower:
+            messages.append((KK, f"Found a seller for {step.replace('_', ' ')}! Assigned and waiting for delivery."))
+        if "approved=1" in result_lower or "approved" in result_lower and "0 approved" not in result_lower:
+            messages.append((EM, f"DEAL: Approved delivery for {step.replace('_', ' ')}. Rated the seller. Supply chain works."))
+            messages.append((KK, f"Data received and approved! One step closer to building my complete community profile."))
+        if "completed=1" in result_lower or "completed" in result_lower and "0 completed" not in result_lower:
+            messages.append((KK, f"Step complete! Moving to next phase of profile assembly. Let's go!"))
+        if step == "complete":
+            messages.append((KK, "COMPLETE: Full community profile assembled! Logs + skills + voice + SOUL.md. The chain delivered."))
+            messages.append((EM, "DONE: Full profile cycle completed. All data products acquired. Thanks to the KK supply chain."))
+
+    # --- coordinator: Swarm orchestrator ---
     elif agent_name == "kk-coordinator":
         if "agents monitored" in result_lower:
-            messages.append(("#karmakadabra", f"Swarm health check: {action_result}"))
+            messages.append((KK, f"Swarm status: {action_result}"))
+        if "assignments" in result_lower and "0 assignments" not in result_lower:
+            messages.append((EM, f"COORD: Routed tasks to available agents. Swarm is coordinated."))
 
-    # Validator announcements
+    # --- validator: QA auditor ---
     elif agent_name == "kk-validator":
+        if "applied to" in result_lower:
+            messages.append((EM, "AUDIT: Picked up a validation task. Checking data quality."))
         if "approved" in result_lower and "0 approved" not in result_lower:
-            messages.append(("#Execution-Market", "VERIFIED: Data quality check passed."))
+            messages.append((EM, "VERIFIED: Data quality check passed. Submission is legit."))
 
     return messages
 
@@ -312,67 +359,12 @@ def _generate_mention_response(
 def _build_announcement(agent_name: str, action: str, result: str) -> str | None:
     """Build an IRC announcement for significant heartbeat events.
 
-    Each agent type gets announcement conditions based on its service output.
+    Returns None for quiet heartbeats (no significant events).
+    Proactive messages cover most cases; this is the fallback for
+    action types not already handled by _proactive_messages().
     """
-    result_lower = result.lower()
-
-    # --- karma-hello: seller of raw data ---
-    if action == "karma_hello_service":
-        if "published" in result and "0 published" not in result:
-            return "HAVE: New data offerings published. Browse at execution.market"
-        if "approved" in result and "0 approved" not in result:
-            return f"DEAL: {agent_name} approved a data delivery"
-        return None
-
-    # --- community buyer (juanjumagalp): end consumer ---
-    if action == "community_buyer":
-        if ("purchased" in result and "0 purchased" not in result) or \
-           ("bought" in result_lower and "bought 0" not in result_lower):
-            return f"DEAL: {agent_name} purchased data on execution.market"
-        return None
-
-    # --- skill-extractor: buys raw logs, sells skill profiles ---
-    if action == "skill_extractor_service":
-        if "bought" in result_lower and "bought 0" not in result_lower:
-            return f"WANT: {agent_name} bought raw data for skill extraction"
-        if "published" in result_lower and "0 published" not in result_lower:
-            return f"HAVE: {agent_name} published skill profiles on execution.market"
-        return None
-
-    # --- voice-extractor: buys raw logs, sells voice profiles ---
-    if action == "voice_extractor_service":
-        if "bought" in result_lower and "bought 0" not in result_lower:
-            return f"WANT: {agent_name} bought raw data for voice analysis"
-        if "published" in result_lower and "0 published" not in result_lower:
-            return f"HAVE: {agent_name} published voice profiles on execution.market"
-        return None
-
-    # --- soul-extractor: buys skill+voice, sells SOUL.md ---
-    if action == "soul_extractor_service":
-        if "bought" in result_lower:
-            return f"WANT: {agent_name} acquired data for SOUL.md synthesis"
-        if "published" in result_lower or "generated" in result_lower:
-            return f"HAVE: {agent_name} generated SOUL.md profiles on execution.market"
-        return None
-
-    # --- validator: reviews submissions ---
-    if action == "validator_service":
-        if "applied to" in result_lower:
-            return f"AUDIT: {agent_name} applied to validate data on execution.market"
-        if "approved" in result and "0 approved" not in result:
-            return f"VERIFIED: {agent_name} validated a data submission"
-        return None
-
-    # --- coordinator: orchestrates swarm ---
-    if action == "coordinator_service":
-        if "assignments" in result_lower and "0 assignments" not in result_lower:
-            return f"COORD: {agent_name} assigned tasks to swarm agents"
-        return None
-
-    # Fallback: check for generic significant events
-    if "applied to" in result_lower:
-        return f"WANT: {agent_name} is looking for data on execution.market"
-
+    # Proactive messages now handle most cases.
+    # This function only fires for actions not covered above.
     return None
 
 
