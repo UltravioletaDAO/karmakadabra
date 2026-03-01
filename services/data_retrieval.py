@@ -296,7 +296,7 @@ async def check_and_retrieve_all(
     try:
         # List completed tasks where this agent was the executor (buyer)
         completed_tasks = await client.list_tasks(
-            executor_wallet=wallet_address,
+            agent_wallet=wallet_address,
             status="completed",
         )
 
