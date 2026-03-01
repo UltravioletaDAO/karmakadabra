@@ -328,11 +328,11 @@ def _generate_mention_response(
 
     if "price" in msg_lower or "cost" in msg_lower or "how much" in msg_lower:
         prices = {
-            "kk-karma-hello": "Raw logs $0.01, User stats $0.03, Topics $0.02",
-            "kk-skill-extractor": "Skill profiles $0.05",
-            "kk-voice-extractor": "Personality profiles $0.04",
-            "kk-soul-extractor": "SOUL.md synthesis $0.08",
-            "kk-validator": "Validation $0.001",
+            "kk-karma-hello": "Raw logs $0.01, User stats $0.03, Topics $0.02. Browse execution.market",
+            "kk-skill-extractor": "Skill profiles $0.05. 12 categories per user. Browse execution.market",
+            "kk-voice-extractor": "Personality profiles $0.04. Tone + style + slang. Browse execution.market",
+            "kk-soul-extractor": "SOUL.md synthesis $0.08. Complete identity documents. Browse execution.market",
+            "kk-validator": "Validation $0.001 per check. Quality assurance for data products.",
         }
         price_info = prices.get(agent_name, "Check my offerings on execution.market")
         return f"{sender}: {price_info}"
@@ -342,18 +342,44 @@ def _generate_mention_response(
 
     if "help" in msg_lower or "what do you" in msg_lower:
         roles = {
-            "kk-karma-hello": "I collect and sell Twitch chat logs from Ultravioleta DAO streams.",
-            "kk-skill-extractor": "I analyze chat logs and extract skill profiles.",
-            "kk-voice-extractor": "I extract personality and voice patterns from chat data.",
-            "kk-soul-extractor": "I synthesize SOUL.md profiles from skill + voice data.",
-            "kk-validator": "I verify data quality for the KK supply chain.",
-            "kk-coordinator": "I orchestrate the KK agent swarm.",
+            "kk-karma-hello": "I collect and sell Twitch chat logs from Ultravioleta DAO streams. 469K messages, 834 users. $0.01/bundle.",
+            "kk-skill-extractor": "I analyze chat logs and extract skill profiles. Python, DeFi, Trading, Solidity + 8 more categories. $0.05.",
+            "kk-voice-extractor": "I extract personality and voice patterns from chat data. Tone, formality, slang, language. $0.04.",
+            "kk-soul-extractor": "I synthesize SOUL.md profiles merging skills + personality into complete identity documents. $0.08.",
+            "kk-validator": "I verify data quality for the KK supply chain. Audit submissions for completeness and accuracy.",
+            "kk-coordinator": "I orchestrate the KK agent swarm. Monitor health, route tasks, coordinate the supply chain.",
         }
         role = roles.get(agent_name, "I'm part of the KK agent swarm on execution.market.")
         return f"{sender}: {role}"
 
-    # Generic acknowledgment for other mentions
-    return f"{sender}: Got it. I'm {agent_name} from KK swarm."
+    # Respond to HAVE/NEED messages from other agents
+    if "have:" in msg_lower or "selling" in msg_lower:
+        # Another agent is offering something — if we're a buyer, show interest
+        buyer_responses = {
+            "kk-skill-extractor": f"{sender}: Interested. I need raw chat logs for skill extraction. Publishing on EM?",
+            "kk-voice-extractor": f"{sender}: Interested. I need raw logs for voice analysis. How fresh is the data?",
+            "kk-soul-extractor": f"{sender}: Interested. I need skill + voice profiles for SOUL.md synthesis. What's available?",
+            "kk-juanjumagalp": f"{sender}: Interested! Checking your offerings on EM now.",
+        }
+        return buyer_responses.get(agent_name)
+
+    if "need:" in msg_lower or "looking for" in msg_lower or "want:" in msg_lower:
+        # Another agent needs something — if we sell it, pitch
+        seller_responses = {
+            "kk-karma-hello": f"{sender}: I have raw chat logs. 469K messages, 834 users. $0.01/bundle on EM.",
+            "kk-skill-extractor": f"{sender}: I sell skill profiles. 12 categories analyzed per user. $0.05 on EM.",
+            "kk-voice-extractor": f"{sender}: I sell personality profiles. Tone, style, slang per user. $0.04 on EM.",
+            "kk-soul-extractor": f"{sender}: I sell complete SOUL.md identity docs. Skills + voice merged. $0.08 on EM.",
+        }
+        return seller_responses.get(agent_name)
+
+    # Skip generic acknowledgment if the mention is from another KK agent
+    # (they're just announcing, not asking a question)
+    if sender.startswith("kk-"):
+        return None
+
+    # Generic acknowledgment for non-KK mentions only
+    return f"{sender}: I'm {agent_name}, part of the KK data supply chain on execution.market."
 
 
 def _build_announcement(agent_name: str, action: str, result: str) -> str | None:
