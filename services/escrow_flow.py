@@ -35,6 +35,40 @@ from em_client import EMClient
 
 logger = logging.getLogger("kk.escrow")
 
+# Executor ID → wallet address lookup (loaded once from identities.json)
+_EXECUTOR_WALLET_MAP: dict[str, str] | None = None
+
+
+def _load_executor_map() -> dict[str, str]:
+    """Build executor_id -> wallet_address map from identities.json."""
+    global _EXECUTOR_WALLET_MAP
+    if _EXECUTOR_WALLET_MAP is not None:
+        return _EXECUTOR_WALLET_MAP
+
+    _EXECUTOR_WALLET_MAP = {}
+    for config_dir in [Path("/app/config"), Path(__file__).parent.parent / "data" / "config"]:
+        id_file = config_dir / "identities.json"
+        if id_file.exists():
+            try:
+                data = json.loads(id_file.read_text(encoding="utf-8"))
+                for agent in data.get("agents", []):
+                    eid = agent.get("executor_id", "")
+                    addr = agent.get("address", "")
+                    if eid and addr:
+                        _EXECUTOR_WALLET_MAP[eid] = addr
+                logger.info(f"Loaded {len(_EXECUTOR_WALLET_MAP)} executor->wallet mappings")
+                break
+            except (json.JSONDecodeError, OSError) as e:
+                logger.debug(f"Failed to load {id_file}: {e}")
+
+    return _EXECUTOR_WALLET_MAP
+
+
+def resolve_executor_wallet(executor_id: str) -> str:
+    """Resolve an executor UUID to a wallet address."""
+    mapping = _load_executor_map()
+    return mapping.get(executor_id, "")
+
 
 # ---------------------------------------------------------------------------
 # State persistence
@@ -174,17 +208,14 @@ async def manage_bounties(
             if applications:
                 applicant = applications[0]
                 executor_id = applicant.get("executor_id", "")
-                # Save worker wallet from application for reputation rating
+                # Resolve worker wallet for reputation rating
                 applicant_wallet = (
                     applicant.get("wallet", "")
                     or applicant.get("worker_wallet", "")
                     or applicant.get("executor_wallet", "")
                     or applicant.get("address", "")
+                    or resolve_executor_wallet(executor_id)
                 )
-                if not applicant_wallet:
-                    logger.info(
-                        f"Application keys (no wallet): {list(applicant.keys())}"
-                    )
                 if executor_id and not dry_run:
                     try:
                         await client.assign_task(task_id, executor_id)
@@ -233,18 +264,16 @@ async def manage_bounties(
                     )
 
                     # Bidirectional reputation: buyer rates worker
-                    # Try submission fields first, then fall back to saved info
+                    # Try submission fields, saved info, then executor_id lookup
+                    sub_executor_id = sub.get("executor_id", "")
                     worker_wallet = (
                         sub.get("worker_wallet", "")
                         or sub.get("executor_wallet", "")
                         or sub.get("wallet", "")
                         or sub.get("address", "")
                         or info.get("worker_wallet", "")
+                        or resolve_executor_wallet(sub_executor_id)
                     )
-                    if not worker_wallet:
-                        logger.info(
-                            f"No worker wallet in submission keys: {list(sub.keys())}"
-                        )
                     if worker_wallet:
                         try:
                             await client.rate_worker(
@@ -431,12 +460,14 @@ async def fulfill_assigned(
 
                     # Bidirectional reputation: worker rates agent/buyer
                     if not info.get("rated_agent"):
+                        task_agent_id = task_data.get("agent_id", "")
                         agent_wallet = (
                             task_data.get("agent_wallet", "")
                             or task_data.get("publisher_wallet", "")
                             or task_data.get("wallet", "")
                             or task_data.get("owner_wallet", "")
                             or task_data.get("creator_wallet", "")
+                            or resolve_executor_wallet(task_agent_id)
                         )
                         if not agent_wallet:
                             logger.info(
