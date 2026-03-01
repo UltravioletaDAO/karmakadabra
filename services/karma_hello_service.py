@@ -390,6 +390,27 @@ async def fulfill_purchases(
     ]
     logger.info(f"Fulfill: {len(kk_tasks)} [KK Data] tasks owned by us")
 
+    # Persist task IDs so Phase B can find them even after status changes.
+    # Tasks go from published → accepted → submitted → completed, and
+    # browse_tasks(status="published") won't return them after assignment.
+    known_tasks_path = data_dir / "kk_data_task_ids.json" if data_dir else None
+    known_task_map: dict[str, str] = {}  # task_id -> title
+
+    if known_tasks_path:
+        try:
+            known_task_map = json.loads(known_tasks_path.read_text())
+        except (FileNotFoundError, json.JSONDecodeError):
+            pass
+
+    # Merge newly discovered tasks into known map
+    for task in kk_tasks:
+        tid = task.get("id", "")
+        if tid:
+            known_task_map[tid] = task.get("title", "")
+
+    if known_tasks_path and known_task_map:
+        known_tasks_path.write_text(json.dumps(known_task_map, indent=2))
+
     for task in kk_tasks:
         task_id = task.get("id", "")
         title = task.get("title", "")
@@ -421,13 +442,18 @@ async def fulfill_purchases(
                 logger.debug(f"Assign {buyer_name} to {task_id}: {e}")
 
     # --- Phase B: Auto-approve submitted deliveries ---
-    # Re-use kk_tasks from Phase A (list_tasks also returns 0 due to auth).
-    # Check each known task for submissions regardless of browse status.
+    # Use known_task_map (persisted IDs) so we find tasks even after
+    # their status changed from "published" to "submitted".
     await asyncio.sleep(1.0)
 
-    for task in kk_tasks:
-        task_id = task.get("id", "")
-        title = task.get("title", "")
+    all_task_ids = list(known_task_map.items()) if known_task_map else [
+        (t.get("id", ""), t.get("title", "")) for t in kk_tasks
+    ]
+    logger.info(f"Phase B: checking {len(all_task_ids)} known [KK Data] tasks")
+
+    for task_id, title in all_task_ids:
+        if not task_id:
+            continue
 
         # Only auto-approve our own KK Data offerings
         if not title.startswith("[KK Data]"):
