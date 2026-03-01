@@ -220,7 +220,16 @@ async def manage_bounties(
                     )
 
                     # Bidirectional reputation: buyer rates worker
-                    worker_wallet = sub.get("worker_wallet", "") or sub.get("executor_wallet", "")
+                    worker_wallet = (
+                        sub.get("worker_wallet", "")
+                        or sub.get("executor_wallet", "")
+                        or sub.get("wallet", "")
+                        or sub.get("address", "")
+                    )
+                    if not worker_wallet:
+                        logger.debug(
+                            f"No worker wallet in submission keys: {list(sub.keys())}"
+                        )
                     if worker_wallet:
                         try:
                             await client.rate_worker(
@@ -410,7 +419,13 @@ async def fulfill_assigned(
                         agent_wallet = (
                             task_data.get("agent_wallet", "")
                             or task_data.get("publisher_wallet", "")
+                            or task_data.get("wallet", "")
+                            or task_data.get("owner_wallet", "")
                         )
+                        if not agent_wallet:
+                            logger.debug(
+                                f"No agent wallet in task keys: {list(task_data.keys())}"
+                            )
                         if agent_wallet:
                             try:
                                 await client.rate_agent(
