@@ -24,7 +24,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from services.karma_hello_service import (
     MAX_DAILY_SPEND_USD,
-    collect_irc_logs,
+    collect_all_logs,
     fulfill_purchases,
     publish_offerings,
     run_service,
@@ -103,7 +103,7 @@ def mock_client(agent: AgentContext) -> EMClient:
 
 def test_collect_finds_and_aggregates_logs(data_dir: Path) -> None:
     """Collect cycle discovers IRC log files and aggregates messages."""
-    result = collect_irc_logs(data_dir)
+    result = collect_all_logs(data_dir)
 
     assert result["files_found"] == 2
     assert result["new_messages"] == 3
@@ -124,10 +124,10 @@ def test_collect_finds_and_aggregates_logs(data_dir: Path) -> None:
 def test_collect_skips_duplicate_messages(data_dir: Path) -> None:
     """Running collect twice does not duplicate messages."""
     # First run
-    collect_irc_logs(data_dir)
+    collect_all_logs(data_dir)
 
     # Second run — same logs, no new messages
-    result = collect_irc_logs(data_dir)
+    result = collect_all_logs(data_dir)
     assert result["new_messages"] == 0
     assert result["total_messages"] == 3
 
@@ -137,14 +137,14 @@ def test_collect_skips_duplicate_messages(data_dir: Path) -> None:
 
 def test_collect_handles_empty_directory(tmp_path: Path) -> None:
     """Collect gracefully handles missing irc-logs/ directory."""
-    result = collect_irc_logs(tmp_path)
+    result = collect_all_logs(tmp_path)
     assert result["files_found"] == 0
     assert result["new_messages"] == 0
 
 
 def test_collect_dry_run_does_not_write(data_dir: Path) -> None:
     """Dry run collects stats but does not write aggregated.json."""
-    result = collect_irc_logs(data_dir, dry_run=True)
+    result = collect_all_logs(data_dir, dry_run=True)
     assert result["new_messages"] == 3
     assert not (data_dir / "aggregated.json").exists()
 
@@ -161,7 +161,7 @@ async def test_publish_creates_correct_payloads(
 ) -> None:
     """Publish cycle creates EM tasks from PRODUCTS catalog with correct data."""
     # First aggregate some data
-    collect_irc_logs(data_dir)
+    collect_all_logs(data_dir)
 
     result = await publish_offerings(mock_client, data_dir)
 
@@ -180,7 +180,7 @@ async def test_publish_respects_budget_limit(
     data_dir: Path,
 ) -> None:
     """Publish cycle skips products when daily budget is exhausted."""
-    collect_irc_logs(data_dir)
+    collect_all_logs(data_dir)
 
     # Exhaust the budget
     mock_client.agent.daily_spent_usd = MAX_DAILY_SPEND_USD
@@ -275,7 +275,7 @@ async def test_publish_respects_safety_cap(
     data_dir: Path,
 ) -> None:
     """Publish cycle enforces MAX_DAILY_SPEND_USD safety cap."""
-    collect_irc_logs(data_dir)
+    collect_all_logs(data_dir)
 
     # Set spent just under the cap — only cheapest product should fit
     mock_client.agent.daily_spent_usd = MAX_DAILY_SPEND_USD - 0.02
