@@ -359,12 +359,12 @@ async def fulfill_purchases(
         "errors": [],
     }
 
-    # --- Phase A: Auto-assign known KK buyers directly ---
-    # Workaround: GET /tasks/{id}/applications returns 403 Forbidden.
-    # Instead, try direct assign_task with known buyer executor_ids.
-    # EM API allows assign without prior apply if executor_id exists.
+    # --- Phase A: Auto-assign applicants ---
+    # Use get_applications to find who applied, then assign them.
+    # Fallback: direct assign_task with known buyer executor_ids if
+    # get_applications fails.
 
-    # Known KK buyer executor_ids (from data/config/identities.json)
+    # Known KK buyer executor_ids (fallback for direct assign)
     KK_BUYERS = {
         "kk-skill-extractor": "2c2fc29d-3dbf-4a53-86e4-ca696022b24e",
         "kk-voice-extractor": "2a67a5d5-ac7f-4434-8c01-a15774f8696d",
@@ -388,75 +388,86 @@ async def fulfill_purchases(
         if t.get("title", "").startswith("[KK Data]")
         and t.get("agent_id", "").lower() == my_wallet
     ]
-    logger.info(f"Fulfill: {len(kk_tasks)} [KK Data] tasks owned by us")
-
-    # Persist task IDs so Phase B can find them even after status changes.
-    # Tasks go from published → accepted → submitted → completed, and
-    # browse_tasks(status="published") won't return them after assignment.
-    known_tasks_path = data_dir / "kk_data_task_ids.json" if data_dir else None
-    known_task_map: dict[str, str] = {}  # task_id -> title
-
-    if known_tasks_path:
-        try:
-            known_task_map = json.loads(known_tasks_path.read_text())
-        except (FileNotFoundError, json.JSONDecodeError):
-            pass
-
-    # Merge newly discovered tasks into known map
-    for task in kk_tasks:
-        tid = task.get("id", "")
-        if tid:
-            known_task_map[tid] = task.get("title", "")
-
-    if known_tasks_path and known_task_map:
-        known_tasks_path.write_text(json.dumps(known_task_map, indent=2))
+    logger.info(f"Fulfill: {len(kk_tasks)} [KK Data] tasks to assign")
 
     for task in kk_tasks:
         task_id = task.get("id", "")
         title = task.get("title", "")
         task_status = task.get("status", "")
 
-        # Only assign tasks that are still open/published
         if task_status not in ("published", "open", ""):
             continue
 
-        # Try to assign each known buyer directly
-        for buyer_name, executor_id in KK_BUYERS.items():
-            if dry_run:
-                logger.info(f"[DRY RUN] Would assign {buyer_name} to {title}")
-                result["assigned"] += 1
-                continue
+        # Try dynamic discovery via get_applications first
+        applicants = []
+        try:
+            applicants = await client.get_applications(task_id)
+            await asyncio.sleep(0.5)
+        except Exception:
+            pass  # Fall through to direct assign
 
-            try:
-                await client.assign_task(task_id, executor_id)
-                logger.info(f"Assigned {buyer_name} to: {title}")
-                result["assigned"] += 1
-                await asyncio.sleep(0.5)
-            except Exception as e:
-                err_str = str(e)
-                # 409 = already assigned, 400 = not applied, 403 = auth issue
-                if any(code in err_str for code in ("409", "400", "403")):
+        if applicants:
+            for applicant in applicants:
+                executor_id = applicant.get("executor_id", "")
+                if not executor_id or applicant.get("status") == "assigned":
                     continue
-                if "already" in err_str.lower():
+                if dry_run:
+                    result["assigned"] += 1
                     continue
-                logger.debug(f"Assign {buyer_name} to {task_id}: {e}")
+                try:
+                    await client.assign_task(task_id, executor_id)
+                    name = applicant.get("display_name", executor_id[:8])
+                    logger.info(f"Assigned {name} to: {title}")
+                    result["assigned"] += 1
+                    await asyncio.sleep(0.5)
+                except Exception as e:
+                    err_str = str(e)
+                    if "409" in err_str or "already" in err_str.lower():
+                        continue
+                    logger.debug(f"Assign {executor_id[:8]} to {task_id}: {e}")
+        else:
+            # Fallback: try direct assign with known buyers
+            for buyer_name, executor_id in KK_BUYERS.items():
+                if dry_run:
+                    result["assigned"] += 1
+                    continue
+                try:
+                    await client.assign_task(task_id, executor_id)
+                    logger.info(f"Assigned {buyer_name} to: {title}")
+                    result["assigned"] += 1
+                    await asyncio.sleep(0.5)
+                except Exception as e:
+                    err_str = str(e)
+                    if any(c in err_str for c in ("409", "400", "403")):
+                        continue
+                    if "already" in err_str.lower():
+                        continue
 
     # --- Phase B: Auto-approve submitted deliveries ---
-    # Use known_task_map (persisted IDs) so we find tasks even after
-    # their status changed from "published" to "submitted".
+    # Use list_tasks(status="submitted") with auth to find tasks
+    # awaiting approval (EM auth fix deployed 2026-03-01).
     await asyncio.sleep(1.0)
 
-    all_task_ids = list(known_task_map.items()) if known_task_map else [
-        (t.get("id", ""), t.get("title", "")) for t in kk_tasks
+    try:
+        submitted_tasks = await client.list_tasks(
+            agent_wallet=client.agent.wallet_address,
+            status="submitted",
+        )
+    except Exception as e:
+        logger.debug(f"list_tasks(submitted) failed: {e}")
+        submitted_tasks = []
+
+    # Filter to our [KK Data] tasks only
+    kk_submitted = [
+        t for t in submitted_tasks
+        if t.get("title", "").startswith("[KK Data]")
     ]
-    logger.info(f"Phase B: checking {len(all_task_ids)} known [KK Data] tasks")
+    logger.info(f"Phase B: {len(kk_submitted)} submitted [KK Data] tasks to review")
 
-    for task_id, title in all_task_ids:
+    for task in kk_submitted:
+        task_id = task.get("id", "")
+        title = task.get("title", "")
         if not task_id:
-            continue
-
-        # Only auto-approve our own KK Data offerings
-        if not title.startswith("[KK Data]"):
             continue
 
         result["reviewed"] += 1
