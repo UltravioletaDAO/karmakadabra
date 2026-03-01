@@ -19,6 +19,11 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
+try:
+    from lib.vault_sync import VaultSync
+except ImportError:
+    VaultSync = None
+
 logger = logging.getLogger("kk.irc-integration")
 
 # Rate limiting: max messages per heartbeat, cooldown per topic
@@ -131,6 +136,33 @@ def _record_sent(state: dict, message_hash: str) -> None:
     ]
 
 
+def _get_vault_swarm_summary(data_dir: Path) -> str | None:
+    """Read vault peer states to generate a swarm summary for coordinator IRC posts."""
+    if not VaultSync:
+        return None
+    vault_dir = data_dir.parent / "vault"
+    if not vault_dir.exists():
+        vault_dir = Path("/app/vault")
+        if not vault_dir.exists():
+            return None
+    try:
+        vault = VaultSync(str(vault_dir), "kk-coordinator")
+        states = vault.list_peer_states()
+        if not states:
+            return None
+        active = sum(1 for s in states.values() if s.get("status") == "active")
+        pending = sum(1 for s in states.values() if s.get("status") == "pending")
+        total = len(states)
+        roles = {}
+        for s in states.values():
+            r = s.get("role", "unknown")
+            roles[r] = roles.get(r, 0) + 1
+        role_parts = ", ".join(f"{c} {r}" for r, c in sorted(roles.items(), key=lambda x: -x[1]))
+        return f"{active}/{total} agents active ({pending} pending). Roles: {role_parts}"
+    except Exception:
+        return None
+
+
 def _proactive_messages(agent_name: str, action: str, action_result: str, data_dir: Path) -> list[tuple[str, str]]:
     """Generate proactive IRC messages based on agent state.
 
@@ -221,9 +253,12 @@ def _proactive_messages(agent_name: str, action: str, action_result: str, data_d
             messages.append((KK, "COMPLETE: Full community profile assembled! Logs + skills + voice + SOUL.md. The chain delivered."))
             messages.append((EM, "DONE: Full profile cycle completed. All data products acquired. Thanks to the KK supply chain."))
 
-    # --- coordinator: Swarm orchestrator ---
+    # --- coordinator: Swarm orchestrator (enriched with vault data) ---
     elif agent_name == "kk-coordinator":
-        if "agents monitored" in result_lower:
+        vault_summary = _get_vault_swarm_summary(data_dir)
+        if vault_summary:
+            messages.append((KK, f"SWARM: {vault_summary}"))
+        elif "agents monitored" in result_lower:
             messages.append((KK, f"Swarm status: {action_result}"))
         if "assignments" in result_lower and "0 assignments" not in result_lower:
             messages.append((EM, f"COORD: Routed tasks to available agents. Swarm is coordinated."))

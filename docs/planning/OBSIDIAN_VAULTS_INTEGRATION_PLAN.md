@@ -1,7 +1,7 @@
 # Mega Plan: Obsidian Vaults Integration
 
 > Fecha: 2026-03-01
-> Estado: PLANNING
+> Estado: IN PROGRESS (Phase 1-3 COMPLETE, Phase 4+ pending)
 > Objetivo: Integrar Obsidian Vaults como capa de estado compartido entre todos los agentes KK, interconectando KarmaCadabra, AbraCadabra, KarmaGelou, y Execution Market.
 
 ---
@@ -150,16 +150,16 @@ Publishing 5 chat log bundles on Execution Market at $0.01 each.
 
 **Objetivo**: Crear el repo Git, estructura de carpetas, y archivos iniciales.
 
-- [ ] 1.1 Crear directorio `vault/` en el repo KK (o repo separado `kk-shared-vault`)
-- [ ] 1.2 Crear estructura de carpetas: `agents/`, `shared/`, `knowledge/`, `dashboards/`, `projects/`
-- [ ] 1.3 Generar `state.md` inicial para los 7 agentes activos con frontmatter correcto
-- [ ] 1.4 Generar `state.md` placeholder para los 17 community agents
-- [ ] 1.5 Crear `.gitattributes` con merge=union para log files
-- [ ] 1.6 Crear `shared/config.md` con parametros globales
-- [ ] 1.7 Crear `shared/supply-chain.md` con el estado de la cadena
-- [ ] 1.8 Crear archivos de `knowledge/` con info de contratos, APIs, protocolos
-- [ ] 1.9 Crear `dashboards/` con Dataview queries
-- [ ] 1.10 Crear `projects/` con links a los otros repos
+- [x] 1.1 Crear directorio `vault/` en el repo KK (o repo separado `kk-shared-vault`)
+- [x] 1.2 Crear estructura de carpetas: `agents/`, `shared/`, `knowledge/`, `dashboards/`, `projects/`
+- [x] 1.3 Generar `state.md` inicial para los 7 agentes activos con frontmatter correcto
+- [x] 1.4 Generar `state.md` placeholder para los 17 community agents
+- [x] 1.5 Crear `.gitattributes` con merge=union para log files
+- [x] 1.6 Crear `shared/config.md` con parametros globales
+- [x] 1.7 Crear `shared/supply-chain.md` con el estado de la cadena
+- [x] 1.8 Crear archivos de `knowledge/` con info de contratos, APIs, protocolos
+- [x] 1.9 Crear `dashboards/` con Dataview queries
+- [x] 1.10 Crear `projects/` con links a los otros repos
 
 **Archivos**: ~60 archivos markdown nuevos
 **Dependencias**: Ninguna
@@ -168,7 +168,7 @@ Publishing 5 chat log bundles on Execution Market at $0.01 each.
 
 **Objetivo**: Modulo Python reutilizable para que los agentes lean/escriban al vault.
 
-- [ ] 2.1 Crear `lib/vault_sync.py` con clase `VaultSync`:
+- [x] 2.1 Crear `lib/vault_sync.py` con clase `VaultSync`:
   - `pull()` — git pull --rebase --autostash
   - `write_state(metadata, body)` — actualiza state.md del agente
   - `read_state()` — lee state.md propio
@@ -177,9 +177,9 @@ Publishing 5 chat log bundles on Execution Market at $0.01 each.
   - `read_shared(filename)` — lee archivo de shared/
   - `write_shared(filename, metadata, body)` — escribe a shared/ (solo coordinator)
   - `commit_and_push(message)` — commit + push atomico
-- [ ] 2.2 Agregar `python-frontmatter` a requirements
-- [ ] 2.3 Tests unitarios para vault_sync
-- [ ] 2.4 Integrar en `Dockerfile.openclaw` (clonar vault repo en /vault/)
+- [x] 2.2 Agregar `python-frontmatter` a requirements
+- [x] 2.3 Tests unitarios para vault_sync
+- [x] 2.4 Integrar en `Dockerfile.openclaw` (clonar vault repo en /vault/)
 
 **Archivos**: `lib/vault_sync.py`, `requirements.txt`, `tests/test_vault_sync.py`
 **Dependencias**: Phase 1
@@ -188,16 +188,16 @@ Publishing 5 chat log bundles on Execution Market at $0.01 each.
 
 **Objetivo**: Cada heartbeat actualiza el state.md del agente en el vault.
 
-- [ ] 3.1 Modificar `cron/heartbeat.py`:
+- [x] 3.1 Modificar `cron/heartbeat.py`:
   - Al inicio: `vault.pull()`
   - Despues de cada accion: `vault.write_state({status, current_task, ...})`
   - Al final: `vault.append_log(summary)` + `vault.commit_and_push()`
-- [ ] 3.2 Agregar vault sync al entrypoint.sh:
+- [x] 3.2 Agregar vault sync al entrypoint.sh:
   - Clonar vault repo al inicio del container
   - Configurar git identity (agent name como author)
   - Cron job: sync cada 60 segundos
-- [ ] 3.3 Crear `scripts/kk/vault_sync_cron.sh` — script de sync para cron
-- [ ] 3.4 Actualizar `terraform/openclaw/user_data.sh.tpl` con vault repo clone
+- [x] 3.3 Crear `scripts/kk/vault_sync_cron.sh` — script de sync para cron
+- [x] 3.4 Actualizar `terraform/openclaw/user_data.sh.tpl` con vault repo clone
 
 **Archivos**: `cron/heartbeat.py`, `openclaw/entrypoint.sh`, `scripts/kk/vault_sync_cron.sh`
 **Dependencias**: Phase 2
