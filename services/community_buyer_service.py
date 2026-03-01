@@ -243,9 +243,10 @@ async def run_cycle(
 
     try:
         # Route to correct mode based on cycle count
-        if cycle_count >= 1 and current_step == "raw_logs":
+        if cycle_count >= 1:
             # Post-autodiscovery: entrepreneurial mode
             stats["step"] = "entrepreneur"
+            state["current_step"] = "entrepreneur"
             await _run_entrepreneur_cycle(client, state, stats, dry_run)
         else:
             # Autodiscovery mode: buy supply chain data
