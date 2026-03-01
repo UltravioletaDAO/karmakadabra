@@ -507,7 +507,7 @@ async def fulfill_purchases(
     await asyncio.sleep(1.0)
 
     kk_submitted = []
-    for tid in list(own_task_ids.keys()):
+    for tid in list(own_task_ids):
         try:
             task_data = await client.get_task(tid)
             if task_data.get("status") == "submitted":

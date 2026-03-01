@@ -44,8 +44,8 @@ except:
     print(raw)
 ")
 
-# Get wallet address from Docker image config
-WALLET_ADDRESS=$(docker run --rm "$ECR_IMAGE" python3 -c "
+# Get wallet address from Docker image config (--entrypoint bypasses default entrypoint)
+WALLET_ADDRESS=$(docker run --rm --entrypoint python3 "$ECR_IMAGE" -c "
 import json
 data = json.load(open('/app/config/identities.json'))
 for a in data.get('agents', []):
@@ -66,6 +66,7 @@ docker rm "$AGENT_NAME" 2>/dev/null || true
 docker run -d \
   --name "$AGENT_NAME" \
   --restart unless-stopped \
+  --memory 1800m \
   -e KK_AGENT_NAME="$AGENT_NAME" \
   -e KK_WALLET_ADDRESS="$WALLET_ADDRESS" \
   -e KK_PRIVATE_KEY="$PRIVATE_KEY" \
