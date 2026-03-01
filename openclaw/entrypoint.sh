@@ -68,6 +68,19 @@ if command -v openclaw &> /dev/null; then
 else
     echo "[entrypoint] OpenClaw not found, running heartbeat loop"
 
+    # Initialize Obsidian Vault (local copy, no git remote yet)
+    VAULT_DIR="/app/vault"
+    if [ -d "$VAULT_DIR" ]; then
+        echo "[entrypoint] Vault directory found at $VAULT_DIR"
+        # Configure git identity for vault commits
+        cd "$VAULT_DIR"
+        git config user.name "$AGENT_NAME" 2>/dev/null || true
+        git config user.email "${AGENT_NAME}@karmacadabra.ultravioletadao.xyz" 2>/dev/null || true
+        cd /app
+    else
+        echo "[entrypoint] No vault directory — vault sync disabled"
+    fi
+
     # Start IRC daemon as background process (connects to MeshRelay)
     echo "[entrypoint] Starting IRC daemon for $AGENT_NAME..."
     python3 /app/scripts/kk/irc_daemon.py \

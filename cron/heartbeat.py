@@ -92,6 +92,7 @@ from services.soul_extractor_service import (
 from services.coordinator_service import coordination_cycle as run_coordinator_cycle
 from services.data_retrieval import check_and_retrieve_all
 from services.irc_integration import check_irc_and_respond
+from lib.vault_sync import VaultSync
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.heartbeat")
@@ -643,6 +644,28 @@ async def heartbeat_once(
     logger.info(f"  [{name}] {action} -> {result}")
     if irc_summary:
         logger.info(f"  [{name}] IRC: {irc_summary}")
+
+    # 8. Vault: update Obsidian vault state (non-fatal)
+    if not dry_run:
+        try:
+            vault_dir = data_dir.parent / "vault"
+            if vault_dir.exists():
+                vault = VaultSync(str(vault_dir), name)
+                vault.pull()
+                vault.write_state(
+                    {
+                        "status": "active" if action != "error" else "error",
+                        "current_task": action,
+                        "tasks_completed": state.tasks_completed if hasattr(state, "tasks_completed") else 0,
+                        "daily_spent_usdc": state.daily_spent,
+                        "errors_last_24h": 1 if action == "error" else 0,
+                    },
+                    body=f"## Last Heartbeat\n{action} -> {result}",
+                )
+                vault.append_log(f"{action} -> {result}")
+                vault.commit_and_push(f"{action}: {result[:60]}")
+        except Exception as e:
+            logger.debug(f"  [{name}] Vault sync (non-fatal): {e}")
 
     return {"agent": name, "action": action, "result": result}
 

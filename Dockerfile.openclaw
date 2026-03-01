@@ -42,7 +42,8 @@ RUN pip install --no-cache-dir \
     "boto3>=1.28.0" \
     "requests>=2.31.0" \
     "httpx>=0.25.0" \
-    "pydantic>=2.0.0"
+    "pydantic>=2.0.0" \
+    "python-frontmatter>=1.0.0"
 
 # Copy all agent identity files (SOUL.md, HEARTBEAT.md, openclaw.json)
 # Each agent picks its own directory at runtime via KK_AGENT_NAME env var
@@ -52,6 +53,9 @@ COPY openclaw/agents/ /app/openclaw/agents/
 # NOTE: Must be at /app/config/ (NOT /app/data/config/) because
 # docker run mounts -v /data/$NAME:/app/data which hides /app/data/*
 COPY data/config/ /app/config/
+
+# Copy Obsidian vault (shared state between agents)
+COPY vault/ /app/vault/
 
 # Copy entrypoint script and fix Windows line endings
 COPY openclaw/entrypoint.sh /app/openclaw/entrypoint.sh

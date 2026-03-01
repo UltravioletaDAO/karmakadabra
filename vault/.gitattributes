@@ -1,0 +1,4 @@
+# Append-only merge for log files (prevents conflicts)
+agents/*/log-*.md merge=union
+shared/announcements.md merge=union
+shared/ledger.md merge=union

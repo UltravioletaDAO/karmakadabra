@@ -761,6 +761,69 @@ grep -r "rawTransaction\|raw_transaction" scripts/
 
 ---
 
+## Obsidian Vault — Shared Agent State
+
+KarmaCadabra uses an **Obsidian Vault** (`vault/`) as a shared state layer between all 24 agents. The vault is a directory of markdown files with YAML frontmatter, synced via git.
+
+### Architecture
+- **Location**: `vault/` subdirectory in repo root
+- **Sync**: Agents read/write directly to filesystem, commit/push via git
+- **Library**: `lib/vault_sync.py` uses `python-frontmatter` for YAML metadata
+- **Conflict avoidance**: Each agent writes ONLY to `vault/agents/<agent-name>/`
+- **Human view**: Open `vault/` as an Obsidian vault with Dataview plugin for dashboards
+
+### Vault Structure
+```
+vault/
+  agents/<agent-name>/state.md    # Per-agent status (frontmatter + body)
+  agents/<agent-name>/memory.md   # Long-term learnings
+  agents/<agent-name>/log-*.md    # Daily activity logs
+  shared/config.md                # Network config, pricing
+  shared/supply-chain.md          # Data flow between agents
+  shared/ledger.md                # Transaction history
+  shared/tasks.md                 # Shared task board
+  knowledge/                      # Contracts, APIs, protocols docs
+  dashboards/                     # Dataview queries for monitoring
+  projects/                       # Cross-project links (AbraCadabra, KarmaGelou, EM)
+```
+
+### Agent State Format
+Each agent's `state.md` has YAML frontmatter with:
+- `agent_id`, `status`, `role`, `last_heartbeat`, `current_task`
+- `wallet`, `executor_id`, `erc8004_id`, `chain`
+- `daily_revenue_usdc`, `daily_spent_usdc`, `tasks_completed`
+- `tags`, `aliases` (for Obsidian search/Dataview)
+
+### Usage in Code
+```python
+from lib.vault_sync import VaultSync
+
+vault = VaultSync("/app/vault", "kk-karma-hello")
+vault.pull()
+vault.write_state({"status": "active", "current_task": "publishing"})
+vault.append_log("Published 5 bundles on EM")
+vault.commit_and_push("published data bundles")
+
+# Read peer state
+peer = vault.read_peer_state("kk-skill-extractor")
+print(peer["status"])  # "active"
+```
+
+### Wikilinks Convention
+Use `[[agent-name]]` wikilinks to cross-reference between vault notes:
+- `[[kk-karma-hello]]` links to that agent's state
+- `[[execution-market]]` links to API docs in knowledge/
+- `[[supply-chain]]` links to the data flow diagram
+
+### Rules
+- Agents write ONLY to their own `vault/agents/<name>/` directory
+- Shared files (`vault/shared/`) written by coordinator or heartbeat only
+- Log files use `merge=union` in `.gitattributes` to prevent conflicts
+- All timestamps in ISO 8601 UTC format
+- Tags use plural form: `tags`, `aliases` (Obsidian standard)
+
+---
+
 ## Project Overview
 
 **Karmacadabra**: Trustless agent economy with AI agents buying/selling data using blockchain payments.
