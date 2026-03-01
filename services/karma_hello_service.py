@@ -548,10 +548,15 @@ async def seller_flow(
             exclude_wallet=client.agent.wallet_address,
             state=state,
         )
-        result["bounties_found"] = len(bounties)
+        # Filter to raw data bounties only (not skill/voice/soul)
+        raw_bounties = [
+            b for b in bounties
+            if any(kw in b.get("title", "").lower() for kw in ["raw", "log", "chat"])
+        ]
+        result["bounties_found"] = len(raw_bounties)
 
         # Phase 2: Apply to up to 3 matching bounties
-        for bounty_task in bounties[:3]:
+        for bounty_task in raw_bounties[:3]:
             ok = await apply_to_bounty(
                 client=client,
                 task=bounty_task,
