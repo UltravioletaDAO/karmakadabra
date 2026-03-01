@@ -502,24 +502,19 @@ async def fulfill_purchases(
                         continue
 
     # --- Phase B: Auto-approve submitted deliveries ---
-    # Use list_tasks(status="submitted") with auth to find tasks
-    # awaiting approval (EM auth fix deployed 2026-03-01).
+    # Check our known task IDs directly (list_tasks with auth only returns
+    # executor's tasks, not publisher's — so we check by ID instead).
     await asyncio.sleep(1.0)
 
-    try:
-        submitted_tasks = await client.list_tasks(
-            agent_wallet=client.agent.wallet_address,
-            status="submitted",
-        )
-    except Exception as e:
-        logger.debug(f"list_tasks(submitted) failed: {e}")
-        submitted_tasks = []
-
-    # Filter to our [KK Data] tasks only
-    kk_submitted = [
-        t for t in submitted_tasks
-        if t.get("title", "").startswith("[KK Data]")
-    ]
+    kk_submitted = []
+    for tid in list(own_task_ids.keys()):
+        try:
+            task_data = await client.get_task(tid)
+            if task_data.get("status") == "submitted":
+                kk_submitted.append(task_data)
+            await asyncio.sleep(0.3)
+        except Exception:
+            continue
     logger.info(f"Phase B: {len(kk_submitted)} submitted [KK Data] tasks to review")
 
     for task in kk_submitted:
