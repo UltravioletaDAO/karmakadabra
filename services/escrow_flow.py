@@ -471,7 +471,8 @@ async def fulfill_assigned(
                         )
                         if not agent_wallet:
                             logger.info(
-                                f"No agent wallet in task keys: {list(task_data.keys())}"
+                                f"No agent wallet — agent_id={task_agent_id}, "
+                                f"erc8004={task_data.get('erc8004_agent_id', '?')}"
                             )
                         if agent_wallet:
                             try:
