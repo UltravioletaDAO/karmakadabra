@@ -341,13 +341,22 @@ async def buy_data(
         return None
 
     logger.info(f"  Buying {data_type}: {title} (${bounty})")
-    result = await client.apply_to_task(
-        task_id=task_id,
-        executor_id=client.agent.executor_id,
-        message=f"Soul Extractor agent -- buying {data_type} data for complete SOUL.md profile generation",
-    )
-    client.agent.record_spend(bounty)
-    return result
+    try:
+        result = await client.apply_to_task(
+            task_id=task_id,
+            executor_id=client.agent.executor_id,
+            message=f"Soul Extractor agent -- buying {data_type} data for complete SOUL.md profile generation",
+        )
+        client.agent.record_spend(bounty)
+        logger.info(f"  Applied to: {title}")
+        return result
+    except Exception as e:
+        err = str(e)
+        if "409" in err or "already" in err.lower():
+            logger.info(f"  Already applied to: {title}")
+        else:
+            logger.warning(f"  Apply failed for {title}: {e}")
+        return None
 
 
 # ---------------------------------------------------------------------------
