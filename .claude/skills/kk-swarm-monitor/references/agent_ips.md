@@ -9,6 +9,7 @@
 | kk-validator | 44.203.23.11 | system | 4 |
 | kk-soul-extractor | 3.234.249.61 | system | 5 |
 | kk-juanjumagalp | 3.235.151.197 | user | 6 |
+| kk-0xjokker | 13.218.189.187 | user | 11 |
 
 ## SSH Access
 

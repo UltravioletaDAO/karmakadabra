@@ -18,6 +18,7 @@ AGENTS[kk-voice-extractor]="100.52.188.43"
 AGENTS[kk-validator]="44.203.23.11"
 AGENTS[kk-soul-extractor]="3.234.249.61"
 AGENTS[kk-juanjumagalp]="3.235.151.197"
+AGENTS[kk-0xjokker]="13.218.189.187"
 
 # Create the restart script that runs on each EC2
 cat > /tmp/restart_agent_remote.sh << 'REMOTESCRIPT'
@@ -102,7 +103,7 @@ REMOTESCRIPT
 
 chmod +x /tmp/restart_agent_remote.sh
 
-echo "=== Deploying to all 7 agents ==="
+echo "=== Deploying to all 8 agents ==="
 echo ""
 
 for AGENT in "${!AGENTS[@]}"; do

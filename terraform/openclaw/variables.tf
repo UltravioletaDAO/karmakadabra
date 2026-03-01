@@ -73,5 +73,9 @@ variable "agents" {
       index          = 6
       wallet_address = "0x3aebb73a33377F0d6FC2195F83559635aDeE8408"
     }
+    kk-0xjokker = {
+      index          = 11
+      wallet_address = "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d"
+    }
   }
 }
