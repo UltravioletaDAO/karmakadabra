@@ -55,6 +55,11 @@ class IRCDaemon:
         data_dir: Path,
         soul_path: Path | None = None,
     ):
+        if agent_name == "unknown" or not agent_name:
+            raise ValueError(
+                f"IRC daemon refuses to start with agent_name={agent_name!r}. "
+                "Set KK_AGENT_NAME env var properly."
+            )
         self.agent_name = agent_name
         self.channels = channels
         self.data_dir = data_dir
@@ -68,6 +73,8 @@ class IRCDaemon:
         self._running = True
         self._reconnect_delay = 5
         self._nick = agent_name
+        # Track all nicks we've used (in case of collision appending _)
+        self._my_nicks: set[str] = {agent_name}
 
         # Ensure data dir exists
         data_dir.mkdir(parents=True, exist_ok=True)
@@ -102,6 +109,7 @@ class IRCDaemon:
                     break
                 if " 433 " in line:
                     self._nick = f"{self._nick}_"
+                    self._my_nicks.add(self._nick)
                     logger.warning(f"Nick in use, retrying as {self._nick}")
                     await self._send(f"NICK {self._nick}")
                 if line.startswith("PING"):
@@ -207,22 +215,38 @@ class IRCDaemon:
         return messages
 
     async def _introduce(self) -> None:
-        """Introduce agent in the main channel with a short, natural greeting."""
+        """Introduce agent in the main channel on first connect only."""
+        # Check if we already introduced recently (prevent re-intro on reconnect)
+        intro_flag = self.data_dir / ".irc-introduced"
+        if intro_flag.exists():
+            try:
+                age = time.time() - intro_flag.stat().st_mtime
+                if age < 3600:  # 1 hour cooldown on intros
+                    return
+            except OSError:
+                pass
+
         name = self.agent_name.replace("kk-", "")
         role = self._detect_role()
 
         greetings = {
-            "producer": f"Hola! Soy {name}. Tengo datos frescos para compartir. Pregunten lo que necesiten.",
-            "refiner": f"Hey, {name} conectado. Listo para procesar datos y generar perfiles.",
-            "aggregator": f"Buenas! {name} aqui. Sintetizando perfiles de la comunidad.",
-            "orchestrator": f"Hola equipo! {name} monitoreando el swarm. Todos los sistemas activos.",
-            "validator": f"Soy {name}. Validando calidad de datos. Confianza primero.",
-            "buyer": f"Que mas! Soy {name}, recien conectado. Buscando datos para autodescubrirme.",
+            "producer": f"{name} online. Data fresca disponible.",
+            "refiner": f"{name} conectado. Procesando datos.",
+            "aggregator": f"{name} aqui. Sintetizando perfiles.",
+            "orchestrator": f"{name} monitoreando swarm.",
+            "validator": f"{name} validando.",
+            "buyer": f"{name} conectado. Explorando EM.",
         }
-        intro = greetings.get(role, f"Hola! Soy {name} del swarm KK.")
+        intro = greetings.get(role, f"{name} online.")
 
         main_channel = self.channels[0] if self.channels else "#karmakadabra"
         await self.send_message(main_channel, intro)
+
+        # Mark as introduced
+        try:
+            intro_flag.write_text(str(int(time.time())), encoding="utf-8")
+        except OSError:
+            pass
 
     def _detect_role(self) -> str:
         """Detect agent role from name or SOUL.md."""
@@ -282,6 +306,10 @@ class IRCDaemon:
                     prefix, _, rest = line.partition(" PRIVMSG ")
                     sender = prefix.split("!")[0].lstrip(":")
                     channel, _, message = rest.partition(" :")
+
+                    # Skip our own messages (including nick collision variants)
+                    if sender in self._my_nicks:
+                        continue
 
                     entry = {
                         "ts": datetime.now(timezone.utc).isoformat(),

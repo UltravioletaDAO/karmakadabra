@@ -1,7 +1,13 @@
 #!/bin/bash
 set -e
 
-AGENT_NAME="${KK_AGENT_NAME:-unknown}"
+AGENT_NAME="${KK_AGENT_NAME:-}"
+if [ -z "$AGENT_NAME" ] || [ "$AGENT_NAME" = "unknown" ]; then
+    echo "[FATAL] KK_AGENT_NAME is not set or is 'unknown'. Cannot start agent."
+    echo "[FATAL] Set KK_AGENT_NAME env var (e.g., kk-karma-hello) in docker run."
+    exit 1
+fi
+
 WORKSPACES_ROOT="/app/workspaces"
 WORKSPACE="$WORKSPACES_ROOT/$AGENT_NAME"
 SKILLS_DIR="/app/skills"

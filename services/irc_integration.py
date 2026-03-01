@@ -103,13 +103,21 @@ def _save_irc_state(data_dir: Path, state: dict) -> None:
 
 
 def _is_mention(message: str, agent_name: str) -> bool:
-    """Check if a message mentions the agent."""
+    """Check if a message mentions the agent.
+
+    Requires explicit @mention or direct address (name:) to avoid
+    false positives from agent names appearing in generic text.
+    """
+    if not agent_name or agent_name == "unknown":
+        return False  # never match on invalid agent name
+
     name_lower = agent_name.lower()
     msg_lower = message.lower()
     return (
-        name_lower in msg_lower
-        or f"@{name_lower}" in msg_lower
-        or f"{name_lower}:" in msg_lower
+        f"@{name_lower}" in msg_lower
+        or msg_lower.startswith(f"{name_lower}:")
+        or msg_lower.startswith(f"{name_lower} ")
+        or msg_lower.startswith(f"{name_lower},")
     )
 
 
@@ -393,17 +401,32 @@ async def check_irc_and_respond(
     # Update agent memory of others seen in IRC
     await _update_agent_memory(data_dir, inbox_msgs, agent_name)
 
-    # Process mentions
+    # Anti-feedback-loop: skip mentions from "unknown" agents or self variants
+    agent_base = agent_name.rstrip("_")
+    responded_senders: set[str] = set()  # max 1 response per sender
+
+    # Process mentions (max 2 per heartbeat to prevent cascades)
+    max_mention_responses = 2
     for msg in inbox_msgs:
-        if messages_sent >= MAX_MESSAGES_PER_HEARTBEAT:
+        if messages_sent >= max_mention_responses:
             break
 
         sender = msg.get("sender", "")
         channel = msg.get("channel", "")
         text = msg.get("message", "")
 
-        if sender == agent_name:
-            continue  # Skip own messages
+        # Skip own messages (including nick collision variants with _)
+        if sender.rstrip("_") == agent_base:
+            continue
+        # Skip messages from "unknown" agents entirely
+        if sender.startswith("unknown"):
+            continue
+        # Max 1 response per sender per heartbeat
+        if sender in responded_senders:
+            continue
+        # Skip auto-generated responses (prevent echo loops)
+        if "agente autonomo del swarm KK" in text or "execution.market. Pregunta" in text:
+            continue
 
         if _is_mention(text, agent_name):
             mentions_found += 1
@@ -415,6 +438,7 @@ async def check_irc_and_respond(
                     _write_outbox(data_dir, reply_target, response)
                     _record_sent(state, msg_hash)
                     messages_sent += 1
+                    responded_senders.add(sender)
 
     # Announce significant heartbeat results to #Execution-Market
     if messages_sent < MAX_MESSAGES_PER_HEARTBEAT:
@@ -533,8 +557,10 @@ def _generate_mention_response(
         short = agent_name.replace("kk-", "")
         return f"{sender}: Hola! Soy {short} del swarm KK. Necesitas algo de nosotros? Estamos operando en execution.market."
 
-    # Non-KK users get a friendly intro
-    return f"{sender}: Soy {agent_name}, agente autonomo del swarm KK. Compro, vendo, y publico tareas en execution.market. Pregunta lo que necesites."
+    # Non-KK users: only respond to direct questions, NOT to every message.
+    # Returning None prevents the feedback loop where every agent responds
+    # to every non-KK message (including auto-generated responses).
+    return None
 
 
 def _build_announcement(agent_name: str, action: str, result: str) -> str | None:
