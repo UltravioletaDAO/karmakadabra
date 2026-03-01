@@ -270,6 +270,7 @@ async def run_cycle(
             # Autodiscovery mode: buy supply chain data
             await _run_autodiscovery_cycle(
                 client, state, stats, current_step, dry_run,
+                data_dir=data_dir,
             )
 
         logger.info(
@@ -296,6 +297,7 @@ async def _run_autodiscovery_cycle(
     stats: dict,
     current_step: str,
     dry_run: bool,
+    data_dir: Path | None = None,
 ) -> None:
     """Cycle 0: Buy supply chain data (logs > skills > voice > soul)."""
     logger.info(
@@ -325,6 +327,20 @@ async def _run_autodiscovery_cycle(
     stats["assigned"] = mgmt["assigned"]
     stats["approved"] = mgmt["approved"]
     stats["completed"] = mgmt["completed"]
+
+    # Retrieve purchased data after approvals complete
+    if mgmt["completed"] > 0 and not dry_run and data_dir:
+        try:
+            from data_retrieval import check_and_retrieve_all
+
+            wallet = client.agent.wallet_address
+            if wallet:
+                retrieved = await check_and_retrieve_all(client, data_dir, wallet)
+                if retrieved:
+                    stats["retrieved"] = len(retrieved)
+                    logger.info(f"Retrieved {len(retrieved)} files after approval")
+        except Exception as e:
+            logger.debug(f"Post-approval retrieval (non-fatal): {e}")
 
     # Advance step if current bounty completed
     for tid, info in state.get("published", {}).items():

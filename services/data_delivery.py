@@ -144,6 +144,89 @@ async def prepare_delivery_package(
         return None
 
 
+def upload_directory_bundle(
+    agent_name: str,
+    product_key: str,
+    source_dir: Path,
+    expiry: int = PRESIGNED_EXPIRY,
+) -> dict[str, str | None]:
+    """Bundle all JSON files in a directory, upload to S3, return URLs.
+
+    Used by extractor agents to upload their processed output (skills/,
+    voices/, souls/) so downstream buyers can retrieve them.
+
+    Args:
+        agent_name: Agent name (S3 prefix).
+        product_key: Product identifier (e.g., "skill_profiles").
+        source_dir: Directory containing JSON files to bundle.
+        expiry: Presigned URL expiry in seconds.
+
+    Returns:
+        Dict with "presigned_url", "s3_key", and "count" keys.
+    """
+    result: dict[str, str | None] = {
+        "presigned_url": None,
+        "s3_key": None,
+        "count": 0,
+    }
+
+    if not source_dir.exists():
+        logger.warning(f"Source directory not found: {source_dir}")
+        return result
+
+    json_files = sorted(source_dir.glob("*.json"))
+    # Exclude internal state files
+    json_files = [f for f in json_files if not f.name.startswith(("_", "."))]
+
+    if not json_files:
+        logger.info(f"No JSON files in {source_dir}")
+        return result
+
+    # Bundle all profiles into a single array
+    profiles = []
+    for jf in json_files:
+        try:
+            data = json.loads(jf.read_text(encoding="utf-8"))
+            profiles.append(data)
+        except (json.JSONDecodeError, OSError):
+            continue
+
+    if not profiles:
+        return result
+
+    result["count"] = len(profiles)
+    bundle = json.dumps(profiles, ensure_ascii=False)
+
+    # Upload to S3
+    ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
+    s3_key = f"{agent_name}/deliveries/{product_key}_{ts}.json"
+
+    try:
+        s3 = _get_s3_client()
+        s3.put_object(
+            Bucket=S3_BUCKET,
+            Key=s3_key,
+            Body=bundle.encode("utf-8"),
+            ContentType="application/json",
+        )
+        logger.info(
+            f"Uploaded {len(profiles)} profiles: s3://{S3_BUCKET}/{s3_key} "
+            f"({len(bundle):,} bytes)"
+        )
+
+        url = s3.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": S3_BUCKET, "Key": s3_key},
+            ExpiresIn=expiry,
+        )
+        result["presigned_url"] = url
+        result["s3_key"] = s3_key
+    except Exception as e:
+        logger.error(f"Upload failed for {product_key}: {e}")
+
+    return result
+
+
 def _serve_latest_logs(agent_name: str, expiry: int) -> str | None:
     """Serve the most recent log file from S3 as fallback."""
     try:

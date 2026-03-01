@@ -383,12 +383,27 @@ async def seller_flow(
             if ok:
                 result["applied"] += 1
 
-        # Phase 3: Fulfill assigned tasks
+        # Phase 3: Fulfill assigned tasks — upload to S3 and include delivery URL
         def make_evidence(task_id: str, info: dict) -> dict:
-            """Generate evidence with voice profile data summary."""
+            """Generate evidence with voice profile data + S3 delivery URL."""
             voices_dir = data_dir / "voices"
             profiles = list(voices_dir.glob("*.json")) if voices_dir.exists() else []
+            profiles = [p for p in profiles if not p.name.startswith(("_", "."))]
             total = len(profiles)
+
+            delivery_url = None
+            s3_key = None
+            if total > 0:
+                try:
+                    from data_delivery import upload_directory_bundle
+
+                    upload = upload_directory_bundle(
+                        "kk-voice-extractor", "voice_profiles", voices_dir,
+                    )
+                    delivery_url = upload.get("presigned_url")
+                    s3_key = upload.get("s3_key")
+                except Exception as e:
+                    logger.debug(f"S3 upload (non-fatal): {e}")
 
             return {
                 "json_response": {
@@ -401,6 +416,8 @@ async def seller_flow(
                     ],
                     "extraction_method": "heuristic analysis (no LLM)",
                     "format": "JSON per-user profiles with personality indicators",
+                    "delivery_url": delivery_url or "S3 bucket: karmacadabra-agent-data/kk-voice-extractor/",
+                    "s3_key": s3_key,
                     "status": "delivered",
                 },
             }

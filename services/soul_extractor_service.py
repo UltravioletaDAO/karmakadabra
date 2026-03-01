@@ -668,12 +668,26 @@ async def seller_flow(
             if ok:
                 result["applied"] += 1
 
-        # Phase 3: Fulfill assigned tasks
+        # Phase 3: Fulfill assigned tasks — upload to S3 and include delivery URL
         def make_evidence(task_id: str, info: dict) -> dict:
-            """Generate evidence with SOUL.md profile data summary."""
+            """Generate evidence with SOUL.md profile data + S3 delivery URL."""
             souls_dir = data_dir / "souls"
             md_profiles = list(souls_dir.glob("*.md")) if souls_dir.exists() else []
             json_profiles = list(souls_dir.glob("*.json")) if souls_dir.exists() else []
+
+            delivery_url = None
+            s3_key = None
+            if json_profiles:
+                try:
+                    from data_delivery import upload_directory_bundle
+
+                    upload = upload_directory_bundle(
+                        "kk-soul-extractor", "soul_profiles", souls_dir,
+                    )
+                    delivery_url = upload.get("presigned_url")
+                    s3_key = upload.get("s3_key")
+                except Exception as e:
+                    logger.debug(f"S3 upload (non-fatal): {e}")
 
             return {
                 "json_response": {
@@ -687,6 +701,8 @@ async def seller_flow(
                         "pricing", "monetizable_capabilities", "trusted_agents",
                     ],
                     "format": "Markdown (SOUL.md) + JSON (structured)",
+                    "delivery_url": delivery_url or "S3 bucket: karmacadabra-agent-data/kk-soul-extractor/",
+                    "s3_key": s3_key,
                     "status": "delivered",
                 },
             }

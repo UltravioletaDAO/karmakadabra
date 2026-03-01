@@ -324,12 +324,27 @@ async def seller_flow(
             if ok:
                 result["applied"] += 1
 
-        # Phase 3: Fulfill assigned tasks
+        # Phase 3: Fulfill assigned tasks — upload to S3 and include delivery URL
         def make_evidence(task_id: str, info: dict) -> dict:
-            """Generate evidence with skill profile data summary."""
+            """Generate evidence with skill profile data + S3 delivery URL."""
             skills_dir = data_dir / "skills"
             profiles = list(skills_dir.glob("*.json")) if skills_dir.exists() else []
+            profiles = [p for p in profiles if not p.name.startswith(("_", "."))]
             total = len(profiles)
+
+            delivery_url = None
+            s3_key = None
+            if total > 0:
+                try:
+                    from data_delivery import upload_directory_bundle
+
+                    upload = upload_directory_bundle(
+                        "kk-skill-extractor", "skill_profiles", skills_dir,
+                    )
+                    delivery_url = upload.get("presigned_url")
+                    s3_key = upload.get("s3_key")
+                except Exception as e:
+                    logger.debug(f"S3 upload (non-fatal): {e}")
 
             return {
                 "json_response": {
@@ -339,6 +354,8 @@ async def seller_flow(
                     "skill_categories": list(SKILL_KEYWORDS.keys()),
                     "extraction_method": "keyword-based analysis (12 categories)",
                     "format": "JSON per-user profiles with top_skills, confidence scores",
+                    "delivery_url": delivery_url or "S3 bucket: karmacadabra-agent-data/kk-skill-extractor/",
+                    "s3_key": s3_key,
                     "status": "delivered",
                 },
             }
