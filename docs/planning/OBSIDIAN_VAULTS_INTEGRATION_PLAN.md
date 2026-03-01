@@ -1,7 +1,7 @@
 # Mega Plan: Obsidian Vaults Integration
 
 > Fecha: 2026-03-01
-> Estado: IN PROGRESS (Phase 1-3 COMPLETE, Phase 4+ pending)
+> Estado: IN PROGRESS (Phase 1-4, 6 COMPLETE; Phase 5, 7 pending)
 > Objetivo: Integrar Obsidian Vaults como capa de estado compartido entre todos los agentes KK, interconectando KarmaCadabra, AbraCadabra, KarmaGelou, y Execution Market.
 
 ---
@@ -206,10 +206,10 @@ Publishing 5 chat log bundles on Execution Market at $0.01 each.
 
 **Objetivo**: Agentes leen el estado de otros agentes del vault para tomar decisiones.
 
-- [ ] 4.1 Coordinator: Lee `agents/*/state.md` para detectar agentes stale
+- [x] 4.1 Coordinator: Lee `agents/*/state.md` para detectar agentes stale (via vault swarm summary in IRC)
 - [ ] 4.2 Buyers: Leen `agents/kk-karma-hello/offerings.md` para saber que hay disponible
 - [ ] 4.3 Extractors: Leen `shared/supply-chain.md` para saber en que paso esta la cadena
-- [ ] 4.4 IRC integration: Incluir info del vault en mensajes proactivos
+- [x] 4.4 IRC integration: Incluir info del vault en mensajes proactivos
   - "HAVE: [offerings from vault] | $price on EM"
   - "STATUS: [from peer state.md] kk-karma-hello last active 2 min ago"
 - [ ] 4.5 Decision engine: Agentes priorizan acciones basado en estado global del vault
@@ -236,12 +236,12 @@ Publishing 5 chat log bundles on Execution Market at $0.01 each.
 
 **Objetivo**: Dataview dashboards funcionales para monitoreo humano.
 
-- [ ] 6.1 `dashboards/agent-status.md` — TABLE de todos los agentes con status, revenue, heartbeat
-- [ ] 6.2 `dashboards/supply-chain-flow.md` — Flujo visual de la cadena de suministro
-- [ ] 6.3 `dashboards/transactions.md` — Historial de compras/ventas
-- [ ] 6.4 `dashboards/irc-activity.md` — Resumen de actividad por canal
-- [ ] 6.5 Documentar como abrir el vault en Obsidian Desktop
-- [ ] 6.6 Crear `.obsidian/` config con Dataview y plugins recomendados
+- [x] 6.1 `dashboards/agent-status.md` — TABLE de todos los agentes con status, revenue, heartbeat
+- [x] 6.2 `dashboards/supply-chain-flow.md` — Flujo visual de la cadena de suministro
+- [x] 6.3 `dashboards/transactions.md` — Historial de compras/ventas
+- [x] 6.4 `dashboards/irc-activity.md` — Resumen de actividad por canal
+- [x] 6.5 Documentar como abrir el vault en Obsidian Desktop (vault/README.md)
+- [x] 6.6 Crear `.obsidian/` config con Dataview y plugins recomendados
 
 **Archivos**: `dashboards/*.md`, `.obsidian/`
 **Dependencias**: Phase 3
@@ -250,10 +250,10 @@ Publishing 5 chat log bundles on Execution Market at $0.01 each.
 
 **Objetivo**: Conectar vaults de KarmaCadabra, AbraCadabra, KarmaGelou, y Execution Market.
 
-- [ ] 7.1 Crear `projects/karmacadabra.md` con MOC (Map of Content) del proyecto
-- [ ] 7.2 Crear `projects/abracadabra.md` con links a transcripciones
-- [ ] 7.3 Crear `projects/karmagelou.md` con links a metricas on-chain
-- [ ] 7.4 Crear `projects/execution-market.md` con links a API/tasks
+- [x] 7.1 Crear `projects/karmacadabra.md` con MOC (Map of Content) del proyecto
+- [x] 7.2 Crear `projects/abracadabra.md` con links a transcripciones
+- [x] 7.3 Crear `projects/karmagelou.md` con links a metricas on-chain
+- [x] 7.4 Crear `projects/execution-market.md` con links a API/tasks
 - [ ] 7.5 Evaluar: git submodules para vaults compartidos entre proyectos
 - [ ] 7.6 Evaluar: `obsidian-headless` para sync con Obsidian Sync (si se paga)
 

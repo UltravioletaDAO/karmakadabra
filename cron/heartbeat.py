@@ -452,6 +452,14 @@ async def heartbeat_once(
                 except Exception as e:
                     logger.debug(f"  [{name}] Process (non-fatal): {e}")
 
+                # Retrieve purchased data (non-fatal)
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, agent.wallet_address)
+                    if retrieved:
+                        parts.append(f"{len(retrieved)} files retrieved")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Retrieval (non-fatal): {e}")
+
                 result = "; ".join(parts)
             except Exception as e:
                 result = f"skill_extractor_service error: {e}"
@@ -479,6 +487,14 @@ async def heartbeat_once(
                 except Exception as e:
                     logger.debug(f"  [{name}] Process (non-fatal): {e}")
 
+                # Retrieve purchased data (non-fatal)
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, agent.wallet_address)
+                    if retrieved:
+                        parts.append(f"{len(retrieved)} files retrieved")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Retrieval (non-fatal): {e}")
+
                 result = "; ".join(parts)
             except Exception as e:
                 result = f"voice_extractor_service error: {e}"
@@ -505,6 +521,14 @@ async def heartbeat_once(
                         parts.append(f"{stats.get('total_profiles', 0)} souls merged")
                 except Exception as e:
                     logger.debug(f"  [{name}] Process (non-fatal): {e}")
+
+                # Retrieve purchased data (non-fatal)
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, agent.wallet_address)
+                    if retrieved:
+                        parts.append(f"{len(retrieved)} files retrieved")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Retrieval (non-fatal): {e}")
 
                 result = "; ".join(parts)
             except Exception as e:
@@ -566,10 +590,20 @@ async def heartbeat_once(
                 approved = buyer_result.get("approved", 0)
                 completed = buyer_result.get("completed", 0)
                 cycle_count = buyer_result.get("cycle_count", 0)
+
+                # Retrieve purchased data (non-fatal)
+                retrieved_count = 0
+                try:
+                    retrieved = await check_and_retrieve_all(client, data_dir, agent.wallet_address)
+                    retrieved_count = len(retrieved)
+                except Exception as e:
+                    logger.debug(f"  [{name}] Retrieval (non-fatal): {e}")
+
                 result = (
                     f"step={step}, cycle#{cycle_count}, "
                     f"published={published}, assigned={assigned}, "
                     f"approved={approved}, completed={completed}"
+                    + (f", retrieved={retrieved_count}" if retrieved_count else "")
                 )
             except ImportError:
                 # Fallback to generic browse+apply if community_buyer_service not available

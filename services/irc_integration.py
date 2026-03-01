@@ -28,7 +28,7 @@ logger = logging.getLogger("kk.irc-integration")
 
 # Rate limiting: max messages per heartbeat, cooldown per topic
 MAX_MESSAGES_PER_HEARTBEAT = 8
-COOLDOWN_HOURS = 1.0  # 1 hour — agents post HAVE/NEED hourly, respond to mentions immediately
+COOLDOWN_HOURS = 0.5  # 30 min — agents post HAVE/NEED frequently with 5-min heartbeats
 
 
 def _read_inbox(data_dir: Path, since_ts: float = 0) -> list[dict]:
