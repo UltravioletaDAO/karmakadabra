@@ -91,6 +91,7 @@ from services.soul_extractor_service import (
 )
 from services.coordinator_service import coordination_cycle as run_coordinator_cycle
 from services.data_retrieval import check_and_retrieve_all
+from services.escrow_flow import fulfill_assigned, load_escrow_state, save_escrow_state
 from services.irc_integration import check_irc_and_respond
 from lib.vault_sync import VaultSync
 from lib.vault_decisions import prioritize_actions
@@ -430,7 +431,7 @@ async def heartbeat_once(
             except Exception as e:
                 result = f"abracadabra_service error: {e}"
 
-        # -- Special heartbeat for kk-skill-extractor: seller flow (escrow)
+        # -- Special heartbeat for kk-skill-extractor: buyer + seller flow
         elif name == "kk-skill-extractor":
             action = "skill_extractor_seller"
             try:
@@ -450,22 +451,39 @@ async def heartbeat_once(
                 except Exception as e:
                     logger.debug(f"  [{name}] Vault read (non-fatal): {e}")
 
-                # Seller flow: discover [KK Request] bounties, apply, fulfill
-                seller_result = await sk_seller_flow(client, data_dir, dry_run=dry_run)
-                sr = seller_result
-                parts.append(
-                    f"seller: {sr.get('bounties_found', 0)} found, "
-                    f"{sr.get('applied', 0)} applied, "
-                    f"{sr.get('submitted', 0)} submitted"
-                )
-
-                # Also process local data if available (enriches evidence quality)
+                # Buyer flow: discover raw data from karma-hello, apply to buy
+                buyer_state = load_escrow_state(data_dir, prefix="buyer")
                 try:
-                    stats = await sk_process(data_dir)
-                    if stats:
-                        parts.append(f"{stats['total_profiles']} profiles processed")
+                    offerings = await sk_discover(client)
+                    bought = 0
+                    for offer in offerings[:2]:  # max 2 buys per heartbeat
+                        tid = offer.get("id", "")
+                        if tid in buyer_state.get("applied", {}):
+                            continue  # already applied
+                        buy_result = await sk_buy(client, offer, dry_run=dry_run)
+                        if buy_result:
+                            bought += 1
+                            buyer_state.setdefault("applied", {})[tid] = {
+                                "title": offer.get("title", ""),
+                                "status": "applied",
+                                "applied_at": datetime.now(timezone.utc).isoformat(),
+                            }
+                    if offerings or bought:
+                        parts.append(f"buyer: {len(offerings)} found, {bought} applied")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
+                    logger.debug(f"  [{name}] Buyer flow (non-fatal): {e}")
+
+                # Fulfill: check if assigned tasks need evidence submission
+                try:
+                    ff = await fulfill_assigned(client, buyer_state, dry_run=dry_run)
+                    if ff.get("submitted"):
+                        parts.append(f"submitted: {ff['submitted']}")
+                    if ff.get("completed"):
+                        parts.append(f"completed: {ff['completed']}")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Fulfill (non-fatal): {e}")
+
+                save_escrow_state(data_dir, buyer_state, prefix="buyer")
 
                 # Retrieve purchased data (non-fatal)
                 try:
@@ -475,11 +493,28 @@ async def heartbeat_once(
                 except Exception as e:
                     logger.debug(f"  [{name}] Retrieval (non-fatal): {e}")
 
+                # Process local data if available (enriches evidence quality)
+                try:
+                    stats = await sk_process(data_dir)
+                    if stats:
+                        parts.append(f"{stats['total_profiles']} profiles processed")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
+
+                # Seller flow: discover [KK Request] bounties, apply, fulfill
+                seller_result = await sk_seller_flow(client, data_dir, dry_run=dry_run)
+                sr = seller_result
+                parts.append(
+                    f"seller: {sr.get('bounties_found', 0)} found, "
+                    f"{sr.get('applied', 0)} applied, "
+                    f"{sr.get('submitted', 0)} submitted"
+                )
+
                 result = "; ".join(parts)
             except Exception as e:
                 result = f"skill_extractor_service error: {e}"
 
-        # -- Special heartbeat for kk-voice-extractor: seller flow (escrow)
+        # -- Special heartbeat for kk-voice-extractor: buyer + seller flow
         elif name == "kk-voice-extractor":
             action = "voice_extractor_seller"
             try:
@@ -499,22 +534,39 @@ async def heartbeat_once(
                 except Exception as e:
                     logger.debug(f"  [{name}] Vault read (non-fatal): {e}")
 
-                # Seller flow: discover [KK Request] bounties, apply, fulfill
-                seller_result = await ve_seller_flow(client, data_dir, dry_run=dry_run)
-                sr = seller_result
-                parts.append(
-                    f"seller: {sr.get('bounties_found', 0)} found, "
-                    f"{sr.get('applied', 0)} applied, "
-                    f"{sr.get('submitted', 0)} submitted"
-                )
-
-                # Also process local data if available
+                # Buyer flow: discover raw data from karma-hello, apply to buy
+                buyer_state = load_escrow_state(data_dir, prefix="buyer")
                 try:
-                    stats = await ve_process(data_dir)
-                    if stats:
-                        parts.append(f"{stats['total_profiles']} profiles processed")
+                    offerings = await ve_discover(client)
+                    bought = 0
+                    for offer in offerings[:2]:  # max 2 buys per heartbeat
+                        tid = offer.get("id", "")
+                        if tid in buyer_state.get("applied", {}):
+                            continue  # already applied
+                        buy_result = await ve_buy(client, offer, dry_run=dry_run)
+                        if buy_result:
+                            bought += 1
+                            buyer_state.setdefault("applied", {})[tid] = {
+                                "title": offer.get("title", ""),
+                                "status": "applied",
+                                "applied_at": datetime.now(timezone.utc).isoformat(),
+                            }
+                    if offerings or bought:
+                        parts.append(f"buyer: {len(offerings)} found, {bought} applied")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
+                    logger.debug(f"  [{name}] Buyer flow (non-fatal): {e}")
+
+                # Fulfill: check if assigned tasks need evidence submission
+                try:
+                    ff = await fulfill_assigned(client, buyer_state, dry_run=dry_run)
+                    if ff.get("submitted"):
+                        parts.append(f"submitted: {ff['submitted']}")
+                    if ff.get("completed"):
+                        parts.append(f"completed: {ff['completed']}")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Fulfill (non-fatal): {e}")
+
+                save_escrow_state(data_dir, buyer_state, prefix="buyer")
 
                 # Retrieve purchased data (non-fatal)
                 try:
@@ -524,11 +576,28 @@ async def heartbeat_once(
                 except Exception as e:
                     logger.debug(f"  [{name}] Retrieval (non-fatal): {e}")
 
+                # Process local data if available
+                try:
+                    stats = await ve_process(data_dir)
+                    if stats:
+                        parts.append(f"{stats['total_profiles']} profiles processed")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
+
+                # Seller flow: discover [KK Request] bounties, apply, fulfill
+                seller_result = await ve_seller_flow(client, data_dir, dry_run=dry_run)
+                sr = seller_result
+                parts.append(
+                    f"seller: {sr.get('bounties_found', 0)} found, "
+                    f"{sr.get('applied', 0)} applied, "
+                    f"{sr.get('submitted', 0)} submitted"
+                )
+
                 result = "; ".join(parts)
             except Exception as e:
                 result = f"voice_extractor_service error: {e}"
 
-        # -- Special heartbeat for kk-soul-extractor: seller flow (escrow)
+        # -- Special heartbeat for kk-soul-extractor: buyer + seller flow
         elif name == "kk-soul-extractor":
             action = "soul_extractor_seller"
             try:
@@ -550,22 +619,41 @@ async def heartbeat_once(
                 except Exception as e:
                     logger.debug(f"  [{name}] Vault read (non-fatal): {e}")
 
-                # Seller flow: discover [KK Request] bounties, apply, fulfill
-                seller_result = await so_seller_flow(client, data_dir, dry_run=dry_run)
-                sr = seller_result
-                parts.append(
-                    f"seller: {sr.get('bounties_found', 0)} found, "
-                    f"{sr.get('applied', 0)} applied, "
-                    f"{sr.get('submitted', 0)} submitted"
-                )
-
-                # Also process local data if available (merges skill+voice into SOUL.md)
+                # Buyer flow: discover skill/voice profiles from sibling extractors
+                buyer_state = load_escrow_state(data_dir, prefix="buyer")
                 try:
-                    stats = await so_process(data_dir)
-                    if stats:
-                        parts.append(f"{stats.get('total_profiles', 0)} souls merged")
+                    offerings_map = await so_discover(client)
+                    bought = 0
+                    for data_type, type_offerings in offerings_map.items():
+                        for offer in type_offerings[:1]:  # max 1 buy per type per heartbeat
+                            tid = offer.get("id", "")
+                            if tid in buyer_state.get("applied", {}):
+                                continue  # already applied
+                            buy_result = await so_buy(client, offer, data_type, dry_run=dry_run)
+                            if buy_result:
+                                bought += 1
+                                buyer_state.setdefault("applied", {})[tid] = {
+                                    "title": offer.get("title", ""),
+                                    "status": "applied",
+                                    "applied_at": datetime.now(timezone.utc).isoformat(),
+                                }
+                    total_found = sum(len(v) for v in offerings_map.values())
+                    if total_found or bought:
+                        parts.append(f"buyer: {total_found} found, {bought} applied")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
+                    logger.debug(f"  [{name}] Buyer flow (non-fatal): {e}")
+
+                # Fulfill: check if assigned tasks need evidence submission
+                try:
+                    ff = await fulfill_assigned(client, buyer_state, dry_run=dry_run)
+                    if ff.get("submitted"):
+                        parts.append(f"submitted: {ff['submitted']}")
+                    if ff.get("completed"):
+                        parts.append(f"completed: {ff['completed']}")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Fulfill (non-fatal): {e}")
+
+                save_escrow_state(data_dir, buyer_state, prefix="buyer")
 
                 # Retrieve purchased data (non-fatal)
                 try:
@@ -574,6 +662,23 @@ async def heartbeat_once(
                         parts.append(f"{len(retrieved)} files retrieved")
                 except Exception as e:
                     logger.debug(f"  [{name}] Retrieval (non-fatal): {e}")
+
+                # Process local data if available (merges skill+voice into SOUL.md)
+                try:
+                    stats = await so_process(data_dir)
+                    if stats:
+                        parts.append(f"{stats.get('total_profiles', 0)} souls merged")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Process (non-fatal): {e}")
+
+                # Seller flow: discover [KK Request] bounties, apply, fulfill
+                seller_result = await so_seller_flow(client, data_dir, dry_run=dry_run)
+                sr = seller_result
+                parts.append(
+                    f"seller: {sr.get('bounties_found', 0)} found, "
+                    f"{sr.get('applied', 0)} applied, "
+                    f"{sr.get('submitted', 0)} submitted"
+                )
 
                 result = "; ".join(parts)
             except Exception as e:

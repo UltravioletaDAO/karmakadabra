@@ -75,9 +75,14 @@ def resolve_executor_wallet(executor_id: str) -> str:
 # ---------------------------------------------------------------------------
 
 
-def load_escrow_state(data_dir: Path) -> dict:
-    """Load escrow state from disk."""
-    state_path = data_dir / "escrow_state.json"
+def load_escrow_state(data_dir: Path, prefix: str = "") -> dict:
+    """Load escrow state from disk.
+
+    Args:
+        prefix: Optional prefix for separate state files (e.g., "buyer" -> buyer_escrow_state.json).
+    """
+    filename = f"{prefix}_escrow_state.json" if prefix else "escrow_state.json"
+    state_path = data_dir / filename
     if state_path.exists():
         try:
             return json.loads(state_path.read_text(encoding="utf-8"))
@@ -86,10 +91,15 @@ def load_escrow_state(data_dir: Path) -> dict:
     return {"published": {}, "applied": {}}
 
 
-def save_escrow_state(data_dir: Path, state: dict) -> None:
-    """Persist escrow state to disk."""
+def save_escrow_state(data_dir: Path, state: dict, prefix: str = "") -> None:
+    """Persist escrow state to disk.
+
+    Args:
+        prefix: Optional prefix for separate state files (e.g., "buyer" -> buyer_escrow_state.json).
+    """
     data_dir.mkdir(parents=True, exist_ok=True)
-    state_path = data_dir / "escrow_state.json"
+    filename = f"{prefix}_escrow_state.json" if prefix else "escrow_state.json"
+    state_path = data_dir / filename
     try:
         state_path.write_text(
             json.dumps(state, indent=2, ensure_ascii=False),
