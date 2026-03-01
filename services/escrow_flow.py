@@ -403,8 +403,10 @@ async def fulfill_assigned(
 
         em_status = task_data.get("status", "")
 
-        if em_status in ("cancelled", "expired"):
+        if em_status in ("cancelled", "expired", "completed"):
             info["status"] = em_status
+            if em_status == "completed":
+                stats["completed"] += 1
             continue
 
         if em_status in ("accepted", "in_progress"):
