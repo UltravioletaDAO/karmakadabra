@@ -47,6 +47,7 @@ from escrow_flow import (
     discover_bounties,
     fulfill_assigned,
     load_escrow_state,
+    publish_offering_deduped,
     save_escrow_state,
 )
 
@@ -542,7 +543,7 @@ async def publish_soul_profiles(
     stats: dict,
     dry_run: bool = False,
 ) -> dict | None:
-    """Publish complete SOUL.md profile bundles on EM."""
+    """Publish complete SOUL.md profile bundles on EM (deduped)."""
     total = stats.get("total_profiles", 0)
     complete = stats.get("complete_profiles", 0)
     new_count = stats.get("new_profiles", 0)
@@ -566,29 +567,15 @@ async def publish_soul_profiles(
         f"Format: Markdown (SOUL.md) + JSON (structured). "
         f"Delivery: URL provided upon approval."
     )
-    bounty = 0.08
 
-    if dry_run:
-        logger.info(f"  [DRY RUN] Would publish: {title} (${bounty})")
-        return None
-
-    if not client.agent.can_spend(bounty):
-        logger.warning(f"  SKIP: Budget limit")
-        return None
-
-    result = await client.publish_task(
+    return await publish_offering_deduped(
+        client=client,
         title=title,
         instructions=description,
-        category="knowledge_access",
-        bounty_usd=bounty,
-        deadline_hours=24,
-        evidence_required=["json_response"],
+        bounty_usd=0.08,
+        title_prefix="[KK Data] Complete Agent Profiles",
+        dry_run=dry_run,
     )
-
-    task_id = result.get("task", {}).get("id") or result.get("id", "unknown")
-    logger.info(f"  Published soul profiles: task_id={task_id}")
-    client.agent.record_spend(bounty)
-    return result
 
 
 async def publish_profile_updates(
@@ -596,7 +583,7 @@ async def publish_profile_updates(
     stats: dict,
     dry_run: bool = False,
 ) -> dict | None:
-    """Publish a delta update product if there are updated profiles."""
+    """Publish a delta update product if there are updated profiles (deduped)."""
     updated_count = stats.get("updated_profiles", 0)
     if updated_count == 0:
         logger.info("  No profile updates to publish")
@@ -611,29 +598,15 @@ async def publish_profile_updates(
         f"Format: Markdown (SOUL.md) + JSON (structured). "
         f"Delivery: URL provided upon approval."
     )
-    bounty = 0.04
 
-    if dry_run:
-        logger.info(f"  [DRY RUN] Would publish update: {title} (${bounty})")
-        return None
-
-    if not client.agent.can_spend(bounty):
-        logger.warning(f"  SKIP: Budget limit")
-        return None
-
-    result = await client.publish_task(
+    return await publish_offering_deduped(
+        client=client,
         title=title,
         instructions=description,
-        category="knowledge_access",
-        bounty_usd=bounty,
-        deadline_hours=24,
-        evidence_required=["json_response"],
+        bounty_usd=0.04,
+        title_prefix="[KK Data] Agent Profile Updates",
+        dry_run=dry_run,
     )
-
-    task_id = result.get("task", {}).get("id") or result.get("id", "unknown")
-    logger.info(f"  Published profile updates: task_id={task_id}")
-    client.agent.record_spend(bounty)
-    return result
 
 
 # ---------------------------------------------------------------------------

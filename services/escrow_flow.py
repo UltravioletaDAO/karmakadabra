@@ -100,6 +100,80 @@ def save_escrow_state(data_dir: Path, state: dict) -> None:
 
 
 # ---------------------------------------------------------------------------
+# Deduplication helper for seller offerings
+# ---------------------------------------------------------------------------
+
+# In-memory cache of published offering task IDs per title prefix
+_published_offering_ids: dict[str, str] = {}
+
+
+async def publish_offering_deduped(
+    client: EMClient,
+    title: str,
+    instructions: str,
+    bounty_usd: float,
+    title_prefix: str = "[KK Data]",
+    dry_run: bool = False,
+) -> dict | None:
+    """Publish a seller offering on EM with deduplication.
+
+    Checks if an active published task with the same title_prefix exists
+    from this agent before creating a new one.
+    """
+    # Check in-memory cache first
+    cache_key = f"{client.agent.wallet_address}:{title_prefix}"
+    if cache_key in _published_offering_ids:
+        cached_id = _published_offering_ids[cache_key]
+        try:
+            task_data = await client.get_task(cached_id)
+            if task_data.get("status") == "published":
+                logger.info(f"Offering active: {cached_id[:8]} — skipping duplicate")
+                return None
+            # Not published anymore, remove from cache
+            del _published_offering_ids[cache_key]
+        except Exception:
+            del _published_offering_ids[cache_key]
+
+    # Check EM for existing published tasks from this agent
+    try:
+        existing = await client.list_tasks(
+            agent_wallet=client.agent.wallet_address,
+            status="published",
+        )
+        for t in existing:
+            if title_prefix.lower() in t.get("title", "").lower():
+                tid = t.get("id", "")
+                _published_offering_ids[cache_key] = tid
+                logger.info(f"Offering already on EM: {tid[:8]} — skipping")
+                return None
+    except Exception as e:
+        logger.debug(f"Dedup check failed (non-fatal): {e}")
+
+    if dry_run:
+        logger.info(f"[DRY RUN] Would publish: {title} (${bounty_usd})")
+        return None
+
+    if not client.agent.can_spend(bounty_usd):
+        logger.warning(f"SKIP: Budget limit for {title_prefix}")
+        return None
+
+    result = await client.publish_task(
+        title=title,
+        instructions=instructions,
+        category="knowledge_access",
+        bounty_usd=bounty_usd,
+        deadline_hours=24,
+        evidence_required=["json_response"],
+    )
+    task_id = result.get("task", {}).get("id") or result.get("id", "")
+    if task_id:
+        _published_offering_ids[cache_key] = task_id
+    client.agent.record_spend(bounty_usd)
+    logger.info(f"Published offering: {title} (${bounty_usd}) -> {task_id[:8]}")
+    return result
+
+
+# ---------------------------------------------------------------------------
 # BUYER SIDE — publish bounties, assign sellers, approve submissions
 # ---------------------------------------------------------------------------
 
@@ -324,7 +398,7 @@ async def discover_bounties(
         tasks = await client.browse_tasks(
             status="published",
             category="knowledge_access",
-            limit=50,
+            limit=200,
         )
     except Exception as e:
         logger.error(f"Browse failed: {e}")
@@ -334,6 +408,16 @@ async def discover_bounties(
     if state:
         applied_ids = set(state.get("applied", {}).keys())
 
+    # Log first few titles for debugging
+    sample_titles = [t.get("title", "?")[:50] for t in tasks[:5]]
+    logger.info(
+        f"Browse returned {len(tasks)} tasks (applied_ids={len(applied_ids)}, "
+        f"exclude_wallet={exclude_wallet[:10]}...) samples={sample_titles}"
+    )
+
+    skipped_own = 0
+    skipped_applied = 0
+    skipped_keyword = 0
     matches = []
     for task in tasks:
         task_id = task.get("id", "")
@@ -347,21 +431,28 @@ async def discover_bounties(
                 or ""
             )
             if task_wallet.lower() == exclude_wallet.lower():
+                skipped_own += 1
                 continue
 
         # Skip already applied
         if task_id in applied_ids:
+            skipped_applied += 1
             continue
 
         # Keyword match (case-insensitive)
         title_lower = title.lower()
         if any(kw.lower() in title_lower for kw in keywords):
             matches.append(task)
+        else:
+            skipped_keyword += 1
 
     # Sort by bounty ascending (cheapest first)
     matches.sort(key=lambda t: t.get("bounty_usd", t.get("bounty_usdc", 0)))
 
-    logger.info(f"Found {len(matches)} matching bounties (keywords: {keywords})")
+    logger.info(
+        f"Found {len(matches)} matching bounties (keywords: {keywords}, "
+        f"skipped: own={skipped_own} applied={skipped_applied} keyword={skipped_keyword})"
+    )
     return matches
 
 

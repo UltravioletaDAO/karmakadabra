@@ -36,6 +36,7 @@ from escrow_flow import (
     discover_bounties,
     fulfill_assigned,
     load_escrow_state,
+    publish_offering_deduped,
     save_escrow_state,
 )
 
@@ -243,7 +244,7 @@ async def publish_enriched_profiles(
     stats: dict,
     dry_run: bool = False,
 ) -> dict | None:
-    """Publish enriched skill profiles on EM."""
+    """Publish enriched skill profiles on EM (deduped)."""
     total = stats.get("total_profiles", 0)
     unique = stats.get("unique_skills", 0)
 
@@ -258,29 +259,15 @@ async def publish_enriched_profiles(
         f"and interaction graphs for higher accuracy.\n\n"
         f"Format: JSON. Delivery: URL provided upon approval."
     )
-    bounty = 0.05
 
-    if dry_run:
-        logger.info(f"  [DRY RUN] Would publish: {title} (${bounty})")
-        return None
-
-    if not client.agent.can_spend(bounty):
-        logger.warning(f"  SKIP: Budget limit")
-        return None
-
-    result = await client.publish_task(
+    return await publish_offering_deduped(
+        client=client,
         title=title,
         instructions=description,
-        category="knowledge_access",
-        bounty_usd=bounty,
-        deadline_hours=24,
-        evidence_required=["json_response"],
+        bounty_usd=0.05,
+        title_prefix="[KK Data] Enriched Skill Profiles",
+        dry_run=dry_run,
     )
-
-    task_id = result.get("task", {}).get("id") or result.get("id", "unknown")
-    logger.info(f"  Published enriched profiles: task_id={task_id}")
-    client.agent.record_spend(bounty)
-    return result
 
 
 async def seller_flow(
