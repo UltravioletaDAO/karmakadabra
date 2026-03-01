@@ -461,13 +461,15 @@ async def heartbeat_once(
                         if tid in buyer_state.get("applied", {}):
                             continue  # already applied
                         buy_result = await sk_buy(client, offer, dry_run=dry_run)
+                        # Track in state even if 409 (already applied server-side)
+                        # so fulfill_assigned can check for assignment + submit evidence
+                        buyer_state.setdefault("applied", {})[tid] = {
+                            "title": offer.get("title", ""),
+                            "status": "applied",
+                            "applied_at": datetime.now(timezone.utc).isoformat(),
+                        }
                         if buy_result:
                             bought += 1
-                            buyer_state.setdefault("applied", {})[tid] = {
-                                "title": offer.get("title", ""),
-                                "status": "applied",
-                                "applied_at": datetime.now(timezone.utc).isoformat(),
-                            }
                     if offerings or bought:
                         parts.append(f"buyer: {len(offerings)} found, {bought} applied")
                 except Exception as e:
@@ -544,13 +546,14 @@ async def heartbeat_once(
                         if tid in buyer_state.get("applied", {}):
                             continue  # already applied
                         buy_result = await ve_buy(client, offer, dry_run=dry_run)
+                        # Track in state even if 409 so fulfill_assigned checks it
+                        buyer_state.setdefault("applied", {})[tid] = {
+                            "title": offer.get("title", ""),
+                            "status": "applied",
+                            "applied_at": datetime.now(timezone.utc).isoformat(),
+                        }
                         if buy_result:
                             bought += 1
-                            buyer_state.setdefault("applied", {})[tid] = {
-                                "title": offer.get("title", ""),
-                                "status": "applied",
-                                "applied_at": datetime.now(timezone.utc).isoformat(),
-                            }
                     if offerings or bought:
                         parts.append(f"buyer: {len(offerings)} found, {bought} applied")
                 except Exception as e:
@@ -630,13 +633,14 @@ async def heartbeat_once(
                             if tid in buyer_state.get("applied", {}):
                                 continue  # already applied
                             buy_result = await so_buy(client, offer, data_type, dry_run=dry_run)
+                            # Track in state even if 409 so fulfill_assigned checks it
+                            buyer_state.setdefault("applied", {})[tid] = {
+                                "title": offer.get("title", ""),
+                                "status": "applied",
+                                "applied_at": datetime.now(timezone.utc).isoformat(),
+                            }
                             if buy_result:
                                 bought += 1
-                                buyer_state.setdefault("applied", {})[tid] = {
-                                    "title": offer.get("title", ""),
-                                    "status": "applied",
-                                    "applied_at": datetime.now(timezone.utc).isoformat(),
-                                }
                     total_found = sum(len(v) for v in offerings_map.values())
                     if total_found or bought:
                         parts.append(f"buyer: {total_found} found, {bought} applied")
