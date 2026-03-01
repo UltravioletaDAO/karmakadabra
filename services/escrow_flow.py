@@ -218,6 +218,23 @@ async def manage_bounties(
                     logger.info(
                         f"Approved submission {sub_id[:8]} for: {info.get('title', '?')}"
                     )
+
+                    # Bidirectional reputation: buyer rates worker
+                    worker_wallet = sub.get("worker_wallet", "") or sub.get("executor_wallet", "")
+                    if worker_wallet:
+                        try:
+                            await client.rate_worker(
+                                task_id=task_id,
+                                worker_wallet=worker_wallet,
+                                score=4,
+                                comment=f"Delivered on time for: {info.get('title', '?')}",
+                            )
+                            stats.setdefault("rated", 0)
+                            stats["rated"] += 1
+                            logger.info(f"Rated worker {worker_wallet[:8]} (score=4)")
+                        except Exception as e:
+                            logger.debug(f"Rate worker failed (non-fatal): {e}")
+
                     break
                 except Exception as e:
                     logger.error(f"Approve failed: {e}")
@@ -384,9 +401,30 @@ async def fulfill_assigned(
             try:
                 task_data = await client.get_task(task_id)
                 em_status = task_data.get("status", "")
-                if em_status == "completed":
+                if em_status == "completed" and status != "completed":
                     info["status"] = "completed"
                     stats["completed"] += 1
+
+                    # Bidirectional reputation: worker rates agent/buyer
+                    if not info.get("rated_agent"):
+                        agent_wallet = (
+                            task_data.get("agent_wallet", "")
+                            or task_data.get("publisher_wallet", "")
+                        )
+                        if agent_wallet:
+                            try:
+                                await client.rate_agent(
+                                    task_id=task_id,
+                                    agent_wallet=agent_wallet,
+                                    score=4,
+                                    comment=f"Prompt payment for: {info.get('title', '?')}",
+                                )
+                                info["rated_agent"] = True
+                                stats.setdefault("rated", 0)
+                                stats["rated"] += 1
+                                logger.info(f"Rated agent {agent_wallet[:8]} (score=4)")
+                            except Exception as e:
+                                logger.debug(f"Rate agent failed (non-fatal): {e}")
             except Exception:
                 pass
             continue

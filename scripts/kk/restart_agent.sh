@@ -1,7 +1,7 @@
 #!/bin/bash
 # restart_agent.sh - Run ON the EC2 instance to restart agent container
 # Usage: bash restart_agent.sh <agent-name> <wallet-address>
-set -euo pipefail
+set -eu
 
 NAME="${1:?Usage: restart_agent.sh <agent-name> <wallet-address>}"
 WALLET="${2:?Usage: restart_agent.sh <agent-name> <wallet-address>}"

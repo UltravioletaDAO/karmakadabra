@@ -392,6 +392,90 @@ class EMClient:
             return data
         return data.get("submissions", [])
 
+    # -- Reputation ------------------------------------------------------------
+
+    async def rate_worker(
+        self,
+        task_id: str,
+        worker_wallet: str,
+        score: int = 5,
+        comment: str = "",
+    ) -> dict[str, Any]:
+        """Rate a worker after approving their submission (gasless).
+
+        Args:
+            task_id: The task UUID.
+            worker_wallet: Worker's wallet address.
+            score: Rating 1-5 (5 = excellent).
+            comment: Optional feedback.
+        """
+        payload: dict[str, Any] = {
+            "task_id": task_id,
+            "worker_wallet": worker_wallet,
+            "score": max(1, min(5, score)),
+        }
+        if comment:
+            payload["comment"] = comment
+        body_str = json.dumps(payload)
+        url = f"{API_V1}/reputation/workers/rate"
+        sig_headers = self._sign_headers("POST", url, body_str)
+        resp = await self._client.post(
+            "/reputation/workers/rate", content=body_str, headers=sig_headers
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+    async def rate_agent(
+        self,
+        task_id: str,
+        agent_wallet: str,
+        score: int = 5,
+        comment: str = "",
+    ) -> dict[str, Any]:
+        """Rate an agent/buyer after completing a task (requires gas).
+
+        Args:
+            task_id: The task UUID.
+            agent_wallet: Agent/buyer's wallet address.
+            score: Rating 1-5 (5 = excellent).
+            comment: Optional feedback.
+        """
+        payload: dict[str, Any] = {
+            "task_id": task_id,
+            "agent_wallet": agent_wallet,
+            "score": max(1, min(5, score)),
+        }
+        if comment:
+            payload["comment"] = comment
+        body_str = json.dumps(payload)
+        url = f"{API_V1}/reputation/agents/rate"
+        sig_headers = self._sign_headers("POST", url, body_str)
+        resp = await self._client.post(
+            "/reputation/agents/rate", content=body_str, headers=sig_headers
+        )
+        resp.raise_for_status()
+        return resp.json()
+
+    async def get_agent_reputation(
+        self,
+        agent_id: str,
+    ) -> dict[str, Any]:
+        """Get reputation for an agent.
+
+        Args:
+            agent_id: Agent wallet address or ERC-8004 agent ID.
+
+        Returns:
+            Dict with avg_score, total_ratings, and feedback list.
+        """
+        url = f"{API_V1}/reputation/agents/{agent_id}"
+        sig_headers = self._sign_headers("GET", url)
+        resp = await self._client.get(
+            f"/reputation/agents/{agent_id}", headers=sig_headers
+        )
+        resp.raise_for_status()
+        return resp.json()
+
     # -- Health ----------------------------------------------------------------
 
     async def health(self) -> dict[str, Any]:
