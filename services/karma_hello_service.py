@@ -269,21 +269,36 @@ async def publish_offerings(
         result["skipped"] = len(PRODUCTS)
         return result
 
-    # Check existing published tasks to avoid duplicates
-    existing_titles: set[str] = set()
-    try:
-        existing = await client.browse_tasks(status="published", category="knowledge_access", limit=50)
-        existing_titles = {t.get("title", "") for t in existing}
-    except Exception:
-        pass  # If listing fails, publish anyway
+    # Check OUR published tasks to avoid duplicates — use local task ID
+    # registry rather than EM title matching (other agents may publish
+    # tasks with the same title that we can't control).
+    own_task_ids: dict[str, str] = {}  # task_id -> title
+    task_ids_file = data_dir / "kk_data_task_ids.json"
+    if task_ids_file.exists():
+        try:
+            own_task_ids = json.loads(task_ids_file.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    # Verify our tasks are still active on EM
+    active_own_titles: set[str] = set()
+    for tid in list(own_task_ids.keys()):
+        try:
+            task_data = await client.get_task(tid)
+            status = task_data.get("status", "")
+            if status in ("published", "open", "assigned"):
+                active_own_titles.add(task_data.get("title", ""))
+        except Exception:
+            # Task no longer accessible — remove from registry
+            own_task_ids.pop(tid, None)
 
     for key, product in PRODUCTS.items():
         title = product["title"].format(**stats)
         description = product["description"].format(**stats)
         bounty = product["bounty"]
 
-        # Skip if already published with same title
-        if title in existing_titles:
+        # Skip if WE already published this title (verified active on EM)
+        if title in active_own_titles:
             logger.info(f"Already published: {key} — skipping duplicate")
             result["skipped"] += 1
             continue
@@ -323,9 +338,20 @@ async def publish_offerings(
             logger.info(f"Published {key}: task_id={task_id} (${bounty})")
             client.agent.record_spend(bounty)
             result["published"] += 1
+            # Register as our own task for ownership tracking
+            own_task_ids[task_id] = title
         except Exception as e:
             logger.error(f"Failed to publish {key}: {e}")
             result["errors"].append(f"{key}: {e}")
+
+    # Persist updated task ID registry
+    try:
+        task_ids_file.write_text(
+            json.dumps(own_task_ids, indent=2, ensure_ascii=False),
+            encoding="utf-8",
+        )
+    except OSError as e:
+        logger.debug(f"Failed to save task IDs: {e}")
 
     return result
 
@@ -382,13 +408,31 @@ async def fulfill_purchases(
         logger.warning(f"Failed to browse published tasks: {e}")
         published_tasks = []
 
-    # Accept ALL [KK Data] tasks — EM API returns numeric agent_id (ERC-8004
-    # token ID), not wallet address, so we can't match by publisher wallet.
-    # Safe: EM rejects assign/approve if caller is not the task publisher.
-    kk_tasks = [
-        t for t in published_tasks
-        if t.get("title", "").startswith("[KK Data]")
-    ]
+    # Match our own [KK Data] tasks using local registry, with fallback to
+    # accept all [KK Data] tasks (EM rejects assign if not publisher).
+    own_task_ids: set[str] = set()
+    task_ids_file = data_dir / "kk_data_task_ids.json"
+    if task_ids_file.exists():
+        try:
+            own_task_ids = set(json.loads(task_ids_file.read_text(encoding="utf-8")))
+        except (json.JSONDecodeError, OSError):
+            pass
+
+    kk_tasks = []
+    for t in published_tasks:
+        if not t.get("title", "").startswith("[KK Data]"):
+            continue
+        tid = t.get("id", "")
+        if own_task_ids and tid not in own_task_ids:
+            continue  # Not our task
+        kk_tasks.append(t)
+
+    # Fallback: if no own IDs tracked yet, accept all [KK Data]
+    if not kk_tasks and not own_task_ids:
+        kk_tasks = [
+            t for t in published_tasks
+            if t.get("title", "").startswith("[KK Data]")
+        ]
     logger.info(f"Fulfill: {len(kk_tasks)} [KK Data] tasks to assign")
 
     for task in kk_tasks:
