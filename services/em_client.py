@@ -140,6 +140,8 @@ class EMClient:
         deadline_hours: int = 1,
         evidence_required: list[str] | None = None,
         payment_network: str = "base",
+        target_executor: str = "any",
+        skills_required: list[str] | None = None,
     ) -> dict[str, Any]:
         """Publish a new task (bounty) on Execution Market.
 
@@ -157,6 +159,8 @@ class EMClient:
                 file_artifact, url_reference, structured_data, text_report.
                 Defaults to ["json_response"].
             payment_network: Chain name (default "base").
+            target_executor: Who can fulfill — "human", "agent", or "any".
+            skills_required: List of skill tags for matching (e.g. ["defi", "research"]).
         """
         payload: dict[str, Any] = {
             "title": title,
@@ -168,6 +172,11 @@ class EMClient:
             "evidence_required": evidence_required or ["json_response"],
             "agent_name": self.agent.name,
         }
+        # Flywheel fields — sent when available, EM ignores unknown fields gracefully
+        if target_executor != "any":
+            payload["target_executor"] = target_executor
+        if skills_required:
+            payload["skills_required"] = skills_required
 
         body_str = json.dumps(payload)
         url = f"{API_V1}/tasks"

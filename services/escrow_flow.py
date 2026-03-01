@@ -186,6 +186,8 @@ async def publish_bounty(
     category_key: str,
     state: dict,
     dry_run: bool = False,
+    target_executor: str = "any",
+    skills_required: list[str] | None = None,
 ) -> str | None:
     """Publish a bounty task requesting data/service.
 
@@ -218,6 +220,8 @@ async def publish_bounty(
             bounty_usd=bounty_usd,
             deadline_hours=24,
             evidence_required=["json_response"],
+            target_executor=target_executor,
+            skills_required=skills_required or [],
         )
         task_id = resp.get("task", {}).get("id") or resp.get("id", "")
 

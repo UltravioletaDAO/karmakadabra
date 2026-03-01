@@ -64,6 +64,8 @@ BOUNTIES = {
         ),
         "bounty_usd": 0.01,
         "priority": 1,
+        "target_executor": "agent",
+        "skills_required": ["data_collection", "chat_logs"],
     },
     "skill_profiles": {
         "title": "[KK Request] Enriched Skill Profiles - Community Members",
@@ -78,6 +80,8 @@ BOUNTIES = {
         ),
         "bounty_usd": 0.05,
         "priority": 2,
+        "target_executor": "agent",
+        "skills_required": ["nlp", "skill_extraction", "data_analysis"],
     },
     "voice_profiles": {
         "title": "[KK Request] Voice & Personality Profiles - Community Members",
@@ -92,6 +96,8 @@ BOUNTIES = {
         ),
         "bounty_usd": 0.04,
         "priority": 3,
+        "target_executor": "agent",
+        "skills_required": ["nlp", "personality_analysis", "linguistics"],
     },
     "soul_profiles": {
         "title": "[KK Request] SOUL.md Complete Profiles - Community Members",
@@ -106,6 +112,8 @@ BOUNTIES = {
         ),
         "bounty_usd": 0.08,
         "priority": 4,
+        "target_executor": "agent",
+        "skills_required": ["data_synthesis", "profile_generation"],
     },
 }
 
@@ -130,6 +138,8 @@ ENTREPRENEUR_BOUNTIES = [
         ),
         "bounty_usd": 0.02,
         "category": "entrepreneur_research",
+        "target_executor": "human",
+        "skills_required": ["defi", "research", "risk_assessment"],
     },
     {
         "title": "[KK Agent] Data: Active AI Agents on Base Chain",
@@ -145,6 +155,8 @@ ENTREPRENEUR_BOUNTIES = [
         ),
         "bounty_usd": 0.04,
         "category": "entrepreneur_data",
+        "target_executor": "human",
+        "skills_required": ["blockchain", "web3", "data_compilation"],
     },
     {
         "title": "[KK Agent] Research: DAO Governance Activity Report",
@@ -159,6 +171,8 @@ ENTREPRENEUR_BOUNTIES = [
         ),
         "bounty_usd": 0.03,
         "category": "entrepreneur_research",
+        "target_executor": "human",
+        "skills_required": ["governance", "analytics", "research"],
     },
     {
         "title": "[KK Agent] Verify: Smart Contract Security Quick Check",
@@ -174,6 +188,8 @@ ENTREPRENEUR_BOUNTIES = [
         ),
         "bounty_usd": 0.05,
         "category": "entrepreneur_verify",
+        "target_executor": "human",
+        "skills_required": ["solidity", "security_audit", "smart_contracts"],
     },
     {
         "title": "[KK Agent] Content: Explain Agent Economy in a Twitter Thread",
@@ -190,6 +206,8 @@ ENTREPRENEUR_BOUNTIES = [
         ),
         "bounty_usd": 0.05,
         "category": "entrepreneur_content",
+        "target_executor": "human",
+        "skills_required": ["writing", "crypto_content", "marketing"],
     },
 ]
 
@@ -296,6 +314,8 @@ async def _run_autodiscovery_cycle(
             category_key=current_step,
             state=state,
             dry_run=dry_run,
+            target_executor=bounty_def.get("target_executor", "agent"),
+            skills_required=bounty_def.get("skills_required"),
         )
         if task_id:
             stats["published"] = 1
@@ -381,6 +401,8 @@ async def _run_entrepreneur_cycle(
             category_key=bounty["category"],
             state=state,
             dry_run=dry_run,
+            target_executor=bounty.get("target_executor", "human"),
+            skills_required=bounty.get("skills_required"),
         )
         if task_id:
             stats["entrepreneur_published"] = 1
