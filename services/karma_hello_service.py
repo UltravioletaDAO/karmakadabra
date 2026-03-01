@@ -281,15 +281,17 @@ async def publish_offerings(
             pass
 
     # Verify our tasks are still active on EM
+    # Only check the 4 most recent tasks (one per product category) to avoid 429
     active_own_titles: set[str] = set()
-    for tid in list(own_task_ids.keys()):
+    recent_ids = list(own_task_ids.keys())[-8:]  # last 8 at most
+    for tid in recent_ids:
         try:
             task_data = await client.get_task(tid)
             status = task_data.get("status", "")
             if status in ("published", "open", "assigned"):
                 active_own_titles.add(task_data.get("title", ""))
+            await asyncio.sleep(0.5)
         except Exception:
-            # Task no longer accessible — remove from registry
             own_task_ids.pop(tid, None)
 
     for key, product in PRODUCTS.items():
@@ -502,17 +504,21 @@ async def fulfill_purchases(
                         continue
 
     # --- Phase B: Auto-approve submitted deliveries ---
-    # Check our known task IDs directly (list_tasks with auth only returns
-    # executor's tasks, not publisher's — so we check by ID instead).
-    await asyncio.sleep(1.0)
+    # Check recent task IDs only (limit API calls to avoid 429).
+    await asyncio.sleep(2.0)
 
     kk_submitted = []
-    for tid in list(own_task_ids):
+    recent_ids = list(own_task_ids)[-8:]  # only check last 8 tasks
+    for tid in recent_ids:
         try:
             task_data = await client.get_task(tid)
-            if task_data.get("status") == "submitted":
+            em_status = task_data.get("status", "")
+            if em_status == "submitted":
                 kk_submitted.append(task_data)
-            await asyncio.sleep(0.3)
+            # Clean up completed/expired from registry
+            if em_status in ("completed", "cancelled", "expired"):
+                own_task_ids.pop(tid, None) if isinstance(own_task_ids, dict) else own_task_ids.discard(tid)
+            await asyncio.sleep(0.8)
         except Exception:
             continue
     logger.info(f"Phase B: {len(kk_submitted)} submitted [KK Data] tasks to review")
