@@ -227,7 +227,7 @@ async def manage_bounties(
                         or sub.get("address", "")
                     )
                     if not worker_wallet:
-                        logger.debug(
+                        logger.info(
                             f"No worker wallet in submission keys: {list(sub.keys())}"
                         )
                     if worker_wallet:
@@ -242,7 +242,7 @@ async def manage_bounties(
                             stats["rated"] += 1
                             logger.info(f"Rated worker {worker_wallet[:8]} (score=4)")
                         except Exception as e:
-                            logger.debug(f"Rate worker failed (non-fatal): {e}")
+                            logger.info(f"Rate worker failed (non-fatal): {e}")
 
                     break
                 except Exception as e:
@@ -423,7 +423,7 @@ async def fulfill_assigned(
                             or task_data.get("owner_wallet", "")
                         )
                         if not agent_wallet:
-                            logger.debug(
+                            logger.info(
                                 f"No agent wallet in task keys: {list(task_data.keys())}"
                             )
                         if agent_wallet:
@@ -439,7 +439,7 @@ async def fulfill_assigned(
                                 stats["rated"] += 1
                                 logger.info(f"Rated agent {agent_wallet[:8]} (score=4)")
                             except Exception as e:
-                                logger.debug(f"Rate agent failed (non-fatal): {e}")
+                                logger.info(f"Rate agent failed (non-fatal): {e}")
             except Exception:
                 pass
             continue
