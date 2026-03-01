@@ -363,16 +363,25 @@ async def fulfill_purchases(
     # Throttle: max 5 task detail checks per cycle to avoid 429
     MAX_CHECKS_PER_CYCLE = 5
 
+    # Use browse_tasks + filter by our wallet (list_tasks returns 0 if EM
+    # /tasks endpoint requires a different auth flow)
     try:
-        published_tasks = await client.list_tasks(
-            agent_wallet=client.agent.wallet_address,
+        published_tasks = await client.browse_tasks(
             status="published",
+            category="knowledge_access",
+            limit=50,
         )
     except Exception as e:
-        logger.warning(f"Failed to list published tasks: {e}")
+        logger.warning(f"Failed to browse published tasks: {e}")
         published_tasks = []
 
-    kk_tasks = [t for t in published_tasks if t.get("title", "").startswith("[KK Data]")]
+    my_wallet = (client.agent.wallet_address or "").lower()
+    kk_tasks = [
+        t for t in published_tasks
+        if t.get("title", "").startswith("[KK Data]")
+        and t.get("agent_id", "").lower() == my_wallet
+    ]
+    logger.info(f"Fulfill: {len(kk_tasks)} [KK Data] tasks owned by us")
     checked = 0
 
     for task in kk_tasks:
@@ -386,16 +395,17 @@ async def fulfill_purchases(
             await asyncio.sleep(1.0)
         checked += 1
 
-        # Get full task detail (includes applications)
+        # Fetch applications via dedicated endpoint (get_task does NOT include them)
         try:
-            detail = await client.get_task(task_id)
+            applications = await client.get_applications(task_id)
         except Exception as e:
-            logger.warning(f"Failed to get task detail {task_id}: {e}")
+            logger.warning(f"Failed to get applications for {task_id}: {e}")
             continue
 
-        applications = detail.get("applications", [])
         if not applications:
             continue
+
+        logger.info(f"Task {title[:40]}: {len(applications)} applicants")
 
         # Auto-assign ALL applicants (not just first)
         for applicant in applications:
