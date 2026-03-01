@@ -382,37 +382,13 @@ async def fulfill_purchases(
         logger.warning(f"Failed to browse published tasks: {e}")
         published_tasks = []
 
-    my_wallet = (client.agent.wallet_address or "").lower()
-    kk_tasks = []
-    for t in published_tasks:
-        title = t.get("title", "")
-        if not title.startswith("[KK Data]"):
-            continue
-        # Match by wallet or agent_id (EM may return either)
-        task_wallet = (
-            t.get("agent_wallet", "")
-            or t.get("agent_id", "")
-            or ""
-        ).lower()
-        if task_wallet == my_wallet:
-            kk_tasks.append(t)
-        elif not my_wallet:
-            # If we don't know our wallet, include all KK Data tasks
-            kk_tasks.append(t)
-
-    if not kk_tasks and published_tasks:
-        # Debug: log why we didn't match
-        kk_data_count = sum(1 for t in published_tasks if t.get("title", "").startswith("[KK Data]"))
-        if kk_data_count > 0:
-            sample = next(
-                t for t in published_tasks if t.get("title", "").startswith("[KK Data]")
-            )
-            logger.info(
-                f"Fulfill: 0/{kk_data_count} [KK Data] tasks matched wallet. "
-                f"Sample agent_id={sample.get('agent_id', 'N/A')}, "
-                f"agent_wallet={sample.get('agent_wallet', 'N/A')}, "
-                f"my_wallet={my_wallet[:12]}..."
-            )
+    # Accept ALL [KK Data] tasks — EM API returns numeric agent_id (ERC-8004
+    # token ID), not wallet address, so we can't match by publisher wallet.
+    # Safe: EM rejects assign/approve if caller is not the task publisher.
+    kk_tasks = [
+        t for t in published_tasks
+        if t.get("title", "").startswith("[KK Data]")
+    ]
     logger.info(f"Fulfill: {len(kk_tasks)} [KK Data] tasks to assign")
 
     for task in kk_tasks:
