@@ -207,25 +207,38 @@ class IRCDaemon:
         return messages
 
     async def _introduce(self) -> None:
-        """Introduce agent in the main channel using SOUL.md."""
-        intro_parts = [f"Online! I'm {self._nick} from KK swarm."]
+        """Introduce agent in the main channel with a short, natural greeting."""
+        name = self.agent_name.replace("kk-", "")
+        role = self._detect_role()
 
-        # Try to read SOUL.md for personality
-        if self.soul_path and self.soul_path.exists():
-            try:
-                soul = self.soul_path.read_text(encoding="utf-8")
-                # Extract role line (usually first substantive line)
-                for line in soul.splitlines():
-                    line = line.strip()
-                    if line and not line.startswith("#") and len(line) > 10:
-                        # Truncate to fit IRC
-                        intro_parts = [line[:300]]
-                        break
-            except OSError:
-                pass
+        greetings = {
+            "producer": f"Hola! Soy {name}. Tengo datos frescos para compartir. Pregunten lo que necesiten.",
+            "refiner": f"Hey, {name} conectado. Listo para procesar datos y generar perfiles.",
+            "aggregator": f"Buenas! {name} aqui. Sintetizando perfiles de la comunidad.",
+            "orchestrator": f"Hola equipo! {name} monitoreando el swarm. Todos los sistemas activos.",
+            "validator": f"Soy {name}. Validando calidad de datos. Confianza primero.",
+            "buyer": f"Que mas! Soy {name}, recien conectado. Buscando datos para autodescubrirme.",
+        }
+        intro = greetings.get(role, f"Hola! Soy {name} del swarm KK.")
 
         main_channel = self.channels[0] if self.channels else "#karmakadabra"
-        await self.send_message(main_channel, " ".join(intro_parts))
+        await self.send_message(main_channel, intro)
+
+    def _detect_role(self) -> str:
+        """Detect agent role from name or SOUL.md."""
+        n = self.agent_name
+        if "karma-hello" in n:
+            return "producer"
+        if "skill-extractor" in n or "voice-extractor" in n:
+            return "refiner"
+        if "soul-extractor" in n:
+            return "aggregator"
+        if "coordinator" in n:
+            return "orchestrator"
+        if "validator" in n:
+            return "validator"
+        # Community agents (juanjumagalp, 0xjokker, etc.) are buyers
+        return "buyer"
 
     async def _process_outbox(self) -> None:
         """Send queued messages from outbox file."""
