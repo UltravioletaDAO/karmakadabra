@@ -171,6 +171,173 @@ class VaultSync:
             f.write(f"- {timestamp} - {message}\n")
 
     # ------------------------------------------------------------------
+    # Offerings (seller publishes what's available)
+    # ------------------------------------------------------------------
+
+    def write_offerings(self, tasks: list[dict]):
+        """Write this agent's offerings.md with current EM task listings.
+
+        Args:
+            tasks: List of dicts with {task_id, title, bounty, category, status}.
+        """
+        offerings_path = self.agent_dir / "offerings.md"
+
+        now = datetime.now(timezone.utc).isoformat()
+        metadata = {
+            "agent_id": self.agent_name,
+            "updated": now,
+            "total_offerings": len(tasks),
+            "tags": ["offerings", "seller"],
+        }
+
+        lines = []
+        lines.append(f"## Active Offerings ({len(tasks)} products)\n")
+        for t in tasks:
+            tid = t.get("task_id", t.get("id", "?"))
+            title = t.get("title", "?")
+            bounty = t.get("bounty", t.get("bounty_usd", 0))
+            lines.append(f"- **{title}** — ${bounty} (task: `{tid}`)")
+        lines.append(f"\nLast updated: {now}")
+
+        body = "\n".join(lines)
+
+        if frontmatter:
+            post = frontmatter.Post(body, **metadata)
+            with open(offerings_path, "w", encoding="utf-8") as f:
+                frontmatter.dump(post, f)
+        else:
+            self._write_raw_state(offerings_path, metadata, body)
+
+    def read_peer_offerings(self, agent_name: str) -> list[dict]:
+        """Read another agent's offerings.md and extract task info.
+
+        Returns list of dicts with available offerings metadata.
+        """
+        path = self.vault / "agents" / agent_name / "offerings.md"
+        meta = self._read_frontmatter(path)
+        if not meta:
+            return []
+
+        # Parse body for task IDs (simple extraction)
+        offerings = []
+        if path.exists():
+            try:
+                text = path.read_text(encoding="utf-8")
+                for line in text.splitlines():
+                    if line.startswith("- **") and "task:" in line:
+                        # Extract task_id from "task: `uuid`"
+                        tid = ""
+                        if "`" in line:
+                            parts = line.split("`")
+                            if len(parts) >= 2:
+                                tid = parts[1]
+                        # Extract bounty from "$X.XX"
+                        bounty = 0.0
+                        if "$" in line:
+                            try:
+                                bounty_str = line.split("$")[1].split(" ")[0].split(")")[0]
+                                bounty = float(bounty_str)
+                            except (ValueError, IndexError):
+                                pass
+                        # Extract title from "**title**"
+                        title = ""
+                        if "**" in line:
+                            title_parts = line.split("**")
+                            if len(title_parts) >= 2:
+                                title = title_parts[1]
+                        if tid:
+                            offerings.append({"task_id": tid, "title": title, "bounty": bounty})
+            except Exception:
+                pass
+
+        return offerings
+
+    # ------------------------------------------------------------------
+    # Supply chain status (coordinator writes, others read)
+    # ------------------------------------------------------------------
+
+    def write_supply_chain_status(self, agent_statuses: dict[str, str]):
+        """Update shared/supply-chain.md with live agent statuses.
+
+        Args:
+            agent_statuses: Dict of {agent_name: status_string}.
+                            e.g. {"kk-karma-hello": "publishing (5 tasks)"}
+        """
+        path = self.shared_dir / "supply-chain.md"
+        if not path.exists():
+            return
+
+        # Read existing file
+        try:
+            text = path.read_text(encoding="utf-8")
+        except Exception:
+            return
+
+        # Update the frontmatter timestamp
+        now = datetime.now(timezone.utc).isoformat()
+
+        # Build live status section
+        status_lines = ["\n## Live Agent Status\n"]
+        for agent_name in sorted(agent_statuses.keys()):
+            status = agent_statuses[agent_name]
+            status_lines.append(f"- **[[{agent_name}]]**: {status}")
+        status_lines.append(f"\n*Updated: {now}*")
+        status_block = "\n".join(status_lines)
+
+        # Replace or append live status section
+        if "## Live Agent Status" in text:
+            # Replace existing section (from header to next ## or end)
+            before = text[:text.index("## Live Agent Status")]
+            # Find next section after Live Agent Status
+            after_start = text.index("## Live Agent Status") + len("## Live Agent Status")
+            remaining = text[after_start:]
+            next_section = remaining.find("\n## ")
+            if next_section >= 0:
+                after = remaining[next_section:]
+            else:
+                after = ""
+            text = before + status_block + after
+        else:
+            text = text.rstrip() + "\n" + status_block
+
+        # Update frontmatter timestamp
+        if "updated:" in text:
+            import re
+            text = re.sub(r"updated:.*", f"updated: {now}", text, count=1)
+
+        path.write_text(text, encoding="utf-8")
+
+    def read_supply_chain_status(self) -> dict[str, str]:
+        """Read live agent statuses from shared/supply-chain.md.
+
+        Returns dict of {agent_name: status_string}.
+        """
+        path = self.shared_dir / "supply-chain.md"
+        statuses = {}
+        if not path.exists():
+            return statuses
+        try:
+            text = path.read_text(encoding="utf-8")
+            in_status = False
+            for line in text.splitlines():
+                if "## Live Agent Status" in line:
+                    in_status = True
+                    continue
+                if in_status and line.startswith("## "):
+                    break
+                if in_status and line.startswith("- **"):
+                    # Parse "- **[[agent-name]]**: status text"
+                    try:
+                        name_part = line.split("[[")[1].split("]]")[0]
+                        status_part = line.split("]]**: ")[1] if "]]**: " in line else ""
+                        statuses[name_part] = status_part
+                    except (IndexError, ValueError):
+                        pass
+        except Exception:
+            pass
+        return statuses
+
+    # ------------------------------------------------------------------
     # Shared files
     # ------------------------------------------------------------------
 

@@ -93,6 +93,7 @@ from services.coordinator_service import coordination_cycle as run_coordinator_c
 from services.data_retrieval import check_and_retrieve_all
 from services.irc_integration import check_irc_and_respond
 from lib.vault_sync import VaultSync
+from lib.vault_decisions import prioritize_actions
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.heartbeat")
@@ -435,6 +436,20 @@ async def heartbeat_once(
             try:
                 parts = []
 
+                # Phase 4: Read vault for upstream awareness
+                try:
+                    vault_dir = data_dir.parent / "vault"
+                    if vault_dir.exists():
+                        _vault = VaultSync(str(vault_dir), name)
+                        upstream_offerings = _vault.read_peer_offerings("kk-karma-hello")
+                        chain_status = _vault.read_supply_chain_status()
+                        if upstream_offerings:
+                            parts.append(f"vault: {len(upstream_offerings)} upstream offerings")
+                        if chain_status:
+                            logger.info(f"  [{name}] Supply chain: {chain_status}")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Vault read (non-fatal): {e}")
+
                 # Seller flow: discover [KK Request] bounties, apply, fulfill
                 seller_result = await sk_seller_flow(client, data_dir, dry_run=dry_run)
                 sr = seller_result
@@ -470,6 +485,20 @@ async def heartbeat_once(
             try:
                 parts = []
 
+                # Phase 4: Read vault for upstream awareness
+                try:
+                    vault_dir = data_dir.parent / "vault"
+                    if vault_dir.exists():
+                        _vault = VaultSync(str(vault_dir), name)
+                        upstream_offerings = _vault.read_peer_offerings("kk-karma-hello")
+                        chain_status = _vault.read_supply_chain_status()
+                        if upstream_offerings:
+                            parts.append(f"vault: {len(upstream_offerings)} upstream offerings")
+                        if chain_status:
+                            logger.info(f"  [{name}] Supply chain: {chain_status}")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Vault read (non-fatal): {e}")
+
                 # Seller flow: discover [KK Request] bounties, apply, fulfill
                 seller_result = await ve_seller_flow(client, data_dir, dry_run=dry_run)
                 sr = seller_result
@@ -504,6 +533,22 @@ async def heartbeat_once(
             action = "soul_extractor_seller"
             try:
                 parts = []
+
+                # Phase 4: Read vault for upstream awareness (skill + voice extractors)
+                try:
+                    vault_dir = data_dir.parent / "vault"
+                    if vault_dir.exists():
+                        _vault = VaultSync(str(vault_dir), name)
+                        sk_offerings = _vault.read_peer_offerings("kk-skill-extractor")
+                        ve_offerings = _vault.read_peer_offerings("kk-voice-extractor")
+                        chain_status = _vault.read_supply_chain_status()
+                        total_upstream = len(sk_offerings) + len(ve_offerings)
+                        if total_upstream:
+                            parts.append(f"vault: {total_upstream} upstream offerings")
+                        if chain_status:
+                            logger.info(f"  [{name}] Supply chain: {chain_status}")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Vault read (non-fatal): {e}")
 
                 # Seller flow: discover [KK Request] bounties, apply, fulfill
                 seller_result = await so_seller_flow(client, data_dir, dry_run=dry_run)
@@ -578,6 +623,19 @@ async def heartbeat_once(
         ):
             action = "community_buyer"
             try:
+                # Phase 4: Read vault offerings before buying
+                try:
+                    vault_dir = data_dir.parent / "vault"
+                    if vault_dir.exists():
+                        _vault = VaultSync(str(vault_dir), name)
+                        kh_offerings = _vault.read_peer_offerings("kk-karma-hello")
+                        if kh_offerings:
+                            logger.info(
+                                f"  [{name}] Vault: karma-hello has {len(kh_offerings)} offerings"
+                            )
+                except Exception as e:
+                    logger.debug(f"  [{name}] Vault read (non-fatal): {e}")
+
                 from services.community_buyer_service import run_cycle as run_buyer_cycle
                 buyer_result = await run_buyer_cycle(
                     data_dir=data_dir,
@@ -679,13 +737,15 @@ async def heartbeat_once(
     if irc_summary:
         logger.info(f"  [{name}] IRC: {irc_summary}")
 
-    # 8. Vault: update Obsidian vault state (non-fatal)
+    # 8. Vault: update Obsidian vault state + cross-agent awareness (non-fatal)
     if not dry_run:
         try:
             vault_dir = data_dir.parent / "vault"
             if vault_dir.exists():
                 vault = VaultSync(str(vault_dir), name)
                 vault.pull()
+
+                # 8a. Write own agent state
                 vault.write_state(
                     {
                         "status": "active" if action != "error" else "error",
@@ -697,6 +757,51 @@ async def heartbeat_once(
                     body=f"## Last Heartbeat\n{action} -> {result}",
                 )
                 vault.append_log(f"{action} -> {result}")
+
+                # 8b. Decision engine: log vault-based priorities
+                try:
+                    priorities = prioritize_actions(vault, name)
+                    vault.append_log(f"Decision priorities: {priorities}")
+                    logger.info(f"  [{name}] Vault priorities: {priorities}")
+                except Exception as e:
+                    logger.debug(f"  [{name}] Decision engine (non-fatal): {e}")
+
+                # 8c. karma-hello: write offerings to vault after publish
+                if name == "kk-karma-hello":
+                    try:
+                        from services.em_client import load_agent_context as _lac
+                        _agent = _lac(workspace_dir)
+                        _client = EMClient(_agent)
+                        try:
+                            my_tasks = await _client.list_tasks(
+                                agent_wallet=_agent.wallet_address,
+                                status="published",
+                            )
+                            if my_tasks:
+                                vault.write_offerings(my_tasks)
+                                logger.info(f"  [{name}] Wrote {len(my_tasks)} offerings to vault")
+                        finally:
+                            await _client.close()
+                    except Exception as e:
+                        logger.debug(f"  [{name}] Vault offerings write (non-fatal): {e}")
+
+                # 8d. Coordinator: write supply chain status to vault
+                if name == "kk-coordinator":
+                    try:
+                        peer_states = vault.list_peer_states()
+                        agent_statuses = {}
+                        for peer_name, peer_meta in peer_states.items():
+                            status_str = peer_meta.get("current_task", "unknown")
+                            peer_status = peer_meta.get("status", "")
+                            if peer_status:
+                                status_str = f"{peer_status} ({status_str})"
+                            agent_statuses[peer_name] = status_str
+                        if agent_statuses:
+                            vault.write_supply_chain_status(agent_statuses)
+                            logger.info(f"  [{name}] Wrote supply chain status for {len(agent_statuses)} agents")
+                    except Exception as e:
+                        logger.debug(f"  [{name}] Supply chain status write (non-fatal): {e}")
+
                 vault.commit_and_push(f"{action}: {result[:60]}")
         except Exception as e:
             logger.debug(f"  [{name}] Vault sync (non-fatal): {e}")
