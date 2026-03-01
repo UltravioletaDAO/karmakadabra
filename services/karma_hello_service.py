@@ -471,7 +471,20 @@ async def fulfill_purchases(
                         continue
                     logger.debug(f"Assign {executor_id[:8]} to {task_id}: {e}")
         else:
-            # Fallback: try direct assign with known buyers
+            # Fallback: direct assign only for tasks older than 10 min
+            # (give buyers time to discover and apply on their own)
+            created = task.get("created_at", "")
+            task_age_ok = False
+            if created:
+                try:
+                    ct = created.replace("Z", "+00:00")
+                    age = datetime.now(timezone.utc) - datetime.fromisoformat(ct)
+                    task_age_ok = age.total_seconds() > 600
+                except Exception:
+                    task_age_ok = True  # Can't parse, allow fallback
+            if not task_age_ok:
+                logger.debug(f"Task {task_id[:8]} too new for direct assign, waiting for applicants")
+                continue
             for buyer_name, executor_id in KK_BUYERS.items():
                 if dry_run:
                     result["assigned"] += 1
