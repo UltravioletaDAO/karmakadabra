@@ -611,8 +611,19 @@ async def fulfill_assigned(
             continue
 
         if em_status in ("accepted", "in_progress"):
-            # We're assigned! Submit evidence
-            if not client.agent.executor_id:
+            # Verify WE are the assigned executor (not someone else)
+            assigned_exec = (
+                task_data.get("executor_id", "")
+                or task_data.get("assigned_executor_id", "")
+                or task_data.get("worker_id", "")
+            )
+            our_exec = client.agent.executor_id or ""
+            if not our_exec:
+                continue
+            if assigned_exec and assigned_exec != our_exec:
+                logger.debug(
+                    f"Task {task_id} assigned to {assigned_exec}, not us ({our_exec})"
+                )
                 continue
 
             ev = {"json_response": {"agent": client.agent.name, "status": "delivered"}}
