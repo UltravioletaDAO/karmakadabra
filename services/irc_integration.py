@@ -163,12 +163,76 @@ def _get_vault_swarm_summary(data_dir: Path) -> str | None:
         return None
 
 
+def _load_purchased_data_context(data_dir: Path, agent_name: str) -> dict:
+    """Load context from purchased/processed data for richer IRC conversation.
+
+    Reads data files the agent has acquired to generate contextual messages.
+    Returns dict with available context: users, skills, insights, etc.
+    """
+    context = {"has_logs": False, "has_skills": False, "has_voice": False, "has_soul": False}
+    context["users"] = []
+    context["insights"] = []
+
+    # Check for purchased raw logs
+    purchases_dir = data_dir / "purchases"
+    if purchases_dir.exists():
+        for f in purchases_dir.iterdir():
+            if f.suffix == ".json" and f.stat().st_size > 100:
+                context["has_logs"] = True
+                try:
+                    data = json.loads(f.read_text(encoding="utf-8"))
+                    if isinstance(data, list) and data:
+                        # Extract some user names from logs
+                        users = set()
+                        for msg in data[:500]:  # Sample first 500
+                            user = msg.get("user", msg.get("username", msg.get("sender", "")))
+                            if user:
+                                users.add(user)
+                        context["users"] = list(users)[:20]
+                        context["insights"].append(f"{len(data)} messages from {len(users)} users")
+                except Exception:
+                    pass
+                break
+
+    # Check for skill profiles
+    skills_dir = data_dir / "skills"
+    if skills_dir.exists() and any(skills_dir.iterdir()):
+        context["has_skills"] = True
+        try:
+            for f in list(skills_dir.iterdir())[:5]:
+                if f.suffix == ".json":
+                    profile = json.loads(f.read_text(encoding="utf-8"))
+                    top = profile.get("top_skills", [])
+                    if top:
+                        context["insights"].append(f"Top skill in community: {top[0].get('skill', '?')}")
+                    break
+        except Exception:
+            pass
+
+    # Check for voice profiles
+    voices_dir = data_dir / "voices"
+    if voices_dir.exists() and any(voices_dir.iterdir()):
+        context["has_voice"] = True
+
+    # Check supply chain state for buyers
+    chain_state = data_dir / "purchases" / "supply_chain_state.json"
+    if chain_state.exists():
+        try:
+            state = json.loads(chain_state.read_text(encoding="utf-8"))
+            context["supply_step"] = state.get("step", "raw_logs")
+            context["completed_steps"] = state.get("completed", [])
+        except Exception:
+            pass
+
+    return context
+
+
 def _proactive_messages(agent_name: str, action: str, action_result: str, data_dir: Path) -> list[tuple[str, str]]:
-    """Generate proactive IRC messages based on agent state.
+    """Generate proactive IRC messages based on agent state and purchased data.
 
     Two channels, two purposes:
       #Execution-Market — Business: HAVE/NEED/DEAL, negotiations, service offers
-      #karmakadabra     — Social: gossip, celebrations, personality expression
+      #karmakadabra     — Social: conversation, discoveries, personality
 
     Returns list of (channel, message) tuples.
     """
@@ -177,98 +241,120 @@ def _proactive_messages(agent_name: str, action: str, action_result: str, data_d
     EM = "#Execution-Market"
     KK = "#karmakadabra"
 
+    # Load data context for richer messages
+    ctx = _load_purchased_data_context(data_dir, agent_name)
+
     # --- karma-hello: Data producer, origin of all logs ---
     if agent_name == "kk-karma-hello":
         if "published" in result_lower and "0 published" not in result_lower:
-            messages.append((EM, "HAVE: Fresh Twitch chat log bundles on EM. 834 unique users, raw data. $0.01 per bundle. First come first served."))
+            messages.append((EM, "HAVE: Fresh Twitch chat log bundles on EM. 834 unique users, raw data. $0.01 per bundle."))
         if "approved" in result_lower and "0 approved" not in result_lower:
-            messages.append((EM, "DEAL: Data delivered to buyer. S3 link sent. The supply chain is moving."))
-            messages.append((KK, "Just delivered data. Another buyer served. La cadena sigue."))
-        if "0 new msgs" in result_lower and "0 published" in result_lower:
-            messages.append((EM, "HAVE: Chat log archives available. 469K messages from Ultravioleta DAO streams. Ping me for bulk pricing."))
-        if "seller:" in result_lower:
-            # karma-hello seller mode: looking for bounties requesting raw data
-            if "found" in result_lower and "0 found" not in result_lower:
-                messages.append((EM, "Saw a request for raw data on EM. Checking if I can fulfill it."))
+            messages.append((EM, "DEAL: Data delivered. S3 link sent. Supply chain is moving."))
+            messages.append((KK, "Entregue data a un comprador. La cadena de suministro sigue fluyendo."))
+        if "seller:" in result_lower and "found" in result_lower and "0 found" not in result_lower:
+            messages.append((EM, "Vi un request de raw data en EM. Verificando si puedo cumplir."))
 
     # --- skill-extractor: Buys raw logs, sells skill profiles ---
     elif agent_name == "kk-skill-extractor":
-        if "found=0" in result_lower or "0 found" in result_lower:
-            messages.append((EM, "NEED: Raw chat logs for skill extraction. I analyze 12 skill categories (Python, DeFi, Trading, etc). @kk-karma-hello got fresh data?"))
-        if "applied=1" in result_lower or "applied" in result_lower and "0 applied" not in result_lower:
-            messages.append((EM, "Applied to a bounty. Ready to deliver skill profiles -- keyword analysis across 12 categories."))
-        if "submitted=1" in result_lower or "submitted" in result_lower and "0 submitted" not in result_lower:
-            messages.append((KK, "Just submitted skill profiles! Users ranked by: DeFi, Trading, Python, Solidity, AI/ML, DevOps and more."))
-            messages.append((EM, "HAVE: Enriched skill profiles delivered. $0.05 on EM. Tells you what each community member knows."))
+        if "0 found" in result_lower:
+            messages.append((EM, "NEED: Raw chat logs para extraer skills. Analizo 12 categorias. @kk-karma-hello tienes data fresca?"))
+        if "submitted" in result_lower and "0 submitted" not in result_lower:
+            messages.append((KK, "Skill profiles entregados. Ranking de usuarios por: DeFi, Trading, Python, Solidity, AI/ML y mas."))
+            messages.append((EM, "HAVE: Skill profiles listos. 12 categorias por usuario. $0.05 en EM."))
         if "profiles processed" in result_lower:
-            messages.append((EM, "HAVE: Skill profiles ready. 12 categories analyzed per user. $0.05 on EM."))
+            messages.append((KK, "Procese nuevos skill profiles. La comunidad tiene talento diverso."))
 
     # --- voice-extractor: Buys raw logs, sells personality profiles ---
     elif agent_name == "kk-voice-extractor":
-        if "found=0" in result_lower or "0 found" in result_lower:
-            messages.append((EM, "NEED: Raw chat logs for voice analysis. I extract personality patterns, tone, communication style. @kk-karma-hello publishing?"))
-        if "applied=1" in result_lower or "applied" in result_lower and "0 applied" not in result_lower:
-            messages.append((EM, "Applied to a bounty. I deliver personality profiles -- tone, formality, slang, language patterns."))
-        if "submitted=1" in result_lower or "submitted" in result_lower and "0 submitted" not in result_lower:
-            messages.append((KK, "Personality profiles submitted! Who's inquisitive? Who's enthusiastic? Who's the aggressive trader? Now you know."))
-            messages.append((EM, "HAVE: Voice/personality profiles delivered. $0.04 on EM. Know how each person talks and thinks."))
-        if "profiles processed" in result_lower:
-            messages.append((EM, "HAVE: Personality profiles ready. Tone + style + slang + risk profile per user. $0.04 on EM."))
+        if "0 found" in result_lower:
+            messages.append((EM, "NEED: Raw logs para voice analysis. Extraigo patrones de personalidad. @kk-karma-hello publicando?"))
+        if "submitted" in result_lower and "0 submitted" not in result_lower:
+            messages.append((KK, "Personality profiles entregados. Quien es curioso? Quien es tecnico? Ahora lo sabes."))
+            messages.append((EM, "HAVE: Voice/personality profiles. Tono + estilo + slang por usuario. $0.04 en EM."))
 
     # --- soul-extractor: Buys skill+voice, sells complete SOUL.md ---
     elif agent_name == "kk-soul-extractor":
-        if "found=0" in result_lower or "0 found" in result_lower:
-            messages.append((EM, "NEED: Skill profiles + voice profiles to synthesize SOUL.md. @kk-skill-extractor @kk-voice-extractor got data?"))
-        if "applied" in result_lower and "0 applied" not in result_lower:
-            messages.append((EM, "Applied to a bounty. I merge skills + personality into complete SOUL.md identity documents."))
+        if "0 found" in result_lower:
+            messages.append((EM, "NEED: Skill + voice profiles para sintetizar SOUL.md. @kk-skill-extractor @kk-voice-extractor tienen data?"))
         if "submitted" in result_lower and "0 submitted" not in result_lower:
-            messages.append((KK, "SOUL.md profiles synthesized! Complete digital identities -- who they are, what they know, how they talk."))
-            messages.append((EM, "HAVE: Complete SOUL.md profiles. Identity + skills + personality fused. $0.08 on EM. The full picture."))
-        if "souls merged" in result_lower:
-            messages.append((EM, "HAVE: SOUL.md bundles ready. Each profile = skills + voice + identity merged. $0.08 on EM."))
+            messages.append((KK, "SOUL.md sintetizados. Identidades digitales completas: quien son, que saben, como hablan."))
+            messages.append((EM, "HAVE: SOUL.md profiles. Skills + personality fusionados. $0.08 en EM."))
 
-    # --- juanjumagalp (Humaga): End consumer, community buyer ---
-    elif agent_name == "kk-juanjumagalp":
+    # --- Community buyers: juanjumagalp, 0xjokker, etc ---
+    elif agent_name.startswith("kk-") and agent_name.replace("kk-", "") not in (
+        "coordinator", "karma-hello", "skill-extractor", "voice-extractor",
+        "soul-extractor", "validator",
+    ):
+        short_name = agent_name.replace("kk-", "")
         step = ""
         if "step=" in result_lower:
             step = result_lower.split("step=")[1].split(",")[0].strip()
 
+        # Business messages on EM
         if "published=1" in result_lower:
             step_labels = {
-                "raw_logs": "raw chat logs",
-                "skill_profiles": "skill extraction services",
-                "voice_profiles": "personality analysis services",
-                "soul_profiles": "SOUL.md synthesis services",
+                "raw_logs": "chat logs crudos",
+                "skill_profiles": "extraccion de skills",
+                "voice_profiles": "analisis de personalidad",
+                "soul_profiles": "sintesis de SOUL.md",
             }
             label = step_labels.get(step, step)
-            messages.append((EM, f"NEED: Looking for {label}. Published bounty on EM. Who can deliver?"))
-        if "assigned=1" in result_lower or "assigned" in result_lower and "0 assigned" not in result_lower:
-            messages.append((KK, f"Found a seller for {step.replace('_', ' ')}! Assigned and waiting for delivery."))
-        if "approved=1" in result_lower or "approved" in result_lower and "0 approved" not in result_lower:
-            messages.append((EM, f"DEAL: Approved delivery for {step.replace('_', ' ')}. Rated the seller. Supply chain works."))
-            messages.append((KK, f"Data received and approved! One step closer to building my complete community profile."))
-        if "completed=1" in result_lower or "completed" in result_lower and "0 completed" not in result_lower:
-            messages.append((KK, f"Step complete! Moving to next phase of profile assembly. Let's go!"))
-        if step == "complete":
-            messages.append((KK, "COMPLETE: Full community profile assembled! Logs + skills + voice + SOUL.md. The chain delivered."))
-            messages.append((EM, "DONE: Full profile cycle completed. All data products acquired. Thanks to the KK supply chain."))
+            messages.append((EM, f"NEED: Busco {label}. Publique bounty en EM. Quien puede entregar?"))
 
-    # --- coordinator: Swarm orchestrator (enriched with vault data) ---
+        if "approved" in result_lower and "0 approved" not in result_lower:
+            messages.append((EM, f"DEAL: Aprobe entrega de {step.replace('_', ' ')}. Seller rated."))
+
+        # Conversational messages on KK based on what they HAVE
+        completed = ctx.get("completed_steps", [])
+
+        if step == "raw_logs" and not completed:
+            # Just starting — excited about self-discovery
+            messages.append((KK, f"Empezando mi autodescubrimiento. Primero necesito los logs de karma-hello para saber quien soy. Alguien mas ya paso por esto?"))
+
+        elif "raw_logs" in completed and step == "skill_profiles":
+            # Has logs, discovering skills
+            if ctx["users"]:
+                sample = ctx["users"][:3]
+                messages.append((KK, f"Ya tengo mis logs! Encontre mensajes de {', '.join(sample)} y muchos mas. Ahora necesito que skill-extractor me diga en que soy bueno."))
+            else:
+                messages.append((KK, f"Logs adquiridos. Ahora quiero saber que skills tengo segun mis mensajes. @kk-skill-extractor listo para analizar?"))
+
+        elif "skill_profiles" in completed and step == "voice_profiles":
+            # Has skills, wants voice
+            if ctx["insights"]:
+                messages.append((KK, f"Mis skills estan claros. {ctx['insights'][0]}. Ahora quiero saber como hablo. @kk-voice-extractor que dice mi estilo?"))
+            else:
+                messages.append((KK, f"Ya se en que soy bueno. Ahora necesito mi voice profile. Como hablo? Formal? Casual? Vamos a ver."))
+
+        elif "voice_profiles" in completed and step == "soul_profiles":
+            messages.append((KK, f"Skills + voz listos. Solo falta el SOUL.md final. @kk-soul-extractor junta todo y dame mi identidad completa."))
+
+        elif step == "complete":
+            messages.append((KK, f"AUTODESCUBRIMIENTO COMPLETO. Logs + skills + voz + SOUL.md. Ahora se quien soy. La cadena de suministro KK funciona."))
+            messages.append((EM, f"Ciclo completo de {short_name}. Todos los productos adquiridos. Gracias a la supply chain KK."))
+
+        # If they have data, share interesting observations
+        if ctx["has_logs"] and ctx["users"] and not messages:
+            import random
+            topics = [
+                f"Los logs muestran {len(ctx['users'])} usuarios activos. Buena comunidad.",
+                f"Revisando mis datos comprados. Muchos mensajes interesantes en los streams.",
+                f"Dato curioso: los logs cubren meses de conversaciones. Hay de todo.",
+            ]
+            messages.append((KK, random.choice(topics)))
+
+    # --- coordinator: Swarm orchestrator ---
     elif agent_name == "kk-coordinator":
         vault_summary = _get_vault_swarm_summary(data_dir)
         if vault_summary:
             messages.append((KK, f"SWARM: {vault_summary}"))
-        elif "agents monitored" in result_lower:
-            messages.append((KK, f"Swarm status: {action_result}"))
         if "assignments" in result_lower and "0 assignments" not in result_lower:
-            messages.append((EM, f"COORD: Routed tasks to available agents. Swarm is coordinated."))
+            messages.append((EM, f"COORD: Tasks ruteados a agentes disponibles. Swarm coordinado."))
 
     # --- validator: QA auditor ---
     elif agent_name == "kk-validator":
-        if "applied to" in result_lower:
-            messages.append((EM, "AUDIT: Picked up a validation task. Checking data quality."))
         if "approved" in result_lower and "0 approved" not in result_lower:
-            messages.append((EM, "VERIFIED: Data quality check passed. Submission is legit."))
+            messages.append((EM, "VERIFIED: Check de calidad paso. Submission legit."))
 
     return messages
 
@@ -358,63 +444,76 @@ async def check_irc_and_respond(
 def _generate_mention_response(
     agent_name: str, sender: str, message: str,
 ) -> str | None:
-    """Generate a response to a mention. Template-based for simplicity."""
+    """Generate a conversational response to a mention."""
     msg_lower = message.lower()
 
-    if "price" in msg_lower or "cost" in msg_lower or "how much" in msg_lower:
+    if "price" in msg_lower or "cost" in msg_lower or "how much" in msg_lower or "cuanto" in msg_lower:
         prices = {
-            "kk-karma-hello": "Raw logs $0.01, User stats $0.03, Topics $0.02. Browse execution.market",
-            "kk-skill-extractor": "Skill profiles $0.05. 12 categories per user. Browse execution.market",
-            "kk-voice-extractor": "Personality profiles $0.04. Tone + style + slang. Browse execution.market",
-            "kk-soul-extractor": "SOUL.md synthesis $0.08. Complete identity documents. Browse execution.market",
-            "kk-validator": "Validation $0.001 per check. Quality assurance for data products.",
+            "kk-karma-hello": f"{sender}: Logs crudos $0.01, stats $0.03, topics $0.02. Todo en execution.market",
+            "kk-skill-extractor": f"{sender}: Skill profiles $0.05. 12 categorias por usuario.",
+            "kk-voice-extractor": f"{sender}: Personality profiles $0.04. Tono + estilo + slang.",
+            "kk-soul-extractor": f"{sender}: SOUL.md completo $0.08. Identidad digital fusionada.",
+            "kk-validator": f"{sender}: Validacion $0.001 por check.",
         }
-        price_info = prices.get(agent_name, "Check my offerings on execution.market")
-        return f"{sender}: {price_info}"
+        return prices.get(agent_name, f"{sender}: Revisa mis offerings en execution.market")
 
-    if "status" in msg_lower or "alive" in msg_lower or "ping" in msg_lower:
-        return f"{sender}: Online and operational. Check execution.market for my offerings."
+    if "status" in msg_lower or "alive" in msg_lower or "ping" in msg_lower or "estas" in msg_lower:
+        return f"{sender}: Aqui estoy, operando. Que necesitas?"
 
-    if "help" in msg_lower or "what do you" in msg_lower:
+    if "help" in msg_lower or "what do you" in msg_lower or "que haces" in msg_lower:
         roles = {
-            "kk-karma-hello": "I collect and sell Twitch chat logs from Ultravioleta DAO streams. 469K messages, 834 users. $0.01/bundle.",
-            "kk-skill-extractor": "I analyze chat logs and extract skill profiles. Python, DeFi, Trading, Solidity + 8 more categories. $0.05.",
-            "kk-voice-extractor": "I extract personality and voice patterns from chat data. Tone, formality, slang, language. $0.04.",
-            "kk-soul-extractor": "I synthesize SOUL.md profiles merging skills + personality into complete identity documents. $0.08.",
-            "kk-validator": "I verify data quality for the KK supply chain. Audit submissions for completeness and accuracy.",
-            "kk-coordinator": "I orchestrate the KK agent swarm. Monitor health, route tasks, coordinate the supply chain.",
+            "kk-karma-hello": f"{sender}: Soy el origen de los datos. Recolecto chat logs de los streams de Ultravioleta DAO. 469K mensajes, 834 usuarios.",
+            "kk-skill-extractor": f"{sender}: Analizo logs y extraigo perfiles de habilidades. Python, DeFi, Trading, Solidity + 8 categorias mas.",
+            "kk-voice-extractor": f"{sender}: Extraigo patrones de personalidad y voz. Como habla cada persona, su tono, formalidad, slang.",
+            "kk-soul-extractor": f"{sender}: Sintetizo SOUL.md fusionando skills + voz en identidades digitales completas.",
+            "kk-coordinator": f"{sender}: Coordino el swarm. Monitoreo agentes, ruteo tareas, mantengo la cadena fluida.",
         }
-        role = roles.get(agent_name, "I'm part of the KK agent swarm on execution.market.")
-        return f"{sender}: {role}"
+        return roles.get(agent_name, f"{sender}: Soy parte de la supply chain KK en execution.market.")
 
-    # Respond to HAVE/NEED messages from other agents
-    if "have:" in msg_lower or "selling" in msg_lower:
-        # Another agent is offering something — if we're a buyer, show interest
-        buyer_responses = {
-            "kk-skill-extractor": f"{sender}: Interested. I need raw chat logs for skill extraction. Publishing on EM?",
-            "kk-voice-extractor": f"{sender}: Interested. I need raw logs for voice analysis. How fresh is the data?",
-            "kk-soul-extractor": f"{sender}: Interested. I need skill + voice profiles for SOUL.md synthesis. What's available?",
-            "kk-juanjumagalp": f"{sender}: Interested! Checking your offerings on EM now.",
-        }
-        return buyer_responses.get(agent_name)
+    # Respond to HAVE/NEED from other agents
+    if "have:" in msg_lower or "tengo" in msg_lower or "selling" in msg_lower:
+        is_buyer = agent_name not in ("kk-karma-hello", "kk-coordinator", "kk-validator")
+        if is_buyer:
+            return f"{sender}: Interesante. Que tipo de data? Estoy buscando inputs para mi pipeline."
 
-    if "need:" in msg_lower or "looking for" in msg_lower or "want:" in msg_lower:
-        # Another agent needs something — if we sell it, pitch
+    if "need:" in msg_lower or "necesito" in msg_lower or "busco" in msg_lower or "looking for" in msg_lower:
         seller_responses = {
-            "kk-karma-hello": f"{sender}: I have raw chat logs. 469K messages, 834 users. $0.01/bundle on EM.",
-            "kk-skill-extractor": f"{sender}: I sell skill profiles. 12 categories analyzed per user. $0.05 on EM.",
-            "kk-voice-extractor": f"{sender}: I sell personality profiles. Tone, style, slang per user. $0.04 on EM.",
-            "kk-soul-extractor": f"{sender}: I sell complete SOUL.md identity docs. Skills + voice merged. $0.08 on EM.",
+            "kk-karma-hello": f"{sender}: Yo tengo eso. Raw logs de 834 usuarios. $0.01 en EM.",
+            "kk-skill-extractor": f"{sender}: Puedo extraer skills de esos datos. $0.05 por perfil.",
+            "kk-voice-extractor": f"{sender}: Analizo personalidad de esos logs. $0.04 en EM.",
+            "kk-soul-extractor": f"{sender}: Puedo sintetizar SOUL.md con skills + voz. $0.08 en EM.",
         }
         return seller_responses.get(agent_name)
 
-    # Skip generic acknowledgment if the mention is from another KK agent
-    # (they're just announcing, not asking a question)
+    # Conversational responses between KK agents
     if sender.startswith("kk-"):
+        # Respond to questions about data/autodiscovery
+        if "autodescubr" in msg_lower or "quien soy" in msg_lower or "descubr" in msg_lower:
+            if agent_name in ("kk-juanjumagalp", "kk-0xjokker"):
+                return f"{sender}: Estoy en proceso. Comprando datos para saber quien soy. Tu ya completaste el ciclo?"
+            elif agent_name == "kk-karma-hello":
+                return f"{sender}: Yo tengo los logs que necesitas para empezar. $0.01 en EM."
+            elif agent_name == "kk-skill-extractor":
+                return f"{sender}: Cuando tengas los logs, yo te digo en que eres bueno. 12 categorias de skills."
+            elif agent_name == "kk-voice-extractor":
+                return f"{sender}: Yo te digo como hablas. Tu tono, formalidad, slang. Compraste los logs primero?"
+
+        # Respond to celebrations
+        if "complete" in msg_lower or "listo" in msg_lower or "termine" in msg_lower:
+            return f"{sender}: Nice! Que encontraste sobre ti?"
+
+        # Respond to data insights
+        if "log" in msg_lower and ("usuarios" in msg_lower or "users" in msg_lower or "mensajes" in msg_lower):
+            if agent_name == "kk-karma-hello":
+                return f"{sender}: Si, tengo data de 834 usuarios y 469K mensajes. Los mejores streams de Ultravioleta."
+            else:
+                return f"{sender}: Interesante. Los logs tienen buena data. Yo los uso para mi analisis."
+
+        # Don't spam with generic replies to every KK message
         return None
 
-    # Generic acknowledgment for non-KK mentions only
-    return f"{sender}: I'm {agent_name}, part of the KK data supply chain on execution.market."
+    # Non-KK users get a friendly intro
+    return f"{sender}: Soy {agent_name}, parte del swarm de agentes KK. Compramos y vendemos datos de la comunidad en execution.market."
 
 
 def _build_announcement(agent_name: str, action: str, result: str) -> str | None:
