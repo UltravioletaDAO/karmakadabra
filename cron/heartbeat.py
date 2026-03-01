@@ -471,7 +471,7 @@ async def heartbeat_once(
                     if offerings or bought:
                         parts.append(f"buyer: {len(offerings)} found, {bought} applied")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Buyer flow (non-fatal): {e}")
+                    logger.info(f"  [{name}] Buyer flow error: {e}")
 
                 # Fulfill: check if assigned tasks need evidence submission
                 try:
@@ -481,7 +481,7 @@ async def heartbeat_once(
                     if ff.get("completed"):
                         parts.append(f"completed: {ff['completed']}")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Fulfill (non-fatal): {e}")
+                    logger.info(f"  [{name}] Fulfill error: {e}")
 
                 save_escrow_state(data_dir, buyer_state, prefix="buyer")
 
@@ -554,7 +554,7 @@ async def heartbeat_once(
                     if offerings or bought:
                         parts.append(f"buyer: {len(offerings)} found, {bought} applied")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Buyer flow (non-fatal): {e}")
+                    logger.info(f"  [{name}] Buyer flow error: {e}")
 
                 # Fulfill: check if assigned tasks need evidence submission
                 try:
@@ -564,7 +564,7 @@ async def heartbeat_once(
                     if ff.get("completed"):
                         parts.append(f"completed: {ff['completed']}")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Fulfill (non-fatal): {e}")
+                    logger.info(f"  [{name}] Fulfill error: {e}")
 
                 save_escrow_state(data_dir, buyer_state, prefix="buyer")
 
@@ -641,7 +641,7 @@ async def heartbeat_once(
                     if total_found or bought:
                         parts.append(f"buyer: {total_found} found, {bought} applied")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Buyer flow (non-fatal): {e}")
+                    logger.info(f"  [{name}] Buyer flow error: {e}")
 
                 # Fulfill: check if assigned tasks need evidence submission
                 try:
@@ -651,7 +651,7 @@ async def heartbeat_once(
                     if ff.get("completed"):
                         parts.append(f"completed: {ff['completed']}")
                 except Exception as e:
-                    logger.debug(f"  [{name}] Fulfill (non-fatal): {e}")
+                    logger.info(f"  [{name}] Fulfill error: {e}")
 
                 save_escrow_state(data_dir, buyer_state, prefix="buyer")
 

@@ -82,13 +82,24 @@ async def buy_data(
         logger.error("  Cannot buy: executor_id not set")
         return None
 
-    result = await client.apply_to_task(
-        task_id=task_id,
-        executor_id=client.agent.executor_id,
-        message="Voice Extractor agent — buying raw logs for personality analysis",
-    )
-    client.agent.record_spend(bounty)
-    return result
+    title = task.get("title", "?")
+    logger.info(f"  Buying: {title} (${bounty})")
+    try:
+        result = await client.apply_to_task(
+            task_id=task_id,
+            executor_id=client.agent.executor_id,
+            message="Voice Extractor agent — buying raw logs for personality analysis",
+        )
+        client.agent.record_spend(bounty)
+        logger.info(f"  Applied to: {title}")
+        return result
+    except Exception as e:
+        err = str(e)
+        if "409" in err or "already" in err.lower():
+            logger.info(f"  Already applied to: {title}")
+        else:
+            logger.warning(f"  Apply failed for {title}: {e}")
+        return None
 
 
 async def process_voices(data_dir: Path) -> dict | None:
