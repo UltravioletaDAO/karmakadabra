@@ -398,7 +398,7 @@ async def discover_bounties(
         tasks = await client.browse_tasks(
             status="published",
             category="knowledge_access",
-            limit=200,
+            limit=100,
         )
     except Exception as e:
         logger.error(f"Browse failed: {e}")
