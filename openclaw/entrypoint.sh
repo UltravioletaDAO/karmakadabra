@@ -78,13 +78,56 @@ if [ -d "$VAULT_DIR" ]; then
     cd /app
 fi
 
-# Start OpenClaw gateway (Node.js LLM gateway with native IRC)
-# OpenClaw handles: IRC connection, LLM reasoning, tool execution, heartbeat cycles
-if command -v openclaw &> /dev/null; then
-    echo "[entrypoint] Starting OpenClaw gateway for $AGENT_NAME"
-    exec openclaw --config /app/openclaw/agents/$AGENT_NAME/openclaw.json
-else
+# ── OpenClaw Gateway Setup ──────────────────────────────────────────
+# OpenClaw uses its own config system (~/.openclaw/openclaw.json).
+# We configure it via CLI on each start, then launch the gateway.
+
+if ! command -v openclaw &> /dev/null; then
     echo "[FATAL] OpenClaw not installed. Ensure Node.js + openclaw are in the Docker image."
-    echo "[FATAL] The heartbeat loop fallback has been removed — OpenClaw is required."
     exit 1
 fi
+
+echo "[entrypoint] Configuring OpenClaw for $AGENT_NAME"
+
+# Step 1: Initialize config (non-interactive, local mode)
+openclaw setup --non-interactive --mode local --workspace "$WORKSPACE" 2>/dev/null || true
+
+# Step 2: Set model (OpenRouter as primary)
+if [ -n "$OPENROUTER_API_KEY" ]; then
+    openclaw config set models.default "openrouter/openai/gpt-4o-mini" 2>/dev/null || true
+    openclaw models auth paste-token --provider openrouter --token "$OPENROUTER_API_KEY" 2>/dev/null || true
+    echo "[entrypoint] Model: openrouter/openai/gpt-4o-mini"
+elif [ -n "$OPENAI_API_KEY" ]; then
+    openclaw config set models.default "openai/gpt-4o-mini" 2>/dev/null || true
+    openclaw models auth paste-token --provider openai --token "$OPENAI_API_KEY" 2>/dev/null || true
+    echo "[entrypoint] Model: openai/gpt-4o-mini"
+elif [ -n "$ANTHROPIC_API_KEY" ]; then
+    openclaw config set models.default "anthropic/claude-haiku-4-5-20251001" 2>/dev/null || true
+    openclaw models auth paste-token --provider anthropic --token "$ANTHROPIC_API_KEY" 2>/dev/null || true
+    echo "[entrypoint] Model: anthropic/claude-haiku-4-5-20251001"
+else
+    echo "[WARN] No LLM API key set (OPENROUTER_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)"
+fi
+
+# Step 3: Configure agent identity
+openclaw config set agents.defaults.name "$AGENT_NAME" 2>/dev/null || true
+openclaw config set agents.defaults.workspace "$WORKSPACE" 2>/dev/null || true
+
+# Step 4: Copy SOUL.md and HEARTBEAT.md to workspace (OpenClaw reads them from there)
+cp /app/openclaw/agents/$AGENT_NAME/SOUL.md "$WORKSPACE/SOUL.md" 2>/dev/null || true
+cp /app/openclaw/agents/$AGENT_NAME/HEARTBEAT.md "$WORKSPACE/HEARTBEAT.md" 2>/dev/null || true
+
+# Step 5: Add IRC channel (MeshRelay)
+openclaw channels add \
+    --channel irc \
+    --name "$AGENT_NAME" \
+    2>/dev/null || true
+
+# Step 6: Set gateway mode
+openclaw config set gateway.mode "local" 2>/dev/null || true
+openclaw config set gateway.bind "loopback" 2>/dev/null || true
+
+echo "[entrypoint] OpenClaw configured. Starting gateway for $AGENT_NAME"
+
+# Launch gateway in foreground (exec replaces shell)
+exec openclaw gateway run --port 18790 --auth none --bind loopback
