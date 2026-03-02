@@ -1,9 +1,30 @@
 {
   "agent": {
-    "model": "anthropic/claude-sonnet-4-6",
-    "name": "kk-validator"
+    "model": "openai/gpt-4o-mini",
+    "name": "kk-validator",
+    "soul": "/app/openclaw/agents/kk-validator/SOUL.md",
+    "heartbeat": "/app/openclaw/agents/kk-validator/HEARTBEAT.md",
+    "heartbeat_interval": 300
+  },
+  "irc": {
+    "server": "irc.meshrelay.xyz",
+    "port": 6697,
+    "ssl": true,
+    "channels": ["#karmakadabra", "#Execution-Market"],
+    "nick": "kk-validator"
   },
   "tools": {
-    "deny": ["browser"]
+    "deny": ["browser"],
+    "exec": {
+      "em_tool": "python3 /app/openclaw/tools/em_tool.py",
+      "wallet_tool": "python3 /app/openclaw/tools/wallet_tool.py",
+      "data_tool": "python3 /app/openclaw/tools/data_tool.py",
+      "reputation_tool": "python3 /app/openclaw/tools/reputation_tool.py",
+      "irc_guard": "python3 /app/openclaw/tools/irc_guard.py"
+    }
+  },
+  "headless": true,
+  "memory": {
+    "dir": "/app/data/memory"
   }
 }

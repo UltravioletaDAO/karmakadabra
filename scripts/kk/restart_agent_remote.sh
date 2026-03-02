@@ -54,6 +54,30 @@ except:
 " <<< "$ANTHROPIC_RAW" 2>/dev/null) || true
 fi
 
+# Get OpenAI key from Secrets Manager (for OpenClaw LLM gateway)
+OPENAI_KEY=""
+OPENAI_RAW=$(aws secretsmanager get-secret-value \
+  --secret-id kk/openai \
+  --region "$REGION" \
+  --query SecretString \
+  --output text 2>/dev/null) || true
+if [ -n "$OPENAI_RAW" ]; then
+    OPENAI_KEY=$(python3 -c "
+import sys, json
+raw = sys.stdin.read().strip()
+try:
+    data = json.loads(raw)
+    for k in ('OPENAI_API_KEY', 'openai_api_key', 'api_key', 'key'):
+        if k in data:
+            print(data[k])
+            break
+    else:
+        print(raw)
+except:
+    print(raw)
+" <<< "$OPENAI_RAW" 2>/dev/null) || true
+fi
+
 # Get wallet address from Docker image config (--entrypoint bypasses default entrypoint)
 WALLET_ADDRESS=$(docker run --rm --entrypoint python3 "$ECR_IMAGE" -c "
 import json
@@ -67,6 +91,7 @@ for a in data.get('agents', []):
 echo "Wallet: $WALLET_ADDRESS"
 echo "Private key: $([ -n "$PRIVATE_KEY" ] && echo SET || echo MISSING)"
 echo "Anthropic key: $([ -n "$ANTHROPIC_KEY" ] && echo SET || echo MISSING)"
+echo "OpenAI key: $([ -n "$OPENAI_KEY" ] && echo SET || echo MISSING)"
 
 # Validate: must have private key to start
 if [ -z "$PRIVATE_KEY" ]; then
@@ -93,6 +118,7 @@ docker run -d \
   -e "KK_WALLET_ADDRESS=$WALLET_ADDRESS" \
   -e "KK_PRIVATE_KEY=$PRIVATE_KEY" \
   -e "ANTHROPIC_API_KEY=$ANTHROPIC_KEY" \
+  -e "OPENAI_API_KEY=$OPENAI_KEY" \
   -p 18790:18790 \
   -v "/data/${AGENT_NAME}:/app/data" \
   "$ECR_IMAGE"

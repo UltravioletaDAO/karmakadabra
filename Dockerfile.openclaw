@@ -4,12 +4,15 @@
 
 FROM python:3.11-slim
 
-# Install system dependencies
+# Install system dependencies + Node.js 22 LTS (for OpenClaw gateway)
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
     git \
     curl \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && npm install -g openclaw \
     && rm -rf /var/lib/apt/lists/*
 
 # Set working directory
@@ -34,6 +37,9 @@ COPY scripts/kk/ /app/scripts/kk/
 
 # Copy OpenClaw skills (shared across all agents)
 COPY openclaw/skills/ /app/openclaw/skills/
+
+# Copy OpenClaw tools (Python CLI wrappers called by gateway via subprocess)
+COPY openclaw/tools/ /app/openclaw/tools/
 
 # Install Python dependencies (minimal - no Playwright, no CrewAI, no FastAPI)
 RUN pip install --no-cache-dir \

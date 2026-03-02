@@ -68,39 +68,23 @@ WALLETEOF
 
 echo "[INIT] wallet.json created for ${AGENT_NAME} (executor: ${EXECUTOR_ID})"
 
-# Start OpenClaw gateway (if installed) or run heartbeat loop
+# Initialize Obsidian Vault (local copy, no git remote yet)
+VAULT_DIR="/app/vault"
+if [ -d "$VAULT_DIR" ]; then
+    echo "[entrypoint] Vault directory found at $VAULT_DIR"
+    cd "$VAULT_DIR"
+    git config user.name "$AGENT_NAME" 2>/dev/null || true
+    git config user.email "${AGENT_NAME}@karmacadabra.ultravioletadao.xyz" 2>/dev/null || true
+    cd /app
+fi
+
+# Start OpenClaw gateway (Node.js LLM gateway with native IRC)
+# OpenClaw handles: IRC connection, LLM reasoning, tool execution, heartbeat cycles
 if command -v openclaw &> /dev/null; then
+    echo "[entrypoint] Starting OpenClaw gateway for $AGENT_NAME"
     exec openclaw --config /app/openclaw/agents/$AGENT_NAME/openclaw.json
 else
-    echo "[entrypoint] OpenClaw not found, running heartbeat loop"
-
-    # Initialize Obsidian Vault (local copy, no git remote yet)
-    VAULT_DIR="/app/vault"
-    if [ -d "$VAULT_DIR" ]; then
-        echo "[entrypoint] Vault directory found at $VAULT_DIR"
-        # Configure git identity for vault commits
-        cd "$VAULT_DIR"
-        git config user.name "$AGENT_NAME" 2>/dev/null || true
-        git config user.email "${AGENT_NAME}@karmacadabra.ultravioletadao.xyz" 2>/dev/null || true
-        cd /app
-    else
-        echo "[entrypoint] No vault directory — vault sync disabled"
-    fi
-
-    # Start IRC daemon as background process (connects to MeshRelay)
-    echo "[entrypoint] Starting IRC daemon for $AGENT_NAME..."
-    python3 /app/scripts/kk/irc_daemon.py \
-        --agent "$AGENT_NAME" \
-        --channel "#karmakadabra" \
-        --extra-channels "#Execution-Market" \
-        --data-dir /app/data \
-        --soul-dir "/app/openclaw/agents/$AGENT_NAME" \
-        &
-    IRC_PID=$!
-    echo "[entrypoint] IRC daemon started (PID=$IRC_PID)"
-
-    while true; do
-        python3 /app/cron/heartbeat.py --agent "$AGENT_NAME" --workspaces "$WORKSPACES_ROOT" --data-dir /app/data
-        sleep ${KK_HEARTBEAT_INTERVAL:-300}
-    done
+    echo "[FATAL] OpenClaw not installed. Ensure Node.js + openclaw are in the Docker image."
+    echo "[FATAL] The heartbeat loop fallback has been removed — OpenClaw is required."
+    exit 1
 fi

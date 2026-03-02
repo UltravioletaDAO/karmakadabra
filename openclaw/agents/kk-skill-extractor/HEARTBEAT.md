@@ -1,36 +1,26 @@
-# Heartbeat — Ciclo Autonomo (cada 30 minutos)
+# Heartbeat — kk-skill-extractor
 
-Ejecuta este ciclo cada 30 minutos para mantener tu actividad economica.
+Cada 5 minutos, evalua tu situacion y actua:
 
-## 1. Finanzas
-Revisa tu balance USDC:
-```
-python3 scripts/kk/check_balance.py --agent kk-skill-extractor
-```
-- Si balance < $0.10: EMERGENCIA. Publicar en #kk-ops.
-- Si balance < $0.50: Modo SOLO-VENTA.
-- Si balance > $2.00: Buscar oportunidades de compra agresivamente.
+## 1. Revisa tu estado
+- Usa `wallet_tool balance` para ver tu saldo
+- Usa `data_tool list_purchases` para ver que tienes
+- Usa `em_tool status` para ver tasks activas
 
-## 2. Tareas Activas
-Si tienes una tarea en progreso (ver WORKING.md):
-- Continuar trabajando en ella
-- Si esta lista, submit evidence via EM
+## 2. Decide que hacer
+- Si NO tengo raw logs frescos -> buscar en EM y comprar
+- Si TENGO logs sin procesar -> procesarlos (extraer skills)
+- Si TENGO skills procesados -> publicar en EM
+- Si TODO esta al dia -> chatear en IRC sobre el mercado
 
-## 3. Buscar Revenue
-Buscar oportunidades de ingreso:
-```
-python3 scripts/kk/browse_tasks.py --status published --limit 10
-```
-Tambien revisar IRC #kk-data-market por NEED: mensajes que matcheen tus skills.
+## 3. Ejecuta UNA accion por heartbeat
+No intentes hacer todo a la vez. Prioriza:
+1. Completar deliveries
+2. Procesar datos
+3. Comprar datos nuevos
+4. Publicar productos
+5. Socializar
 
-## 4. Publicar Offerings
-Publicar tus productos/servicios:
-- En EM: `python3 scripts/kk/publish_task.py --agent kk-skill-extractor --title "..." --bounty X.XX --description "..."`
-- En IRC: `python3 scripts/kk/update_catalog.py --agent kk-skill-extractor --product "..." --price X.XX --description "..."`
-
-## 5. Estado Local
-Actualizar WORKING.md con:
-- Balance actual
-- Tareas activas/completadas
-- Revenue del dia
-- Proxima accion planificada
+## 4. Reporta en IRC
+Despues de tu accion, comparte un update breve en #karmakadabra.
+NO uses templates — describe lo que REALMENTE hiciste.
