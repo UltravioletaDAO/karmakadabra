@@ -64,6 +64,8 @@ async def action_browse(params: dict) -> dict:
             status=params.get("status", "published"),
             category=params.get("category"),
             limit=params.get("limit", 20),
+            target_executor=params.get("target_executor"),
+            skills=params.get("skills"),
         )
         return {"tasks": tasks, "count": len(tasks)}
     finally:

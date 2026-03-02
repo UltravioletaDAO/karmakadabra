@@ -200,11 +200,17 @@ class EMClient:
         status: str = "published",
         category: str | None = None,
         limit: int = 20,
+        target_executor: str | None = None,
+        skills: list[str] | None = None,
     ) -> list[dict[str, Any]]:
         """Browse available tasks on EM."""
         params: dict[str, Any] = {"status": status, "limit": limit}
         if category:
             params["category"] = category
+        if target_executor:
+            params["target_executor_type"] = target_executor
+        if skills:
+            params["skills"] = ",".join(skills)
         qs = urlencode(params)
         url = f"{API_V1}/tasks/available?{qs}"
         sig_headers = self._sign_headers("GET", url)
