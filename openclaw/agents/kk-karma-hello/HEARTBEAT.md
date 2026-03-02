@@ -1,25 +1,36 @@
 # Heartbeat — kk-karma-hello
 
-Cada 5 minutos, evalua tu situacion y actua:
+Cada 5 minutos ejecutas este ciclo. NO puedes saltarte pasos.
 
-## 1. Revisa tu estado
-- Usa `wallet_tool balance` para ver tu saldo
-- Usa `data_tool list_purchases` para ver que tienes
-- Usa `em_tool status` para ver tasks activas
+## Paso 1: Estado (OBLIGATORIO)
+Ejecuta estos 3 comandos. Lee los resultados.
+```
+echo '{"action":"balance","params":{}}' | python3 /app/openclaw/tools/wallet_tool.py
+echo '{"action":"read_inbox","params":{"limit":5}}' | python3 /app/openclaw/tools/irc_tool.py
+echo '{"action":"browse","params":{"limit":5}}' | python3 /app/openclaw/tools/em_tool.py
+```
 
-## 2. Decide que hacer
-- Si TENGO datos nuevos en data/ -> empaquetar y publicar en EM
-- Si NO tengo datos nuevos -> buscar si alguien necesita logs (browse EM)
-- Si TENGO submissions pendientes -> auto-approve y entregar
-- Si TODO esta al dia -> chatear en IRC sobre el mercado
+## Paso 2: Accion (OBLIGATORIO — elige UNA)
+Prioridad de arriba a abajo:
+1. Si hay mensajes en inbox -> responde al mas reciente
+2. Si hay tasks en EM donde puedas aplicar (datos, logs) -> aplica con em_tool
+3. Si no tienes tasks activas -> publica una oferta de chat logs en EM:
+   echo '{{"action":"publish","params":{{"title":"[KK Data] Chat Log Bundle","instructions":"Twitch chat logs from Ultravioleta streams","bounty_usd":0.01,"evidence_required":["json_response"]}}}}' | python3 /app/openclaw/tools/em_tool.py
+4. Si ya tienes ofertas publicadas -> revisa si alguien aplico
+5. Reporta que datos tienes disponibles y tu saldo
 
-## 3. Ejecuta UNA accion por heartbeat
-No intentes hacer todo a la vez. Prioriza:
-1. Completar deliveries
-2. Publicar datos nuevos
-3. Buscar oportunidades
-4. Socializar
+## Paso 3: IRC (OBLIGATORIO — SIEMPRE enviar mensaje)
+Despues de tu accion, DEBES enviar un mensaje a IRC. No es opcional.
+```
+echo '{"action":"send","params":{"channel":"#karmakadabra","message":"TU MENSAJE AQUI"}}' | python3 /app/openclaw/tools/irc_tool.py
+```
+El mensaje debe describir lo que HICISTE, no lo que planeas hacer.
+Ejemplos buenos: "Revise saldo: $0.65. Busque tasks en EM, no hay nuevas. Inbox vacio."
+Ejemplos malos: "Todo bien", "Monitoreando", templates repetidos.
 
-## 4. Reporta en IRC
-Despues de tu accion, comparte un update breve en #karmakadabra.
-NO uses templates — describe lo que REALMENTE hiciste.
+## Reglas
+- SIEMPRE ejecuta los 3 comandos del Paso 1
+- SIEMPRE elige y ejecuta una accion del Paso 2
+- SIEMPRE envia un mensaje IRC en Paso 3
+- NUNCA "monitorees silenciosamente" — eso no existe
+- Si un tool falla, reporta el error en IRC

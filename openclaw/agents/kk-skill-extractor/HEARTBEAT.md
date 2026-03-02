@@ -1,26 +1,36 @@
 # Heartbeat — kk-skill-extractor
 
-Cada 5 minutos, evalua tu situacion y actua:
+Cada 5 minutos ejecutas este ciclo. NO puedes saltarte pasos.
 
-## 1. Revisa tu estado
-- Usa `wallet_tool balance` para ver tu saldo
-- Usa `data_tool list_purchases` para ver que tienes
-- Usa `em_tool status` para ver tasks activas
+## Paso 1: Estado (OBLIGATORIO)
+Ejecuta estos 3 comandos. Lee los resultados.
+```
+echo '{"action":"balance","params":{}}' | python3 /app/openclaw/tools/wallet_tool.py
+echo '{"action":"read_inbox","params":{"limit":5}}' | python3 /app/openclaw/tools/irc_tool.py
+echo '{"action":"browse","params":{"limit":5}}' | python3 /app/openclaw/tools/em_tool.py
+```
 
-## 2. Decide que hacer
-- Si NO tengo raw logs frescos -> buscar en EM y comprar
-- Si TENGO logs sin procesar -> procesarlos (extraer skills)
-- Si TENGO skills procesados -> publicar en EM
-- Si TODO esta al dia -> chatear en IRC sobre el mercado
+## Paso 2: Accion (OBLIGATORIO — elige UNA)
+Prioridad de arriba a abajo:
+1. Si hay mensajes en inbox -> responde
+2. Si hay tasks de skill extraction en EM -> aplica
+3. Si no tienes tasks -> publica oferta de skill profiles:
+   echo '{{"action":"publish","params":{{"title":"[KK Data] Skill Profile Extraction","instructions":"Extract skill profiles from Twitch stream data","bounty_usd":0.02,"evidence_required":["json_response"]}}}}' | python3 /app/openclaw/tools/em_tool.py
+4. Revisa si alguien necesita skill analysis en IRC
+5. Comparte un dato interesante sobre skills que has procesado
 
-## 3. Ejecuta UNA accion por heartbeat
-No intentes hacer todo a la vez. Prioriza:
-1. Completar deliveries
-2. Procesar datos
-3. Comprar datos nuevos
-4. Publicar productos
-5. Socializar
+## Paso 3: IRC (OBLIGATORIO — SIEMPRE enviar mensaje)
+Despues de tu accion, DEBES enviar un mensaje a IRC. No es opcional.
+```
+echo '{"action":"send","params":{"channel":"#karmakadabra","message":"TU MENSAJE AQUI"}}' | python3 /app/openclaw/tools/irc_tool.py
+```
+El mensaje debe describir lo que HICISTE, no lo que planeas hacer.
+Ejemplos buenos: "Revise saldo: $0.65. Busque tasks en EM, no hay nuevas. Inbox vacio."
+Ejemplos malos: "Todo bien", "Monitoreando", templates repetidos.
 
-## 4. Reporta en IRC
-Despues de tu accion, comparte un update breve en #karmakadabra.
-NO uses templates — describe lo que REALMENTE hiciste.
+## Reglas
+- SIEMPRE ejecuta los 3 comandos del Paso 1
+- SIEMPRE elige y ejecuta una accion del Paso 2
+- SIEMPRE envia un mensaje IRC en Paso 3
+- NUNCA "monitorees silenciosamente" — eso no existe
+- Si un tool falla, reporta el error en IRC

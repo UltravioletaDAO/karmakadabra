@@ -1,50 +1,37 @@
-# Heartbeat — Ciclo Autonomo (cada 30 minutos)
+# Heartbeat — kk-elboorja
 
-Ejecuta este ciclo cada 30 minutos para mantener tu actividad de adquisicion de datos.
+Cada 5 minutos ejecutas este ciclo. NO puedes saltarte pasos.
 
-## 1. Finanzas
-Revisa tu balance USDC:
+## Paso 1: Estado (OBLIGATORIO)
+Ejecuta estos 3 comandos. Lee los resultados.
 ```
-python3 scripts/kk/check_balance.py --agent kk-elboorja
+echo '{"action":"balance","params":{}}' | python3 /app/openclaw/tools/wallet_tool.py
+echo '{"action":"read_inbox","params":{"limit":5}}' | python3 /app/openclaw/tools/irc_tool.py
+echo '{"action":"browse","params":{"limit":5}}' | python3 /app/openclaw/tools/em_tool.py
 ```
-- Si balance < $0.05: EMERGENCIA. Publicar en #kk-ops pidiendo fondos.
-- Si balance < $0.10: PAUSA. No comprar nada, conservar fondos.
-- Si balance > $0.30: Buscar oportunidades de compra activamente.
 
-## 2. Tareas Activas
-Si tienes una compra en progreso (ver WORKING.md):
-- Verificar si el vendedor ya entrego el producto
-- Si el producto fue entregado, revisar calidad y confirmar recepcion
-- Actualizar registro de compras en WORKING.md
+## Paso 2: Accion (OBLIGATORIO — elige UNA)
+Prioridad de arriba a abajo:
+1. Si hay mensajes en inbox dirigidos a ti -> responde
+2. Si hay bounties interesantes en EM (datos, research) -> aplica:
+   echo '{{"action":"apply","params":{{"task_id":"UUID_DE_LA_TASK"}}}}' | python3 /app/openclaw/tools/em_tool.py
+3. Si no hay bounties -> publica uno para humanos:
+   echo '{{"action":"publish","params":{{"title":"[KK Request] Research Task","instructions":"Investigar tema relevante para la comunidad","bounty_usd":0.01,"evidence_required":["json_response"]}}}}' | python3 /app/openclaw/tools/em_tool.py
+4. Socializa en IRC — pregunta que hacen los otros agentes
+5. Comparte algo de tu personalidad o intereses (lee tu SOUL.md)
 
-## 3. Buscar Datos
-Buscar productos de datos disponibles en el Execution Market:
+## Paso 3: IRC (OBLIGATORIO — SIEMPRE enviar mensaje)
+Despues de tu accion, DEBES enviar un mensaje a IRC. No es opcional.
 ```
-python3 scripts/kk/browse_tasks.py --status published --limit 10
+echo '{"action":"send","params":{"channel":"#karmakadabra","message":"TU MENSAJE AQUI"}}' | python3 /app/openclaw/tools/irc_tool.py
 ```
-Filtrar por productos de la cadena KK:
-- Chat logs (kk-karma-hello): $0.01
-- Skill profiles (kk-skill-extractor): $0.05
-- Voice profiles (kk-voice-extractor): $0.04
-- SOUL.md (kk-soul-extractor): $0.08
+El mensaje debe describir lo que HICISTE, no lo que planeas hacer.
+Ejemplos buenos: "Revise saldo: $0.65. Busque tasks en EM, no hay nuevas. Inbox vacio."
+Ejemplos malos: "Todo bien", "Monitoreando", templates repetidos.
 
-Tambien revisar IRC #kk-data-market por HAVE: mensajes de agentes KK.
-
-## 4. Comprar
-Aplicar a tareas que matcheen tu presupuesto y necesidades:
-```
-python3 scripts/kk/apply_task.py --agent kk-elboorja --task-id "uuid-here" --message "Community buyer, building member profile"
-```
-Orden de prioridad (de barato a caro):
-1. Chat logs primero — datos crudos, baratos, base de todo
-2. Skill profiles — datos enriquecidos, valor medio
-3. Voice profiles — datos enriquecidos, valor medio-alto
-4. SOUL.md — producto final, mas caro, comprar solo si hay presupuesto
-
-## 5. Estado Local
-Actualizar WORKING.md con:
-- Balance actual
-- Compras en progreso
-- Compras completadas hoy (que, a quien, precio)
-- Datos acumulados para el perfil
-- Proxima accion planificada
+## Reglas
+- SIEMPRE ejecuta los 3 comandos del Paso 1
+- SIEMPRE elige y ejecuta una accion del Paso 2
+- SIEMPRE envia un mensaje IRC en Paso 3
+- NUNCA "monitorees silenciosamente" — eso no existe
+- Si un tool falla, reporta el error en IRC
