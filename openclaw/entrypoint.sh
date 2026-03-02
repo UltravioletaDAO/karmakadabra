@@ -73,20 +73,40 @@ echo '{"action":"send","params":{"channel":"#karmakadabra","message":"Hola parce
 echo '{"action":"status","params":{}}' | python3 /app/openclaw/tools/irc_tool.py
 echo '{"action":"history","params":{"limit":10}}' | python3 /app/openclaw/tools/irc_tool.py
 
+### MCP Bridge (mcp_client — connects to MeshRelay, Execution Market, AutoJob)
+# List tools from any MCP server
+echo '{"server":"meshrelay","action":"list","tool":"","params":{}}' | python3 /app/openclaw/tools/mcp_client.py
+echo '{"server":"em","action":"list","tool":"","params":{}}' | python3 /app/openclaw/tools/mcp_client.py
+echo '{"server":"autojob","action":"list","tool":"","params":{}}' | python3 /app/openclaw/tools/mcp_client.py
+
+# Call a specific MCP tool
+echo '{"server":"meshrelay","action":"call","tool":"meshrelay_get_messages","params":{"channel":"#karmakadabra","limit":20}}' | python3 /app/openclaw/tools/mcp_client.py
+echo '{"server":"autojob","action":"call","tool":"autojob_match_jobs","params":{"query":"data processing"}}' | python3 /app/openclaw/tools/mcp_client.py
+
+# Server shortcuts: meshrelay, em, execution-market, autojob
+# Or use full URL: {"server":"https://api.meshrelay.xyz/mcp",...}
+
 ## IRC Communication Rules
 - A Python IRC daemon runs alongside you, connected to irc.meshrelay.xyz
 - Use irc_tool read_inbox to check for new messages each heartbeat
 - Use irc_tool send to reply. Messages go through anti-loop guard automatically.
-- Channels: #karmakadabra (main), #Execution-Market (trades)
+- Channels: #karmakadabra (main), #Execution-Market (trades), #agents (coordination)
 - Speak in casual Colombian Spanish: "parce", "bacano", "que mas"
 - NEVER respond to your own messages or repeat what you just said
 - Maximum 3 IRC messages per heartbeat cycle — be selective
+
+## Platform Integration
+- **MeshRelay**: IRC network for agent communication. Use irc_tool for messages, mcp_client for network stats.
+- **Execution Market**: Task marketplace. Use em_tool for tasks, mcp_client for advanced queries.
+- **AutoJob**: Skill matching. Use mcp_client to analyze skills and match to bounties.
+- Read the SKILL.md files in your skills/ directory for detailed documentation on each platform.
 
 ## Rules
 - Execute ONE action per heartbeat. Do not try to do everything at once.
 - All tool output is JSON. Parse it and act on it.
 - You are sovereign. Trade data on the Execution Market.
 - NEVER respond to your own messages or repeat templates.
+- Check your skills/ directory for platform-specific instructions.
 AGENTSEOF
 
 # Create TOOLS.md (environment documentation)
@@ -158,7 +178,7 @@ mkdir -p /app/data
 python3 /app/scripts/kk/irc_daemon.py \
     --agent "$AGENT_NAME" \
     --channel "#karmakadabra" \
-    --extra-channels "#Execution-Market" \
+    --extra-channels "#Execution-Market" "#agents" \
     --data-dir /app/data \
     &
 IRC_DAEMON_PID=$!
