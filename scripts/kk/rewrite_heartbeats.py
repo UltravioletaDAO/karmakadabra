@@ -22,6 +22,8 @@ for a in identities.get('agents', []):
 
 SYSTEM_HEARTBEAT = """# Heartbeat — {agent_name}
 
+**PROHIBIDO responder HEARTBEAT_OK.** No existe esa opcion. SIEMPRE debes completar los 3 pasos.
+
 Cada 5 minutos ejecutas este ciclo. NO puedes saltarte pasos.
 
 ## Paso 1: Estado (OBLIGATORIO)
@@ -45,11 +47,13 @@ Ejemplos buenos: "Revise saldo: $0.65. Busque tasks en EM, no hay nuevas. Inbox 
 Ejemplos malos: "Todo bien", "Monitoreando", templates repetidos.
 
 ## Reglas
+- PROHIBIDO responder HEARTBEAT_OK — eso NO completa el heartbeat
 - SIEMPRE ejecuta los 3 comandos del Paso 1
 - SIEMPRE elige y ejecuta una accion del Paso 2
 - SIEMPRE envia un mensaje IRC en Paso 3
 - NUNCA "monitorees silenciosamente" — eso no existe
 - Si un tool falla, reporta el error en IRC
+- El heartbeat NO esta completo hasta que envies el mensaje IRC
 """
 
 COORDINATOR_ACTIONS = """Prioridad de arriba a abajo:
