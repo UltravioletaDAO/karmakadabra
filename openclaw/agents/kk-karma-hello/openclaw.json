@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "openai/gpt-4o-mini",
+    "model": "openrouter/openai/gpt-4o-mini",
     "name": "kk-karma-hello",
     "soul": "/app/openclaw/agents/kk-karma-hello/SOUL.md",
     "heartbeat": "/app/openclaw/agents/kk-karma-hello/HEARTBEAT.md",
