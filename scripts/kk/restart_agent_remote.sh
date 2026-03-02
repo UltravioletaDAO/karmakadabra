@@ -121,6 +121,7 @@ docker run -d \
   -e "ANTHROPIC_API_KEY=$ANTHROPIC_KEY" \
   -e "OPENAI_API_KEY=$OPENAI_KEY" \
   -e "OPENROUTER_API_KEY=$OPENROUTER_KEY" \
+  -e "OPENCLAW_LOG_LEVEL=${OPENCLAW_LOG_LEVEL:-info}" \
   -p 18790:18790 \
   -v "/data/${AGENT_NAME}:/app/data" \
   "$ECR_IMAGE"
