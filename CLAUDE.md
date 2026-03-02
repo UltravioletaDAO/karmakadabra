@@ -167,21 +167,6 @@ curl -s https://SERVICE.karmacadabra.ultravioletadao.xyz/health
 4. ❌ ECS kept pulling old cached image from correct repo
 5. ❌ Took 2 HOURS to realize repository mismatch
 
-**WHAT FINALLY WORKED**:
-1. ✅ Checked task definition FIRST to get correct ECR repo
-2. ✅ Built with `--no-cache`
-3. ✅ Tagged and pushed to CORRECT repository
-4. ✅ Stopped old task to force fresh image pull
-5. ✅ 5 MINUTES total once done correctly
-
-**KEY LESSONS**:
-- **NEVER assume deploy scripts push to the right place** - ALWAYS check task definition first
-- **Docker cache WILL break code changes** - use `--no-cache` for ANY code modification
-- **`:latest` tag LIES** - ECS caches it, always verify image digest matches
-- **For simple changes**: Check task def → Build no-cache → Push to correct repo → Stop old task → Done in 5 min
-
-**SIMPLE CHANGES SHOULD TAKE 5 MINUTES, NOT 2 HOURS**
-
 ### x402-rs Facilitator Upgrades - CRITICAL SAFEGUARDS
 **⚠️ THIS IS USER-FACING INFRASTRUCTURE WITH DAO BRANDING - LIVE STREAM VISIBLE**
 
@@ -536,14 +521,6 @@ x402-rs/
 
 **Recommendation**: Start with **manual process** (this document). Add **CI/CD verification** (Option 2) next sprint. Consider **overlay system** (Option 3) only if we fork >5 files.
 
-#### Key Lessons from Incident
-
-1. **Never trust `cp -r` with customized codebases** - always use git merge
-2. **User-facing branding is critical** - automated tests must verify it
-3. **Infrastructure code needs version control discipline** - same as application code
-4. **Recovery is expensive** - prevention (this doc) pays for itself first incident avoided
-5. **Live streams amplify impact** - broken branding is public embarrassment + DAO reputation damage
-
 ### Documentation Synchronization
 - ✅ **README.md** ↔️ **README.es.md** MUST stay synchronized
 - Update both when changing architecture, features, or any content
@@ -733,31 +710,6 @@ ls -1 *.json 2>/dev/null
 2. Update storage AND retrieval atomically
 3. Verify consistency - use same attribute names as working code
 4. Document OLD vs NEW architecture
-
-### Learning from Working Code
-
-```bash
-# Find patterns before coding
-grep -r "pattern" scripts/
-grep -r "rawTransaction\|raw_transaction" scripts/
-```
-
-- `rawTransaction` vs `raw_transaction` - details matter, verify against working code
-- Copy working patterns wholesale - consistency > cleverness
-- For smart contracts: ALWAYS read `.sol` file for exact return types
-
-### Common Failures to Avoid
-
-**❌ DON'T:**
-- Give untested code - run dry-runs first
-- Guess smart contract ABIs - read Solidity source
-- Work from memory - check working examples
-- Skip testing with known data
-
-**✅ DO:**
-- Trace data flows before coding
-- Verify attribute names against actual usage
-- Test ABIs with known addresses before batch operations
 
 ---
 
@@ -1082,12 +1034,31 @@ python scripts/demo_client_purchases.py --production
 
 ---
 
+## Launching New Community Agents
+
+When the user asks to launch a new agent, follow the onboarding pipeline in `docs/guides/AGENT_ONBOARDING.md`. The full checklist:
+
+1. Verify agent exists in `data/config/identities.json` (address, executor_id, ERC-8004 agent_id)
+2. Create `openclaw/agents/kk-<name>/SOUL.md` (use existing community agent as template, keep BASE SOUL)
+3. Copy `HEARTBEAT.md` from existing agent
+4. Fund wallet ($5+ USDC on Base + gas) via `blockchain/fund-agents.ts`
+5. Create AWS secret `kk/kk-<name>` in us-east-1 with `{"private_key":"0x..."}`
+6. Add to `terraform/openclaw/variables.tf` agents map
+7. Rebuild Docker image (`docker build --no-cache -f Dockerfile.openclaw`) and push to ECR
+8. `terraform apply` to create EC2 instance
+9. Verify: container running, IRC connected, skills loaded, S3 cron active
+
+**Available agents** (registered but not deployed): HD indices 7-10, 12-23. Check `identities.json`.
+
+---
+
 ## Documentation Map
 
 - **MASTER_PLAN.md**: Vision, roadmap, all components
 - **docs/ARCHITECTURE.md**: Technical decisions, data flows
 - **docs/MONETIZATION_OPPORTUNITIES.md**: 50+ services with pricing
 - **docs/guides/QUICKSTART.md**: 30-minute setup
+- **docs/guides/AGENT_ONBOARDING.md**: New agent launch pipeline
 - **Component READMEs**: Detailed guides per folder
 
 **Start**: `QUICKSTART.md` (30 min) → `MASTER_PLAN.md` (60 min) → component READMEs
