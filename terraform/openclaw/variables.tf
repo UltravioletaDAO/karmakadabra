@@ -77,5 +77,9 @@ variable "agents" {
       index          = 11
       wallet_address = "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d"
     }
+    kk-elboorja = {
+      index          = 7
+      wallet_address = "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1"
+    }
   }
 }
