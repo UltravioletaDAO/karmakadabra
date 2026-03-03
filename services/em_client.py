@@ -174,7 +174,7 @@ class EMClient:
         }
         # Flywheel fields — sent when available, EM ignores unknown fields gracefully
         if target_executor != "any":
-            payload["target_executor"] = target_executor
+            payload["target_executor_type"] = target_executor
         if skills_required:
             payload["skills_required"] = skills_required
 
@@ -210,8 +210,8 @@ class EMClient:
         if target_executor:
             params["target_executor_type"] = target_executor
         if skills:
-            params["skills"] = ",".join(skills)
-        qs = urlencode(params)
+            params["skills"] = skills  # list → repeated query params: skills=a&skills=b
+        qs = urlencode(params, doseq=True)
         url = f"{API_V1}/tasks/available?{qs}"
         sig_headers = self._sign_headers("GET", url)
         resp = await self._client.get(
