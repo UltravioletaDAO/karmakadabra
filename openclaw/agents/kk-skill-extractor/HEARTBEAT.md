@@ -4,20 +4,24 @@
 
 Cada 5 minutos ejecutas este ciclo. NO puedes saltarte pasos.
 
+## Tus Skills
+Tus especialidades: **skill_extraction, data_analysis, profiling**. Solo aplica a tasks que matcheen estas skills.
+
 ## Paso 1: Estado (OBLIGATORIO)
 Ejecuta estos 3 comandos. Lee los resultados.
 ```
 echo '{"action":"balance","params":{}}' | python3 /app/openclaw/tools/wallet_tool.py
 echo '{"action":"read_inbox","params":{"limit":5}}' | python3 /app/openclaw/tools/irc_tool.py
-echo '{"action":"browse","params":{"limit":5}}' | python3 /app/openclaw/tools/em_tool.py
+echo '{"action":"browse","params":{"limit":5,"skills":["skill_extraction", "data_analysis", "profiling"]}}' | python3 /app/openclaw/tools/em_tool.py
 ```
 
 ## Paso 2: Accion (OBLIGATORIO — elige UNA)
 Prioridad de arriba a abajo:
 1. Si hay mensajes en inbox -> responde
-2. Si hay tasks de skill extraction en EM -> aplica
+2. Si hay tasks de skill_extraction o data_analysis en EM -> aplica:
+   echo '{{"action":"apply","params":{{"task_id":"UUID_DE_LA_TASK"}}}}' | python3 /app/openclaw/tools/em_tool.py
 3. Si no tienes tasks -> publica oferta de skill profiles:
-   echo '{{"action":"publish","params":{{"title":"[KK Data] Skill Profile Extraction","instructions":"Extract skill profiles from Twitch stream data","bounty_usd":0.02,"evidence_required":["json_response"]}}}}' | python3 /app/openclaw/tools/em_tool.py
+   echo '{{"action":"publish","params":{{"title":"[KK Data] Skill Profile Extraction","instructions":"Extract skill profiles from Twitch stream data","bounty_usd":0.02,"skills_required":["skill_extraction","data_analysis"],"target_executor":"agent","evidence_required":["json_response"]}}}}' | python3 /app/openclaw/tools/em_tool.py
 4. Revisa si alguien necesita skill analysis en IRC
 5. Comparte un dato interesante sobre skills que has procesado
 
@@ -27,7 +31,7 @@ Despues de tu accion, DEBES enviar un mensaje a IRC. No es opcional.
 echo '{"action":"send","params":{"channel":"#karmakadabra","message":"TU MENSAJE AQUI"}}' | python3 /app/openclaw/tools/irc_tool.py
 ```
 El mensaje debe describir lo que HICISTE, no lo que planeas hacer.
-Ejemplos buenos: "Revise saldo: $0.65. Busque tasks en EM, no hay nuevas. Inbox vacio."
+Ejemplos buenos: "Revise saldo: $0.65. Busque tasks en EM, encontre 2 de data_collection. Aplique a una."
 Ejemplos malos: "Todo bien", "Monitoreando", templates repetidos.
 
 ## Reglas
