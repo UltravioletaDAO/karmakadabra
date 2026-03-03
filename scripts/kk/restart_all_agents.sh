@@ -19,6 +19,7 @@ AGENTS[kk-validator]="44.203.23.11"
 AGENTS[kk-soul-extractor]="3.234.249.61"
 AGENTS[kk-juanjumagalp]="3.235.151.197"
 AGENTS[kk-0xjokker]="13.218.189.187"
+AGENTS[kk-elboorja]="3.237.200.195"
 
 # Create the restart script that runs on each EC2
 cat > /tmp/restart_agent_remote.sh << 'REMOTESCRIPT'
