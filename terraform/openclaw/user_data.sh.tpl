@@ -99,14 +99,10 @@ docker run -d \
   -v /data/${agent_name}:/app/data \
   ${ecr_repo}:latest
 
-# Cron: sync S3 data every 15 minutes (download)
-(crontab -l 2>/dev/null; echo "*/15 * * * * aws s3 sync s3://karmacadabra-agent-data/${agent_name}/ /data/${agent_name}/ --region ${region} >> /var/log/s3-sync.log 2>&1") | crontab -
-
-# Cron: upload agent state to S3 every 15 minutes (offset 7 min from download)
-(crontab -l 2>/dev/null; echo "7,22,37,52 * * * * aws s3 sync /data/${agent_name}/ s3://karmacadabra-agent-data/${agent_name}/state/ --region ${region} --exclude '*' --include 'purchase_history.json' --include 'memory/*' --include 'irc_guard_state.json' --include 'escrow_state.json' >> /var/log/s3-upload.log 2>&1") | crontab -
-
-# Cron: restart container every 12 hours (memory leak mitigation)
-(crontab -l 2>/dev/null; echo "0 */12 * * * docker restart ${agent_name}") | crontab -
-
-# Cron: clean dangling Docker images daily at 4am (prevents disk full)
-(crontab -l 2>/dev/null; echo "0 4 * * * docker image prune -af --filter 'until=24h' >> /var/log/docker-prune.log 2>&1") | crontab -
+# Install all cron jobs at once (avoids set -e issues with crontab -l on empty crontab)
+cat <<CRONTAB | crontab -
+*/15 * * * * aws s3 sync s3://karmacadabra-agent-data/${agent_name}/ /data/${agent_name}/ --region ${region} >> /var/log/s3-sync.log 2>&1
+7,22,37,52 * * * * aws s3 sync /data/${agent_name}/ s3://karmacadabra-agent-data/${agent_name}/state/ --region ${region} --exclude '*' --include 'purchase_history.json' --include 'memory/*' --include 'irc_guard_state.json' --include 'escrow_state.json' >> /var/log/s3-upload.log 2>&1
+0 */12 * * * docker restart ${agent_name}
+0 4 * * * docker image prune -af --filter 'until=24h' >> /var/log/docker-prune.log 2>&1
+CRONTAB
