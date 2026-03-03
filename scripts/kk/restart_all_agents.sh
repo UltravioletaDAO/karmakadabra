@@ -9,17 +9,38 @@ KEY="$HOME/.ssh/kk-openclaw.pem"
 REGION="us-east-1"
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
-# Agent IPs
+# Agent IPs — dynamically resolved from AWS EC2 tags
+# Falls back to hardcoded IPs if AWS CLI is unavailable
 declare -A AGENTS
-AGENTS[kk-coordinator]="44.211.242.65"
-AGENTS[kk-karma-hello]="13.218.119.234"
-AGENTS[kk-skill-extractor]="100.53.60.94"
-AGENTS[kk-voice-extractor]="100.52.188.43"
-AGENTS[kk-validator]="44.203.23.11"
-AGENTS[kk-soul-extractor]="3.234.249.61"
-AGENTS[kk-juanjumagalp]="3.235.151.197"
-AGENTS[kk-0xjokker]="13.218.189.187"
-AGENTS[kk-0xyuls]="3.237.200.195"
+
+echo "Resolving agent IPs from AWS..."
+RESOLVED=0
+while IFS=$'\t' read -r ip name; do
+  if [ -n "$name" ] && [ -n "$ip" ] && [ "$name" != "None" ] && [ "$ip" != "None" ]; then
+    AGENTS["$name"]="$ip"
+    RESOLVED=$((RESOLVED + 1))
+    echo "  $name -> $ip"
+  fi
+done < <(aws ec2 describe-instances \
+  --region "$REGION" \
+  --filters "Name=tag:Project,Values=karmacadabra" "Name=tag:Component,Values=openclaw" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].{Name: Tags[?Key==`Agent`].Value | [0], IP: PublicIpAddress}' \
+  --output text 2>/dev/null)
+
+if [ "$RESOLVED" -eq 0 ]; then
+  echo "WARN: AWS lookup failed, using hardcoded IPs"
+  AGENTS[kk-coordinator]="44.211.242.65"
+  AGENTS[kk-karma-hello]="13.218.119.234"
+  AGENTS[kk-skill-extractor]="100.53.60.94"
+  AGENTS[kk-voice-extractor]="100.52.188.43"
+  AGENTS[kk-validator]="44.203.23.11"
+  AGENTS[kk-soul-extractor]="3.234.249.61"
+  AGENTS[kk-juanjumagalp]="3.235.151.197"
+  AGENTS[kk-0xjokker]="13.218.189.187"
+  AGENTS[kk-0xyuls]="3.237.200.195"
+else
+  echo "Resolved $RESOLVED agents from AWS"
+fi
 
 # Create the restart script that runs on each EC2
 cat > /tmp/restart_agent_remote.sh << 'REMOTESCRIPT'
