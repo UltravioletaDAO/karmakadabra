@@ -1,5 +1,5 @@
 #!/bin/bash
-# Run script for alej_o agent
+# Run script for x4rlz agent
 
 cd "$(dirname "$0")"
 

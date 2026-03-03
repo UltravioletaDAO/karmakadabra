@@ -1,0 +1,11 @@
+{
+  "agent_name": "kk-f3l1p3_bx",
+  "log_level": "info",
+  "gateway": {
+    "bind": "0.0.0.0",
+    "port": 18790
+  },
+  "workspaces": {
+    "root": "/app/workspaces"
+  }
+}

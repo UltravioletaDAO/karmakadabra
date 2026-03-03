@@ -73,3 +73,6 @@ docker run -d \
 
 # Cron: restart container every 12 hours (memory leak mitigation)
 (crontab -l 2>/dev/null; echo "0 */12 * * * docker restart ${agent_name}") | crontab -
+
+# Cron: clean dangling Docker images daily at 4am (prevents disk full)
+(crontab -l 2>/dev/null; echo "0 4 * * * docker image prune -af --filter 'until=24h' >> /var/log/docker-prune.log 2>&1") | crontab -

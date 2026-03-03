@@ -1,5 +1,5 @@
 @echo off
-REM Run script for 0xyuls agent
+REM Run script for x4rlz agent
 
 cd /d "%~dp0"
 
