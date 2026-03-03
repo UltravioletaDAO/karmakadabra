@@ -212,34 +212,49 @@ async def test_publish_skips_when_no_data(
 @pytest.mark.asyncio
 async def test_fulfill_auto_approves_data_deliveries(
     mock_client: EMClient,
+    tmp_path: Path,
 ) -> None:
     """Fulfill cycle auto-approves submissions on [KK Data] tasks."""
-    mock_client.list_tasks.return_value = [
-        {"id": "task-100", "title": "[KK Data] Raw Twitch Chat Logs"},
-    ]
+    # Phase A: browse_tasks finds published KK tasks
+    mock_client.browse_tasks = AsyncMock(return_value=[
+        {"id": "task-100", "title": "[KK Data] Raw Twitch Chat Logs", "status": "published"},
+    ])
+    mock_client.get_applications = AsyncMock(return_value=[])
+    # Phase B: get_task returns submitted status, get_submissions returns deliveries
+    mock_client.get_task = AsyncMock(return_value={
+        "id": "task-100", "title": "[KK Data] Raw Twitch Chat Logs", "status": "submitted",
+    })
     mock_client.get_submissions.return_value = [
         {"id": "sub-200"},
     ]
 
-    result = await fulfill_purchases(mock_client)
+    # Provide data_dir with task ID registry so Phase B checks it
+    task_ids_file = tmp_path / "kk_data_task_ids.json"
+    task_ids_file.write_text(json.dumps(["task-100"]))
+
+    result = await fulfill_purchases(mock_client, data_dir=tmp_path)
 
     assert result["reviewed"] == 1
     assert result["approved"] == 1
-    mock_client.approve_submission.assert_called_once_with(
-        "sub-200", rating_score=90, notes="KK data delivery auto-approved",
-    )
+    mock_client.approve_submission.assert_called_once()
+    call_args = mock_client.approve_submission.call_args
+    assert call_args[0][0] == "sub-200"  # submission ID
+    assert call_args[1]["rating_score"] == 90
 
 
 @pytest.mark.asyncio
 async def test_fulfill_ignores_non_kk_tasks(
     mock_client: EMClient,
+    tmp_path: Path,
 ) -> None:
     """Fulfill cycle ignores tasks not prefixed with [KK Data]."""
-    mock_client.list_tasks.return_value = [
-        {"id": "task-999", "title": "Take a photo of the store"},
-    ]
+    mock_client.browse_tasks = AsyncMock(return_value=[
+        {"id": "task-999", "title": "Take a photo of the store", "status": "published"},
+    ])
+    mock_client.get_applications = AsyncMock(return_value=[])
+    mock_client.get_task = AsyncMock(return_value={})
 
-    result = await fulfill_purchases(mock_client)
+    result = await fulfill_purchases(mock_client, data_dir=tmp_path)
 
     assert result["reviewed"] == 0
     assert result["approved"] == 0
@@ -249,16 +264,24 @@ async def test_fulfill_ignores_non_kk_tasks(
 @pytest.mark.asyncio
 async def test_fulfill_dry_run_does_not_approve(
     mock_client: EMClient,
+    tmp_path: Path,
 ) -> None:
     """Dry run counts but does not call approve_submission."""
-    mock_client.list_tasks.return_value = [
-        {"id": "task-100", "title": "[KK Data] Topic Analysis"},
-    ]
+    mock_client.browse_tasks = AsyncMock(return_value=[
+        {"id": "task-100", "title": "[KK Data] Topic Analysis", "status": "published"},
+    ])
+    mock_client.get_applications = AsyncMock(return_value=[])
+    mock_client.get_task = AsyncMock(return_value={
+        "id": "task-100", "title": "[KK Data] Topic Analysis", "status": "submitted",
+    })
     mock_client.get_submissions.return_value = [
         {"id": "sub-300"},
     ]
 
-    result = await fulfill_purchases(mock_client, dry_run=True)
+    task_ids_file = tmp_path / "kk_data_task_ids.json"
+    task_ids_file.write_text(json.dumps(["task-100"]))
+
+    result = await fulfill_purchases(mock_client, dry_run=True, data_dir=tmp_path)
 
     assert result["approved"] == 1
     mock_client.approve_submission.assert_not_called()

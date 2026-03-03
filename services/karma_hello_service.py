@@ -413,12 +413,13 @@ async def fulfill_purchases(
     # Match our own [KK Data] tasks using local registry, with fallback to
     # accept all [KK Data] tasks (EM rejects assign if not publisher).
     own_task_ids: set[str] = set()
-    task_ids_file = data_dir / "kk_data_task_ids.json"
-    if task_ids_file.exists():
-        try:
-            own_task_ids = set(json.loads(task_ids_file.read_text(encoding="utf-8")))
-        except (json.JSONDecodeError, OSError):
-            pass
+    if data_dir is not None:
+        task_ids_file = data_dir / "kk_data_task_ids.json"
+        if task_ids_file.exists():
+            try:
+                own_task_ids = set(json.loads(task_ids_file.read_text(encoding="utf-8")))
+            except (json.JSONDecodeError, OSError):
+                pass
 
     kk_tasks = []
     for t in published_tasks:
