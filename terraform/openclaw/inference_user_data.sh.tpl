@@ -32,7 +32,7 @@ mkdir -p /opt/vllm-cache
 
 # Pull vLLM image
 echo "[vllm] Pulling vLLM image..."
-docker pull vllm/vllm-openai:latest
+docker pull vllm/vllm-openai:nightly
 
 # Run vLLM server
 echo "[vllm] Starting vLLM with model ${vllm_model}..."
@@ -44,7 +44,7 @@ docker run -d \
   -p 8000:8000 \
   -v /opt/vllm-cache:/root/.cache/huggingface \
   -e VLLM_API_KEY="${vllm_api_key}" \
-  vllm/vllm-openai:latest \
+  vllm/vllm-openai:nightly \
   --model "${vllm_model}" \
   --quantization awq \
   --max-model-len 32768 \
