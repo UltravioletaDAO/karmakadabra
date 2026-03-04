@@ -270,7 +270,7 @@ resource "aws_instance" "inference" {
   key_name               = aws_key_pair.openclaw.key_name
   vpc_security_group_ids = [aws_security_group.openclaw.id]
   iam_instance_profile   = aws_iam_instance_profile.openclaw_agent.name
-  subnet_id              = data.aws_subnets.default.ids[0]
+  # No subnet_id pinning — let AWS pick the AZ with best spot capacity
 
   instance_market_options {
     market_type = "spot"

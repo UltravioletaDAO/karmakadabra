@@ -97,7 +97,7 @@ variable "inference_instance_type" {
 variable "inference_spot_price" {
   description = "Maximum spot price for GPU instance (on-demand ~$1.006/hr)"
   type        = string
-  default     = "0.50"
+  default     = "1.00"
 }
 
 variable "vllm_model" {
