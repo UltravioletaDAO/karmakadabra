@@ -19,6 +19,10 @@ terraform {
       source  = "hashicorp/aws"
       version = "~> 5.0"
     }
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 
   backend "s3" {
@@ -59,6 +63,22 @@ data "aws_ami" "amazon_linux" {
   }
 }
 
+# Deep Learning Base AMI (AL2023 + NVIDIA drivers pre-installed)
+data "aws_ami" "deep_learning" {
+  most_recent = true
+  owners      = ["amazon"]
+
+  filter {
+    name   = "name"
+    values = ["Deep Learning Base OSS Nvidia Driver AMI (Amazon Linux 2023)*"]
+  }
+
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
+}
+
 # Use default VPC for simplicity (no NAT Gateway costs)
 data "aws_vpc" "default" {
   default = true
@@ -93,6 +113,14 @@ resource "aws_security_group" "openclaw" {
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
     description = "OpenClaw gateway"
+  }
+
+  ingress {
+    from_port   = 8000
+    to_port     = 8000
+    protocol    = "tcp"
+    self        = true
+    description = "vLLM inference API (internal, agents only)"
   }
 
   egress {
@@ -211,10 +239,57 @@ resource "aws_instance" "agent" {
     ecr_repo       = var.ecr_repository
     region         = var.region
     account_id     = data.aws_caller_identity.current.account_id
+    inference_url  = "http://${aws_instance.inference.private_ip}:8000/v1"
+    vllm_api_key   = random_password.vllm_api_key.result
   })
 
   tags = {
     Name  = "kk-${each.key}"
     Agent = each.key
+  }
+
+  depends_on = [aws_instance.inference]
+}
+
+# ----------------------------------------------------------------------------
+# vLLM API Key (shared between inference server and agents)
+# ----------------------------------------------------------------------------
+
+resource "random_password" "vllm_api_key" {
+  length  = 32
+  special = false
+}
+
+# ----------------------------------------------------------------------------
+# GPU Inference Server - vLLM + Qwen 3.5 (Spot Instance)
+# ----------------------------------------------------------------------------
+
+resource "aws_instance" "inference" {
+  ami                    = data.aws_ami.deep_learning.id
+  instance_type          = var.inference_instance_type
+  key_name               = aws_key_pair.openclaw.key_name
+  vpc_security_group_ids = [aws_security_group.openclaw.id]
+  iam_instance_profile   = aws_iam_instance_profile.openclaw_agent.name
+  subnet_id              = data.aws_subnets.default.ids[0]
+
+  instance_market_options {
+    market_type = "spot"
+    spot_options {
+      max_price = var.inference_spot_price
+    }
+  }
+
+  root_block_device {
+    volume_size = 100
+    volume_type = "gp3"
+  }
+
+  user_data = templatefile("${path.module}/inference_user_data.sh.tpl", {
+    vllm_model   = var.vllm_model
+    vllm_api_key = random_password.vllm_api_key.result
+  })
+
+  tags = {
+    Name = "kk-inference-gpu"
   }
 }

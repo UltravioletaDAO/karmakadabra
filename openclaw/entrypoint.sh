@@ -200,8 +200,31 @@ echo "[entrypoint] Configuring OpenClaw for $AGENT_NAME"
 # Step 1: Initialize config (non-interactive, local mode)
 openclaw setup --non-interactive --mode local --workspace "$WORKSPACE" 2>/dev/null || true
 
-# Step 2: Set model (env vars auto-detected, no paste-token needed)
-if [ -n "$OPENROUTER_API_KEY" ]; then
+# Step 2: Set model — Priority: Local vLLM > OpenRouter > OpenAI > Anthropic
+if [ -n "$KK_LLM_BASE_URL" ]; then
+    # Test if vLLM is reachable (may still be loading model on first boot)
+    if curl -sf "${KK_LLM_BASE_URL}/models" -H "Authorization: Bearer ${KK_LLM_API_KEY:-none}" > /dev/null 2>&1; then
+        export OPENAI_BASE_URL="$KK_LLM_BASE_URL"
+        export OPENAI_API_KEY="${KK_LLM_API_KEY:-none}"
+        openclaw models set "openai/qwen3.5" 2>/dev/null || true
+        echo "[entrypoint] Model: qwen3.5 via LOCAL vLLM ($KK_LLM_BASE_URL)"
+    else
+        echo "[WARN] Local vLLM unreachable at $KK_LLM_BASE_URL, falling back..."
+        # Fall through to OpenRouter/OpenAI/Anthropic
+        if [ -n "$OPENROUTER_API_KEY" ]; then
+            openclaw models set "openrouter/openai/gpt-4o-mini" 2>/dev/null || true
+            echo "[entrypoint] Model: openrouter/openai/gpt-4o-mini (FALLBACK)"
+        elif [ -n "$OPENAI_API_KEY" ]; then
+            openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
+            echo "[entrypoint] Model: openai/gpt-4o-mini (FALLBACK)"
+        elif [ -n "$ANTHROPIC_API_KEY" ]; then
+            openclaw models set "anthropic/claude-haiku-4-5-20251001" 2>/dev/null || true
+            echo "[entrypoint] Model: anthropic/claude-haiku-4-5-20251001 (FALLBACK)"
+        else
+            echo "[WARN] No fallback LLM API key available"
+        fi
+    fi
+elif [ -n "$OPENROUTER_API_KEY" ]; then
     openclaw models set "openrouter/openai/gpt-4o-mini" 2>/dev/null || true
     echo "[entrypoint] Model: openrouter/openai/gpt-4o-mini (key from env)"
 elif [ -n "$OPENAI_API_KEY" ]; then
@@ -211,7 +234,7 @@ elif [ -n "$ANTHROPIC_API_KEY" ]; then
     openclaw models set "anthropic/claude-haiku-4-5-20251001" 2>/dev/null || true
     echo "[entrypoint] Model: anthropic/claude-haiku-4-5-20251001 (key from env)"
 else
-    echo "[WARN] No LLM API key set (OPENROUTER_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)"
+    echo "[WARN] No LLM API key set (KK_LLM_BASE_URL, OPENROUTER_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)"
 fi
 
 # Step 3: Agent identity and workspace

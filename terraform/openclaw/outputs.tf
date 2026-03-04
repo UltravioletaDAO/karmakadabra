@@ -41,6 +41,31 @@ output "estimated_monthly_cost" {
     per_agent = "$15.18 (t3.small on-demand)"
     phase_1   = "$91.08 (6 system agents)"
     phase_2   = "$364.32 (24 total agents)"
+    inference = "~$216/mo (g5.xlarge spot ~$0.30/hr)"
     notes     = "Reduce with Reserved Instances or Spot"
   }
+}
+
+# ----------------------------------------------------------------------------
+# GPU Inference Server Outputs
+# ----------------------------------------------------------------------------
+
+output "inference_public_ip" {
+  description = "Public IP of GPU inference server (for SSH/debug)"
+  value       = aws_instance.inference.public_ip
+}
+
+output "inference_private_ip" {
+  description = "Private IP of GPU inference server (used by agents)"
+  value       = aws_instance.inference.private_ip
+}
+
+output "inference_instance_id" {
+  description = "EC2 instance ID of GPU inference server"
+  value       = aws_instance.inference.id
+}
+
+output "vllm_internal_url" {
+  description = "vLLM API URL (internal, for agents)"
+  value       = "http://${aws_instance.inference.private_ip}:8000/v1"
 }

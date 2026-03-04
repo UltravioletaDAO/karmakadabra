@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "openrouter/openai/gpt-4o-mini",
+    "model": "openai/qwen3.5",
     "name": "kk-skill-extractor",
     "soul": "/app/openclaw/agents/kk-skill-extractor/SOUL.md",
     "heartbeat": "/app/openclaw/agents/kk-skill-extractor/HEARTBEAT.md",

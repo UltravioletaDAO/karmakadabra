@@ -83,3 +83,25 @@ variable "agents" {
     }
   }
 }
+
+# ----------------------------------------------------------------------------
+# GPU Inference Server Configuration
+# ----------------------------------------------------------------------------
+
+variable "inference_instance_type" {
+  description = "EC2 instance type for GPU inference (g5.xlarge = 1x A10G 24GB)"
+  type        = string
+  default     = "g5.xlarge"
+}
+
+variable "inference_spot_price" {
+  description = "Maximum spot price for GPU instance (on-demand ~$1.006/hr)"
+  type        = string
+  default     = "0.50"
+}
+
+variable "vllm_model" {
+  description = "HuggingFace model ID for vLLM inference server"
+  type        = string
+  default     = "QuantTrio/Qwen3.5-35B-A3B-AWQ"
+}

@@ -95,6 +95,8 @@ docker run -d \
   -e ANTHROPIC_API_KEY="$ANTHROPIC_KEY" \
   -e OPENROUTER_API_KEY="$OPENROUTER_KEY" \
   -e OPENAI_API_KEY="$OPENAI_KEY" \
+  -e KK_LLM_BASE_URL="${inference_url}" \
+  -e KK_LLM_API_KEY="${vllm_api_key}" \
   -p 18790:18790 \
   -v /data/${agent_name}:/app/data \
   ${ecr_repo}:latest

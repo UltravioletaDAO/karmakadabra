@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "openrouter/openai/gpt-4o-mini",
+    "model": "openai/qwen3.5",
     "name": "kk-coordinator",
     "soul": "/app/openclaw/agents/kk-coordinator/SOUL.md",
     "heartbeat": "/app/openclaw/agents/kk-coordinator/HEARTBEAT.md",
