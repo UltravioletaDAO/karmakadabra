@@ -37,13 +37,13 @@ SENT_LOG = DATA_DIR / "irc_sent_log.jsonl"
 STATE_FILE = DATA_DIR / "irc_guard_state.json"
 
 # Thresholds
-DEDUP_WINDOW_SEC = 600       # 10 minutes
+DEDUP_WINDOW_SEC = 120       # 2 minutes
 DEDUP_SIMILARITY = 0.8       # Word overlap threshold
-RATE_LIMIT_MSGS = 5          # Max messages per window
-RATE_LIMIT_WINDOW_SEC = 300  # 5 minutes
+RATE_LIMIT_MSGS = 10         # Max messages per window
+RATE_LIMIT_WINDOW_SEC = 120  # 2 minutes
 CIRCUIT_BREAKER_MSGS = 10    # Trigger threshold
 CIRCUIT_BREAKER_WINDOW = 120 # 2 minutes
-CIRCUIT_BREAKER_COOLDOWN = 300  # 5 minutes silence
+CIRCUIT_BREAKER_COOLDOWN = 60   # 1 minute silence
 
 
 def _word_set(text: str) -> set:

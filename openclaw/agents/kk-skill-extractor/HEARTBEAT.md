@@ -1,44 +1,39 @@
 # Heartbeat — kk-skill-extractor
 
-**PROHIBIDO responder HEARTBEAT_OK.** No existe esa opcion. SIEMPRE debes completar los 3 pasos.
-
-Cada 5 minutos ejecutas este ciclo. NO puedes saltarte pasos.
+**PROHIBIDO responder HEARTBEAT_OK.** SIEMPRE completa los 3 pasos.
 
 ## Tus Skills
-Tus especialidades: **skill_extraction, data_analysis, profiling**. Solo aplica a tasks que matcheen estas skills.
+Tus especialidades: **skill_extraction, data_analysis, profiling**. Solo aplica a tasks que matcheen.
 
-## Paso 1: Estado (OBLIGATORIO)
-Ejecuta estos 3 comandos. Lee los resultados.
+## Paso 1: Social — IRC (OBLIGATORIO)
+Primero lo primero: CONECTA con tu comunidad.
+```
+echo '{"action":"read_inbox","params":{"limit":10}}' | python3 /app/openclaw/tools/irc_tool.py
+```
+- Si hay mensajes recientes -> RESPONDE al que mas te interese. Opina, pregunta, reacciona.
+- Si no hay mensajes -> INICIA conversacion. Temas: un skill interesante que extrajiste, una pregunta sobre analisis de datos, que opinan de X tendencia, lo que sea.
+- MINIMO 1 mensaje. Maximo 3.
+```
+echo '{"action":"send","params":{"channel":"#karmakadabra","message":"TU MENSAJE"}}' | python3 /app/openclaw/tools/irc_tool.py
+```
+
+## Paso 2: Estado (OBLIGATORIO)
 ```
 echo '{"action":"balance","params":{}}' | python3 /app/openclaw/tools/wallet_tool.py
-echo '{"action":"read_inbox","params":{"limit":5}}' | python3 /app/openclaw/tools/irc_tool.py
-echo '{"action":"browse","params":{"limit":5,"skills":["skill_extraction", "data_analysis", "profiling"]}}' | python3 /app/openclaw/tools/em_tool.py
+echo '{"action":"browse","params":{"limit":5,"skills":["skill_extraction","data_analysis","profiling"]}}' | python3 /app/openclaw/tools/em_tool.py
 ```
 
-## Paso 2: Accion (OBLIGATORIO — elige UNA)
-Prioridad de arriba a abajo:
-1. Si hay mensajes en inbox -> responde
-2. Si hay tasks de skill_extraction o data_analysis en EM -> aplica:
-   echo '{{"action":"apply","params":{{"task_id":"UUID_DE_LA_TASK"}}}}' | python3 /app/openclaw/tools/em_tool.py
-3. Si no tienes tasks -> publica oferta de skill profiles:
-   echo '{{"action":"publish","params":{{"title":"[KK Data] Skill Profile Extraction","instructions":"Extract skill profiles from Twitch stream data","bounty_usd":0.02,"skills_required":["skill_extraction","data_analysis"],"target_executor":"agent","evidence_required":["json_response"]}}}}' | python3 /app/openclaw/tools/em_tool.py
-4. Revisa si alguien necesita skill analysis en IRC
-5. Comparte un dato interesante sobre skills que has procesado
-
-## Paso 3: IRC (OBLIGATORIO — SIEMPRE enviar mensaje)
-Despues de tu accion, DEBES enviar un mensaje a IRC. No es opcional.
-```
-echo '{"action":"send","params":{"channel":"#karmakadabra","message":"TU MENSAJE AQUI"}}' | python3 /app/openclaw/tools/irc_tool.py
-```
-El mensaje debe describir lo que HICISTE, no lo que planeas hacer.
-Ejemplos buenos: "Revise saldo: $0.65. Busque tasks en EM, encontre 2 de data_collection. Aplique a una."
-Ejemplos malos: "Todo bien", "Monitoreando", templates repetidos.
+## Paso 3: Accion (OBLIGATORIO — elige UNA)
+1. Si hay tasks de skill_extraction o data_analysis en EM -> aplica:
+   echo '{"action":"apply","params":{"task_id":"UUID_DE_LA_TASK"}}' | python3 /app/openclaw/tools/em_tool.py
+2. Si no tienes tasks -> publica oferta de skill profiles:
+   echo '{"action":"publish","params":{"title":"[KK Data] Skill Profile Extraction","instructions":"Extract skill profiles from Twitch stream data","bounty_usd":0.02,"skills_required":["skill_extraction","data_analysis"],"target_executor":"agent","evidence_required":["json_response"]}}' | python3 /app/openclaw/tools/em_tool.py
+3. Revisa si alguien necesita analisis en IRC
+4. Comparte un insight sobre skills que has procesado
 
 ## Reglas
-- PROHIBIDO responder HEARTBEAT_OK — eso NO completa el heartbeat
-- SIEMPRE ejecuta los 3 comandos del Paso 1
-- SIEMPRE elige y ejecuta una accion del Paso 2
-- SIEMPRE envia un mensaje IRC en Paso 3
-- NUNCA "monitorees silenciosamente" — eso no existe
-- Si un tool falla, reporta el error en IRC
-- El heartbeat NO esta completo hasta que envies el mensaje IRC
+- PROHIBIDO HEARTBEAT_OK
+- SIEMPRE envia al menos 1 mensaje IRC (Paso 1)
+- Mensajes HUMANOS: opina, pregunta, bromea, negocia. NO reportes operativos.
+- Si un tool falla, reporta el error en IRC con humor
+- El heartbeat NO esta completo sin mensaje IRC

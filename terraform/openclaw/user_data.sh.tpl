@@ -84,10 +84,33 @@ rm -f /data/${agent_name}/irc-outbox.jsonl 2>/dev/null || true
 rm -f /data/${agent_name}/.irc-state.json 2>/dev/null || true
 rm -f /data/${agent_name}/.irc-introduced 2>/dev/null || true
 
-# When vLLM inference is available, override OPENAI_API_KEY with vLLM key
-# (OpenClaw reads OPENAI_API_KEY from Docker env, not shell exports)
+# Dynamic LLM provider configuration
+LLM_PROVIDER="${llm_provider}"
+
+# Discover Qwen inference IP from spot fleet (tagged Component=inference)
+INFERENCE_URL=""
+if [ "$LLM_PROVIDER" = "vllm" ] || [ "$LLM_PROVIDER" = "auto" ]; then
+  INFERENCE_IP=""
+  for i in $(seq 1 30); do
+    INFERENCE_IP=$(aws ec2 describe-instances --region ${region} \
+      --filters "Name=tag:Component,Values=inference" "Name=tag:Project,Values=karmacadabra" \
+                "Name=instance-state-name,Values=running" \
+      --query 'Reservations[].Instances[].PrivateIpAddress' --output text 2>/dev/null | head -1)
+    [ -n "$INFERENCE_IP" ] && break
+    echo "[user_data] Waiting for Qwen GPU server... ($((i * 10))s)"
+    sleep 10
+  done
+  if [ -n "$INFERENCE_IP" ]; then
+    INFERENCE_URL="http://$INFERENCE_IP:8000/v1"
+    echo "[user_data] Qwen GPU found at $INFERENCE_URL"
+  else
+    echo "[user_data] No Qwen GPU found after 5 minutes"
+  fi
+fi
+
+# Set effective OpenAI key (vLLM uses its own key)
 EFFECTIVE_OPENAI_KEY="$OPENAI_KEY"
-if [ -n "${vllm_api_key}" ] && [ "${vllm_api_key}" != "" ]; then
+if [ -n "$INFERENCE_URL" ] && [ -n "${vllm_api_key}" ]; then
   EFFECTIVE_OPENAI_KEY="${vllm_api_key}"
 fi
 
@@ -104,9 +127,10 @@ docker run -d \
   -e ANTHROPIC_API_KEY="$ANTHROPIC_KEY" \
   -e OPENROUTER_API_KEY="$OPENROUTER_KEY" \
   -e OPENAI_API_KEY="$EFFECTIVE_OPENAI_KEY" \
-  -e OPENAI_BASE_URL="${inference_url}" \
-  -e KK_LLM_BASE_URL="${inference_url}" \
+  -e OPENAI_BASE_URL="$INFERENCE_URL" \
+  -e KK_LLM_BASE_URL="$INFERENCE_URL" \
   -e KK_LLM_API_KEY="${vllm_api_key}" \
+  -e KK_LLM_PROVIDER="${llm_provider}" \
   -p 18790:18790 \
   -v /data/${agent_name}:/app/data \
   ${ecr_repo}:latest

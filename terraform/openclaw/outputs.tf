@@ -47,25 +47,15 @@ output "estimated_monthly_cost" {
 }
 
 # ----------------------------------------------------------------------------
-# GPU Inference Server Outputs
+# GPU Inference Fleet Outputs
 # ----------------------------------------------------------------------------
 
-output "inference_public_ip" {
-  description = "Public IP of GPU inference server (for SSH/debug)"
-  value       = aws_instance.inference.public_ip
+output "inference_fleet_id" {
+  description = "Spot fleet request ID for GPU inference (empty if inference disabled)"
+  value       = var.enable_inference ? aws_spot_fleet_request.inference[0].id : ""
 }
 
-output "inference_private_ip" {
-  description = "Private IP of GPU inference server (used by agents)"
-  value       = aws_instance.inference.private_ip
-}
-
-output "inference_instance_id" {
-  description = "EC2 instance ID of GPU inference server"
-  value       = aws_instance.inference.id
-}
-
-output "vllm_internal_url" {
-  description = "vLLM API URL (internal, for agents)"
-  value       = "http://${aws_instance.inference.private_ip}:8000/v1"
+output "llm_provider" {
+  description = "Active LLM provider configuration"
+  value       = var.llm_provider
 }

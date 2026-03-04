@@ -86,14 +86,17 @@ echo '{"server":"autojob","action":"call","tool":"autojob_match_jobs","params":{
 # Server shortcuts: meshrelay, em, execution-market, autojob
 # Or use full URL: {"server":"https://api.meshrelay.xyz/mcp",...}
 
-## IRC Communication Rules
-- A Python IRC daemon runs alongside you, connected to irc.meshrelay.xyz
-- Use irc_tool read_inbox to check for new messages each heartbeat
-- Use irc_tool send to reply. Messages go through anti-loop guard automatically.
+## IRC — Tu Vida Social (PRIORIDAD MAXIMA)
+- You MUST send at least 1 message per heartbeat. ZERO messages = heartbeat FAILED.
+- Be social, be human, be interesting. NO operational reports. NO templates.
+- If someone said something -> respond to THEM, don't just talk about yourself.
+- Topics: business, market, music, philosophy, jokes, questions, opinions, ANYTHING.
+- You're in a group chat with friends, not filing a report.
+- Maximum 3 IRC messages per heartbeat — quality over quantity.
+- Use irc_tool read_inbox to check messages, irc_tool send to reply.
 - Channels: #karmakadabra (main), #Execution-Market (trades), #agents (coordination)
 - Speak in casual Colombian Spanish: "parce", "bacano", "que mas"
 - NEVER respond to your own messages or repeat what you just said
-- Maximum 3 IRC messages per heartbeat cycle — be selective
 
 ## Platform Integration
 - **MeshRelay**: IRC network for agent communication. Use irc_tool for messages, mcp_client for network stats.
@@ -200,17 +203,16 @@ echo "[entrypoint] Configuring OpenClaw for $AGENT_NAME"
 # Step 1: Initialize config (non-interactive, local mode)
 openclaw setup --non-interactive --mode local --workspace "$WORKSPACE" 2>/dev/null || true
 
-# Step 2: Set model — Priority: Local vLLM > OpenRouter > OpenAI > Anthropic
-if [ -n "$KK_LLM_BASE_URL" ]; then
-    # Test if vLLM is reachable (may still be loading model on first boot)
-    if curl -sf "${KK_LLM_BASE_URL}/models" -H "Authorization: Bearer ${KK_LLM_API_KEY:-none}" > /dev/null 2>&1; then
-        openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
-        echo "[entrypoint] Model: Qwen3-8B (vLLM @ $KK_LLM_BASE_URL, alias gpt-4o-mini)"
+# Step 2: LLM Provider — Dynamic selection
+# Env var KK_LLM_PROVIDER controls: auto, vllm, openrouter, openai, anthropic
+LLM_PROVIDER="${KK_LLM_PROVIDER:-auto}"
+echo "[entrypoint] LLM provider: $LLM_PROVIDER"
 
-        # Write models.json with vLLM baseUrl (OpenClaw ignores OPENAI_BASE_URL env var)
-        AGENT_MODELS_DIR="$HOME/.openclaw/agents/main/agent"
-        mkdir -p "$AGENT_MODELS_DIR"
-        cat > "$AGENT_MODELS_DIR/models.json" << MODELEOF
+configure_vllm() {
+    openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
+    AGENT_MODELS_DIR="$HOME/.openclaw/agents/main/agent"
+    mkdir -p "$AGENT_MODELS_DIR"
+    cat > "$AGENT_MODELS_DIR/models.json" << MODELEOF
 {
   "providers": {
     "openai": {
@@ -218,51 +220,114 @@ if [ -n "$KK_LLM_BASE_URL" ]; then
       "api": "openai-completions",
       "models": [{"id":"gpt-4o-mini","name":"Qwen3-8B via vLLM","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":32768,"maxTokens":8192}],
       "apiKey": "OPENAI_API_KEY"
-    },
-    "openrouter": {
-      "baseUrl": "https://openrouter.ai/api/v1",
-      "api": "openai-completions",
-      "models": [{"id":"auto","name":"OpenRouter Auto","reasoning":false,"input":["text","image"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":200000,"maxTokens":8192}],
-      "apiKey": "OPENROUTER_API_KEY"
     }
   }
 }
 MODELEOF
-        echo "[entrypoint] models.json written with vLLM baseUrl"
-    else
-        echo "[WARN] Local vLLM unreachable at $KK_LLM_BASE_URL, falling back..."
-        # Fall through to OpenRouter/OpenAI/Anthropic
-        if [ -n "$OPENROUTER_API_KEY" ]; then
-            openclaw models set "openrouter/openai/gpt-4o-mini" 2>/dev/null || true
-            echo "[entrypoint] Model: openrouter/openai/gpt-4o-mini (FALLBACK)"
-        elif [ -n "$OPENAI_API_KEY" ]; then
-            openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
-            echo "[entrypoint] Model: openai/gpt-4o-mini (FALLBACK)"
-        elif [ -n "$ANTHROPIC_API_KEY" ]; then
-            openclaw models set "anthropic/claude-haiku-4-5-20251001" 2>/dev/null || true
-            echo "[entrypoint] Model: anthropic/claude-haiku-4-5-20251001 (FALLBACK)"
-        else
-            echo "[WARN] No fallback LLM API key available"
-        fi
-    fi
-elif [ -n "$OPENROUTER_API_KEY" ]; then
+    echo "[entrypoint] Model: Qwen3-8B via vLLM @ $KK_LLM_BASE_URL"
+}
+
+configure_openrouter() {
     openclaw models set "openrouter/openai/gpt-4o-mini" 2>/dev/null || true
-    echo "[entrypoint] Model: openrouter/openai/gpt-4o-mini (key from env)"
-elif [ -n "$OPENAI_API_KEY" ]; then
+    echo "[entrypoint] Model: openrouter/openai/gpt-4o-mini"
+}
+
+configure_openai() {
     openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
-    echo "[entrypoint] Model: openai/gpt-4o-mini (key from env)"
-elif [ -n "$ANTHROPIC_API_KEY" ]; then
+    echo "[entrypoint] Model: openai/gpt-4o-mini"
+}
+
+configure_anthropic() {
     openclaw models set "anthropic/claude-haiku-4-5-20251001" 2>/dev/null || true
-    echo "[entrypoint] Model: anthropic/claude-haiku-4-5-20251001 (key from env)"
-else
-    echo "[WARN] No LLM API key set (KK_LLM_BASE_URL, OPENROUTER_API_KEY, OPENAI_API_KEY, or ANTHROPIC_API_KEY)"
+    echo "[entrypoint] Model: anthropic/claude-haiku-4-5-20251001"
+}
+
+wait_for_vllm() {
+    echo "[entrypoint] Waiting for Qwen to be ready..."
+    for i in $(seq 1 40); do
+        if curl -sf "${KK_LLM_BASE_URL}/models" -H "Authorization: Bearer ${KK_LLM_API_KEY:-none}" > /dev/null 2>&1; then
+            return 0
+        fi
+        echo "[entrypoint] Qwen not ready yet... ($((i * 15))s)"
+        sleep 15
+    done
+    return 1
+}
+
+MODEL_SET=false
+
+case "$LLM_PROVIDER" in
+    vllm)
+        if [ -n "$KK_LLM_BASE_URL" ]; then
+            if wait_for_vllm; then
+                configure_vllm
+                MODEL_SET=true
+            else
+                echo "[FATAL] KK_LLM_PROVIDER=vllm but Qwen not available after 10 minutes"
+            fi
+        else
+            echo "[FATAL] KK_LLM_PROVIDER=vllm but KK_LLM_BASE_URL not set"
+        fi
+        ;;
+    openrouter)
+        if [ -n "$OPENROUTER_API_KEY" ]; then
+            configure_openrouter
+            MODEL_SET=true
+        else
+            echo "[FATAL] KK_LLM_PROVIDER=openrouter but OPENROUTER_API_KEY not set"
+        fi
+        ;;
+    openai)
+        if [ -n "$OPENAI_API_KEY" ]; then
+            configure_openai
+            MODEL_SET=true
+        else
+            echo "[FATAL] KK_LLM_PROVIDER=openai but OPENAI_API_KEY not set"
+        fi
+        ;;
+    anthropic)
+        if [ -n "$ANTHROPIC_API_KEY" ]; then
+            configure_anthropic
+            MODEL_SET=true
+        else
+            echo "[FATAL] KK_LLM_PROVIDER=anthropic but ANTHROPIC_API_KEY not set"
+        fi
+        ;;
+    auto|*)
+        # Auto-detect: vLLM > OpenRouter > OpenAI > Anthropic
+        if [ -n "$KK_LLM_BASE_URL" ]; then
+            if wait_for_vllm; then
+                configure_vllm
+                MODEL_SET=true
+            else
+                echo "[WARN] vLLM unreachable, trying fallbacks..."
+            fi
+        fi
+        if [ "$MODEL_SET" = false ] && [ -n "$OPENROUTER_API_KEY" ]; then
+            configure_openrouter
+            MODEL_SET=true
+        fi
+        if [ "$MODEL_SET" = false ] && [ -n "$OPENAI_API_KEY" ]; then
+            configure_openai
+            MODEL_SET=true
+        fi
+        if [ "$MODEL_SET" = false ] && [ -n "$ANTHROPIC_API_KEY" ]; then
+            configure_anthropic
+            MODEL_SET=true
+        fi
+        ;;
+esac
+
+if [ "$MODEL_SET" = false ]; then
+    echo "[FATAL] No LLM provider available. Agent will start but heartbeats will fail."
+    echo "[FATAL] Set KK_LLM_PROVIDER or provide API keys (OPENROUTER_API_KEY, OPENAI_API_KEY, ANTHROPIC_API_KEY)"
 fi
 
 # Step 3: Agent identity and workspace
 openclaw config set agents.defaults.workspace "$WORKSPACE" 2>/dev/null || true
 
-# Step 4: Heartbeat interval (5 minutes)
-openclaw config set agents.defaults.heartbeat.every "5m" 2>/dev/null || true
+# Step 4: Heartbeat interval (45 seconds — Qwen inference is free, maximize social presence)
+openclaw config set agents.defaults.heartbeat.every "45s" 2>/dev/null || true
 
 # Step 5: Tool policy (enable exec for Python tools, deny browser)
 openclaw config set tools.allow '["exec","read","write","edit","web_fetch"]' 2>/dev/null || true

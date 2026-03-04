@@ -88,16 +88,33 @@ variable "agents" {
 # GPU Inference Server Configuration
 # ----------------------------------------------------------------------------
 
-variable "inference_instance_type" {
-  description = "EC2 instance type for GPU inference (g5.xlarge = 1x A10G 24GB)"
-  type        = string
-  default     = "g5.xlarge"
+variable "inference_instance_types" {
+  description = "GPU instance types for spot fleet (ordered by preference). Qwen3-8B-AWQ needs 5.7GB VRAM."
+  type        = list(string)
+  default     = ["g4dn.xlarge", "g5.xlarge", "g6.xlarge"]
 }
 
 variable "inference_spot_price" {
   description = "Maximum spot price for GPU instance (on-demand ~$1.006/hr)"
   type        = string
   default     = "1.00"
+}
+
+variable "enable_inference" {
+  description = "Enable self-hosted GPU inference (spot fleet). Set to false when using external providers."
+  type        = bool
+  default     = true
+}
+
+variable "llm_provider" {
+  description = "LLM provider for agents: auto (vLLM>OpenRouter>OpenAI>Anthropic), vllm, openrouter, openai, anthropic"
+  type        = string
+  default     = "auto"
+
+  validation {
+    condition     = contains(["auto", "vllm", "openrouter", "openai", "anthropic"], var.llm_provider)
+    error_message = "llm_provider must be one of: auto, vllm, openrouter, openai, anthropic"
+  }
 }
 
 variable "vllm_model" {

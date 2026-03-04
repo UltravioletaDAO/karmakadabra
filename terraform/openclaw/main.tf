@@ -194,6 +194,11 @@ resource "aws_iam_role_policy" "openclaw_agent" {
           "arn:aws:s3:::karmacadabra-agent-data",
           "arn:aws:s3:::karmacadabra-agent-data/*"
         ]
+      },
+      {
+        Effect   = "Allow"
+        Action   = ["ec2:DescribeInstances"]
+        Resource = "*"
       }
     ]
   })
@@ -239,7 +244,7 @@ resource "aws_instance" "agent" {
     ecr_repo       = var.ecr_repository
     region         = var.region
     account_id     = data.aws_caller_identity.current.account_id
-    inference_url  = "http://${aws_instance.inference.private_ip}:8000/v1"
+    llm_provider   = var.llm_provider
     vllm_api_key   = random_password.vllm_api_key.result
   })
 
@@ -247,8 +252,6 @@ resource "aws_instance" "agent" {
     Name  = "kk-${each.key}"
     Agent = each.key
   }
-
-  depends_on = [aws_instance.inference]
 }
 
 # ----------------------------------------------------------------------------
@@ -261,35 +264,91 @@ resource "random_password" "vllm_api_key" {
 }
 
 # ----------------------------------------------------------------------------
-# GPU Inference Server - vLLM + Qwen 3.5 (Spot Instance)
+# IAM Role for Spot Fleet (required to manage EC2 instances)
 # ----------------------------------------------------------------------------
 
-resource "aws_instance" "inference" {
-  ami                    = data.aws_ami.deep_learning.id
-  instance_type          = var.inference_instance_type
-  key_name               = aws_key_pair.openclaw.key_name
-  vpc_security_group_ids = [aws_security_group.openclaw.id]
-  iam_instance_profile   = aws_iam_instance_profile.openclaw_agent.name
-  # No subnet_id pinning — let AWS pick the AZ with best spot capacity
+resource "aws_iam_role" "spot_fleet" {
+  count = var.enable_inference ? 1 : 0
+  name  = "kk-openclaw-spot-fleet"
 
-  instance_market_options {
-    market_type = "spot"
-    spot_options {
-      max_price = var.inference_spot_price
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Action    = "sts:AssumeRole"
+      Effect    = "Allow"
+      Principal = { Service = "spotfleet.amazonaws.com" }
+    }]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "spot_fleet" {
+  count      = var.enable_inference ? 1 : 0
+  role       = aws_iam_role.spot_fleet[0].name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonEC2SpotFleetTaggingRole"
+}
+
+# ----------------------------------------------------------------------------
+# GPU Inference Server - vLLM + Qwen3-8B (Spot Fleet, Multi-Type)
+# ----------------------------------------------------------------------------
+
+resource "aws_launch_template" "inference" {
+  count         = var.enable_inference ? 1 : 0
+  name_prefix   = "kk-inference-"
+  image_id      = data.aws_ami.deep_learning.id
+  key_name      = aws_key_pair.openclaw.key_name
+
+  vpc_security_group_ids = [aws_security_group.openclaw.id]
+
+  iam_instance_profile {
+    name = aws_iam_instance_profile.openclaw_agent.name
+  }
+
+  block_device_mappings {
+    device_name = "/dev/xvda"
+    ebs {
+      volume_size = 100
+      volume_type = "gp3"
     }
   }
 
-  root_block_device {
-    volume_size = 100
-    volume_type = "gp3"
-  }
-
-  user_data = templatefile("${path.module}/inference_user_data.sh.tpl", {
+  user_data = base64encode(templatefile("${path.module}/inference_user_data.sh.tpl", {
     vllm_model   = var.vllm_model
     vllm_api_key = random_password.vllm_api_key.result
-  })
+  }))
+
+  tag_specifications {
+    resource_type = "instance"
+    tags = {
+      Name      = "kk-inference-gpu"
+      Component = "inference"
+      Project   = "karmacadabra"
+    }
+  }
+}
+
+resource "aws_spot_fleet_request" "inference" {
+  count                               = var.enable_inference ? 1 : 0
+  iam_fleet_role                      = aws_iam_role.spot_fleet[0].arn
+  target_capacity                     = 1
+  allocation_strategy                 = "capacityOptimized"
+  terminate_instances_with_expiration = true
+  replace_unhealthy_instances         = true
+  fleet_type                          = "maintain"
+
+  dynamic "launch_template_config" {
+    for_each = var.inference_instance_types
+    content {
+      launch_template_specification {
+        id      = aws_launch_template.inference[0].id
+        version = aws_launch_template.inference[0].latest_version
+      }
+      overrides {
+        instance_type = launch_template_config.value
+      }
+    }
+  }
 
   tags = {
-    Name = "kk-inference-gpu"
+    Name = "kk-inference-fleet"
   }
 }
