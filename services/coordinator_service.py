@@ -576,6 +576,129 @@ async def coordination_cycle(
 # ---------------------------------------------------------------------------
 
 
+# ---------------------------------------------------------------------------
+# Class-based interface (for swarm_runner.py daemon integration)
+# ---------------------------------------------------------------------------
+
+
+def load_coordinator_config(config: dict = None) -> dict:
+    """Load coordinator configuration.
+
+    Merges defaults with provided config dict or environment variables.
+    Used by swarm_runner.py to configure the coordinator.
+
+    Args:
+        config: Optional dict with overrides
+
+    Returns:
+        Configuration dict with all coordinator settings
+    """
+    defaults = {
+        "use_autojob": False,
+        "autojob_path": None,
+        "autojob_api": None,
+        "use_legacy_matching": False,
+        "dry_run": False,
+    }
+    # Environment variable overrides
+    import os
+    env_map = {
+        "KK_USE_AUTOJOB": ("use_autojob", lambda v: v.lower() in ("1", "true", "yes")),
+        "KK_AUTOJOB_PATH": ("autojob_path", str),
+        "KK_AUTOJOB_API": ("autojob_api", str),
+        "KK_DRY_RUN": ("dry_run", lambda v: v.lower() in ("1", "true", "yes")),
+        "KK_LEGACY_MATCHING": ("use_legacy_matching", lambda v: v.lower() in ("1", "true", "yes")),
+    }
+    for env_key, (config_key, converter) in env_map.items():
+        val = os.getenv(env_key)
+        if val is not None:
+            defaults[config_key] = converter(val)
+
+    if config:
+        defaults.update(config)
+
+    return defaults
+
+
+class CoordinatorService:
+    """Class-based wrapper around coordination_cycle for daemon integration.
+
+    This is the interface swarm_runner.py expects. It wraps the
+    function-based coordination_cycle() with stateful configuration.
+
+    Usage:
+        coordinator = CoordinatorService(
+            workspaces_dir="./workspaces",
+            em_client=client,
+            use_autojob=True,
+        )
+        result = await coordinator.run_cycle()
+    """
+
+    def __init__(
+        self,
+        workspaces_dir: str,
+        em_client: EMClient,
+        dry_run: bool = False,
+        max_assignments: int = 5,
+        use_autojob: bool = False,
+        autojob_path: str = None,
+        autojob_api: str = None,
+        use_legacy_matching: bool = False,
+    ):
+        self.workspaces_dir = Path(workspaces_dir)
+        self.em_client = em_client
+        self.dry_run = dry_run
+        self.max_assignments = max_assignments
+        self.use_autojob = use_autojob
+        self.autojob_path = autojob_path
+        self.autojob_api = autojob_api
+        self.use_legacy_matching = use_legacy_matching
+
+    async def run_cycle(self) -> dict:
+        """Run one coordination cycle and return results.
+
+        Returns:
+            Dict with standardized result keys:
+            - tasks_found: number of available tasks
+            - tasks_assigned: number of assignments made
+            - agents_active: total agents
+            - agents_idle: idle agents
+            - assignments: list of assignment details
+            - matching_mode: which matching engine was used
+            - autojob: AutoJob bridge stats (if enabled)
+        """
+        result = await coordination_cycle(
+            workspaces_dir=self.workspaces_dir,
+            client=self.em_client,
+            dry_run=self.dry_run,
+            use_legacy_matching=self.use_legacy_matching,
+            use_autojob=self.use_autojob,
+            autojob_path=self.autojob_path,
+            autojob_api=self.autojob_api,
+        )
+
+        # Normalize result keys for swarm_runner compatibility
+        summary = result.get("summary", {})
+        assignments = result.get("assignments", [])
+
+        return {
+            "tasks_found": summary.get("total_published_tasks", len(assignments)),
+            "tasks_assigned": len([a for a in assignments if not a.get("dry_run")]),
+            "agents_active": summary.get("total_agents", 0),
+            "agents_idle": summary.get("idle_agents", 0),
+            "assignments": assignments,
+            "matching_mode": result.get("matching_mode", "unknown"),
+            "autojob": result.get("autojob"),
+            "stale_agents": result.get("stale_agents", []),
+        }
+
+
+# ---------------------------------------------------------------------------
+# CLI entry point
+# ---------------------------------------------------------------------------
+
+
 async def main():
     parser = argparse.ArgumentParser(description="KK Coordinator Service")
     parser.add_argument("--workspace", type=str, default=None)

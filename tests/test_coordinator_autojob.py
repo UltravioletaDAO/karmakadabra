@@ -24,8 +24,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent / "services"))
 
 from lib.autojob_bridge import AgentRanking, AutoJobBridge, BridgeResult
 from services.coordinator_service import (
+    CoordinatorService,
     _autojob_rank_to_coordinator,
     _build_autojob_bridge,
+    load_coordinator_config,
 )
 
 
@@ -572,6 +574,118 @@ class TestEdgeCases:
         )
         scores = [s for _, s in ranked]
         assert scores == sorted(scores, reverse=True)
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Test: CoordinatorService class wrapper
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestCoordinatorService:
+    """Tests for the class-based CoordinatorService interface."""
+
+    @pytest.fixture
+    def mock_em_client(self):
+        """Mock EM API client."""
+        client = MagicMock()
+        client.agent = MagicMock()
+        client.agent.wallet_address = "0x000"
+        client.browse_tasks = AsyncMock(return_value=[])
+        client.close = AsyncMock()
+        return client
+
+    def test_init_with_defaults(self, mock_em_client, tmp_path):
+        """CoordinatorService initializes with default settings."""
+        svc = CoordinatorService(
+            workspaces_dir=str(tmp_path),
+            em_client=mock_em_client,
+        )
+        assert svc.dry_run is False
+        assert svc.use_autojob is False
+        assert svc.use_legacy_matching is False
+
+    def test_init_with_autojob(self, mock_em_client, tmp_path):
+        """CoordinatorService accepts AutoJob parameters."""
+        svc = CoordinatorService(
+            workspaces_dir=str(tmp_path),
+            em_client=mock_em_client,
+            use_autojob=True,
+            autojob_path="/path/to/autojob",
+        )
+        assert svc.use_autojob is True
+        assert svc.autojob_path == "/path/to/autojob"
+
+    @pytest.mark.asyncio
+    async def test_run_cycle_returns_normalized_result(self, mock_em_client, tmp_path):
+        """run_cycle returns swarm_runner-compatible result dict."""
+        (tmp_path / "workspaces").mkdir(exist_ok=True)
+        workspaces = tmp_path / "workspaces"
+
+        with patch("services.coordinator_service.get_agent_states") as mock_agents, \
+             patch("services.coordinator_service.get_stale_agents") as mock_stale, \
+             patch("services.coordinator_service.get_swarm_summary") as mock_summary:
+
+            mock_agents.return_value = []
+            mock_stale.return_value = []
+            mock_summary.return_value = {"total_agents": 0, "idle_agents": 0}
+
+            svc = CoordinatorService(
+                workspaces_dir=str(workspaces),
+                em_client=mock_em_client,
+                dry_run=True,
+            )
+            result = await svc.run_cycle()
+
+            # Verify standardized keys
+            assert "tasks_found" in result
+            assert "tasks_assigned" in result
+            assert "agents_active" in result
+            assert "agents_idle" in result
+            assert "assignments" in result
+            assert "matching_mode" in result
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Test: load_coordinator_config
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestLoadCoordinatorConfig:
+    """Tests for coordinator configuration loading."""
+
+    def test_defaults(self):
+        """Returns sensible defaults when no overrides provided."""
+        config = load_coordinator_config()
+        assert config["use_autojob"] is False
+        assert config["dry_run"] is False
+        assert config["use_legacy_matching"] is False
+        assert config["autojob_path"] is None
+        assert config["autojob_api"] is None
+
+    def test_dict_overrides(self):
+        """Provided dict overrides defaults."""
+        config = load_coordinator_config({
+            "use_autojob": True,
+            "autojob_path": "/opt/autojob",
+        })
+        assert config["use_autojob"] is True
+        assert config["autojob_path"] == "/opt/autojob"
+        # Other defaults remain
+        assert config["dry_run"] is False
+
+    def test_env_overrides(self, monkeypatch):
+        """Environment variables override defaults."""
+        monkeypatch.setenv("KK_USE_AUTOJOB", "true")
+        monkeypatch.setenv("KK_AUTOJOB_PATH", "/env/autojob")
+        config = load_coordinator_config()
+        assert config["use_autojob"] is True
+        assert config["autojob_path"] == "/env/autojob"
+
+    def test_dict_takes_precedence_over_env(self, monkeypatch):
+        """Explicit dict overrides override env vars."""
+        monkeypatch.setenv("KK_USE_AUTOJOB", "true")
+        config = load_coordinator_config({"use_autojob": False})
+        assert config["use_autojob"] is False
 
 
 if __name__ == "__main__":
