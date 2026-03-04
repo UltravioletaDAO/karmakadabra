@@ -204,10 +204,31 @@ openclaw setup --non-interactive --mode local --workspace "$WORKSPACE" 2>/dev/nu
 if [ -n "$KK_LLM_BASE_URL" ]; then
     # Test if vLLM is reachable (may still be loading model on first boot)
     if curl -sf "${KK_LLM_BASE_URL}/models" -H "Authorization: Bearer ${KK_LLM_API_KEY:-none}" > /dev/null 2>&1; then
-        export OPENAI_BASE_URL="$KK_LLM_BASE_URL"
-        export OPENAI_API_KEY="${KK_LLM_API_KEY:-none}"
         openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
         echo "[entrypoint] Model: Qwen3-8B (vLLM @ $KK_LLM_BASE_URL, alias gpt-4o-mini)"
+
+        # Write models.json with vLLM baseUrl (OpenClaw ignores OPENAI_BASE_URL env var)
+        AGENT_MODELS_DIR="$HOME/.openclaw/agents/main/agent"
+        mkdir -p "$AGENT_MODELS_DIR"
+        cat > "$AGENT_MODELS_DIR/models.json" << MODELEOF
+{
+  "providers": {
+    "openai": {
+      "baseUrl": "${KK_LLM_BASE_URL}",
+      "api": "openai-completions",
+      "models": [{"id":"gpt-4o-mini","name":"Qwen3-8B via vLLM","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":32768,"maxTokens":8192}],
+      "apiKey": "OPENAI_API_KEY"
+    },
+    "openrouter": {
+      "baseUrl": "https://openrouter.ai/api/v1",
+      "api": "openai-completions",
+      "models": [{"id":"auto","name":"OpenRouter Auto","reasoning":false,"input":["text","image"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":200000,"maxTokens":8192}],
+      "apiKey": "OPENROUTER_API_KEY"
+    }
+  }
+}
+MODELEOF
+        echo "[entrypoint] models.json written with vLLM baseUrl"
     else
         echo "[WARN] Local vLLM unreachable at $KK_LLM_BASE_URL, falling back..."
         # Fall through to OpenRouter/OpenAI/Anthropic
@@ -246,6 +267,15 @@ openclaw config set agents.defaults.heartbeat.every "5m" 2>/dev/null || true
 # Step 5: Tool policy (enable exec for Python tools, deny browser)
 openclaw config set tools.allow '["exec","read","write","edit","web_fetch"]' 2>/dev/null || true
 openclaw config set tools.deny '["browser"]' 2>/dev/null || true
+openclaw config set tools.exec.host "gateway" 2>/dev/null || true
+
+# Step 5b: Disable sandbox (no Docker-in-Docker in our containers)
+openclaw config set agents.defaults.sandbox.mode "off" 2>/dev/null || true
+
+# Step 5c: Pre-approve exec tools
+openclaw approvals allowlist add --agent "*" "python3 /app/openclaw/tools/*" 2>/dev/null || true
+openclaw approvals allowlist add --agent "*" "/usr/bin/*" 2>/dev/null || true
+openclaw approvals allowlist add --agent "*" "/app/**" 2>/dev/null || true
 
 # Step 6: DISABLE OpenClaw native IRC plugin (buggy — exits 2ms after connecting)
 # IRC is handled by the Python daemon started above.

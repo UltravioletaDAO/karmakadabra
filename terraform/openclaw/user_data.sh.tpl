@@ -84,17 +84,27 @@ rm -f /data/${agent_name}/irc-outbox.jsonl 2>/dev/null || true
 rm -f /data/${agent_name}/.irc-state.json 2>/dev/null || true
 rm -f /data/${agent_name}/.irc-introduced 2>/dev/null || true
 
+# When vLLM inference is available, override OPENAI_API_KEY with vLLM key
+# (OpenClaw reads OPENAI_API_KEY from Docker env, not shell exports)
+EFFECTIVE_OPENAI_KEY="$OPENAI_KEY"
+if [ -n "${vllm_api_key}" ] && [ "${vllm_api_key}" != "" ]; then
+  EFFECTIVE_OPENAI_KEY="${vllm_api_key}"
+fi
+
 # Run agent container
 docker run -d \
   --name ${agent_name} \
   --restart unless-stopped \
+  --memory 1800m \
+  --memory-swap 2g \
   -e KK_AGENT_NAME=${agent_name} \
   -e KK_WALLET_INDEX=${wallet_index} \
   -e KK_WALLET_ADDRESS=${wallet_address} \
   -e KK_PRIVATE_KEY="$PRIVATE_KEY" \
   -e ANTHROPIC_API_KEY="$ANTHROPIC_KEY" \
   -e OPENROUTER_API_KEY="$OPENROUTER_KEY" \
-  -e OPENAI_API_KEY="$OPENAI_KEY" \
+  -e OPENAI_API_KEY="$EFFECTIVE_OPENAI_KEY" \
+  -e OPENAI_BASE_URL="${inference_url}" \
   -e KK_LLM_BASE_URL="${inference_url}" \
   -e KK_LLM_API_KEY="${vllm_api_key}" \
   -p 18790:18790 \
