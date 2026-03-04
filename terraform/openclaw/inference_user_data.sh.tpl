@@ -49,7 +49,7 @@ docker run -d \
   --quantization awq_marlin \
   --max-model-len 32768 \
   --gpu-memory-utilization 0.90 \
-  --served-model-name qwen3 \
+  --served-model-name gpt-4o-mini \
   --enable-auto-tool-choice \
   --tool-call-parser hermes \
   --trust-remote-code

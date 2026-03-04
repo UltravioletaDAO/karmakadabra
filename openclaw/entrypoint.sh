@@ -206,8 +206,8 @@ if [ -n "$KK_LLM_BASE_URL" ]; then
     if curl -sf "${KK_LLM_BASE_URL}/models" -H "Authorization: Bearer ${KK_LLM_API_KEY:-none}" > /dev/null 2>&1; then
         export OPENAI_BASE_URL="$KK_LLM_BASE_URL"
         export OPENAI_API_KEY="${KK_LLM_API_KEY:-none}"
-        openclaw models set "openai/qwen3" 2>/dev/null || true
-        echo "[entrypoint] Model: qwen3 via LOCAL vLLM ($KK_LLM_BASE_URL)"
+        openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
+        echo "[entrypoint] Model: Qwen3-8B (vLLM @ $KK_LLM_BASE_URL, alias gpt-4o-mini)"
     else
         echo "[WARN] Local vLLM unreachable at $KK_LLM_BASE_URL, falling back..."
         # Fall through to OpenRouter/OpenAI/Anthropic

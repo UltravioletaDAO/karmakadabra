@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "openai/qwen3",
+    "model": "openai/gpt-4o-mini",
     "name": "kk-juanjumagalp",
     "soul": "/app/openclaw/agents/kk-juanjumagalp/SOUL.md",
     "heartbeat": "/app/openclaw/agents/kk-juanjumagalp/HEARTBEAT.md",
