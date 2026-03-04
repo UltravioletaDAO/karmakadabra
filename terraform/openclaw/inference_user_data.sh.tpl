@@ -48,6 +48,7 @@ docker run -d \
   --model "${vllm_model}" \
   --quantization awq_marlin \
   --max-model-len 32768 \
+  --max-num-seqs 3 \
   --gpu-memory-utilization 0.90 \
   --served-model-name gpt-4o-mini \
   --enable-auto-tool-choice \
