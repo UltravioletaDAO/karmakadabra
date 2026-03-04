@@ -96,6 +96,11 @@ class RunnerConfig:
     em_api_url: str = "https://api.execution.market"
     em_api_key: Optional[str] = None
 
+    # AutoJob matching
+    use_autojob: bool = False
+    autojob_path: Optional[str] = None
+    autojob_api: Optional[str] = None
+
     @classmethod
     def from_env(cls) -> "RunnerConfig":
         """Load config from environment variables."""
@@ -111,6 +116,9 @@ class RunnerConfig:
             max_assignments_per_cycle=int(os.getenv("KK_MAX_ASSIGN", "5")),
             em_api_url=os.getenv("EM_API_URL", "https://api.execution.market"),
             em_api_key=os.getenv("EM_API_KEY"),
+            use_autojob=os.getenv("KK_USE_AUTOJOB", "").lower() in ("1", "true", "yes"),
+            autojob_path=os.getenv("KK_AUTOJOB_PATH"),
+            autojob_api=os.getenv("KK_AUTOJOB_API"),
         )
 
     @classmethod
@@ -323,12 +331,15 @@ class SwarmRunner:
             if not workspaces.exists():
                 raise FileNotFoundError(f"Workspaces directory not found: {workspaces}")
 
-            # Initialize coordinator
+            # Initialize coordinator with AutoJob support
             coordinator = CoordinatorService(
                 workspaces_dir=str(workspaces),
                 em_client=self._get_em_client(),
                 dry_run=self.config.dry_run,
                 max_assignments=self.config.max_assignments_per_cycle,
+                use_autojob=self.config.use_autojob,
+                autojob_path=self.config.autojob_path,
+                autojob_api=self.config.autojob_api,
             )
 
             # Run coordination
@@ -340,12 +351,19 @@ class SwarmRunner:
             agents_active = result.get("agents_active", 0)
             agents_idle = result.get("agents_idle", 0)
 
+            matching_mode = result.get("matching_mode", "enhanced")
+            autojob_info = result.get("autojob")
+
             metrics.details = {
                 "tasks_found": tasks_found,
                 "tasks_assigned": tasks_assigned,
                 "agents_active": agents_active,
                 "agents_idle": agents_idle,
+                "matching_mode": matching_mode,
             }
+            if autojob_info:
+                metrics.details["autojob"] = autojob_info
+
             metrics.success = True
 
             self.metrics.total_coordination_cycles += 1
@@ -356,9 +374,10 @@ class SwarmRunner:
             self.state.total_lifetime_assignments += tasks_assigned
 
             if tasks_assigned > 0:
+                autojob_tag = f" [autojob]" if matching_mode == "autojob" else ""
                 logger.info(
                     f"Coordination: {tasks_assigned}/{tasks_found} tasks assigned "
-                    f"to {agents_idle} idle agents"
+                    f"to {agents_idle} idle agents{autojob_tag}"
                 )
             else:
                 logger.debug(f"Coordination: no assignments ({tasks_found} tasks, {agents_idle} idle)")
@@ -811,12 +830,22 @@ Examples:
     daemon_p.add_argument("--health-interval", type=int, default=1800)
     daemon_p.add_argument("--dry-run", action="store_true")
     daemon_p.add_argument("--state-file", default="./runner_state.json")
+    daemon_p.add_argument("--autojob", action="store_true",
+                         help="Enable AutoJob evidence-based matching")
+    daemon_p.add_argument("--autojob-path", type=str, default=None,
+                         help="Path to AutoJob repo (local mode)")
+    daemon_p.add_argument("--autojob-api", type=str, default=None,
+                         help="AutoJob API URL (remote mode)")
 
     # Single cycle
     cycle_p = subparsers.add_parser("cycle", help="Run one coordination cycle")
     cycle_p.add_argument("--workspaces", default="./workspaces")
     cycle_p.add_argument("--dry-run", action="store_true")
     cycle_p.add_argument("--json", action="store_true")
+    cycle_p.add_argument("--autojob", action="store_true",
+                         help="Enable AutoJob evidence-based matching")
+    cycle_p.add_argument("--autojob-path", type=str, default=None)
+    cycle_p.add_argument("--autojob-api", type=str, default=None)
 
     # Evidence
     evidence_p = subparsers.add_parser("evidence", help="Process pending evidence")
@@ -854,6 +883,13 @@ async def async_main(args: argparse.Namespace) -> int:
         config.evidence_interval = args.evidence_interval
     if hasattr(args, "health_interval") and args.health_interval:
         config.health_interval = args.health_interval
+    # AutoJob CLI overrides
+    if getattr(args, "autojob", False):
+        config.use_autojob = True
+    if getattr(args, "autojob_path", None):
+        config.autojob_path = args.autojob_path
+    if getattr(args, "autojob_api", None):
+        config.autojob_api = args.autojob_api
 
     runner = SwarmRunner(config)
 
