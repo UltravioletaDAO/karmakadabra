@@ -16,6 +16,26 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/* \
     && ln -sf /usr/local/bin/python3 /usr/bin/python3
 
+# Patch OpenClaw exec bugs:
+# 1. Bug #4689: model requests host="sandbox" but configuredHost="gateway" → mismatch rejection
+#    Fix: force host=configuredHost and disable the mismatch throw
+# 2. Bug #26496: tools.exec.security="full" not honored → exec blocked by "allowlist miss"
+#    Fix: disable the allowlist miss check entirely (our agents are trusted, no sandbox)
+# See: https://github.com/openclaw/openclaw/issues/4689
+# See: https://github.com/openclaw/openclaw/issues/26496
+RUN OPENCLAW_DIST="/usr/lib/node_modules/openclaw/dist" \
+    && echo "Patching exec host bug #4689..." \
+    && find "$OPENCLAW_DIST" -name "*.js" -exec grep -l 'requestedHost.*configuredHost' {} \; | while read f; do \
+       sed -i 's/let host = requestedHost ?? configuredHost/let host = configuredHost/g' "$f" \
+       && sed -i 's/!elevatedRequested && requestedHost && requestedHost !== configuredHost/false/g' "$f" \
+       && echo "  Host patch: $f"; \
+    done \
+    && echo "Patching exec approval bug #26496..." \
+    && find "$OPENCLAW_DIST" -name "*.js" -exec grep -l 'exec denied: allowlist miss' {} \; | while read f; do \
+       sed -i 's/if (hostSecurity === "allowlist" && (!analysisOk || !allowlistSatisfied)) throw new Error("exec denied: allowlist miss")/if (false) throw new Error("exec denied: allowlist miss")/g' "$f" \
+       && echo "  Allowlist patch: $f"; \
+    done
+
 # Set working directory
 WORKDIR /app
 

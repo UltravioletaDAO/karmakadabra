@@ -1,11 +1,11 @@
 ---
 name: kk-deploy
-description: Build and deploy KarmaCadabra OpenClaw agents to EC2. Use this skill whenever the user says "deploy", "build and push", "push to ECR", "restart agents", "update agents", "redeploy", "rebuild Docker", or wants to get new code running on the 7 EC2 agent instances. Also use when discussing Docker builds, ECR pushes, or SSH operations to the KK swarm. Proactively use this after committing code changes that affect agent behavior (heartbeat.py, services/, lib/, cron/, openclaw/).
+description: Build and deploy KarmaCadabra OpenClaw agents to EC2. Use this skill whenever the user says "deploy", "build and push", "push to ECR", "restart agents", "update agents", "redeploy", "rebuild Docker", or wants to get new code running on the 9 EC2 agent instances. Also use when discussing Docker builds, ECR pushes, or SSH operations to the KK swarm. Proactively use this after committing code changes that affect agent behavior (heartbeat.py, services/, lib/, cron/, openclaw/).
 ---
 
 # KK Deploy — Build + Push + Deploy to EC2 Swarm
 
-This skill handles the complete deployment pipeline for KarmaCadabra's 7 OpenClaw agents running on EC2.
+This skill handles the complete deployment pipeline for KarmaCadabra's 9 OpenClaw agents running on EC2.
 
 ## Architecture
 
@@ -13,19 +13,34 @@ This skill handles the complete deployment pipeline for KarmaCadabra's 7 OpenCla
 - **ECR repo**: `518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/openclaw-agent:latest`
 - **Region**: us-east-1
 - **SSH key**: `~/.ssh/kk-openclaw.pem`
-- **7 agents on EC2 t3.small instances**
+- **9 agents on EC2 t3.small instances** (6 system + 3 community)
 
 ## Agent IPs
 
-| Agent | IP |
-|-------|-----|
-| kk-coordinator | 44.211.242.65 |
-| kk-karma-hello | 13.218.119.234 |
-| kk-skill-extractor | 100.53.60.94 |
-| kk-voice-extractor | 100.52.188.43 |
-| kk-validator | 44.203.23.11 |
-| kk-soul-extractor | 3.234.249.61 |
-| kk-juanjumagalp | 3.235.151.197 |
+**IPs are DYNAMIC** — after terraform destroy/apply, IPs change. Use dynamic resolution:
+
+```bash
+# Get current IPs from AWS tags (preferred method)
+aws ec2 describe-instances \
+  --region us-east-1 \
+  --filters "Name=tag:Project,Values=karmacadabra" "Name=tag:Component,Values=openclaw" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].{Name: Tags[?Key==`Agent`].Value | [0], IP: PublicIpAddress}' \
+  --output table
+```
+
+IPs as of 2026-03-03 (post terraform apply):
+
+| Agent | IP | Type |
+|-------|-----|------|
+| kk-coordinator | 35.175.131.60 | system |
+| kk-karma-hello | 18.215.188.251 | system |
+| kk-skill-extractor | 32.192.232.149 | system |
+| kk-voice-extractor | 34.201.0.116 | system |
+| kk-validator | 34.205.90.226 | system |
+| kk-soul-extractor | 54.175.121.254 | system |
+| kk-juanjumagalp | 44.204.220.220 | user |
+| kk-0xjokker | 13.220.23.234 | user |
+| kk-0xyuls | 3.238.16.22 | user |
 
 ## Full Deploy Pipeline (3 steps)
 
@@ -52,21 +67,24 @@ docker tag openclaw-agent:latest 518898403364.dkr.ecr.us-east-1.amazonaws.com/ka
 docker push 518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/openclaw-agent:latest
 ```
 
-### Step 3: Deploy to All 7 Agents
+### Step 3: Deploy to All 9 Agents
 
-Use the existing script for parallel deploy:
+Use the existing script for parallel deploy (resolves IPs dynamically from AWS tags):
 
 ```bash
 bash scripts/kk/restart_all_agents.sh
 ```
 
-Or for a single agent:
+Or for a single agent (resolve IP first):
 
 ```bash
-# SCP the update script and run it
+# Get current IP from AWS
+IP=$(aws ec2 describe-instances --region us-east-1 \
+  --filters "Name=tag:Agent,Values=kk-karma-hello" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].PublicIpAddress' --output text)
+
 KEY="$HOME/.ssh/kk-openclaw.pem"
 AGENT="kk-karma-hello"
-IP="13.218.119.234"
 
 scp -o StrictHostKeyChecking=no -i "$KEY" scripts/kk/update_agent.sh ec2-user@$IP:/tmp/
 ssh -o StrictHostKeyChecking=no -i "$KEY" ec2-user@$IP "bash /tmp/update_agent.sh $AGENT"
@@ -77,9 +95,12 @@ ssh -o StrictHostKeyChecking=no -i "$KEY" ec2-user@$IP "bash /tmp/update_agent.s
 After deploy, verify agents are healthy:
 
 ```bash
-# Check one agent's logs
+# Get agent IP dynamically
+IP=$(aws ec2 describe-instances --region us-east-1 \
+  --filters "Name=tag:Agent,Values=kk-karma-hello" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].PublicIpAddress' --output text)
 KEY="$HOME/.ssh/kk-openclaw.pem"
-ssh -o StrictHostKeyChecking=no -i "$KEY" ec2-user@13.218.119.234 "docker logs kk-karma-hello --tail 30 2>&1"
+ssh -o StrictHostKeyChecking=no -i "$KEY" ec2-user@$IP "docker logs kk-karma-hello --tail 30 2>&1"
 ```
 
 Look for:
@@ -88,16 +109,21 @@ Look for:
 - `vault swarm summary` — vault sync working (coordinator only)
 - No `OOM`, `Killed`, or crash tracebacks
 
-### Quick Health Check (All 7)
+### Quick Health Check (All 9 — Dynamic IPs)
 
 ```bash
 KEY="$HOME/.ssh/kk-openclaw.pem"
-for IP in 44.211.242.65 13.218.119.234 100.53.60.94 100.52.188.43 44.203.23.11 3.234.249.61 3.235.151.197; do
-  echo "=== $IP ==="
-  ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i "$KEY" ec2-user@$IP \
+# Resolve IPs dynamically from AWS
+while IFS=$'\t' read -r ip name; do
+  [ -z "$ip" ] || [ "$ip" = "None" ] && continue
+  echo "=== $name @ $ip ==="
+  ssh -o StrictHostKeyChecking=no -o ConnectTimeout=5 -i "$KEY" ec2-user@$ip \
     "docker ps --format '{{.Names}} {{.Status}}' && docker logs \$(docker ps -q --filter 'name=kk-') --tail 5 2>&1 | tail -3" 2>/dev/null
   echo ""
-done
+done < <(aws ec2 describe-instances --region us-east-1 \
+  --filters "Name=tag:Project,Values=karmacadabra" "Name=tag:Component,Values=openclaw" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].{Name: Tags[?Key==`Agent`].Value | [0], IP: PublicIpAddress}' \
+  --output text)
 ```
 
 ## Common Issues
@@ -126,21 +152,27 @@ ssh -i "$KEY" ec2-user@$IP "docker inspect --format='{{.Created}}' kk-karma-hell
 
 ## Parallel Deploy Pattern
 
-When deploying to all 7 agents from Claude Code, run SSH commands in parallel using `&`:
+When deploying to all 9 agents from Claude Code, use `restart_all_agents.sh` which resolves IPs dynamically:
+
+```bash
+# Preferred — uses AWS tag lookup with hardcoded fallback
+bash scripts/kk/restart_all_agents.sh
+```
+
+Or manually with dynamic IP resolution:
 
 ```bash
 KEY="$HOME/.ssh/kk-openclaw.pem"
 ECR="518898403364.dkr.ecr.us-east-1.amazonaws.com/karmacadabra/openclaw-agent:latest"
 
-declare -A AGENTS=(
-  [kk-coordinator]="44.211.242.65"
-  [kk-karma-hello]="13.218.119.234"
-  [kk-skill-extractor]="100.53.60.94"
-  [kk-voice-extractor]="100.52.188.43"
-  [kk-validator]="44.203.23.11"
-  [kk-soul-extractor]="3.234.249.61"
-  [kk-juanjumagalp]="3.235.151.197"
-)
+# Resolve IPs from AWS tags
+declare -A AGENTS
+while IFS=$'\t' read -r ip name; do
+  [ -n "$name" ] && [ "$name" != "None" ] && [ -n "$ip" ] && [ "$ip" != "None" ] && AGENTS["$name"]="$ip"
+done < <(aws ec2 describe-instances --region us-east-1 \
+  --filters "Name=tag:Project,Values=karmacadabra" "Name=tag:Component,Values=openclaw" "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].{Name: Tags[?Key==`Agent`].Value | [0], IP: PublicIpAddress}' \
+  --output text)
 
 for AGENT in "${!AGENTS[@]}"; do
   IP="${AGENTS[$AGENT]}"

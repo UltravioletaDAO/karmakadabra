@@ -59,3 +59,9 @@ output "llm_provider" {
   description = "Active LLM provider configuration"
   value       = var.llm_provider
 }
+
+output "vllm_api_key" {
+  description = "vLLM API key (shared between inference server and agents)"
+  value       = random_password.vllm_api_key.result
+  sensitive   = true
+}

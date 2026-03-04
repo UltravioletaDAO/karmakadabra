@@ -25,7 +25,7 @@ done < <(aws ec2 describe-instances \
   --region "$REGION" \
   --filters "Name=tag:Project,Values=karmacadabra" "Name=tag:Component,Values=openclaw" "Name=instance-state-name,Values=running" \
   --query 'Reservations[].Instances[].{Name: Tags[?Key==`Agent`].Value | [0], IP: PublicIpAddress}' \
-  --output text 2>/dev/null)
+  --output text 2>/dev/null | tr -d '\r')
 
 if [ "$RESOLVED" -eq 0 ]; then
   echo "WARN: AWS lookup failed, using hardcoded IPs"
@@ -42,14 +42,42 @@ else
   echo "Resolved $RESOLVED agents from AWS"
 fi
 
+# Discover vLLM GPU inference server IP (from spot fleet tags)
+echo "Discovering GPU inference server..."
+INFERENCE_IP=""
+INFERENCE_IP=$(aws ec2 describe-instances --region "$REGION" \
+  --filters "Name=tag:Component,Values=inference" "Name=tag:Project,Values=karmacadabra" \
+            "Name=instance-state-name,Values=running" \
+  --query 'Reservations[].Instances[].PrivateIpAddress' --output text 2>/dev/null | tr -d '\r' | head -1) || true
+INFERENCE_URL=""
+VLLM_API_KEY=""
+if [ -n "$INFERENCE_IP" ]; then
+  INFERENCE_URL="http://$INFERENCE_IP:8000/v1"
+  echo "  GPU found: $INFERENCE_URL"
+  # Get vLLM API key from terraform state (stored in random_password)
+  VLLM_API_KEY=$(cd "$(dirname "$0")/../../terraform/openclaw" && terraform output -raw vllm_api_key 2>/dev/null) || true
+  if [ -z "$VLLM_API_KEY" ]; then
+    echo "  WARN: Could not get vLLM API key from terraform state"
+  fi
+else
+  echo "  No GPU inference server found"
+fi
+
+# LLM provider (default: auto)
+LLM_PROVIDER="${KK_LLM_PROVIDER:-auto}"
+echo "LLM provider: $LLM_PROVIDER"
+
 # Create the restart script that runs on each EC2
 cat > /tmp/restart_agent_remote.sh << 'REMOTESCRIPT'
 #!/bin/bash
 # Do NOT use set -e here — individual failures must be handled gracefully
 
-AGENT_NAME="$1"
-ECR_IMAGE="$2"
-REGION="$3"
+AGENT_NAME="$(echo "$1" | tr -d '\r')"
+ECR_IMAGE="$(echo "$2" | tr -d '\r')"
+REGION="$(echo "$3" | tr -d '\r')"
+INFERENCE_URL="$(echo "$4" | tr -d '\r')"
+VLLM_API_KEY="$(echo "$5" | tr -d '\r')"
+LLM_PROVIDER="$(echo "$6" | tr -d '\r')"
 
 if [ -z "$AGENT_NAME" ] || [ "$AGENT_NAME" = "unknown" ]; then
     echo "FATAL: AGENT_NAME is empty or unknown. Skipping."
@@ -152,16 +180,28 @@ rm -f "/data/$AGENT_NAME/irc-outbox.jsonl" 2>/dev/null || true
 rm -f "/data/$AGENT_NAME/.irc-state.json" 2>/dev/null || true
 rm -f "/data/$AGENT_NAME/.irc-introduced" 2>/dev/null || true
 
+# When vLLM inference is available, override OPENAI_API_KEY with vLLM key
+EFFECTIVE_OPENAI_KEY="$OPENAI_KEY"
+if [ -n "$INFERENCE_URL" ] && [ -n "$VLLM_API_KEY" ]; then
+  EFFECTIVE_OPENAI_KEY="$VLLM_API_KEY"
+fi
+
 # Start new container
 docker run -d \
   --name "$AGENT_NAME" \
   --restart unless-stopped \
+  --memory 1800m \
+  --memory-swap 2g \
   -e "KK_AGENT_NAME=$AGENT_NAME" \
   -e "KK_WALLET_ADDRESS=$WALLET_ADDRESS" \
   -e "KK_PRIVATE_KEY=$PRIVATE_KEY" \
   -e "ANTHROPIC_API_KEY=$ANTHROPIC_KEY" \
-  -e "OPENAI_API_KEY=$OPENAI_KEY" \
+  -e "OPENAI_API_KEY=$EFFECTIVE_OPENAI_KEY" \
   -e "OPENROUTER_API_KEY=$OPENROUTER_KEY" \
+  -e "OPENAI_BASE_URL=$INFERENCE_URL" \
+  -e "KK_LLM_BASE_URL=$INFERENCE_URL" \
+  -e "KK_LLM_API_KEY=$VLLM_API_KEY" \
+  -e "KK_LLM_PROVIDER=$LLM_PROVIDER" \
   -p 18790:18790 \
   -v "/data/$AGENT_NAME:/app/data" \
   "$ECR_IMAGE"
@@ -195,7 +235,7 @@ for AGENT in "${!AGENTS[@]}"; do
 
   # Execute it (tolerate failure per agent)
   if ssh -o StrictHostKeyChecking=no -o ConnectTimeout=30 -i "$KEY" "ec2-user@$IP" \
-    "bash /tmp/restart_agent.sh '$AGENT' '$ECR_IMAGE' '$REGION'" 2>&1; then
+    "bash /tmp/restart_agent.sh '$AGENT' '$ECR_IMAGE' '$REGION' '$INFERENCE_URL' '$VLLM_API_KEY' '$LLM_PROVIDER'" 2>&1; then
     DEPLOYED=$((DEPLOYED + 1))
   else
     echo "WARN: Deploy failed for $AGENT @ $IP"

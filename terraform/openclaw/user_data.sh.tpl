@@ -140,5 +140,5 @@ cat <<CRONTAB | crontab -
 */15 * * * * aws s3 sync s3://karmacadabra-agent-data/${agent_name}/ /data/${agent_name}/ --region ${region} >> /var/log/s3-sync.log 2>&1
 7,22,37,52 * * * * aws s3 sync /data/${agent_name}/ s3://karmacadabra-agent-data/${agent_name}/state/ --region ${region} --exclude '*' --include 'purchase_history.json' --include 'memory/*' --include 'irc_guard_state.json' --include 'escrow_state.json' >> /var/log/s3-upload.log 2>&1
 0 */12 * * * docker restart ${agent_name}
-0 4 * * * docker image prune -af --filter 'until=24h' >> /var/log/docker-prune.log 2>&1
+0 */6 * * * docker system prune -af --filter 'until=2h' >> /var/log/docker-prune.log 2>&1
 CRONTAB

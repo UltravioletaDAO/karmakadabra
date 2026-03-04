@@ -332,15 +332,40 @@ openclaw config set agents.defaults.heartbeat.every "45s" 2>/dev/null || true
 # Step 5: Tool policy (enable exec for Python tools, deny browser)
 openclaw config set tools.allow '["exec","read","write","edit","web_fetch"]' 2>/dev/null || true
 openclaw config set tools.deny '["browser"]' 2>/dev/null || true
-openclaw config set tools.exec.host "gateway" 2>/dev/null || true
-
 # Step 5b: Disable sandbox (no Docker-in-Docker in our containers)
+# See: https://github.com/openclaw/openclaw/issues/4689
+# Bug: Model requests host="sandbox" in exec tool calls, but configuredHost="gateway"
+#      causes strict mismatch rejection. Config alone doesn't fix this.
+# Fix: Patch OpenClaw source to skip the host mismatch check (allow any host).
+#      With sandbox.mode=off, all exec runs on host regardless of requested host.
 openclaw config set agents.defaults.sandbox.mode "off" 2>/dev/null || true
+openclaw config set tools.exec.host "gateway" 2>/dev/null || true
+# Bug #26496: tools.exec.security defaults to "allowlist" and minSecurity() picks the
+# MORE restrictive of tools.exec.security vs exec-approvals.json — so we must set BOTH.
+# "full" = allow all exec commands without approval prompts.
+openclaw config set tools.exec.security "full" 2>/dev/null || true
+openclaw config set tools.exec.ask "off" 2>/dev/null || true
 
-# Step 5c: Pre-approve exec tools
-openclaw approvals allowlist add --agent "*" "python3 /app/openclaw/tools/*" 2>/dev/null || true
-openclaw approvals allowlist add --agent "*" "/usr/bin/*" 2>/dev/null || true
-openclaw approvals allowlist add --agent "*" "/app/**" 2>/dev/null || true
+# Note: exec host patch (bug #4689) applied at Docker build time in Dockerfile
+
+# Step 5c: Exec approvals — security=full means ALL exec commands auto-approved
+# Without this, every exec call waits 120s for manual approval (timeout)
+# See: https://docs.openclaw.ai/tools/exec-approvals
+APPROVALS_FILE="$HOME/.openclaw/exec-approvals.json"
+mkdir -p "$(dirname "$APPROVALS_FILE")"
+cat > "$APPROVALS_FILE" << 'APPROVALS_EOF'
+{
+  "version": 1,
+  "defaults": {
+    "security": "full",
+    "ask": "off",
+    "askFallback": "full",
+    "autoAllowSkills": true
+  },
+  "agents": {}
+}
+APPROVALS_EOF
+echo "[entrypoint] Exec approvals: security=full, ask=off (all commands auto-approved)"
 
 # Step 6: DISABLE OpenClaw native IRC plugin (buggy — exits 2ms after connecting)
 # IRC is handled by the Python daemon started above.
