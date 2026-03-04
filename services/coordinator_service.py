@@ -54,9 +54,14 @@ from lib.swarm_state import (
     get_swarm_summary,
     send_notification,
 )
+from lib.autojob_bridge import AutoJobBridge, BridgeResult
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.coordinator")
+
+
+# Default path to AutoJob repo (same machine local mode)
+AUTOJOB_DEFAULT_PATH = str(Path(__file__).parent.parent.parent / "autojob")
 
 
 # ---------------------------------------------------------------------------
@@ -171,11 +176,93 @@ def load_performance_profiles(
 # ---------------------------------------------------------------------------
 
 
+def _build_autojob_bridge(
+    autojob_path: str = None,
+    autojob_api: str = None,
+    wallets_file: Path = None,
+) -> tuple[AutoJobBridge | None, dict[str, str]]:
+    """Initialize AutoJob bridge and build wallet→agent mapping.
+
+    Returns (bridge, wallet_to_agent) or (None, {}) on failure.
+    """
+    wallet_to_agent: dict[str, str] = {}
+
+    # Build wallet→agent mapping from wallets.json
+    if wallets_file and wallets_file.exists():
+        try:
+            data = json.loads(wallets_file.read_text(encoding="utf-8"))
+            for w in data.get("wallets", []):
+                addr = w.get("address", "").lower()
+                name = w.get("name", "")
+                if addr and name:
+                    wallet_to_agent[addr] = name
+        except Exception as e:
+            logger.warning("Failed to load wallets.json: %s", e)
+
+    # Determine bridge mode
+    if autojob_api:
+        mode = "remote"
+        path = None
+    else:
+        mode = "local"
+        path = autojob_path or AUTOJOB_DEFAULT_PATH
+
+    try:
+        bridge = AutoJobBridge(
+            mode=mode,
+            autojob_path=path,
+            api_base=autojob_api or "https://autojob.cc",
+            wallet_to_agent=wallet_to_agent,
+        )
+        health = bridge.health()
+        if health.get("status") == "healthy":
+            logger.info(
+                "AutoJob bridge initialized (%s mode, %d workers, %d wallet mappings)",
+                mode,
+                health.get("registered_workers", 0),
+                len(wallet_to_agent),
+            )
+            return bridge, wallet_to_agent
+        else:
+            logger.warning("AutoJob bridge unhealthy: %s", health)
+            return None, wallet_to_agent
+    except Exception as e:
+        logger.warning("AutoJob bridge init failed: %s", e)
+        return None, wallet_to_agent
+
+
+def _autojob_rank_to_coordinator(
+    bridge_result: BridgeResult,
+    idle_names: set[str],
+    assigned_agents: set[str],
+    system_agents: set[str],
+) -> list[tuple[str, float]]:
+    """Convert AutoJob BridgeResult into coordinator-compatible ranked list.
+
+    Filters to only idle, non-system, non-assigned agents.
+    Returns list of (agent_name, score) tuples, score normalized to 0-1.
+    """
+    ranked = []
+    for r in bridge_result.rankings:
+        name = r.agent_name
+        if name in system_agents or name in assigned_agents:
+            continue
+        if name not in idle_names:
+            continue
+        # Normalize AutoJob's 0-100 score to 0-1 for coordinator compatibility
+        score = r.final_score / 100.0
+        ranked.append((name, score))
+    return ranked
+
+
 async def coordination_cycle(
     workspaces_dir: Path,
     client: EMClient,
     dry_run: bool = False,
     use_legacy_matching: bool = False,
+    use_autojob: bool = False,
+    autojob_path: str = None,
+    autojob_api: str = None,
 ) -> dict:
     """Execute one coordinator cycle.
 
@@ -185,6 +272,12 @@ async def coordination_cycle(
         dry_run: If True, preview assignments without executing.
         use_legacy_matching: If True, use simple skill-only matching instead
             of the enhanced 5-factor performance-aware matching.
+        use_autojob: If True, use AutoJob's evidence-based matching engine.
+            Falls back to enhanced matching if AutoJob is unavailable.
+        autojob_path: Path to AutoJob repo (local mode). Defaults to
+            sibling directory.
+        autojob_api: AutoJob API base URL (remote mode). If set, overrides
+            local mode.
 
     Returns dict with assignments, health summary, and performance stats.
     """
@@ -200,6 +293,19 @@ async def coordination_cycle(
     # 2. Load performance profiles + reputation data (enhanced matching)
     performance_profiles: dict[str, AgentPerformance] = {}
     reputation_data: dict[str, UnifiedReputation] = {}
+    autojob_bridge: AutoJobBridge | None = None
+    autojob_stats = {"used": False, "tasks_matched": 0, "fallbacks": 0}
+
+    if use_autojob:
+        wallets_file = workspaces_dir.parent / "data" / "config" / "wallets.json"
+        autojob_bridge, wallet_to_agent = _build_autojob_bridge(
+            autojob_path=autojob_path,
+            autojob_api=autojob_api,
+            wallets_file=wallets_file,
+        )
+        if autojob_bridge:
+            autojob_stats["used"] = True
+
     if not use_legacy_matching:
         performance_profiles = load_performance_profiles(workspaces_dir)
         agents_with_data = sum(
@@ -258,8 +364,11 @@ async def coordination_cycle(
         if task.get("agent_wallet", "") == client.agent.wallet_address:
             continue
 
+        matching_mode_used = "unknown"
+
         if use_legacy_matching:
             # --- Legacy mode: simple skill keyword matching ---
+            matching_mode_used = "legacy"
             best_agent = None
             best_score = 0.0
 
@@ -274,8 +383,81 @@ async def coordination_cycle(
                     best_agent = agent
 
             ranked = [(best_agent.get("agent_name", ""), best_score)] if best_agent and best_score > 0.0 else []
+
+        elif autojob_bridge:
+            # --- AutoJob mode: evidence-based matching via AutoJob bridge ---
+            matching_mode_used = "autojob"
+            try:
+                bridge_result = autojob_bridge.rank_agents_for_task(
+                    task=task,
+                    limit=10,
+                    min_score=1.0,  # AutoJob uses 0-100 scale
+                )
+                ranked = _autojob_rank_to_coordinator(
+                    bridge_result,
+                    idle_names=idle_names,
+                    assigned_agents=assigned_agents,
+                    system_agents=system_agents,
+                )
+                if ranked:
+                    autojob_stats["tasks_matched"] += 1
+                    logger.info(
+                        f"  AutoJob matched '{title[:30]}': "
+                        f"{len(ranked)} candidates (best={ranked[0][0]}, "
+                        f"score={ranked[0][1]:.3f}, "
+                        f"time={bridge_result.match_time_ms:.0f}ms)"
+                    )
+                else:
+                    # AutoJob returned no matches — fall back to enhanced
+                    logger.info(
+                        f"  AutoJob: no matches for '{title[:30]}', "
+                        f"falling back to enhanced matching"
+                    )
+                    autojob_stats["fallbacks"] += 1
+                    matching_mode_used = "enhanced (autojob-fallback)"
+                    # Fall through to enhanced matching below
+                    ranked = None
+            except Exception as e:
+                logger.warning(f"  AutoJob error for '{title[:30]}': {e}")
+                autojob_stats["fallbacks"] += 1
+                matching_mode_used = "enhanced (autojob-error)"
+                ranked = None
+
+            # Fallback to enhanced matching if AutoJob returned nothing
+            if ranked is None:
+                eligible_profiles = {
+                    name: performance_profiles.get(name, AgentPerformance(agent_name=name))
+                    for name in agent_skills_map
+                    if name not in assigned_agents
+                }
+                ranked = rank_agents_for_task(
+                    profiles=eligible_profiles,
+                    agent_skills_map=agent_skills_map,
+                    task_title=title,
+                    task_description=desc,
+                    task_category=category,
+                    task_chain=chain,
+                    task_bounty=bounty,
+                    exclude_agents=system_agents | assigned_agents,
+                    min_score=0.01,
+                )
+                if reputation_data and ranked:
+                    boosted_ranked = []
+                    for agent_n, base_score in ranked:
+                        rep = reputation_data.get(agent_n)
+                        if rep and rep.effective_confidence > 0:
+                            boosted = reputation_boost_for_matching(
+                                rep, base_score, reputation_weight=0.15,
+                            )
+                            boosted_ranked.append((agent_n, boosted))
+                        else:
+                            boosted_ranked.append((agent_n, base_score))
+                    boosted_ranked.sort(key=lambda x: x[1], reverse=True)
+                    ranked = boosted_ranked
+
         else:
             # --- Enhanced mode: 5-factor performance-aware matching ---
+            matching_mode_used = "enhanced"
             # Filter to only idle, non-system, non-assigned agents
             eligible_profiles = {
                 name: performance_profiles.get(name, AgentPerformance(agent_name=name))
@@ -319,7 +501,7 @@ async def coordination_cycle(
         if dry_run:
             logger.info(
                 f"  [DRY RUN] Would assign '{title}' to {agent_name} "
-                f"(score={score:.3f}, mode={'legacy' if use_legacy_matching else 'enhanced'})"
+                f"(score={score:.3f}, mode={matching_mode_used})"
             )
             assignments.append({
                 "task_id": task_id,
@@ -327,7 +509,7 @@ async def coordination_cycle(
                 "agent": agent_name,
                 "score": score,
                 "dry_run": True,
-                "matching_mode": "legacy" if use_legacy_matching else "enhanced",
+                "matching_mode": matching_mode_used,
                 "alternatives": len(ranked) - 1,
             })
         else:
@@ -343,13 +525,13 @@ async def coordination_cycle(
                 })
                 await send_notification(agent_name, "kk-coordinator", notification)
 
-                logger.info(f"  Assigned '{title}' to {agent_name} (score={score:.3f})")
+                logger.info(f"  Assigned '{title}' to {agent_name} (score={score:.3f}, mode={matching_mode_used})")
                 assignments.append({
                     "task_id": task_id,
                     "title": title,
                     "agent": agent_name,
                     "score": score,
-                    "matching_mode": "legacy" if use_legacy_matching else "enhanced",
+                    "matching_mode": matching_mode_used,
                     "alternatives": len(ranked) - 1,
                 })
 
@@ -371,12 +553,21 @@ async def coordination_cycle(
         for sa in stale_agents:
             logger.warning(f"    {sa['agent_name']}: {sa.get('minutes_stale', '?')} min since last heartbeat")
 
+    # Determine overall matching mode label
+    if use_legacy_matching:
+        overall_mode = "legacy"
+    elif use_autojob and autojob_stats["used"]:
+        overall_mode = "autojob"
+    else:
+        overall_mode = "enhanced"
+
     return {
         "assignments": assignments,
         "summary": summary,
         "stale_agents": [s["agent_name"] for s in stale_agents],
-        "matching_mode": "legacy" if use_legacy_matching else "enhanced",
+        "matching_mode": overall_mode,
         "performance_profiles_loaded": len(performance_profiles),
+        "autojob": autojob_stats if use_autojob else None,
     }
 
 
@@ -395,6 +586,23 @@ async def main():
         "--legacy",
         action="store_true",
         help="Use legacy skill-only matching instead of enhanced 5-factor matching",
+    )
+    parser.add_argument(
+        "--autojob",
+        action="store_true",
+        help="Use AutoJob evidence-based matching engine (with fallback to enhanced)",
+    )
+    parser.add_argument(
+        "--autojob-path",
+        type=str,
+        default=None,
+        help="Path to AutoJob repo (local mode). Defaults to sibling directory.",
+    )
+    parser.add_argument(
+        "--autojob-api",
+        type=str,
+        default=None,
+        help="AutoJob API base URL (remote mode). Overrides local mode.",
     )
     args = parser.parse_args()
 
@@ -419,7 +627,12 @@ async def main():
             workspace_dir=workspace_dir,
         )
 
-    matching_mode = "legacy" if args.legacy else "enhanced (6-factor + reputation)"
+    if args.autojob:
+        matching_mode = "autojob (evidence-based + decay-aware)"
+    elif args.legacy:
+        matching_mode = "legacy (skill-only)"
+    else:
+        matching_mode = "enhanced (6-factor + reputation)"
     print(f"\n{'=' * 60}")
     print(f"  Karma Kadabra — Coordinator")
     print(f"  Agent: {agent.name}")
@@ -440,14 +653,25 @@ async def main():
                 client,
                 dry_run=args.dry_run,
                 use_legacy_matching=args.legacy,
+                use_autojob=args.autojob,
+                autojob_path=args.autojob_path,
+                autojob_api=args.autojob_api,
             )
             print(f"\n  Matching mode: {result.get('matching_mode', 'unknown')}")
             print(f"  Performance profiles: {result.get('performance_profiles_loaded', 0)}")
+            if result.get("autojob"):
+                aj = result["autojob"]
+                print(
+                    f"  AutoJob: active={aj['used']}, "
+                    f"matched={aj['tasks_matched']}, "
+                    f"fallbacks={aj['fallbacks']}"
+                )
             print(f"  Assignments: {len(result['assignments'])}")
             for a in result["assignments"]:
                 status = "[DRY RUN]" if a.get("dry_run") else "[ASSIGNED]"
                 alt = f" ({a.get('alternatives', 0)} alternatives)" if a.get("alternatives") else ""
-                print(f"    {status} {a['title'][:40]} -> {a['agent']} (score={a['score']:.3f}){alt}")
+                mode_tag = f" [{a.get('matching_mode', '')}]" if a.get("matching_mode") else ""
+                print(f"    {status} {a['title'][:40]} -> {a['agent']} (score={a['score']:.3f}){alt}{mode_tag}")
             if result["stale_agents"]:
                 print(f"\n  Stale agents: {', '.join(result['stale_agents'])}")
             print(f"\n  Swarm summary: {json.dumps(result['summary'], indent=2)}")
