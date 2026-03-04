@@ -103,5 +103,5 @@ variable "inference_spot_price" {
 variable "vllm_model" {
   description = "HuggingFace model ID for vLLM inference server"
   type        = string
-  default     = "QuantTrio/Qwen3.5-35B-A3B-AWQ"
+  default     = "Qwen/Qwen3-8B-AWQ"
 }

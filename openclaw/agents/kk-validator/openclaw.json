@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "openai/qwen3.5",
+    "model": "openai/qwen3",
     "name": "kk-validator",
     "soul": "/app/openclaw/agents/kk-validator/SOUL.md",
     "heartbeat": "/app/openclaw/agents/kk-validator/HEARTBEAT.md",

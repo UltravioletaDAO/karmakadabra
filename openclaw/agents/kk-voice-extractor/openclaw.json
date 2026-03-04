@@ -1,6 +1,6 @@
 {
   "agent": {
-    "model": "openai/qwen3.5",
+    "model": "openai/qwen3",
     "name": "kk-voice-extractor",
     "soul": "/app/openclaw/agents/kk-voice-extractor/SOUL.md",
     "heartbeat": "/app/openclaw/agents/kk-voice-extractor/HEARTBEAT.md",

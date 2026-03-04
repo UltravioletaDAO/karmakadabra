@@ -46,10 +46,12 @@ docker run -d \
   -e VLLM_API_KEY="${vllm_api_key}" \
   vllm/vllm-openai:nightly \
   --model "${vllm_model}" \
-  --quantization awq \
+  --quantization awq_marlin \
   --max-model-len 32768 \
-  --gpu-memory-utilization 0.95 \
-  --served-model-name qwen3.5 \
+  --gpu-memory-utilization 0.90 \
+  --served-model-name qwen3 \
+  --enable-auto-tool-choice \
+  --tool-call-parser hermes \
   --trust-remote-code
 
 echo "[vllm] Container started. Model download may take 5-10 minutes on first boot."
