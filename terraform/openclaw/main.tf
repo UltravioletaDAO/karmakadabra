@@ -70,7 +70,7 @@ data "aws_ami" "deep_learning" {
 
   filter {
     name   = "name"
-    values = ["Deep Learning Base OSS Nvidia Driver AMI (Amazon Linux 2023)*"]
+    values = ["Deep Learning Base OSS Nvidia Driver GPU AMI (Amazon Linux 2023)*"]
   }
 
   filter {
