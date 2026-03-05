@@ -17,6 +17,8 @@ tfplan
 !**/.env.fuji.example
 !.env.example
 !.env.fuji.example
+!.env.local.example
+!.env.secrets.example
 
 # Temporary wallet files (used during rotation)
 .facilitator_wallet_temp.json
@@ -182,6 +184,9 @@ abracadabra-agent/transcripts/20251021/*/*.wav
 *credential*
 *private_key*
 keystore/
+# But allow secret example templates and helper scripts (safe, no real keys)
+!.env.secrets.example
+!scripts/kk/export_secrets_local.sh
 
 # OpenAI / API keys
 .openai

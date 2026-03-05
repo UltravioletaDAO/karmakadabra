@@ -1,0 +1,202 @@
+# docker-compose.local.yml — KarmaCadabra Local Swarm
+# 9 agents on Windows Docker, inference on Mac Mini via LAN
+#
+# Usage:
+#   bash scripts/kk/deploy.sh local              # Start
+#   bash scripts/kk/deploy.sh local --build      # Rebuild + start
+#   bash scripts/kk/deploy.sh local --down       # Stop
+#   bash scripts/kk/deploy.sh local --logs       # Tail logs
+#   bash scripts/kk/deploy.sh local --status     # Container status
+#   bash scripts/kk/deploy.sh local --clean      # Stop + remove volumes
+
+x-agent-common: &agent-common
+  build:
+    context: .
+    dockerfile: Dockerfile.openclaw
+  restart: unless-stopped
+  mem_limit: ${KK_CONTAINER_MEMORY:-1200m}
+  memswap_limit: 1800m
+  logging:
+    driver: json-file
+    options:
+      max-size: "5m"
+      max-file: "2"
+  networks:
+    - kk-local
+
+x-agent-env-common: &agent-env-common
+  KK_LLM_BASE_URL: ${KK_LLM_BASE_URL}
+  KK_LLM_API_KEY: ${KK_LLM_API_KEY:-local}
+  KK_LLM_PROVIDER: ${KK_LLM_PROVIDER:-vllm}
+  KK_HEARTBEAT_INTERVAL: ${KK_HEARTBEAT_INTERVAL:-90s}
+  KK_CHAIN_ID: "8453"
+  ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+  OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+
+services:
+  # ── Group 1: Coordinator (starts first) ───────────────────────────
+  kk-coordinator:
+    <<: *agent-common
+    container_name: kk-coordinator
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-coordinator
+      KK_WALLET_INDEX: "0"
+      KK_WALLET_ADDRESS: "0xE66C0A519F4B4Bef94FC45447FDba5bF381cDD48"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_COORDINATOR}
+    volumes:
+      - kk-coordinator-data:/app/data
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:18790/health"]
+      interval: 30s
+      timeout: 10s
+      start_period: 120s
+      retries: 5
+
+  # ── Group 2: Core agents (wait for coordinator) ───────────────────
+  kk-karma-hello:
+    <<: *agent-common
+    container_name: kk-karma-hello
+    depends_on:
+      kk-coordinator:
+        condition: service_healthy
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-karma-hello
+      KK_WALLET_INDEX: "1"
+      KK_WALLET_ADDRESS: "0xa3279F744438F83Bc75ce9f8A8282c448F97cc8A"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_KARMA_HELLO}
+    volumes:
+      - kk-karma-hello-data:/app/data
+
+  kk-skill-extractor:
+    <<: *agent-common
+    container_name: kk-skill-extractor
+    depends_on:
+      kk-coordinator:
+        condition: service_healthy
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-skill-extractor
+      KK_WALLET_INDEX: "2"
+      KK_WALLET_ADDRESS: "0xE3fB9e1592b1F445d984E9FA4Db2abb3d04eacdC"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_SKILL_EXTRACTOR}
+    volumes:
+      - kk-skill-extractor-data:/app/data
+
+  kk-validator:
+    <<: *agent-common
+    container_name: kk-validator
+    depends_on:
+      kk-coordinator:
+        condition: service_healthy
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-validator
+      KK_WALLET_INDEX: "4"
+      KK_WALLET_ADDRESS: "0x7a729393D3854a6B85F84a86F62e19f74f4234F7"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_VALIDATOR}
+    volumes:
+      - kk-validator-data:/app/data
+
+  # ── Group 3: Remaining agents (wait for group 2) ─────────────────
+  kk-voice-extractor:
+    <<: *agent-common
+    container_name: kk-voice-extractor
+    depends_on:
+      kk-karma-hello:
+        condition: service_started
+      kk-validator:
+        condition: service_started
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-voice-extractor
+      KK_WALLET_INDEX: "3"
+      KK_WALLET_ADDRESS: "0x8E503212c3c0806ADEcD2Cc24F74379A3dEDcBBC"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_VOICE_EXTRACTOR}
+    volumes:
+      - kk-voice-extractor-data:/app/data
+
+  kk-soul-extractor:
+    <<: *agent-common
+    container_name: kk-soul-extractor
+    depends_on:
+      kk-karma-hello:
+        condition: service_started
+      kk-validator:
+        condition: service_started
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-soul-extractor
+      KK_WALLET_INDEX: "5"
+      KK_WALLET_ADDRESS: "0x04EaEDdBA3b03B9a5aBbD2ECb024458c7b1dCEFA"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_SOUL_EXTRACTOR}
+    volumes:
+      - kk-soul-extractor-data:/app/data
+
+  kk-juanjumagalp:
+    <<: *agent-common
+    container_name: kk-juanjumagalp
+    depends_on:
+      kk-karma-hello:
+        condition: service_started
+      kk-validator:
+        condition: service_started
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-juanjumagalp
+      KK_WALLET_INDEX: "6"
+      KK_WALLET_ADDRESS: "0x3aebb73a33377F0d6FC2195F83559635aDeE8408"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_JUANJUMAGALP}
+    volumes:
+      - kk-juanjumagalp-data:/app/data
+
+  kk-0xjokker:
+    <<: *agent-common
+    container_name: kk-0xjokker
+    depends_on:
+      kk-karma-hello:
+        condition: service_started
+      kk-validator:
+        condition: service_started
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-0xjokker
+      KK_WALLET_INDEX: "11"
+      KK_WALLET_ADDRESS: "0x5975442E9608f71cEA6e9b1f3841b5A045e0500d"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_0XJOKKER}
+    volumes:
+      - kk-0xjokker-data:/app/data
+
+  kk-0xyuls:
+    <<: *agent-common
+    container_name: kk-0xyuls
+    depends_on:
+      kk-karma-hello:
+        condition: service_started
+      kk-validator:
+        condition: service_started
+    environment:
+      <<: *agent-env-common
+      KK_AGENT_NAME: kk-0xyuls
+      KK_WALLET_INDEX: "7"
+      KK_WALLET_ADDRESS: "0xFa1c6fF4edE5a8290B292f40bB7AD0FbCb1C65d1"
+      KK_PRIVATE_KEY: ${KK_PRIVATE_KEY_0XYULS}
+    volumes:
+      - kk-0xyuls-data:/app/data
+
+volumes:
+  kk-coordinator-data:
+  kk-karma-hello-data:
+  kk-skill-extractor-data:
+  kk-voice-extractor-data:
+  kk-validator-data:
+  kk-soul-extractor-data:
+  kk-juanjumagalp-data:
+  kk-0xjokker-data:
+  kk-0xyuls-data:
+
+networks:
+  kk-local:
+    driver: bridge

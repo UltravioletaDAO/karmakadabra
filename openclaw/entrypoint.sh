@@ -326,8 +326,9 @@ fi
 # Step 3: Agent identity and workspace
 openclaw config set agents.defaults.workspace "$WORKSPACE" 2>/dev/null || true
 
-# Step 4: Heartbeat interval (45 seconds — Qwen inference is free, maximize social presence)
-openclaw config set agents.defaults.heartbeat.every "45s" 2>/dev/null || true
+# Step 4: Heartbeat interval (configurable: 45s remote, 90s local — less GPU pressure)
+HEARTBEAT="${KK_HEARTBEAT_INTERVAL:-45s}"
+openclaw config set agents.defaults.heartbeat.every "$HEARTBEAT" 2>/dev/null || true
 
 # Step 5: Tool policy (enable exec for Python tools, deny browser)
 openclaw config set tools.allow '["exec","read","write","edit","web_fetch"]' 2>/dev/null || true
