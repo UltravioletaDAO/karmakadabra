@@ -41,6 +41,7 @@ fi
 
 # Create AGENTS.md (primary operational instructions for the LLM)
 cat > "$WORKSPACE/AGENTS.md" << AGENTSEOF
+/no_think
 # Agent Instructions — $AGENT_NAME
 
 You are $AGENT_NAME, an autonomous economic agent in the KarmaCadabra swarm.
@@ -209,7 +210,8 @@ LLM_PROVIDER="${KK_LLM_PROVIDER:-auto}"
 echo "[entrypoint] LLM provider: $LLM_PROVIDER"
 
 configure_vllm() {
-    openclaw models set "openai/gpt-4o-mini" 2>/dev/null || true
+    LLM_MODEL="${KK_LLM_MODEL:-gpt-4o-mini}"
+    openclaw models set "openai/$LLM_MODEL" 2>/dev/null || true
     AGENT_MODELS_DIR="$HOME/.openclaw/agents/main/agent"
     mkdir -p "$AGENT_MODELS_DIR"
     cat > "$AGENT_MODELS_DIR/models.json" << MODELEOF
@@ -218,13 +220,13 @@ configure_vllm() {
     "openai": {
       "baseUrl": "${KK_LLM_BASE_URL}",
       "api": "openai-completions",
-      "models": [{"id":"gpt-4o-mini","name":"Qwen3-8B via vLLM","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":32768,"maxTokens":8192}],
+      "models": [{"id":"${LLM_MODEL}","name":"Local LLM","reasoning":false,"input":["text"],"cost":{"input":0,"output":0,"cacheRead":0,"cacheWrite":0},"contextWindow":32768,"maxTokens":8192}],
       "apiKey": "OPENAI_API_KEY"
     }
   }
 }
 MODELEOF
-    echo "[entrypoint] Model: Qwen3-8B via vLLM @ $KK_LLM_BASE_URL"
+    echo "[entrypoint] Model: $LLM_MODEL via $KK_LLM_BASE_URL"
 }
 
 configure_openrouter() {

@@ -14,8 +14,8 @@ x-agent-common: &agent-common
     context: .
     dockerfile: Dockerfile.openclaw
   restart: unless-stopped
-  mem_limit: ${KK_CONTAINER_MEMORY:-1200m}
-  memswap_limit: 1800m
+  mem_limit: ${KK_CONTAINER_MEMORY:-2g}
+  memswap_limit: 3g
   logging:
     driver: json-file
     options:
@@ -28,11 +28,13 @@ x-agent-env-common: &agent-env-common
   KK_LLM_BASE_URL: ${KK_LLM_BASE_URL}
   KK_LLM_API_KEY: ${KK_LLM_API_KEY:-local}
   KK_LLM_PROVIDER: ${KK_LLM_PROVIDER:-vllm}
+  KK_LLM_MODEL: ${KK_LLM_MODEL:-qwen3:4b}
   KK_HEARTBEAT_INTERVAL: ${KK_HEARTBEAT_INTERVAL:-90s}
+  NODE_OPTIONS: "--max-old-space-size=1536"
   KK_CHAIN_ID: "8453"
   ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
   OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
-  OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+  OPENAI_API_KEY: ${OPENAI_API_KEY:-local}
 
 services:
   # ── Group 1: Coordinator (starts first) ───────────────────────────
