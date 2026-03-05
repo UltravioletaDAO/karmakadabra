@@ -60,3 +60,34 @@ class ReputationBridge:
         except Exception as e:
             logger.error(f"Attestation failed: {e}")
             raise
+
+    def verify_skill_dna(self, wallet_address, required_skills, min_confidence=50):
+        """
+        Queries the EM API to determine if a worker's Skill DNA meets the threshold
+        for the required skills.
+        """
+        try:
+            res = requests.post(f"{self.em_api_base}/reputation/verify_dna", json={
+                "wallet": wallet_address,
+                "required_skills": required_skills,
+                "min_confidence": min_confidence
+            }, timeout=5)
+            if res.status_code == 200:
+                return res.json().get("verified", False)
+            return False
+        except requests.exceptions.RequestException as e:
+            logger.error(f"DNA Verification failed for {wallet_address}: {e}")
+            return False
+
+    def get_worker_confidence(self, wallet_address, task_type):
+        """
+        Returns a confidence score (0-100) for a worker on a specific task type.
+        """
+        try:
+            res = requests.get(f"{self.em_api_base}/reputation/confidence/{wallet_address}?task_type={task_type}", timeout=5)
+            if res.status_code == 200:
+                return res.json().get("confidence_score", 0)
+            return 0
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Confidence check failed for {wallet_address}: {e}")
+            return 0
