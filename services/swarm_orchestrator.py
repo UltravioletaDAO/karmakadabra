@@ -76,6 +76,11 @@ from lib.reputation_bridge import (
     UnifiedReputation,
     classify_tier,
 )
+from lib.seal_issuer import (
+    SealIssuer,
+    SealIssuerConfig,
+    save_issuance_state,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(name)s] %(message)s")
 logger = logging.getLogger("kk.orchestrator")
@@ -285,6 +290,13 @@ class SwarmOrchestrator:
         self.state_path = self.data_dir / "orchestrator_state.json"
         self.reports_dir = self.data_dir / "reports"
         self.reputation_dir = self.data_dir / "reputation"
+
+        # Seal issuance (describe-net flywheel)
+        self.seal_issuer = SealIssuer(SealIssuerConfig(
+            dry_run=self.config.dry_run or True,  # Start in dry-run until describe-net deploys
+            chain_id=8453,  # Base mainnet
+        ))
+        self.seal_issuance_dir = self.data_dir / "seal_issuance"
 
         # Runtime state
         self.agents: list[AgentLifecycle] = []
@@ -675,7 +687,18 @@ class SwarmOrchestrator:
             else:
                 result.matching_mode = "enhanced"
 
-            # Step 5: Recommended actions (informational)
+            # Step 5: Seal issuance cycle (describe-net flywheel)
+            seal_result = self.seal_issuer.process_cycle()
+            if seal_result["signed"] > 0 or seal_result["batches_submitted"] > 0:
+                result.actions_taken.append(
+                    f"seals: signed={seal_result['signed']}, "
+                    f"submitted={seal_result['batches_submitted']}, "
+                    f"total={seal_result['total_issued']}"
+                )
+                # Persist seal state
+                save_issuance_state(self.seal_issuer, self.seal_issuance_dir)
+
+            # Step 6: Recommended actions (informational)
             actions = recommend_actions(self.agents, self.lifecycle_config, now)
             if actions:
                 critical = [a for a in actions if a["priority"] == "critical"]
@@ -927,6 +950,7 @@ class SwarmOrchestrator:
                 }
                 for a in self.agents
             ],
+            "seal_issuer": self.seal_issuer.get_status(),
         }
 
 
