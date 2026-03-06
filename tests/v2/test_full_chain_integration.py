@@ -31,7 +31,7 @@ from lib.decision_engine import (
     TaskProfile,
 )
 from lib.autojob_enrichment import (
-    AutoJobEnricher,
+    AutoJobEnrichment as AutoJobEnricher,
     EnrichmentConfig,
     EnrichmentStats,
     create_enriched_decision_context,

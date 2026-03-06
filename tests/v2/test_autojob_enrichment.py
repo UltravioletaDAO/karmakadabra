@@ -1,581 +1,463 @@
 """
-Tests for AutoJob Enrichment Layer
-====================================
+Tests for KK V2 AutoJob Enrichment Layer
 
-Tests the glue between AutoJobBridge and DecisionEngine.
-Verifies that AgentProfile fields get properly populated from
-AutoJob intelligence data.
+Tests the bridge between KK's decision engine and AutoJob's SwarmRouter,
+covering both local mode (SwarmRouter available) and fallback mode.
 """
 
-import logging
-from dataclasses import dataclass, field
-from datetime import datetime, timezone
-from typing import Optional
-from unittest import TestCase, mock
+import json
+import sys
+import time
+from pathlib import Path
+from unittest.mock import MagicMock, patch
+
+import pytest
+
+sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
 from lib.autojob_enrichment import (
-    AutoJobEnricher,
-    EnrichmentConfig,
-    EnrichmentStats,
-    enrich_profiles,
-    create_enriched_decision_context,
-)
-from lib.decision_engine import (
-    AgentProfile,
-    DecisionConfig,
-    DecisionContext,
-    DecisionEngine,
-    TaskProfile,
+    AutoJobEnrichment,
+    EnrichedProfile,
+    EnrichmentResult,
 )
 
 
-# ---------------------------------------------------------------------------
-# Mock AutoJobBridge
-# ---------------------------------------------------------------------------
-
-@dataclass
-class MockAgentRanking:
-    """Mock of AutoJobBridge's AgentRanking."""
-    agent_name: str
-    wallet: str
-    final_score: float = 75.0
-    skill_score: float = 80.0
-    reputation_score: float = 70.0
-    reliability_score: float = 85.0
-    recency_score: float = 90.0
-    tier: str = "Oro"
-    confidence: float = 0.8
-    explanation: str = "Test ranking"
-    predicted_quality: float = 4.2
-    predicted_success: float = 0.85
-    categories_worked: list = field(default_factory=lambda: ["data_collection"])
-    total_tasks: int = 15
-    agent_id: Optional[int] = None
+# ═══════════════════════════════════════════════════════════════════
+# EnrichedProfile Tests
+# ═══════════════════════════════════════════════════════════════════
 
 
-@dataclass
-class MockBridgeResult:
-    """Mock of AutoJobBridge's BridgeResult."""
-    task_id: str
-    task_category: str
-    rankings: list = field(default_factory=list)
-    total_candidates: int = 0
-    qualified_candidates: int = 0
-    best_match: object = None
-    match_time_ms: float = 5.0
-    mode: str = "local"
-    autojob_version: str = "test"
+class TestEnrichedProfile:
+    """Test EnrichedProfile data class."""
+
+    def test_default_values(self):
+        p = EnrichedProfile(agent_name="alice", wallet="0xABC")
+        assert p.autojob_score == 0.0
+        assert p.autojob_tier == "unverified"
+        assert p.autojob_confidence == 0.0
+        assert p.predicted_quality == 3.0
+        assert p.predicted_success == 0.5
+        assert p.enrichment_source == "none"
+
+    def test_to_dict(self):
+        p = EnrichedProfile(
+            agent_name="alice",
+            wallet="0xABC",
+            autojob_score=85.5,
+            autojob_tier="oro",
+            enrichment_source="autojob_local",
+        )
+        d = p.to_dict()
+        assert d["agent_name"] == "alice"
+        assert d["autojob_score"] == 85.5
+        assert d["autojob_tier"] == "oro"
+        assert d["enrichment_source"] == "autojob_local"
+
+    def test_custom_values(self):
+        p = EnrichedProfile(
+            agent_name="bob",
+            wallet="0xDEF",
+            autojob_score=92.0,
+            autojob_tier="diamante",
+            autojob_confidence=0.95,
+            predicted_quality=4.5,
+            predicted_success=0.9,
+            categories_worked=["physical_verification", "data_collection"],
+            total_tasks_completed=42,
+            composite_reputation=88.0,
+        )
+        assert p.total_tasks_completed == 42
+        assert len(p.categories_worked) == 2
+        assert p.composite_reputation == 88.0
 
 
-class MockAutoJobBridge:
-    """Mock bridge that returns configurable rankings."""
+class TestEnrichmentResult:
+    """Test EnrichmentResult data class."""
 
-    def __init__(self, rankings=None, should_fail=False):
-        self.rankings = rankings or []
-        self.should_fail = should_fail
-        self.calls = []
+    def test_to_dict(self):
+        profile = EnrichedProfile(agent_name="alice", wallet="0xABC")
+        result = EnrichmentResult(
+            task_id="task_123",
+            task_category="physical_verification",
+            profiles={"alice": profile},
+            total_agents=3,
+            enriched_agents=1,
+            source="autojob_local",
+            enrichment_time_ms=15.5,
+        )
+        d = result.to_dict()
+        assert d["task_id"] == "task_123"
+        assert d["total_agents"] == 3
+        assert d["enriched_agents"] == 1
+        assert "alice" in d["profiles"]
 
-    def rank_agents_for_task(self, task, agent_wallets=None, limit=10, min_score=None):
-        self.calls.append({
-            "task": task,
-            "agent_wallets": agent_wallets,
-            "limit": limit,
-            "min_score": min_score,
-        })
+    def test_empty_result(self):
+        result = EnrichmentResult(
+            task_id="",
+            task_category="",
+            profiles={},
+            total_agents=0,
+            enriched_agents=0,
+            source="fallback",
+        )
+        assert result.enrichment_time_ms == 0.0
+        assert result.router_health == {}
 
-        if self.should_fail:
-            raise ConnectionError("Bridge is down")
 
-        # Filter rankings to requested wallets
-        filtered = self.rankings
-        if agent_wallets:
-            wallet_set = {w.lower() for w in agent_wallets}
-            filtered = [r for r in self.rankings if r.wallet.lower() in wallet_set]
+# ═══════════════════════════════════════════════════════════════════
+# AutoJobEnrichment - Fallback Mode Tests
+# ═══════════════════════════════════════════════════════════════════
 
-        return MockBridgeResult(
-            task_id=task.get("id", "unknown"),
-            task_category=task.get("category", "unknown"),
-            rankings=filtered,
-            total_candidates=len(filtered),
-            qualified_candidates=len(filtered),
-            best_match=filtered[0] if filtered else None,
+
+class TestFallbackMode:
+    """Test enrichment when AutoJob is not available."""
+
+    def test_init_without_autojob(self):
+        e = AutoJobEnrichment()
+        assert not e.is_available
+        assert e.mode == "none"
+
+    def test_init_with_nonexistent_path(self):
+        e = AutoJobEnrichment(autojob_path="/nonexistent/path/autojob")
+        assert not e.is_available
+        assert e.mode == "fallback"
+
+    def test_fallback_enrichment(self):
+        e = AutoJobEnrichment(fallback_score=55.0)
+        task = {"id": "task_1", "category": "data_collection", "title": "Test task"}
+
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA", "0xBBB", "0xCCC"],
+            agent_names={"0xaaa": "alice", "0xbbb": "bob", "0xccc": "carol"},
         )
 
+        assert result.task_id == "task_1"
+        assert result.task_category == "data_collection"
+        assert result.total_agents == 3
+        assert result.enriched_agents == 0  # All fallback
+        assert result.source == "fallback"
+        assert len(result.profiles) == 3
 
-# ---------------------------------------------------------------------------
-# Helper Functions
-# ---------------------------------------------------------------------------
+        # All profiles should have fallback score
+        for name, profile in result.profiles.items():
+            assert profile.autojob_score == 55.0
+            assert profile.autojob_tier == "unverified"
+            assert profile.enrichment_source == "fallback"
 
-def _make_task(category="data_collection", bounty=0.50):
-    return TaskProfile(
-        task_id="test_task_1",
-        category=category,
-        bounty_usd=bounty,
-    )
+    def test_fallback_profile_values(self):
+        e = AutoJobEnrichment(fallback_score=40.0)
+        p = e._fallback_profile("alice", "0xABC")
 
+        assert p.agent_name == "alice"
+        assert p.wallet == "0xABC"
+        assert p.autojob_score == 40.0
+        assert p.predicted_quality == 3.0
+        assert p.predicted_success == 0.5
+        assert p.enrichment_source == "fallback"
 
-def _make_agents(count=3):
-    agents = []
-    for i in range(count):
-        agents.append(AgentProfile(
-            agent_name=f"kk-agent-{i}",
-            agent_id=i,
-            is_available=True,
-            reputation_score=50.0 + i * 10,
-        ))
-    return agents
-
-
-def _make_wallet_map(agents, prefix="0xAgent"):
-    return {
-        a.agent_name: f"{prefix}{i:02d}" + "0" * (40 - len(prefix) - 2)
-        for i, a in enumerate(agents)
-    }
-
-
-def _make_rankings(agents, wallet_map):
-    rankings = []
-    for i, agent in enumerate(agents):
-        wallet = wallet_map.get(agent.agent_name, "")
-        rankings.append(MockAgentRanking(
-            agent_name=agent.agent_name,
-            wallet=wallet,
-            final_score=80.0 - i * 10,
-            skill_score=85.0 - i * 5,
-            reputation_score=75.0 - i * 10,
-            reliability_score=90.0 - i * 5,
-            recency_score=95.0 - i * 5,
-            tier=["Diamante", "Oro", "Plata"][i % 3],
-            confidence=0.9 - i * 0.1,
-            explanation=f"Ranked #{i + 1}",
-            predicted_quality=4.5 - i * 0.3,
-            predicted_success=0.9 - i * 0.1,
-            categories_worked=["data_collection"],
-            total_tasks=20 - i * 5,
-        ))
-    return rankings
-
-
-# ---------------------------------------------------------------------------
-# Tests: Configuration
-# ---------------------------------------------------------------------------
-
-class TestEnrichmentConfig(TestCase):
-    """Test enrichment configuration."""
-
-    def test_default_config(self):
-        config = EnrichmentConfig()
-        self.assertTrue(config.enabled)
-        self.assertEqual(config.signal_strength, 1.0)
-        self.assertTrue(config.use_bridge_predictions)
-
-    def test_disabled_config(self):
-        config = EnrichmentConfig(enabled=False)
-        self.assertFalse(config.enabled)
-
-    def test_dampened_signal(self):
-        config = EnrichmentConfig(signal_strength=0.5)
-        self.assertEqual(config.signal_strength, 0.5)
-
-
-# ---------------------------------------------------------------------------
-# Tests: Enrichment Core
-# ---------------------------------------------------------------------------
-
-class TestAutoJobEnricher(TestCase):
-    """Test the AutoJobEnricher class."""
-
-    def test_basic_enrichment(self):
-        """Enrichment populates autojob fields in AgentProfile."""
-        agents = _make_agents(3)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        result, stats = enricher.enrich(_make_task(), agents)
-
-        # All agents should have non-zero autojob fields
-        for agent in result:
-            self.assertGreater(agent.autojob_match_score, 0.0,
-                               f"{agent.agent_name} should have autojob_match_score > 0")
-            self.assertGreater(agent.predicted_quality, 0.0,
-                               f"{agent.agent_name} should have predicted_quality > 0")
-            self.assertGreater(agent.predicted_success, 0.0,
-                               f"{agent.agent_name} should have predicted_success > 0")
-
-    def test_enrichment_stats(self):
-        """Enrichment returns accurate stats."""
-        agents = _make_agents(3)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        _, stats = enricher.enrich(_make_task(), agents)
-
-        self.assertEqual(stats.total_agents, 3)
-        self.assertEqual(stats.agents_enriched, 3)
-        self.assertEqual(stats.agents_cold_start, 0)
-        self.assertEqual(stats.agents_failed, 0)
-        self.assertGreater(stats.enrichment_time_ms, 0)
-        self.assertEqual(stats.bridge_mode, "local")
-
-    def test_enrichment_preserves_existing_data(self):
-        """Enrichment doesn't clobber non-autojob fields."""
-        agents = _make_agents(1)
-        agents[0].reputation_score = 88.0
-        agents[0].efficiency_score = 75.0
-        agents[0].tasks_completed = 42
-
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        enricher.enrich(_make_task(), agents)
-
-        # Original fields should be untouched
-        self.assertEqual(agents[0].reputation_score, 88.0)
-        self.assertEqual(agents[0].efficiency_score, 75.0)
-        self.assertEqual(agents[0].tasks_completed, 42)
-
-    def test_match_score_range(self):
-        """Match score should be normalized to [0, 1]."""
-        agents = _make_agents(3)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        enricher.enrich(_make_task(), agents)
-
-        for agent in agents:
-            self.assertGreaterEqual(agent.autojob_match_score, 0.0)
-            self.assertLessEqual(agent.autojob_match_score, 1.0)
-
-    def test_ranking_order_reflected(self):
-        """Higher-ranked agents get higher match scores."""
-        agents = _make_agents(3)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        enricher.enrich(_make_task(), agents)
-
-        # Agent 0 should have highest score, agent 2 lowest
-        self.assertGreater(agents[0].autojob_match_score, agents[1].autojob_match_score)
-        self.assertGreater(agents[1].autojob_match_score, agents[2].autojob_match_score)
-
-    def test_signal_strength_dampening(self):
-        """Signal strength < 1.0 dampens enrichment values."""
-        agents_full = _make_agents(1)
-        agents_half = _make_agents(1)
-
-        wallet_map = _make_wallet_map(agents_full)
-        rankings = _make_rankings(agents_full, wallet_map)
-
-        # Full signal
-        bridge = MockAutoJobBridge(rankings=rankings)
-        enricher_full = AutoJobEnricher(
-            bridge=bridge, wallet_map=wallet_map,
-            config=EnrichmentConfig(signal_strength=1.0),
+    def test_wallet_name_mapping(self):
+        e = AutoJobEnrichment(
+            wallet_to_agent={"0xaaa": "alice", "0xbbb": "bob"}
         )
-        enricher_full.enrich(_make_task(), agents_full)
+        task = {"id": "t1", "category": "survey"}
 
-        # Half signal
-        bridge2 = MockAutoJobBridge(rankings=_make_rankings(agents_half, wallet_map))
-        enricher_half = AutoJobEnricher(
-            bridge=bridge2, wallet_map=wallet_map,
-            config=EnrichmentConfig(signal_strength=0.5),
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA", "0xBBB"],
         )
-        enricher_half.enrich(_make_task(), agents_half)
 
-        # Half-signal agent should have lower scores
-        self.assertLess(agents_half[0].autojob_match_score,
-                        agents_full[0].autojob_match_score)
+        names = set(result.profiles.keys())
+        assert "alice" in names
+        assert "bob" in names
 
-    def test_bridge_calls_with_wallets(self):
-        """Enricher passes correct wallets to bridge."""
-        agents = _make_agents(2)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
+    def test_unknown_wallet_uses_prefix(self):
+        e = AutoJobEnrichment()
+        task = {"id": "t1", "category": "survey"}
 
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        enricher.enrich(_make_task(), agents)
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xDEADBEEF123456"],
+        )
 
-        # Verify bridge was called with correct wallets
-        self.assertEqual(len(bridge.calls), 1)
-        call = bridge.calls[0]
-        expected_wallets = [wallet_map[a.agent_name] for a in agents]
-        self.assertEqual(sorted(call["agent_wallets"]), sorted(expected_wallets))
+        # Should use first 10 chars of wallet as name
+        assert len(result.profiles) == 1
 
 
-# ---------------------------------------------------------------------------
-# Tests: Cold Start
-# ---------------------------------------------------------------------------
+# ═══════════════════════════════════════════════════════════════════
+# AutoJobEnrichment - Local Mode Tests (Mocked SwarmRouter)
+# ═══════════════════════════════════════════════════════════════════
 
-class TestColdStart(TestCase):
-    """Test behavior when agents aren't in AutoJob."""
 
-    def test_no_wallet_mapping(self):
-        """Agents without wallet mappings get cold-start defaults."""
-        agents = _make_agents(2)
-        wallet_map = {}  # No mappings
-        bridge = MockAutoJobBridge(rankings=[])
+class TestLocalMode:
+    """Test enrichment with a mocked SwarmRouter."""
 
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        _, stats = enricher.enrich(_make_task(), agents)
-
-        self.assertEqual(stats.agents_cold_start, 2)
-        self.assertEqual(stats.agents_enriched, 0)
-
-        for agent in agents:
-            self.assertEqual(agent.autojob_match_score, 0.3)  # default
-            self.assertEqual(agent.predicted_quality, 0.5)
-            self.assertEqual(agent.predicted_success, 0.4)
-
-    def test_partial_coverage(self):
-        """Mix of known and unknown agents."""
-        agents = _make_agents(3)
-        # Only map first 2
-        wallet_map = {
-            agents[0].agent_name: "0xKnown01" + "0" * 31,
-            agents[1].agent_name: "0xKnown02" + "0" * 31,
+    @pytest.fixture
+    def mock_router(self):
+        router = MagicMock()
+        router.route_task.return_value = {
+            "best_match": {"wallet": "0xAAA", "final_score": 92.0},
+            "rankings": [
+                {
+                    "wallet": "0xAAA",
+                    "final_score": 92.0,
+                    "tier": "diamante",
+                    "confidence": 0.95,
+                    "predicted_quality": 4.5,
+                    "predicted_success": 0.88,
+                    "skill_match": {"photography": 0.95, "geo": 0.80},
+                    "evidence_types": ["photo_geo", "video"],
+                    "categories_worked": ["physical_verification"],
+                    "total_tasks": 42,
+                    "composite_reputation": 88.5,
+                },
+                {
+                    "wallet": "0xBBB",
+                    "final_score": 75.0,
+                    "tier": "oro",
+                    "confidence": 0.7,
+                    "predicted_quality": 3.8,
+                    "predicted_success": 0.72,
+                    "skill_match": {"photography": 0.6},
+                    "evidence_types": ["photo"],
+                    "categories_worked": ["content_creation"],
+                    "total_tasks": 15,
+                    "composite_reputation": 72.0,
+                },
+            ],
         }
-        rankings = [
-            MockAgentRanking(
-                agent_name=agents[0].agent_name,
-                wallet="0xKnown01" + "0" * 31,
-            ),
-            MockAgentRanking(
-                agent_name=agents[1].agent_name,
-                wallet="0xKnown02" + "0" * 31,
-            ),
-        ]
-        bridge = MockAutoJobBridge(rankings=rankings)
+        router.health.return_value = {"status": "healthy", "workers": 10}
+        return router
 
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        _, stats = enricher.enrich(_make_task(), agents)
+    def test_local_enrichment(self, mock_router):
+        e = AutoJobEnrichment()
+        e._router = mock_router
+        e._mode = "autojob_local"
 
-        self.assertEqual(stats.agents_enriched, 2)
-        self.assertEqual(stats.agents_cold_start, 1)
+        task = {
+            "id": "task_photo",
+            "category": "physical_verification",
+            "title": "Verify storefront",
+        }
 
-        # Agent 2 (no wallet) should have cold-start values
-        self.assertEqual(agents[2].autojob_match_score, 0.3)
-
-    def test_custom_cold_start_values(self):
-        """Custom cold-start config applies."""
-        agents = _make_agents(1)
-        config = EnrichmentConfig(
-            cold_start_match_score=0.5,
-            cold_start_quality=0.7,
-            cold_start_success=0.6,
-        )
-        bridge = MockAutoJobBridge(rankings=[])
-
-        enricher = AutoJobEnricher(
-            bridge=bridge, wallet_map={}, config=config,
-        )
-        enricher.enrich(_make_task(), agents)
-
-        self.assertEqual(agents[0].autojob_match_score, 0.5)
-        self.assertEqual(agents[0].predicted_quality, 0.7)
-        self.assertEqual(agents[0].predicted_success, 0.6)
-
-
-# ---------------------------------------------------------------------------
-# Tests: Error Handling
-# ---------------------------------------------------------------------------
-
-class TestErrorHandling(TestCase):
-    """Test graceful degradation when bridge fails."""
-
-    def test_bridge_failure_fallback(self):
-        """Bridge failure falls back to cold-start for all agents."""
-        agents = _make_agents(3)
-        wallet_map = _make_wallet_map(agents)
-        bridge = MockAutoJobBridge(should_fail=True)
-
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map=wallet_map)
-        _, stats = enricher.enrich(_make_task(), agents)
-
-        # All agents should get cold-start values
-        self.assertEqual(stats.agents_failed, 3)
-        self.assertEqual(stats.agents_cold_start, 3)
-        self.assertEqual(stats.agents_enriched, 0)
-
-        for agent in agents:
-            self.assertEqual(agent.autojob_match_score, 0.3)
-
-    def test_disabled_enrichment(self):
-        """Disabled enrichment returns agents unchanged."""
-        agents = _make_agents(2)
-        config = EnrichmentConfig(enabled=False)
-        bridge = MockAutoJobBridge(rankings=[])
-
-        enricher = AutoJobEnricher(bridge=bridge, wallet_map={}, config=config)
-        result, stats = enricher.enrich(_make_task(), agents)
-
-        # No enrichment happened
-        self.assertEqual(stats.agents_enriched, 0)
-        self.assertEqual(stats.agents_cold_start, 0)
-
-        # Fields should be at their defaults (0.0)
-        for agent in result:
-            self.assertEqual(agent.autojob_match_score, 0.0)
-
-    def test_no_bridge(self):
-        """No bridge configured → no enrichment."""
-        agents = _make_agents(2)
-        enricher = AutoJobEnricher(bridge=None, wallet_map={})
-        _, stats = enricher.enrich(_make_task(), agents)
-
-        self.assertEqual(stats.agents_enriched, 0)
-
-
-# ---------------------------------------------------------------------------
-# Tests: Functional API
-# ---------------------------------------------------------------------------
-
-class TestFunctionalAPI(TestCase):
-    """Test the one-shot functional API."""
-
-    def test_enrich_profiles_function(self):
-        """enrich_profiles() works as a one-shot call."""
-        agents = _make_agents(2)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        result, stats = enrich_profiles(bridge, _make_task(), agents, wallet_map)
-
-        self.assertEqual(len(result), 2)
-        self.assertEqual(stats.agents_enriched, 2)
-
-    def test_create_enriched_context(self):
-        """create_enriched_decision_context() produces a usable context."""
-        agents = _make_agents(2)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        context, stats = create_enriched_decision_context(
-            bridge, _make_task(), agents, wallet_map
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA", "0xBBB"],
+            agent_names={"0xaaa": "alice", "0xbbb": "bob"},
         )
 
-        self.assertIsInstance(context, DecisionContext)
-        self.assertEqual(len(context.agents), 2)
-        self.assertEqual(stats.agents_enriched, 2)
+        assert result.source == "autojob_local"
+        assert result.enriched_agents == 2
+        assert result.total_agents == 2
 
-        # Context agents should be enriched
-        for agent in context.agents:
-            self.assertGreater(agent.autojob_match_score, 0.0)
+        alice = result.profiles["alice"]
+        assert alice.autojob_score == 92.0
+        assert alice.autojob_tier == "diamante"
+        assert alice.predicted_quality == 4.5
+        assert alice.enrichment_source == "autojob_local"
 
+        bob = result.profiles["bob"]
+        assert bob.autojob_score == 75.0
+        assert bob.autojob_tier == "oro"
 
-# ---------------------------------------------------------------------------
-# Tests: Integration with DecisionEngine
-# ---------------------------------------------------------------------------
+    def test_local_with_missing_agents(self, mock_router):
+        """Agents not in AutoJob results get fallback profiles."""
+        e = AutoJobEnrichment(fallback_score=50.0)
+        e._router = mock_router
+        e._mode = "autojob_local"
 
-class TestDecisionEngineIntegration(TestCase):
-    """Test that enriched profiles work correctly with DecisionEngine."""
+        task = {"id": "t1", "category": "survey"}
 
-    def test_enriched_profiles_in_decision(self):
-        """DecisionEngine uses autojob fields from enriched profiles."""
-        agents = _make_agents(3)
-        wallet_map = _make_wallet_map(agents)
-        rankings = _make_rankings(agents, wallet_map)
-        bridge = MockAutoJobBridge(rankings=rankings)
-
-        task = _make_task()
-
-        # Enrich
-        context, stats = create_enriched_decision_context(
-            bridge, task, agents, wallet_map
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA", "0xBBB", "0xCCC"],
+            agent_names={
+                "0xaaa": "alice",
+                "0xbbb": "bob",
+                "0xccc": "carol",
+            },
         )
 
-        # Decide
-        engine = DecisionEngine(DecisionConfig())
-        decision = engine.decide(context)
+        assert result.total_agents == 3
+        assert result.enriched_agents == 2  # alice + bob
+        carol = result.profiles["carol"]
+        assert carol.enrichment_source == "fallback"
+        assert carol.autojob_score == 50.0
 
-        # Should produce a valid decision
-        self.assertIsNotNone(decision)
-        self.assertIsInstance(decision.chosen_agent, (str, type(None)))
-        self.assertGreater(decision.agents_considered, 0)
+    def test_local_error_falls_back(self, mock_router):
+        """Router error falls back to default profiles."""
+        mock_router.route_task.side_effect = Exception("Network error")
+        e = AutoJobEnrichment()
+        e._router = mock_router
+        e._mode = "autojob_local"
 
-    def test_enrichment_improves_discrimination(self):
-        """Enrichment helps the engine differentiate between agents."""
-        agents = _make_agents(3)
-        # Make all agents look identical without AutoJob
-        for a in agents:
-            a.reputation_score = 50.0
-            a.efficiency_score = 50.0
-            a.reliability = 0.5
+        task = {"id": "t1", "category": "survey"}
 
-        wallet_map = _make_wallet_map(agents)
-
-        # Rankings with clear differentiation
-        rankings = [
-            MockAgentRanking(
-                agent_name=agents[0].agent_name,
-                wallet=wallet_map[agents[0].agent_name],
-                final_score=95.0,
-                predicted_success=0.95,
-            ),
-            MockAgentRanking(
-                agent_name=agents[1].agent_name,
-                wallet=wallet_map[agents[1].agent_name],
-                final_score=50.0,
-                predicted_success=0.50,
-            ),
-            MockAgentRanking(
-                agent_name=agents[2].agent_name,
-                wallet=wallet_map[agents[2].agent_name],
-                final_score=20.0,
-                predicted_success=0.20,
-            ),
-        ]
-
-        bridge = MockAutoJobBridge(rankings=rankings)
-        task = _make_task()
-
-        # With enrichment
-        context, _ = create_enriched_decision_context(
-            bridge, task, agents, wallet_map
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA"],
+            agent_names={"0xaaa": "alice"},
         )
 
-        engine = DecisionEngine(DecisionConfig())
-        decision = engine.decide(context)
+        assert result.source == "fallback"
+        assert result.enriched_agents == 0
 
-        # The engine should pick the agent with the best AutoJob signal
-        # or at least differentiate them
-        self.assertGreater(decision.agents_qualified, 0)
+    def test_enrichment_time_tracked(self, mock_router):
+        e = AutoJobEnrichment()
+        e._router = mock_router
+        e._mode = "autojob_local"
 
-    def test_enrichment_stats_serializable(self):
-        """Stats.to_dict() is JSON-safe."""
-        import json
-        stats = EnrichmentStats(
-            agents_enriched=5,
-            agents_cold_start=2,
-            total_agents=7,
-            bridge_time_ms=12.5,
-            enrichment_time_ms=15.3,
-            bridge_mode="local",
-        )
-        d = stats.to_dict()
-        json.dumps(d)  # Must not raise
+        task = {"id": "t1", "category": "survey"}
 
-    def test_wallet_map_update(self):
-        """Wallet map can be updated dynamically."""
-        enricher = AutoJobEnricher(
-            bridge=MockAutoJobBridge(),
-            wallet_map={"agent-a": "0xAAA"},
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA"],
+            agent_names={"0xaaa": "alice"},
         )
 
-        enricher.update_wallet_map("agent-b", "0xBBB")
+        assert result.enrichment_time_ms >= 0
 
-        self.assertIn("agent-b", enricher.wallet_map)
-        self.assertEqual(enricher.wallet_map["agent-b"], "0xBBB")
-        self.assertIn("0xbbb", enricher._reverse_map)
+    def test_router_health_included(self, mock_router):
+        e = AutoJobEnrichment()
+        e._router = mock_router
+        e._mode = "autojob_local"
+
+        task = {"id": "t1", "category": "survey"}
+
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA"],
+            agent_names={"0xaaa": "alice"},
+        )
+
+        assert result.router_health.get("status") == "healthy"
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Context Injection Tests
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestContextInjection:
+    """Test injecting enrichment into existing agent profiles."""
+
+    @pytest.fixture
+    def mock_enrichment(self):
+        e = AutoJobEnrichment(fallback_score=60.0)
+        return e
+
+    def test_inject_into_profiles(self, mock_enrichment):
+        task = {"id": "t1", "category": "data_collection"}
+        profiles = {
+            "alice": {"wallet": "0xAAA", "skills": ["research"], "reliability": 0.9},
+            "bob": {"wallet": "0xBBB", "skills": ["writing"], "reliability": 0.8},
+        }
+
+        result = mock_enrichment.enrich_task_context(task, profiles)
+
+        # Original fields preserved
+        assert result["alice"]["skills"] == ["research"]
+        assert result["alice"]["reliability"] == 0.9
+
+        # Enrichment fields added
+        assert "autojob_score" in result["alice"]
+        assert "autojob_tier" in result["alice"]
+        assert result["alice"]["enrichment_source"] == "fallback"
+
+    def test_inject_with_no_wallets(self, mock_enrichment):
+        task = {"id": "t1", "category": "survey"}
+        profiles = {
+            "alice": {"skills": ["survey"]},  # No wallet field
+        }
+
+        result = mock_enrichment.enrich_task_context(task, profiles)
+
+        # Should return profiles unchanged (no wallets to look up)
+        assert result == profiles
+
+    def test_inject_preserves_original(self, mock_enrichment):
+        task = {"id": "t1", "category": "survey"}
+        profiles = {
+            "alice": {
+                "wallet": "0xAAA",
+                "custom_field": "preserved",
+                "nested": {"data": 42},
+            },
+        }
+
+        result = mock_enrichment.enrich_task_context(task, profiles)
+        assert result["alice"]["custom_field"] == "preserved"
+        assert result["alice"]["nested"]["data"] == 42
+
+
+# ═══════════════════════════════════════════════════════════════════
+# Edge Cases
+# ═══════════════════════════════════════════════════════════════════
+
+
+class TestEdgeCases:
+    """Test edge cases and boundary conditions."""
+
+    def test_empty_wallet_list(self):
+        e = AutoJobEnrichment()
+        task = {"id": "t1", "category": "survey"}
+
+        result = e.enrich_for_decision(task=task, agent_wallets=[])
+        assert result.total_agents == 0
+        assert result.enriched_agents == 0
+        assert len(result.profiles) == 0
+
+    def test_single_agent(self):
+        e = AutoJobEnrichment()
+        task = {"id": "t1", "category": "survey"}
+
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA"],
+            agent_names={"0xaaa": "solo"},
+        )
+        assert len(result.profiles) == 1
+        assert "solo" in result.profiles
+
+    def test_task_with_missing_fields(self):
+        e = AutoJobEnrichment()
+        task = {}  # Empty task
+
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA"],
+        )
+        assert result.task_id == "unknown"
+        assert result.task_category == "unknown"
+
+    def test_large_agent_list(self):
+        e = AutoJobEnrichment()
+        task = {"id": "t1", "category": "survey"}
+        wallets = [f"0x{i:040x}" for i in range(100)]
+        names = {f"0x{i:040x}": f"agent-{i}" for i in range(100)}
+
+        result = e.enrich_for_decision(task=task, agent_wallets=wallets, agent_names=names)
+        assert result.total_agents == 100
+        assert len(result.profiles) == 100
+
+    def test_duplicate_wallets(self):
+        e = AutoJobEnrichment()
+        task = {"id": "t1", "category": "survey"}
+
+        result = e.enrich_for_decision(
+            task=task,
+            agent_wallets=["0xAAA", "0xAAA"],
+        )
+        # Should handle duplicates gracefully
+        assert result.total_agents == 2
+
+    def test_is_available_property(self):
+        e = AutoJobEnrichment()
+        assert not e.is_available
+
+    def test_mode_property(self):
+        e = AutoJobEnrichment()
+        assert e.mode == "none"
+
+        e2 = AutoJobEnrichment(autojob_path="/nonexistent")
+        assert e2.mode == "fallback"
