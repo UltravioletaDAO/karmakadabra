@@ -25,10 +25,10 @@ x-agent-common: &agent-common
     - kk-local
 
 x-agent-env-common: &agent-env-common
-  KK_LLM_BASE_URL: ${KK_LLM_BASE_URL}
+  KK_LLM_BASE_URL: http://ollama-proxy:11434/v1
   KK_LLM_API_KEY: ${KK_LLM_API_KEY:-local}
   KK_LLM_PROVIDER: ${KK_LLM_PROVIDER:-vllm}
-  KK_LLM_MODEL: ${KK_LLM_MODEL:-qwen3:4b}
+  KK_LLM_MODEL: ${KK_LLM_MODEL:-qwen3.5:4b}
   KK_HEARTBEAT_INTERVAL: ${KK_HEARTBEAT_INTERVAL:-90s}
   NODE_OPTIONS: "--max-old-space-size=1536"
   KK_CHAIN_ID: "8453"
@@ -37,10 +37,40 @@ x-agent-env-common: &agent-env-common
   OPENAI_API_KEY: ${OPENAI_API_KEY:-local}
 
 services:
+  # ── Ollama Proxy: injects reasoning_effort:"none" to disable thinking ──
+  ollama-proxy:
+    image: node:22-alpine
+    container_name: ollama-proxy
+    restart: unless-stopped
+    mem_limit: 128m
+    command: ["node", "/app/ollama-proxy.js"]
+    volumes:
+      - ./scripts/kk/ollama-proxy.js:/app/ollama-proxy.js:ro
+    environment:
+      OLLAMA_HOST: ${KK_OLLAMA_HOST:-192.168.0.59}
+      OLLAMA_PORT: "11434"
+      PROXY_PORT: "11434"
+    networks:
+      - kk-local
+    healthcheck:
+      test: ["CMD", "wget", "-q", "-O", "/dev/null", "-T", "10", "http://127.0.0.1:11434/v1/models"]
+      interval: 15s
+      timeout: 15s
+      start_period: 10s
+      retries: 5
+    logging:
+      driver: json-file
+      options:
+        max-size: "2m"
+        max-file: "1"
+
   # ── Group 1: Coordinator (starts first) ───────────────────────────
   kk-coordinator:
     <<: *agent-common
     container_name: kk-coordinator
+    depends_on:
+      ollama-proxy:
+        condition: service_healthy
     environment:
       <<: *agent-env-common
       KK_AGENT_NAME: kk-coordinator
