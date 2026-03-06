@@ -181,9 +181,9 @@ class AutoJobBridge:
             logger.info(
                 "AutoJob bridge initialized (local mode, workers_dir=%s)", wdir
             )
-        except ImportError as e:
+        except (ImportError, OSError) as e:
             logger.warning(
-                "AutoJob local import failed (%s), falling back to remote mode", e
+                "AutoJob local init failed (%s), falling back to remote mode", e
             )
             self.mode = "remote"
 
