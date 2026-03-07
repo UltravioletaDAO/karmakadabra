@@ -355,7 +355,7 @@ async def coordination_cycle(
     for task in available_tasks:
         task_id = task.get("id", "")
         title = task.get("title", "")
-        desc = task.get("instructions", task.get("description", ""))
+        desc = task.get("instructions") or task.get("description") or ""
         bounty = task.get("bounty_usd", 0)
         category = task.get("category", "")
         chain = task.get("payment_network", "base")
