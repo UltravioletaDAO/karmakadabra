@@ -27,7 +27,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from karma_hello_service import collect_irc_logs, fulfill_purchases, publish_offerings
+from karma_hello_service import collect_all_logs as collect_irc_logs, fulfill_purchases, publish_offerings
 from em_client import AgentContext, EMClient, load_agent_context
 from lib.swarm_state import report_heartbeat
 
