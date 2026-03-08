@@ -1,12 +1,12 @@
 {
-  "saved_at": "2026-02-26T08:08:15.253616+00:00",
+  "saved_at": "2026-03-08T08:03:21.570906+00:00",
   "agent_count": 24,
   "agents": {
     "kk-coordinator": {
       "agent_name": "kk-coordinator",
       "agent_type": "system",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -17,13 +17,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-coordinator",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-coordinator",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-validator": {
       "agent_name": "kk-validator",
       "agent_type": "system",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -34,13 +51,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-validator",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-validator",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-karma-hello": {
       "agent_name": "kk-karma-hello",
       "agent_type": "core",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -51,13 +85,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-karma-hello",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-karma-hello",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-skill-extractor": {
       "agent_name": "kk-skill-extractor",
       "agent_type": "core",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -68,13 +119,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-skill-extractor",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-skill-extractor",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-soul-extractor": {
       "agent_name": "kk-soul-extractor",
       "agent_type": "core",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -85,13 +153,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-soul-extractor",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-soul-extractor",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-voice-extractor": {
       "agent_name": "kk-voice-extractor",
       "agent_type": "core",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -102,13 +187,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-voice-extractor",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-voice-extractor",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-abracadabra": {
       "agent_name": "kk-abracadabra",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -119,13 +221,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-abracadabra",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-abracadabra",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-3": {
       "agent_name": "kk-agent-3",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -136,13 +255,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-3",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-3",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-4": {
       "agent_name": "kk-agent-4",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -153,13 +289,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-4",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-4",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-5": {
       "agent_name": "kk-agent-5",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -170,13 +323,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-5",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-5",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-6": {
       "agent_name": "kk-agent-6",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -187,13 +357,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-6",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-6",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-7": {
       "agent_name": "kk-agent-7",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -204,13 +391,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-7",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-7",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-8": {
       "agent_name": "kk-agent-8",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -221,13 +425,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-8",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-8",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-9": {
       "agent_name": "kk-agent-9",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -238,13 +459,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-9",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-9",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-10": {
       "agent_name": "kk-agent-10",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -255,13 +493,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-10",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-10",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-11": {
       "agent_name": "kk-agent-11",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -272,13 +527,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-11",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-11",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-12": {
       "agent_name": "kk-agent-12",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -289,13 +561,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-12",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-12",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-13": {
       "agent_name": "kk-agent-13",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -306,13 +595,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-13",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-13",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-14": {
       "agent_name": "kk-agent-14",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -323,13 +629,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-14",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-14",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-15": {
       "agent_name": "kk-agent-15",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -340,13 +663,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-15",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-15",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-16": {
       "agent_name": "kk-agent-16",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -357,13 +697,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-16",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-16",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-17": {
       "agent_name": "kk-agent-17",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -374,13 +731,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-17",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-17",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-18": {
       "agent_name": "kk-agent-18",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -391,13 +765,30 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-18",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-18",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     },
     "kk-agent-19": {
       "agent_name": "kk-agent-19",
       "agent_type": "user",
-      "state": "offline",
-      "state_entered_at": "",
+      "state": "idle",
+      "state_entered_at": "2026-03-08T08:02:56.558525+00:00",
       "last_heartbeat": "",
       "last_task_completed": "",
       "current_task_id": "",
@@ -408,7 +799,24 @@
       "cooldown_until": "",
       "usdc_balance": 0.0,
       "eth_balance": 0.0,
-      "recent_transitions": []
+      "recent_transitions": [
+        {
+          "agent": "kk-agent-19",
+          "from": "offline",
+          "to": "starting",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        },
+        {
+          "agent": "kk-agent-19",
+          "from": "starting",
+          "to": "idle",
+          "reason": "startup",
+          "timestamp": "2026-03-08T08:02:56.558525+00:00",
+          "details": {}
+        }
+      ]
     }
   }
 }
