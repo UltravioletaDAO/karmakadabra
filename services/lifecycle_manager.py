@@ -30,6 +30,7 @@ from __future__ import annotations
 import json
 import logging
 import time
+import requests
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -343,8 +344,33 @@ class LifecycleManagerService:
 
         self._save_agent(agent)
         self._save_stats()
+        
         logger.info(f"{agent_name} completed task {task_id}")
+        
+        # --- AUTOJOB INTEGRATION ---
+        # Push completed task to AutoJob for Skill DNA extraction
+        # URL defaults to production autojob.cc webhook
+        webhook_url = "https://autojob.cc/api/webhook/em-completion"
+        try:
+            payload = {
+                "agent_id": agent_name,
+                "task_id": task_id,
+                "timestamp": now,
+                "status": "completed"
+            }
+            # Only POST if we have a real task_id to avoid spamming the webhook
+            if task_id:
+                res = requests.post(webhook_url, json=payload, timeout=2)
+                if res.status_code == 200:
+                    logger.info(f"AutoJob Skill DNA updated for {agent_name} on task {task_id}")
+                else:
+                    logger.warning(f"AutoJob webhook returned {res.status_code}")
+        except Exception as e:
+            logger.warning(f"Failed to push to AutoJob webhook: {e}")
+        # ---------------------------
+        
         return agent
+
 
     def report_failure(
         self,
