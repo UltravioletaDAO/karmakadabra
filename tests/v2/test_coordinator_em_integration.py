@@ -52,50 +52,47 @@ EM_API = "https://api.execution.market"
 # Helpers
 # ---------------------------------------------------------------------------
 
+import asyncio
+from httpx import HTTPStatusError
+
 def make_read_only_client() -> httpx.AsyncClient:
-    """Create a raw HTTP client for read-only EM API queries."""
     return httpx.AsyncClient(
         base_url=f"{EM_API}/api/v1",
         headers={"Content-Type": "application/json"},
         timeout=15.0,
     )
 
+async def _fetch_with_retry(client, method, url, **kwargs):
+    for i in range(3):
+        resp = await getattr(client, method)(url, **kwargs)
+        if resp.status_code == 429:
+            await asyncio.sleep(2 * (i + 1))
+            continue
+        resp.raise_for_status()
+        return resp.json()
+    resp.raise_for_status()
 
 async def fetch_health() -> dict:
     async with make_read_only_client() as c:
-        resp = await c.get("/health")
-        resp.raise_for_status()
-        return resp.json()
-
+        return await _fetch_with_retry(c, "get", "/health")
 
 async def fetch_available_tasks(limit: int = 20) -> list[dict]:
     async with make_read_only_client() as c:
-        resp = await c.get("/tasks/available", params={"status": "published", "limit": limit})
-        resp.raise_for_status()
-        data = resp.json()
+        data = await _fetch_with_retry(c, "get", "/tasks/available", params={"status": "published", "limit": limit})
         return data if isinstance(data, list) else data.get("tasks", [])
-
 
 async def fetch_completed_tasks(limit: int = 20) -> list[dict]:
     async with make_read_only_client() as c:
-        resp = await c.get("/tasks", params={"status": "completed", "limit": limit})
-        resp.raise_for_status()
-        data = resp.json()
+        data = await _fetch_with_retry(c, "get", "/tasks", params={"status": "completed", "limit": limit})
         return data if isinstance(data, list) else data.get("tasks", [])
-
 
 async def fetch_nonce() -> dict:
     async with make_read_only_client() as c:
-        resp = await c.get("/auth/nonce")
-        resp.raise_for_status()
-        return resp.json()
-
+        return await _fetch_with_retry(c, "get", "/auth/nonce")
 
 async def fetch_erc8128_info() -> dict:
     async with make_read_only_client() as c:
-        resp = await c.get("/auth/erc8128/info")
-        resp.raise_for_status()
-        return resp.json()
+        return await _fetch_with_retry(c, "get", "/auth/erc8128/info")
 
 
 # ---------------------------------------------------------------------------
