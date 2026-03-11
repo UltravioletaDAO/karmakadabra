@@ -61,7 +61,8 @@ logger = logging.getLogger("kk.coordinator")
 
 
 # Default path to AutoJob repo (same machine local mode)
-AUTOJOB_DEFAULT_PATH = str(Path(__file__).parent.parent.parent / "autojob")
+# Resolve from __file__ to get absolute path: karmakadabra/services/ → karmakadabra/ → projects/ → autojob/
+AUTOJOB_DEFAULT_PATH = str(Path(__file__).resolve().parent.parent.parent / "autojob")
 
 
 # ---------------------------------------------------------------------------
