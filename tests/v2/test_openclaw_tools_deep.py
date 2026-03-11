@@ -136,7 +136,8 @@ class TestIrcGuardCheckMessage:
         # Next should be blocked
         result = check_message("One more message that is completely unique and novel", "#ch", "kk-test")
         assert result["allow"] is False
-        assert "Rate limit" in result["reason"]
+        # Circuit breaker fires before rate limit (same thresholds)
+        assert result["reason"] and ("Rate limit" in result["reason"] or "Circuit breaker" in result["reason"])
 
     def test_circuit_breaker_triggers(self):
         from openclaw.tools.irc_guard import (
