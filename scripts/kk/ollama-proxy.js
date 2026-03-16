@@ -17,9 +17,19 @@ const server = http.createServer((req, res) => {
     if (isChat) {
       try {
         const json = JSON.parse(payload.toString());
+        // Disable Qwen3/3.5 thinking tokens
         if (!json.reasoning_effort) {
           json.reasoning_effort = "none";
         }
+        // Set context window per-request (Ollama supports this in OpenAI endpoint)
+        if (!json.options) json.options = {};
+        if (!json.options.num_ctx) json.options.num_ctx = 8192;
+        const tools = json.tools || [];
+        const msgCount = (json.messages || []).length;
+        const lastMsg = (json.messages || []).slice(-1)[0];
+        const lastRole = lastMsg ? lastMsg.role : "?";
+        const lastLen = lastMsg ? JSON.stringify(lastMsg.content).length : 0;
+        console.log(`[proxy] model=${json.model} msgs=${msgCount} tools=${tools.length} lastRole=${lastRole} lastLen=${lastLen} ctx=${json.options.num_ctx}`);
         payload = Buffer.from(JSON.stringify(json));
       } catch (_) {}
     }
