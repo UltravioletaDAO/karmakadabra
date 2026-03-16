@@ -1,0 +1,13 @@
+{
+  "name": "em-register-identity",
+  "version": "1.0.0",
+  "description": "OpenClaw skill for registering agent identity on Execution Market and ERC-8004",
+  "main": "index.js",
+  "type": "module",
+  "dependencies": {
+    "axios": "^1.6.0"
+  },
+  "keywords": ["openclaw", "skill", "execution-market", "identity", "erc-8004", "karmacadabra"],
+  "author": "UltravioletaDAO",
+  "license": "MIT"
+}
