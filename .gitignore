@@ -203,3 +203,12 @@ NEW_BUYER_WALLET.txt
 buyer_keypair_NEW.json
 data/lifecycle_state.json
 data/orchestrator_state.json
+
+# EM integration reports (historical tx data, regenerable)
+scripts/em-integration/report-*.json
+
+# EM integration extracted data (regenerable from source)
+scripts/em-integration/data/
+
+# Funding config with real amounts (use example instead)
+scripts/em-integration/config/funding-config.json
