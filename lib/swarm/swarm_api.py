@@ -30,7 +30,7 @@ Usage:
     python -m mcp_server.swarm.swarm_api --port 8888
 
     # Import and mount in existing app
-    from mcp_server.swarm.swarm_api import create_app
+    from .swarm_api import create_app
     app = create_app(runner)
 """
 
@@ -49,8 +49,8 @@ from aiohttp import web
 
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from mcp_server.swarm.swarm_runner import SwarmRunner, KK_ROSTER
-from mcp_server.swarm.swarm_analytics import SwarmAnalytics
+from .swarm_runner import SwarmRunner, KK_ROSTER
+from .swarm_analytics import SwarmAnalytics
 
 logger = logging.getLogger("swarm_api")
 

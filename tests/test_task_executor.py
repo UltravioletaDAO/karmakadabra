@@ -14,7 +14,7 @@ import time
 from datetime import datetime, timezone, timedelta
 from unittest.mock import AsyncMock, MagicMock, patch
 
-from mcp_server.swarm.task_executor import (
+from lib.swarm.task_executor import (
     SwarmTaskExecutor,
     ExecutionResult,
     ExecutionPlan,
@@ -22,13 +22,13 @@ from mcp_server.swarm.task_executor import (
     ExecutionStrategy,
     CATEGORY_STRATEGIES,
 )
-from mcp_server.swarm.lifecycle_manager import (
+from lib.swarm.lifecycle_manager import (
     LifecycleManager,
     AgentStatus,
     ResourceBudget,
 )
-from mcp_server.swarm.reputation_bridge import ReputationBridge
-from mcp_server.swarm.swarm_orchestrator import SwarmOrchestrator
+from lib.swarm.reputation_bridge import ReputationBridge
+from lib.swarm.swarm_orchestrator import SwarmOrchestrator
 
 
 # ══════════════════════════════════════════════

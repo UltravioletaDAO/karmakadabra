@@ -49,10 +49,10 @@ from typing import Optional, Dict, List, Any
 # Add parent to path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from mcp_server.swarm.lifecycle_manager import LifecycleManager, ResourceBudget
-from mcp_server.swarm.reputation_bridge import ReputationBridge
-from mcp_server.swarm.swarm_orchestrator import SwarmOrchestrator
-from mcp_server.swarm.swarm_runner import SwarmRunner, KK_ROSTER
+from .lifecycle_manager import LifecycleManager, ResourceBudget
+from .reputation_bridge import ReputationBridge
+from .swarm_orchestrator import SwarmOrchestrator
+from .swarm_runner import SwarmRunner, KK_ROSTER
 
 logger = logging.getLogger("swarm_daemon")
 

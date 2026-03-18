@@ -18,4 +18,6 @@ collect_ignore_glob = [
     # Level 2/3 integration tests (require running server + network)
     "tests/test_integration_level2.py",
     "tests/test_level3_e2e.py",
+    # KK scenarios test (imports from EM's integrations.erc8004 — requires EM on PYTHONPATH)
+    "tests/test_kk_scenarios.py",
 ]

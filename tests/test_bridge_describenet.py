@@ -9,14 +9,14 @@ This closes the evidence triangle:
 """
 
 import pytest
-from unittest.mock import AsyncMock, patch
+from unittest.mock import AsyncMock, MagicMock, patch
 from datetime import datetime, timezone
 
-from mcp_server.swarm.reputation_bridge import (
+from lib.swarm.reputation_bridge import (
     ReputationBridge,
     ReputationSource,
 )
-from mcp_server.swarm.describenet_reader import (
+from lib.swarm.describenet_reader import (
     DescribeNetReader,
     DescribeNetReputation,
     SealScore,
@@ -321,13 +321,20 @@ class TestBridgeDescribeNetIntegration:
     """Test that ReputationBridge properly reads from describe-net."""
 
     @pytest.fixture(autouse=True)
-    async def _enable_describenet(self):
-        """Enable describenet feature flag for all tests in this class."""
-        with patch(
-            "config.platform_config.PlatformConfig.is_feature_enabled",
-            new_callable=AsyncMock,
-            return_value=True,
-        ):
+    def _enable_describenet(self):
+        """Enable describenet feature flag for all tests in this class.
+
+        The feature flag lives in config.platform_config (EM project), so we
+        create a lightweight mock module to satisfy the import inside
+        ReputationBridge._get_on_chain_reputation().
+        """
+        mock_config = MagicMock()
+        mock_platform = MagicMock()
+        mock_platform.PlatformConfig.is_feature_enabled = AsyncMock(return_value=True)
+        with patch.dict("sys.modules", {
+            "config": mock_config,
+            "config.platform_config": mock_platform,
+        }):
             yield
 
     @pytest.fixture
@@ -368,7 +375,7 @@ class TestBridgeDescribeNetIntegration:
         bridge_data = reader.to_bridged_format(mock_describenet_rep)
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=bridge_data,
         ):
@@ -384,7 +391,7 @@ class TestBridgeDescribeNetIntegration:
     async def test_bridge_handles_no_seals(self, bridge):
         """Bridge gracefully handles wallets with no seals."""
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=None,
         ):
@@ -395,7 +402,7 @@ class TestBridgeDescribeNetIntegration:
     async def test_bridge_handles_import_error(self, bridge):
         """Bridge falls back gracefully if describenet_reader not available."""
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             side_effect=ImportError("No module"),
         ):
             result = await bridge._read_chain_reputation("0xtest")
@@ -405,7 +412,7 @@ class TestBridgeDescribeNetIntegration:
     async def test_bridge_handles_rpc_error(self, bridge):
         """Bridge handles RPC failures from describe-net reader."""
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             side_effect=ConnectionError("RPC timeout"),
         ):
@@ -419,7 +426,7 @@ class TestBridgeDescribeNetIntegration:
         bridge_data = reader.to_bridged_format(mock_describenet_rep)
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=bridge_data,
         ):
@@ -462,7 +469,7 @@ class TestBridgeDescribeNetIntegration:
         bridge_data = reader.to_bridged_format(mock_describenet_rep)
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=bridge_data,
         ):
@@ -483,7 +490,7 @@ class TestBridgeDescribeNetIntegration:
         bridge_data = reader.to_bridged_format(mock_describenet_rep)
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=bridge_data,
         ):
@@ -505,7 +512,7 @@ class TestBridgeDescribeNetIntegration:
     async def test_sync_em_to_chain_with_delta(self, bridge):
         """Sync to chain only happens when score delta exceeds threshold."""
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value={
                 "score": 80.0,
@@ -525,7 +532,7 @@ class TestBridgeDescribeNetIntegration:
     async def test_empty_bridge_data_ignored(self, bridge):
         """Bridge data with 0 ratings is treated as no data."""
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value={
                 "score": 0.0,
@@ -555,13 +562,15 @@ class TestEvidenceTriangle:
     """
 
     @pytest.fixture(autouse=True)
-    async def _enable_describenet(self):
+    def _enable_describenet(self):
         """Enable describenet feature flag for all tests in this class."""
-        with patch(
-            "config.platform_config.PlatformConfig.is_feature_enabled",
-            new_callable=AsyncMock,
-            return_value=True,
-        ):
+        mock_config = MagicMock()
+        mock_platform = MagicMock()
+        mock_platform.PlatformConfig.is_feature_enabled = AsyncMock(return_value=True)
+        with patch.dict("sys.modules", {
+            "config": mock_config,
+            "config.platform_config": mock_platform,
+        }):
             yield
 
     def test_evidence_hierarchy_ordering(self):
@@ -645,7 +654,7 @@ class TestEvidenceTriangle:
         }
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=chain_data,
         ):
@@ -688,7 +697,7 @@ class TestEvidenceTriangle:
         }
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=chain_data,
         ):
@@ -716,7 +725,7 @@ class TestEvidenceTriangle:
         }
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=chain_data,
         ):
@@ -730,7 +739,7 @@ class TestEvidenceTriangle:
         bridge = ReputationBridge(dry_run=True)
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=None,
         ):
@@ -746,6 +755,18 @@ class TestEvidenceTriangle:
 
 class TestCachingBehavior:
     """Test that caching works correctly for describe-net reads."""
+
+    @pytest.fixture(autouse=True)
+    def _enable_describenet(self):
+        """Mock config module for feature flag."""
+        mock_config = MagicMock()
+        mock_platform = MagicMock()
+        mock_platform.PlatformConfig.is_feature_enabled = AsyncMock(return_value=True)
+        with patch.dict("sys.modules", {
+            "config": mock_config,
+            "config.platform_config": mock_platform,
+        }):
+            yield
 
     @pytest.mark.asyncio
     async def test_reader_cache_hit(self):
@@ -785,7 +806,7 @@ class TestCachingBehavior:
         assert len(bridge._cache) == 0
 
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=None,
         ):
@@ -800,6 +821,18 @@ class TestCachingBehavior:
 
 class TestEdgeCases:
     """Edge cases and boundary conditions."""
+
+    @pytest.fixture(autouse=True)
+    def _enable_describenet(self):
+        """Mock config module for feature flag."""
+        mock_config = MagicMock()
+        mock_platform = MagicMock()
+        mock_platform.PlatformConfig.is_feature_enabled = AsyncMock(return_value=True)
+        with patch.dict("sys.modules", {
+            "config": mock_config,
+            "config.platform_config": mock_platform,
+        }):
+            yield
 
     def test_zero_count_quadrants(self):
         """Worker avg with zero counts doesn't divide by zero."""
@@ -840,7 +873,7 @@ class TestEdgeCases:
         """Bridge normalizes wallet addresses to lowercase."""
         bridge = ReputationBridge(dry_run=True)
         with patch(
-            "mcp_server.swarm.describenet_reader.read_describenet_for_bridge",
+            "lib.swarm.describenet_reader.read_describenet_for_bridge",
             new_callable=AsyncMock,
             return_value=None,
         ):

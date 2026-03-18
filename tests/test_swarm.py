@@ -10,18 +10,18 @@ Tests cover:
 import pytest
 from datetime import datetime, timezone, timedelta
 
-from mcp_server.swarm.reputation_bridge import (
+from lib.swarm.reputation_bridge import (
     ReputationBridge,
     BridgedReputation,
     ReputationSource,
 )
-from mcp_server.swarm.lifecycle_manager import (
+from lib.swarm.lifecycle_manager import (
     LifecycleManager,
     AgentState,
     AgentStatus,
     ResourceBudget,
 )
-from mcp_server.swarm.swarm_orchestrator import (
+from lib.swarm.swarm_orchestrator import (
     SwarmOrchestrator,
     AssignmentStrategy,
 )
@@ -322,7 +322,7 @@ class TestLifecycleManager:
         from datetime import datetime as _dt, timezone as _tz
 
         mock_dt = _dt(2026, 2, 23, 12, 0, 0, tzinfo=_tz.utc)
-        with patch("mcp_server.swarm.lifecycle_manager.datetime") as mock_datetime:
+        with patch("lib.swarm.lifecycle_manager.datetime") as mock_datetime:
             mock_datetime.now.return_value = mock_dt
             mock_datetime.side_effect = lambda *a, **kw: _dt(*a, **kw)
             result = self.lm.heartbeat("aurora", {"tokens": 100})
@@ -705,7 +705,7 @@ class TestSwarmIntegration:
         agent.usage.usd_spent_today = 0.48
         agent.usage.last_reset_date = mock_date_str
 
-        with patch("mcp_server.swarm.lifecycle_manager.datetime") as mock_datetime:
+        with patch("lib.swarm.lifecycle_manager.datetime") as mock_datetime:
             mock_datetime.now.return_value = mock_dt
             mock_datetime.side_effect = lambda *a, **kw: _dt(*a, **kw)
 

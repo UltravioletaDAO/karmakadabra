@@ -48,12 +48,12 @@ from typing import Optional, List
 # Add parent to path for imports
 sys.path.insert(0, str(Path(__file__).parent.parent.parent))
 
-from mcp_server.swarm.lifecycle_manager import (
+from .lifecycle_manager import (
     LifecycleManager,
     ResourceBudget,
 )
-from mcp_server.swarm.reputation_bridge import ReputationBridge
-from mcp_server.swarm.swarm_orchestrator import SwarmOrchestrator
+from .reputation_bridge import ReputationBridge
+from .swarm_orchestrator import SwarmOrchestrator
 
 
 logger = logging.getLogger("swarm_runner")

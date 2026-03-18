@@ -1,0 +1,944 @@
+{
+  "generated_at": "2026-03-11T03:11:19.237944+00:00",
+  "agent_count": 24,
+  "agents": {
+    "kk-coordinator": {
+      "agent_name": "kk-coordinator",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-validator": {
+      "agent_name": "kk-validator",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-karma-hello": {
+      "agent_name": "kk-karma-hello",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-skill-extractor": {
+      "agent_name": "kk-skill-extractor",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-soul-extractor": {
+      "agent_name": "kk-soul-extractor",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-voice-extractor": {
+      "agent_name": "kk-voice-extractor",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-abracadabra": {
+      "agent_name": "kk-abracadabra",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-3": {
+      "agent_name": "kk-agent-3",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-4": {
+      "agent_name": "kk-agent-4",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-5": {
+      "agent_name": "kk-agent-5",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-6": {
+      "agent_name": "kk-agent-6",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-7": {
+      "agent_name": "kk-agent-7",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-8": {
+      "agent_name": "kk-agent-8",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-9": {
+      "agent_name": "kk-agent-9",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-10": {
+      "agent_name": "kk-agent-10",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-11": {
+      "agent_name": "kk-agent-11",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-12": {
+      "agent_name": "kk-agent-12",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-13": {
+      "agent_name": "kk-agent-13",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-14": {
+      "agent_name": "kk-agent-14",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-15": {
+      "agent_name": "kk-agent-15",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-16": {
+      "agent_name": "kk-agent-16",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-17": {
+      "agent_name": "kk-agent-17",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-18": {
+      "agent_name": "kk-agent-18",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    },
+    "kk-agent-19": {
+      "agent_name": "kk-agent-19",
+      "agent_address": "",
+      "agent_id": 0,
+      "composite_score": 50.0,
+      "tier": "Plata",
+      "confidence": 0.0,
+      "layers": {
+        "on_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "off_chain": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        },
+        "transactional": {
+          "score": 50.0,
+          "confidence": 0.0,
+          "available": false
+        }
+      },
+      "weights_used": {
+        "on_chain": 0.3,
+        "off_chain": 0.4,
+        "transactional": 0.3
+      },
+      "sources_available": [],
+      "seal_type_scores": {},
+      "category_strengths": {}
+    }
+  },
+  "leaderboard": [
+    {
+      "rank": 1,
+      "agent": "kk-coordinator",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 2,
+      "agent": "kk-validator",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 3,
+      "agent": "kk-karma-hello",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 4,
+      "agent": "kk-skill-extractor",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 5,
+      "agent": "kk-soul-extractor",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 6,
+      "agent": "kk-voice-extractor",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 7,
+      "agent": "kk-abracadabra",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 8,
+      "agent": "kk-agent-3",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 9,
+      "agent": "kk-agent-4",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 10,
+      "agent": "kk-agent-5",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 11,
+      "agent": "kk-agent-6",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 12,
+      "agent": "kk-agent-7",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 13,
+      "agent": "kk-agent-8",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 14,
+      "agent": "kk-agent-9",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 15,
+      "agent": "kk-agent-10",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 16,
+      "agent": "kk-agent-11",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 17,
+      "agent": "kk-agent-12",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 18,
+      "agent": "kk-agent-13",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 19,
+      "agent": "kk-agent-14",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 20,
+      "agent": "kk-agent-15",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 21,
+      "agent": "kk-agent-16",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 22,
+      "agent": "kk-agent-17",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 23,
+      "agent": "kk-agent-18",
+      "score": 50.0,
+      "tier": "Plata"
+    },
+    {
+      "rank": 24,
+      "agent": "kk-agent-19",
+      "score": 50.0,
+      "tier": "Plata"
+    }
+  ]
+}

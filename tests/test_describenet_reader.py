@@ -16,7 +16,7 @@ import pytest
 from datetime import datetime, timezone, timedelta
 from unittest.mock import AsyncMock, patch
 
-from mcp_server.swarm.describenet_reader import (
+from lib.swarm.describenet_reader import (
     DescribeNetReader,
     DescribeNetReputation,
     SealScore,

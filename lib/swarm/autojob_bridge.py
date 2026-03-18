@@ -31,7 +31,7 @@ Integration modes:
     3. Fallback:   Uses orchestrator's built-in scoring (no AutoJob)
 
 Usage:
-    from mcp_server.swarm.autojob_bridge import AutoJobBridge
+    from .autojob_bridge import AutoJobBridge
 
     bridge = AutoJobBridge(mode="api", autojob_url="http://localhost:7860")
     rankings = await bridge.route_task(task_dict)

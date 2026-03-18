@@ -18,17 +18,17 @@ import pytest
 import time
 from datetime import datetime, timezone, timedelta
 
-from mcp_server.swarm.reputation_bridge import (
+from lib.swarm.reputation_bridge import (
     ReputationBridge,
     BridgedReputation,
     ReputationSource,
 )
-from mcp_server.swarm.lifecycle_manager import (
+from lib.swarm.lifecycle_manager import (
     LifecycleManager,
     AgentStatus,
     ResourceBudget,
 )
-from mcp_server.swarm.swarm_orchestrator import (
+from lib.swarm.swarm_orchestrator import (
     SwarmOrchestrator,
     AgentProfile,
     TaskAssignment,
